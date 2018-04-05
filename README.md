@@ -1,5 +1,5 @@
 #  sagrada-board-game
-![sagrada-box-image] ( ./sagrada-box.jpg =x300 )
+<img src="sagrada-box.jpg" width="35%"  ></img>
 ### Group number: 7
 ### Team:
 * __10503336__ - Belcao Matteo
