@@ -106,3 +106,8 @@ buildNumber.properties
 
 
 # End of https://www.gitignore.io/api/java,maven,intellij
+
+#added by us
+LM7.iml
+pom.xml
+
