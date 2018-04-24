@@ -1,6 +1,6 @@
 #  Sagrada board-game
 
-<div style="margin:auto; width:50%"><img src="sagrada-box.jpg" ></img></div>
+<img src="sagrada-box.jpg" height="400px" ></img>
 
 ### Group number: 7
 * __10503336__ - *Belcao Matteo*
