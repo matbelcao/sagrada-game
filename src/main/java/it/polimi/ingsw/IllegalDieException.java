@@ -1,4 +1,4 @@
 package it.polimi.ingsw;
 
-public class IllegalDieException {
+public class IllegalDieException extends Throwable {
 }

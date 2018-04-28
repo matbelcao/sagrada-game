@@ -1,4 +1,5 @@
 package it.polimi.ingsw;
 
-public class InvalidFaceValueException {
+class InvalidFaceValueException extends Throwable {
+
 }
