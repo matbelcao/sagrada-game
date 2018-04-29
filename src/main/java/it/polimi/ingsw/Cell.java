@@ -1,11 +1,19 @@
 package it.polimi.ingsw;
 
+/**
+ * This class represents a Cell in Schema Cards, it can contain a constraint and/or a die.
+ *
+ */
 
 public class Cell {
     private Constraint constraint;
     private Die die;
 
-
+    /**
+     * Tests whether a die respects the Cell specific constraint
+     * @param die die to be checked if it can be possibly be placed in the Cell.
+     * @return true iff the die respects the Cell constraint
+     */
     public Boolean canAcceptDie(Die die){
         if(this.constraint==null) {
             return true;
@@ -25,6 +33,11 @@ public class Cell {
         return false;
     }
 
+    /**
+     * Sets the new die in place.
+     * @param die die to be placed in the Cell
+     * @throws IllegalDieException if the die you're trying to place doesn't respect the contraint (this shouldn't be happening in the first place)
+     */
     public void setDie(Die die) throws IllegalDieException {
         if(canAcceptDie(die)){
             this.die=die;
@@ -33,10 +46,18 @@ public class Cell {
         }
     }
 
+    /**
+     * Allows to get the die placed in the Cell
+     * @return the Cell's die
+     */
     public Die getDie(){
         return this.die;
     }
 
+    /**
+     * Allows to set a new constraint
+     * @param constraint
+     */
     public void setConstraint( Constraint constraint){
         this.constraint=constraint;
     }
