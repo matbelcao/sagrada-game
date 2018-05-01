@@ -4,52 +4,52 @@
 	<!-- Public Objective cards 1 to 10 -->
 	<PubObjectiveCard id="1">
 		<name>Colori diversi - Riga [6]</name>
-		<imgSrc>..\..\..\..\..\img\PubObjectiveCard\1.png</imgSrc>
+		<imgSrc>src\img\PubObjectiveCard\1.png</imgSrc>
 		<description>Righe senza colori ripetuti</description>
 	</PubObjectiveCard>
 	<PubObjectiveCard id="2">
 		<name>Colori diversi - Colonna [5]</name>
-		<imgSrc>..\..\..\..\..\img\PubObjectiveCard\2.png</imgSrc>
+		<imgSrc>src\img\PubObjectiveCard\2.png</imgSrc>
 		<description>Colonne senza colori ripetuti</description>
 	</PubObjectiveCard>
 	<PubObjectiveCard id="3">
 		<name>Sfumature diverse - Riga [5]</name>
-		<imgSrc>..\..\..\..\..\img\PubObjectiveCard\3.png</imgSrc>
+		<imgSrc>src\img\PubObjectiveCard\3.png</imgSrc>
 		<description>Righe senza sfumature ripetute</description>
 	</PubObjectiveCard>
 	<PubObjectiveCard id="4">
 		<name>Sfumature diverse - Colonna [4]</name>
-		<imgSrc>..\..\..\..\..\img\PubObjectiveCard\4.png</imgSrc>
+		<imgSrc>src\img\PubObjectiveCard\4.png</imgSrc>
 		<description>Colonne senza sfumature ripetute</description>
 	</PubObjectiveCard>
 	<PubObjectiveCard id="5">
 		<name>Sfumature Chiare [2]</name>
-		<imgSrc>..\..\..\..\..\img\PubObjectiveCard\5.png</imgSrc>
+		<imgSrc>src\img\PubObjectiveCard\5.png</imgSrc>
 		<description>Set di 1 e 2 ovunque</description>
 	</PubObjectiveCard>
 	<PubObjectiveCard id="6">
 		<name>Sfumature Medie [2]</name>
-		<imgSrc>..\..\..\..\..\img\PubObjectiveCard\6.png</imgSrc>
+		<imgSrc>src\img\PubObjectiveCard\6.png</imgSrc>
 		<description>Set di 3 e 4 ovunque</description>
 	</PubObjectiveCard>
 	<PubObjectiveCard id="7">
 		<name>Sfumature Scure [2]</name>
-		<imgSrc>..\..\..\..\..\img\PubObjectiveCard\7.png</imgSrc>
+		<imgSrc>src\img\PubObjectiveCard\7.png</imgSrc>
 		<description>Set di 5 e 6 ovunque</description>
 	</PubObjectiveCard>
 	<PubObjectiveCard id="8">
 		<name>Sfumature Diverse [5]</name>
-		<imgSrc>..\..\..\..\..\img\PubObjectiveCard\8.png</imgSrc>
+		<imgSrc>src\img\PubObjectiveCard\8.png</imgSrc>
 		<description>Set di dadi di ogni valore ovunque</description>
 	</PubObjectiveCard>
 	<PubObjectiveCard id="9">
 		<name>Diagonali Colorate [#]</name>
-		<imgSrc>..\..\..\..\..\img\PubObjectiveCard\9.png</imgSrc>
+		<imgSrc>src\img\PubObjectiveCard\9.png</imgSrc>
 		<description>Numero di dadi dello stesso colore diagonalmente adiacenti</description>
 	</PubObjectiveCard>
 	<PubObjectiveCard id="10">
 		<name>Varietà di Colore [4]</name>
-		<imgSrc>..\..\..\..\..\img\PubObjectiveCard\10.png</imgSrc>
+		<imgSrc>src\img\PubObjectiveCard\10.png</imgSrc>
 		<description>Set di dadi di ogni colore ovunque</description>
 	</PubObjectiveCard>
 </Cards>

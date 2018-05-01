@@ -4,7 +4,6 @@
 	<!-- Schema cards 1 to 24 (odd -> front , even -> back) -->
 	<SchemaCard id="1">
 		<name>Kaleidoscopic Dream</name>
-		<imgSrc>src\img\SchemaCard\1.png</imgSrc>
 		<token>4</token>
 		<constraint>
 			<row>0</row>
@@ -69,7 +68,6 @@
 	</SchemaCard>
 	<SchemaCard id="2">
 		<name>Firmitas</name>
-		<imgSrc>src\img\SchemaCard\2.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
@@ -139,7 +137,6 @@
 	</SchemaCard>
 	<SchemaCard id="3">
 		<name>Fractal Drops</name>
-		<imgSrc>src\img\SchemaCard\3.png</imgSrc>
 		<token>3</token>
 		<constraint>
 			<row>0</row>
@@ -194,7 +191,6 @@
 	</SchemaCard>
 	<SchemaCard id="4">
 		<name>Ripples of Light</name>
-		<imgSrc>src\img\SchemaCard\4.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
@@ -269,7 +265,6 @@
 	</SchemaCard>
 	<SchemaCard id="5">
 		<name>Lux Mundi</name>
-		<imgSrc>src\img\SchemaCard\5.png</imgSrc>
 		<token>6</token>
 		<constraint>
 			<row>0</row>
@@ -344,7 +339,6 @@
 	</SchemaCard>
 	<SchemaCard id="6">
 		<name>Lux Astram</name>
-		<imgSrc>src\img\SchemaCard\6.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
@@ -419,7 +413,6 @@
 	</SchemaCard>
 	<SchemaCard id="7">
 		<name>Gravitas</name>
-		<imgSrc>src\img\SchemaCard\7.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
@@ -484,7 +477,6 @@
 	</SchemaCard>
 	<SchemaCard id="8">
 		<name>Water of Life</name>
-		<imgSrc>src\img\SchemaCard\8.png</imgSrc>
 		<token>6</token>
 		<constraint>
 			<row>0</row>
@@ -559,7 +551,6 @@
 	</SchemaCard>
 	<SchemaCard id="9">
 		<name>Sun Catcher</name>
-		<imgSrc>src\img\SchemaCard\9.png</imgSrc>
 		<token>3</token>
 		<constraint>
 			<row>0</row>
@@ -614,7 +605,6 @@
 	</SchemaCard>
 	<SchemaCard id="10">
 		<name>Shadow Thief</name>
-		<imgSrc>src\img\SchemaCard\10.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
@@ -684,7 +674,6 @@
 	</SchemaCard>
 	<SchemaCard id="11">
 		<name>Aurorae Mangnificus</name>
-		<imgSrc>src\img\SchemaCard\11.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
@@ -754,7 +743,6 @@
 	</SchemaCard>
 	<SchemaCard id="12">
 		<name>Aurora Sagradis</name>
-		<imgSrc>src\img\SchemaCard\12.png</imgSrc>
 		<token>4</token>
 		<constraint>
 			<row>0</row>
@@ -814,7 +802,6 @@
 	</SchemaCard>
 	<SchemaCard id="13">
 		<name>Symphony of Light</name>
-		<imgSrc>src\img\SchemaCard\13.png</imgSrc>
 		<token>6</token>
 		<constraint>
 			<row>0</row>
@@ -884,7 +871,6 @@
 	</SchemaCard>
 	<SchemaCard id="14">
 		<name>Virtus</name>
-		<imgSrc>src\img\SchemaCard\14.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
@@ -954,7 +940,6 @@
 	</SchemaCard>
 	<SchemaCard id="15">
 		<name>Firelight</name>
-		<imgSrc>src\img\SchemaCard\15.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
@@ -1024,7 +1009,6 @@
 	</SchemaCard>
 	<SchemaCard id="16">
 		<name>Sun's Glory</name>
-		<imgSrc>src\img\SchemaCard\16.png</imgSrc>
 		<token>6</token>
 		<constraint>
 			<row>0</row>
@@ -1099,7 +1083,6 @@
 	</SchemaCard>
 	<SchemaCard id="17">
 		<name>Batllo</name>
-		<imgSrc>src\img\SchemaCard\17.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
@@ -1174,7 +1157,6 @@
 	</SchemaCard>
 	<SchemaCard id="18">
 		<name>Bellesguard</name>
-		<imgSrc>src\img\SchemaCard\18.png</imgSrc>
 		<token>3</token>
 		<constraint>
 			<row>0</row>
@@ -1234,7 +1216,6 @@
 	</SchemaCard>
 	<SchemaCard id="19">
 		<name>Fulgor del Cielo</name>
-		<imgSrc>src\img\SchemaCard\19.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
@@ -1304,7 +1285,6 @@
 	</SchemaCard>
 	<SchemaCard id="20">
 		<name>Luz Celestial</name>
-		<imgSrc>src\img\SchemaCard\20.png</imgSrc>
 		<token>3</token>
 		<constraint>
 			<row>0</row>
@@ -1359,7 +1339,6 @@
 	</SchemaCard>
 	<SchemaCard id="21">
 		<name>Chromatic Splendor</name>
-		<imgSrc>src\img\SchemaCard\21.png</imgSrc>
 		<token>4</token>
 		<constraint>
 			<row>0</row>
@@ -1424,7 +1403,6 @@
 	</SchemaCard>
 	<SchemaCard id="22">
 		<name>Comitas</name>
-		<imgSrc>src\img\SchemaCard\22.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
@@ -1489,7 +1467,6 @@
 	</SchemaCard>
 	<SchemaCard id="23">
 		<name>Via Lux</name>
-		<imgSrc>src\img\SchemaCard\23.png</imgSrc>
 		<token>4</token>
 		<constraint>
 			<row>0</row>
@@ -1554,7 +1531,6 @@
 	</SchemaCard>
 	<SchemaCard id="24">
 		<name>Industria</name>
-		<imgSrc>src\img\SchemaCard\24.png</imgSrc>
 		<token>5</token>
 		<constraint>
 			<row>0</row>
