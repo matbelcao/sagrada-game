@@ -68,7 +68,6 @@ public enum Face {
      * Gets the utf code for the CLI representation of the die face
      * @return the string containing the utf java code for the CLI
      */
-
     public String getUtf(){
         return this.utf;
     }

@@ -68,6 +68,6 @@ public class SchemaCard extends Card {
      * @return die pornter
      */
     public Die getCellConstraint(int row, int column){
-        return cell[].getDie();
+        return cell[row][column].getDie();
     }
 }

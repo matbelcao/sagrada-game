@@ -39,7 +39,7 @@ public class Die {
      */
     public void increaseShade () throws IllegalShadeException{
         if(this.shade.toInt()==6){
-            throw new IllegalShadeException;
+            throw new IllegalShadeException();
         }
         this.shade = Face.valueOf(this.shade.toInt() + 1);
     }
@@ -50,13 +50,13 @@ public class Die {
      */
     public void decreaseShade () throws IllegalShadeException{
         if(this.shade.toInt()==1){
-            throw new IllegalShadeException;
+            throw new IllegalShadeException();
         }
         this.shade = Face.valueOf(this.shade.toInt() - 1);
     }
 
     /**
-     * Flips the shade of the die
+     * Flips die and sets the opposite face's shade
      */
     public void flipShade (){
         try {
@@ -67,11 +67,11 @@ public class Die {
     }
 
     /**
-     *
-     * @param shade
+     * Sets a new shade to the die
+     * @param shade the new shade to be set
      */
-    public void setShade(int shade){
-
+    public void setShade(int shade) throws IllegalShadeException{
+        this.shade = Face.valueOf(shade);
     }
 
     /**
