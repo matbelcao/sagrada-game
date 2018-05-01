@@ -9,15 +9,15 @@ public abstract class Card {
     private int id;
 
     /**
-     * Initialize the common parameters
-     * @param name name of the card
-     * @param imgSrc directory path of the image
-     * @param id unique id of the card
+     * Changes the card properties
+     * @param name card name
+     * @param imgSrc image path
+     * @param id card id
      */
-    public Card(String name, String imgSrc, int id){
+    protected void setParam(String name, String imgSrc, int id){
         this.name = new String(name);
-        this.imgSrc = new String(imgSrc);
-        this.id = id;
+        this.imgSrc = new String (imgSrc);
+        this.id=id;
     }
 
     /**
