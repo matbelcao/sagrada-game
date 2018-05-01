@@ -173,7 +173,7 @@ public class SchemaCard extends Card implements Iterable{
 
 
 
-    
+
 
     /**
      * Instantiates an iterator for cells containing a die
