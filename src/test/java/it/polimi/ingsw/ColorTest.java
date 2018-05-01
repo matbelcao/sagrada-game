@@ -18,4 +18,5 @@ public class ColorTest {
         assertFalse(Color.contains("a")); //random test case
 
     }
+
 }
