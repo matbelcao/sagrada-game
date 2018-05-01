@@ -27,9 +27,9 @@ public class DieIterator implements Iterator {
      * @return true if there's a valid die
      */
     public boolean hasNext() {
-        while(index<20){
-            if(this.cells[index/5][index%5].getDie()!=null){
-                next=this.cells[index/5][index%5];
+        while(index < SchemaCard.NUM_COLS*SchemaCard.NUM_ROWS){
+            if(this.cells[index/SchemaCard.NUM_COLS][index%SchemaCard.NUM_COLS].getDie()!=null){
+                next=this.cells[index/SchemaCard.NUM_COLS][index%SchemaCard.NUM_COLS];
                 return true;
             }
             index++;
@@ -55,7 +55,7 @@ public class DieIterator implements Iterator {
      * @return the row of the cell
      */
     public int getRow(){
-        return (index-1)/5;
+        return (index-1)/SchemaCard.NUM_COLS;
     }
 
     /**
@@ -63,7 +63,7 @@ public class DieIterator implements Iterator {
      * @return the column of the cell
      */
     public int getColumn(){
-        return (index-1)%5;
+        return (index-1)%SchemaCard.NUM_COLS;
     }
 
     public void remove() {

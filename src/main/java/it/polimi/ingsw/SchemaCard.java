@@ -22,7 +22,7 @@ public class SchemaCard extends Card implements Iterable{
     private int favorTokens;
     private Cell cell [][];
     private Boolean isFirstDie;
-
+    static final int NUM_COLS=5,NUM_ROWS=4;
     /**
      * Retrieves the SchemaCard(id) data from the xml file and instantiates it
      * @param id ToolCard id
@@ -31,7 +31,7 @@ public class SchemaCard extends Card implements Iterable{
     public SchemaCard(int id, String xmlSrc){
         super();
 
-        cell = new Cell[4][5];
+        cell = new Cell[NUM_ROWS][NUM_COLS];
 
         File xmlFile= new File(xmlSrc);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -63,65 +63,141 @@ public class SchemaCard extends Card implements Iterable{
         }
     }
 
-    public ArrayList<Cell> canBePlacedHere(Die die){
-        int row,column;
-        ArrayList <Cell> list= new ArrayList();
+    /**
+     * Calculates and returns a list of integers that are the indexes (from 0 to 19) where the die could be placed
+     * @param die the die we want to place
+     * @return the list of valid positions for the die
+     */
+    public ArrayList<Integer> listPossiblePlacements(Die die){
+        int row;
+        int column;
+        DieIterator dice;
+        Integer index;
+        ArrayList <Integer> list= new ArrayList();
+
         if(isFirstDie){
             //first and last rows
-            for(row=0,column=0; column < 5;column++){
+
+            for(row=0,column=0; column < NUM_COLS; column++){
                 if(this.cell[row][column].canAcceptDie(die)){
-                    list.add(this.cell[row][column]);
+                    list.add(row * NUM_COLS + column);
                 }
-                if(this.cell[row+3][column].canAcceptDie(die)){
-                    list.add(this.cell[row][column]);
+                if(this.cell[row+NUM_ROWS-1][column].canAcceptDie(die)){
+                    list.add((row+NUM_ROWS-1) * NUM_COLS + column);
                 }
             }
             //first and last columns
-            for(row=0,column=0; row<3;row++){
+            for(row=0,column=0; row<NUM_ROWS-1;row++){
                 if(this.cell[row][column].canAcceptDie(die)){
-                    list.add(this.cell[row][column]);
+                    list.add(row * NUM_COLS );
                 }
-                if(this.cell[row][column+4].canAcceptDie(die)){
-                    list.add(this.cell[row][column]);
+                if(this.cell[row][column+NUM_COLS-1].canAcceptDie(die)){
+                    list.add(row * NUM_COLS + NUM_COLS-1);
                 }
+            }
+        }else{
+            dice=new DieIterator(cell);
+            while(dice.hasNext()){
+                dice.next();
+                for(int i=-1; i<2; i++){
+                    for(int j=-1; j<2; j++){
+                        if((i!=0 && j!=0) && (dice.getRow()+i>=0 && dice.getRow()+i<NUM_ROWS && dice.getColumn()+j>=0 && dice.getColumn()+j<NUM_COLS)){
+                            index=(dice.getRow()+i)*NUM_COLS + (dice.getColumn()+j);
+                            if(!list.contains(index)) {
+                                if(canBePlacedHere(dice.getRow()+i,dice.getColumn()+j,die)){
+                                    list.add(index);
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
         }
         return list;
     }
 
+    /**
+     * Checks whether or not a die can be placed in a cell that is known to be adiacent to a die that is already placed
+     * @param row  the row of the cell to be checked
+     * @param column the column of the cell to be checked
+     * @param die the die we want to place
+     * @return true iff the die can be placed there
+     */
+    private Boolean canBePlacedHere(int row,int column, Die die){
+        if(!this.cell[row][column].canAcceptDie(die)){
+            return false;
+        }
+        if(row > 0){
+            if(this.cell[row - 1][column].getDie()!=null) {
+                if (this.cell[row - 1][column].getDie().getColor().equals(die.getColor()) || this.cell[row - 1][column].getDie().getShade().equals(die.getShade())) {
+                    return false;
+                }
+            }
+        }
+        if(row < 3){
+            if(this.cell[row + 1][column].getDie()!=null) {
+                if (this.cell[row + 1][column].getDie().getColor().equals(die.getColor()) || this.cell[row + 1][column].getDie().getShade().equals(die.getShade())) {
+                    return false;
+                }
+            }
+        }
+        if(column > 0){
+            if(this.cell[row][column - 1].getDie()!=null) {
+                if (this.cell[row][column - 1].getDie().getColor().equals(die.getColor()) || this.cell[row][column - 1].getDie().getShade().equals(die.getShade())) {
+                    return false;
+                }
+            }
+        }
+        if(column < 4){
+            if(this.cell[row][column + 1].getDie()!=null) {
+                if (this.cell[row][column + 1].getDie().getColor().equals(die.getColor()) || this.cell[row][column + 1].getDie().getShade().equals(die.getShade())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     /**
      * Puts the die in place if possible, if not an exception is thrown
+     * @param index index (0 to 19) where the die is going to be put
      * @param die die to be put
-     * @param row row of the schema card
-     * @param column column of the schema card
-     * @throws IllegalDieException
      */
-    public void putDie (Die die, int row, int column) throws IllegalDieException{
+    public void putDie (Integer index,Die die)throws IllegalDieException{
 
+        assert this.listPossiblePlacements(die).contains(index);
+
+        this.cell[index/NUM_COLS][index%NUM_COLS].setDie(die);
         }
 
-    /**
-     * Returns the die in the cell(x,y) or NULL if it's empty
-     * @param row x coordinate
-     * @param column y coordinate
-     * @return die pornter
-     */
-    public Die getCellConstraint(int row, int column){
-        return cell[row][column].getDie();
-    }
 
+
+    
+
+    /**
+     * Instantiates an iterator for cells containing a die
+     * @return iterator on cells that contain a die
+     */
     @NotNull
     @Override
     public Iterator iterator() {
         return new DieIterator(this.cell);
     }
 
+    /**
+     * This method has not been implemented
+     * @param action
+     */
     @Override
     public void forEach(Consumer action) {
 
     }
 
+    /**
+     * This method hasn't been implemented
+     * @return spliterator
+     */
     @Override
     public Spliterator spliterator() {
         return null;

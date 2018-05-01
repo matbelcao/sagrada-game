@@ -38,7 +38,7 @@ public class Cell {
     /**
      * Sets the new die in place.
      * @param die die to be placed in the Cell
-     * @throws IllegalDieException if the die you're trying to place doesn't respect the contraint (this shouldn't be happening in the first place)
+     * @throws IllegalDieException if the die you're trying to place doesn't respect the constraint (this shouldn't be happening in the first place)
      */
     public void setDie(Die die) throws IllegalDieException {
         if(canAcceptDie(die)){
