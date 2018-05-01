@@ -9,7 +9,7 @@ import org.xml.sax.SAXException;
 public class ToolCard extends Card{
     private boolean used;
     private String description;
-    //private ToolAction tool;
+    private ToolAction tool;
 
     /**
      * Retrieve from the xml file the ToolCard(id) data and instantiate it
