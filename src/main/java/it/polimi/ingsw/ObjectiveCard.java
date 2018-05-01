@@ -10,7 +10,6 @@ import org.xml.sax.SAXException;
  * This abstract class is useful to the subclasses [PrivObjectiveCard and PubObjectiveCard ] to initialize common parameters
  */
 public abstract class ObjectiveCard extends Card{
-    private String description;
 
     /**
      * Retrieve from the xml file the ObjectiveCard(id) data and instantiate it
@@ -37,8 +36,7 @@ public abstract class ObjectiveCard extends Card{
             for (int temp = 0; temp < nodeList.getLength() && (temp-1)!=id; temp++) {
                 Element eElement = (Element)nodeList.item(temp);
                 if(Integer.parseInt(eElement.getAttribute("id"))==id){
-                    super.setParam(eElement.getElementsByTagName("name").item(0).getTextContent(),eElement.getElementsByTagName("imgSrc").item(0).getTextContent(),id);
-                    description = new String(eElement.getElementsByTagName("description").item(0).getTextContent());
+                    super.setParam(eElement.getElementsByTagName("name").item(0).getTextContent(),eElement.getElementsByTagName("imgSrc").item(0).getTextContent(),eElement.getElementsByTagName("description").item(0).getTextContent(),id);
                 }
             }
         }catch (SAXException e1) {
@@ -50,19 +48,4 @@ public abstract class ObjectiveCard extends Card{
         }
     }
 
-    /**
-     * Changes the ObjectiveCard properties
-     * @param description card description
-     */
-    protected void setDescription(String description){
-        this.description=new String(description);
-    }
-
-    /**
-     * Returns the ObjectiveCard description
-     * @return card description
-     */
-    public String getDescription(){
-        return new String(description);
-    }
 }

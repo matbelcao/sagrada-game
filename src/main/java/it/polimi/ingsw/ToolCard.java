@@ -8,7 +8,6 @@ import org.xml.sax.SAXException;
 
 public class ToolCard extends Card{
     private boolean used;
-    private String description;
     //private ToolAction tool;
 
     /**
@@ -30,9 +29,8 @@ public class ToolCard extends Card{
             for (int temp = 0; temp < nodeList.getLength() && (temp-1)!=id; temp++) {
                 Element eElement = (Element)nodeList.item(temp);
                 if(Integer.parseInt(eElement.getAttribute("id"))==id){
-                    super.setParam(eElement.getElementsByTagName("name").item(0).getTextContent(),eElement.getElementsByTagName("imgSrc").item(0).getTextContent(),id);
-                    description = new String(eElement.getElementsByTagName("description").item(0).getTextContent());
-                    used=false;
+                    super.setParam(eElement.getElementsByTagName("name").item(0).getTextContent(),eElement.getElementsByTagName("imgSrc").item(0).getTextContent(),eElement.getElementsByTagName("description").item(0).getTextContent(),id);
+                    this.used=false;
                 }
             }
         }catch (SAXException e1) {
@@ -45,19 +43,11 @@ public class ToolCard extends Card{
     }
 
     /**
-     * Returns the ToolCard description
-     * @return ToolCard description
-     */
-    public String getDescription(){
-        return new String(description);
-    }
-
-    /**
      * Return if the toolcard has been used during the game
      * @return true if it has been used, false if not
      */
     public boolean hasBeenUsed(){
-        return used;
+        return this.used;
     }
 
 

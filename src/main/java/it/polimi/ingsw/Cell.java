@@ -1,5 +1,7 @@
 package it.polimi.ingsw;
 
+
+
 /**
  * This class represents a Cell in Schema Cards, it can contain a constraint and/or a die.
  *
@@ -15,7 +17,7 @@ public class Cell {
      * @return true iff the die respects the Cell constraint
      */
     public Boolean canAcceptDie(Die die){
-        if(this.constraint==null) {
+        if(this.constraint==null || !this.constraint.isActive()) {
             return true;
         }
 
@@ -55,10 +57,11 @@ public class Cell {
     }
 
     /**
-     * Allows to set a new constraint
-     * @param constraint
+     * Returns the cell's constraint
+     * @return cell's constraint
      */
-    public void setConstraint( Constraint constraint){
-        this.constraint=constraint;
+    public Constraint getConstraint(){
+        return this.constraint;
     }
+
 }

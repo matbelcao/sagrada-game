@@ -7,9 +7,10 @@ public class Constraint {
     private Color color;
     private Face shade;
     private Boolean isColorConstraint;
+    private Boolean isActive;
 
     /**
-     * Creates the object setting the correct type of contraint
+     * Creates the object setting the correct type of constraint
      * @param constraint a String describing the constraint (whether it is a color or a shade)
      */
     Constraint(String constraint){
@@ -20,6 +21,7 @@ public class Constraint {
             color = Color.valueOf(constraint);
             isColorConstraint= Boolean.TRUE;
         }
+        isActive=true;
     }
 
     /**
@@ -44,6 +46,22 @@ public class Constraint {
      */
     public Boolean isColorConstraint() {
         return this.isColorConstraint;
+    }
+
+    /**
+     * Checks if constraint is active
+     * @return true if the constraint is a color constraint
+     */
+    public Boolean isActive() {
+        return this.isActive;
+    }
+
+    /**
+     * Changes the status of the constraint
+     * @param status the new status of activity of the constraint
+     */
+    public void setActive(Boolean status){
+        this.isActive= status;
     }
 
     /**

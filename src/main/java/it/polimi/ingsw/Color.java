@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Contract;
  * This enum offers the set of colors (RED, GREEN, YELLOW, BLUE, PURPLE) needed to build the dice,
  * it also contains the ansi code to apply color to text in the CLI
  */
-public enum Color {
+public enum Color { //need to add png address combined with Face's ones
     RED("\u001B[31m" ),
     GREEN("\u001B[32m"),
     YELLOW("\u001B[33m"),

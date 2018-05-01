@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Contract;
 /**
  * This enum represents the possible faces (shades) of the game dice. The elements are immutable.
  */
-public enum Face {
+public enum Face { // need to add address for png of the face
     ONE(1,"\u2680"),
     TWO(2,"\u2681"),
     THREE(3,"\u2682"),
@@ -35,7 +35,7 @@ public enum Face {
      * @throws IllegalShadeException this is thrown if an invalid number is passed
      */
 
-    public static Face valueOf(int shade) throws IllegalShadeException {
+    public static Face valueOf(int shade) throws IllegalShadeException, NullPointerException{
         switch(shade) {
             case 1:
                 return Face.ONE;
