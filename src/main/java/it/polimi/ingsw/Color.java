@@ -29,7 +29,7 @@ public enum Color {
      * Gets the ansi color code
      * @return the Color ansi code for CLI
      */
-    @Contract(pure = true)
+
     public String ansi(){
         return ansi;
     }

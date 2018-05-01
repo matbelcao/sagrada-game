@@ -32,10 +32,10 @@ public enum Face {
      * Gets a die face through its int value instead of its string name
      * @param shade the number corresponding to the wanted face of the die
      * @return the instance of Face corresponding to the number
-     * @throws InvalidFaceValueException this is thrown if an invalid number is passed
+     * @throws IllegalShadeException this is thrown if an invalid number is passed
      */
-    @Contract(pure = true)
-    public static Face valueOf(int shade) throws InvalidFaceValueException {
+
+    public static Face valueOf(int shade) throws IllegalShadeException {
         switch(shade) {
             case 1:
                 return Face.ONE;
@@ -50,7 +50,7 @@ public enum Face {
             case 6:
                 return Face.SIX;
             default :
-                throw new InvalidFaceValueException();
+                throw new IllegalShadeException();
 
         }
     }
@@ -59,7 +59,7 @@ public enum Face {
      * Gets the integer value of the face of the die
      * @return the integer number between 1 and 6 corresponding to the Face
      */
-    @Contract(pure = true)
+
     public int toInt(){
         return this.shade;
     }
@@ -68,10 +68,11 @@ public enum Face {
      * Gets the utf code for the CLI representation of the die face
      * @return the string containing the utf java code for the CLI
      */
-    @Contract(pure = true)
+
     public String getUtf(){
         return this.utf;
     }
+
 
     /**
      * Checks whether a string is a valid Face name
@@ -79,13 +80,11 @@ public enum Face {
      * @return true iff the string equals the name of one of the listed shades
      */
     public static boolean contains(String shade) {
-
         for (Face c : Face.values()) {
             if (c.toString().equals(shade)) {
                 return true;
             }
         }
-
         return false;
     }
 }

@@ -8,16 +8,17 @@ import org.xml.sax.SAXException;
 
 public class SchemaCard extends Card {
     private int favorTokens;
-    private Cell cell [];
+    private Cell cell [][];
 
     /**
-     * Retrieve from the xml file the SchemaCard(id) data and instantiate it
+     * Retrieves the SchemaCard(id) data from the xml file and instantiates it
      * @param id ToolCard id
-     * @param xmlSrc xml path
+     * @param xmlSrc xml file path
      */
     public SchemaCard(int id, String xmlSrc){
         super();
-        cell = new Cell[20];
+
+        cell = new Cell[4][5];
 
         File xmlFile= new File(xmlSrc);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -28,7 +29,11 @@ public class SchemaCard extends Card {
             doc.getDocumentElement().normalize();
             NodeList nodeList = doc.getElementsByTagName("SchemaCard");
             for (int temp = 0; temp < nodeList.getLength() && (temp-1)!=id; temp++) {
+
                 Element eElement = (Element)nodeList.item(temp);
+
+                //va aggiunto caricamento constraints
+
                 if(Integer.parseInt(eElement.getAttribute("id"))==id){
                     super.setParam(eElement.getElementsByTagName("name").item(0).getTextContent(),eElement.getElementsByTagName("imgSrc").item(0).getTextContent(),id);
                     favorTokens = Integer.parseInt(eElement.getElementsByTagName("favor").item(0).getTextContent());
@@ -43,33 +48,26 @@ public class SchemaCard extends Card {
         }
     }
 
+
+
+
     /**
-     * Check if the cell(x,y) can be put the die and do it if it's possible
-     * @param d die tu put
-     * @param x x coordinate
-     * @param y y coordinate
-     * @return true if do it
+     * Puts the die in place if possible, if not an exception is thrown
+     * @param die die to be put
+     * @param row row of the schema card
+     * @param column column of the schema card
      */
-    public boolean putDie (Die d, int x, int y){
-            if ( x>=1 && y>=1 && cell[(x-1)*5+(y-1)].canAcceptDie(d)){
-                try{
-                    cell[x*5+y-1].setDie(d);
-                }catch (IllegalDieException ex){
-                    return false;
-                }
-                return true;
-            }else{
-                return false;
-            }
+    public void putDie (Die die, int row, int column) throws IllegalDieException{
+
         }
 
     /**
-     * Returns the die in the cell(x,y) or NULL if it's empry
-     * @param x x coordinate
-     * @param y y coordinate
+     * Returns the die in the cell(x,y) or NULL if it's empty
+     * @param row x coordinate
+     * @param column y coordinate
      * @return die pornter
      */
-    public Die getCellContent(int x, int y){
-        return cell[x*5+y-1].getDie();
+    public Die getCellConstraint(int row, int column){
+        return cell[].getDie();
     }
 }

@@ -18,7 +18,7 @@ public class Die {
     }
 
     /**
-     * Get the string name of the color of the die
+     * Gets the string name of the color of the die
      * @return a String tha is the name of the color of the die
      */
     public String getColor(){
@@ -26,11 +26,52 @@ public class Die {
     }
 
     /**
-     * Get the string name of the shade of the die
+     * Gets the string name of the shade of the die
      * @return a String that is the name of the shade of the die
      */
     public String getShade(){
         return this.shade!=null? this.shade.toString() : null;
+    }
+
+    /**
+     * Increases by one the shade of the die
+     * @throws IllegalShadeException if the shade is equal to SIX
+     */
+    public void increaseShade () throws IllegalShadeException{
+        if(this.shade.toInt()==6){
+            throw new IllegalShadeException;
+        }
+        this.shade = Face.valueOf(this.shade.toInt() + 1);
+    }
+
+    /**
+     * Decreases by one the shade of the die
+     * @throws IllegalShadeException if the shade is equal to ONE
+     */
+    public void decreaseShade () throws IllegalShadeException{
+        if(this.shade.toInt()==1){
+            throw new IllegalShadeException;
+        }
+        this.shade = Face.valueOf(this.shade.toInt() - 1);
+    }
+
+    /**
+     * Flips the shade of the die
+     */
+    public void flipShade (){
+        try {
+            this.shade = Face.valueOf(7 - this.shade.toInt());
+        } catch (IllegalShadeException e) { // this can never happen
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     * @param shade
+     */
+    public void setShade(int shade){
+
     }
 
     /**
