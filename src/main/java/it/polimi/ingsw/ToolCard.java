@@ -18,6 +18,7 @@ public class ToolCard extends Card{
     public ToolCard(int id, String xmlSrc){
         super();
 
+        String imgSrc;
         File xmlFile= new File(xmlSrc);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -25,11 +26,15 @@ public class ToolCard extends Card{
             dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
+
             NodeList nodeList = doc.getElementsByTagName("ToolCard");
             for (int temp = 0; temp < nodeList.getLength() && (temp-1)!=id; temp++) {
                 Element eElement = (Element)nodeList.item(temp);
+
                 if(Integer.parseInt(eElement.getAttribute("id"))==id){
-                    super.setParam(eElement.getElementsByTagName("name").item(0).getTextContent(),eElement.getElementsByTagName("imgSrc").item(0).getTextContent(),eElement.getElementsByTagName("description").item(0).getTextContent(),id);
+                    imgSrc= eElement.getElementsByTagName("imgSrc").item(0).getTextContent();
+                    imgSrc=imgSrc.replaceAll("[\\ ]", File.separator);
+                    super.setParam(eElement.getElementsByTagName("name").item(0).getTextContent(),imgSrc,eElement.getElementsByTagName("description").item(0).getTextContent(),id);
                     this.used=false;
                 }
             }
@@ -49,7 +54,5 @@ public class ToolCard extends Card{
     public boolean hasBeenUsed(){
         return this.used;
     }
-
-
 
 }

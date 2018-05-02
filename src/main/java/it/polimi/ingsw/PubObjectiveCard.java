@@ -1,8 +1,42 @@
 package it.polimi.ingsw;
+import java.io.File;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
 
-public class PubObjectiveCard extends ObjectiveCard{
+import java.io.IOException;
+import org.xml.sax.SAXException;
+
+public class PubObjectiveCard extends Card{
 
     public PubObjectiveCard(int id, String xmlSrc){
-        super(id,xmlSrc,"PubObjectiveCard");
+            super();
+
+            String imgSrc;
+            File xmlFile= new File(xmlSrc);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder;
+            NodeList nodeList;
+            try {
+                dBuilder = dbFactory.newDocumentBuilder();
+                Document doc = dBuilder.parse(xmlFile);
+                doc.getDocumentElement().normalize();
+
+                nodeList = doc.getElementsByTagName("PubObjectiveCard");
+
+                for (int temp = 0; temp < nodeList.getLength() && (temp-1)!=id; temp++) {
+                    Element eElement = (Element)nodeList.item(temp);
+                    if(Integer.parseInt(eElement.getAttribute("id"))==id){
+                        imgSrc= eElement.getElementsByTagName("imgSrc").item(0).getTextContent();
+                        imgSrc=imgSrc.replaceAll("[\\ ]", File.separator);
+                        super.setParam(eElement.getElementsByTagName("name").item(0).getTextContent(),imgSrc,eElement.getElementsByTagName("description").item(0).getTextContent(),id);
+                    }
+                }
+            }catch (SAXException e1) {
+                e1.printStackTrace();
+            }catch (ParserConfigurationException e2){
+                e2.printStackTrace();
+            }catch (IOException e3){
+                e3.printStackTrace();
+            }
     }
 }
