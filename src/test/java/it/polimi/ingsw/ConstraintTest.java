@@ -9,16 +9,16 @@ public class ConstraintTest {
     public void  colorConstraint(){
         Constraint test = new Constraint("RED");
         assertEquals(test.getColor(),"RED");
-        assertEquals(test.getShade(),null);
+        assertEquals(test.getShade(),"null");
         assertEquals(test.isColorConstraint(),Boolean.TRUE);
-        assertEquals("\u001B[31m\u25a0\u001B[0m",test.toString());
+        assertEquals("\u001B[31m\u25a0\u001B[0m",test.toUtf());
         }
     @Test
     public void  shadeConstraint(){
         Constraint test = new Constraint("ONE");
-        assertEquals(null, test.getColor());
+        assertEquals("null", test.getColor());
         assertEquals("ONE",test.getShade());
         assertEquals(Boolean.FALSE,test.isColorConstraint());
-        assertEquals("\u001B[0m\u2680",test.toString());
+        assertEquals("\u001B[0m\u2680",test.toUtf());
     }
     }

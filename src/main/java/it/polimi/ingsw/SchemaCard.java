@@ -58,7 +58,6 @@ public class SchemaCard extends Card implements Iterable{
                         row = Integer.parseInt(eElement.getElementsByTagName("row").item(temp2).getTextContent());
                         column = Integer.parseInt(eElement.getElementsByTagName("col").item(temp2).getTextContent());
                         cell[row][column]=new Cell(eElement.getElementsByTagName("data").item(temp2).getTextContent());
-                        System.out.println(row+"  "+column+"  "+eElement.getElementsByTagName("data").item(temp2).getTextContent());
                     }
                 }
             }

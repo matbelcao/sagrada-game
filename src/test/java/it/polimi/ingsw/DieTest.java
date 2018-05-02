@@ -18,7 +18,7 @@ class DieTest {
     void init() {
         assertEquals("ONE", test.getShade());
         assertEquals("RED", test.getColor());
-        assertEquals("\u001B[31m\u2680\u001B[0m", test.toString());
+        assertEquals("\u001B[31m\u2680\u001B[0m", test.toUtf());
     }
 
     @Test
