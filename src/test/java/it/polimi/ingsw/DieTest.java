@@ -59,28 +59,18 @@ class DieTest {
 
     @Test
     void decreaseException() {
-        assertThrows(IllegalShadeException.class,
-                () -> {
-                    test.decreaseShade();
-                });
+        assertThrows(IllegalShadeException.class,() -> test.decreaseShade());
     }
 
     @Test
     void increaseException() throws IllegalShadeException {
         test.setShade(6);
-        assertThrows(IllegalShadeException.class,
-                () -> {
-                    test.increaseShade();
-                });
-
+        assertThrows(IllegalShadeException.class,() -> test.increaseShade());
     }
+
     @Test
     void setException(){
-        assertThrows(IllegalShadeException.class,
-                () -> {
-                    test.setShade(0);
-                });
-
+        assertThrows(IllegalShadeException.class,() ->test.setShade(0));
     }
 
 }
