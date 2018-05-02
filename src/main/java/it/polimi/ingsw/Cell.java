@@ -12,6 +12,23 @@ public class Cell {
     private Die die;
 
     /**
+     * Default constructor
+     */
+    public Cell(){
+        this.constraint=null;
+        this.die=null;
+    }
+
+    /**
+     * Initializes a new cell with its constraint
+     * @param constraint name of the constraint
+     */
+    public Cell(String constraint){
+        this.constraint = new Constraint(constraint);
+        this.die=null;
+    }
+
+    /**
      * Tests whether a die respects the Cell specific constraint
      * @param die die to be checked if it can be possibly be placed in the Cell.
      * @return true iff the die respects the Cell constraint

@@ -56,6 +56,7 @@ public class Constraint {
         return this.isActive;
     }
 
+
     /**
      * Changes the status of the constraint
      * @param status the new status of activity of the constraint

@@ -23,6 +23,7 @@ public class SchemaCard extends Card implements Iterable{
     private Cell cell [][];
     private Boolean isFirstDie;
     static final int NUM_COLS=5,NUM_ROWS=4;
+
     /**
      * Retrieves the SchemaCard(id) data from the xml file and instantiates it
      * @param id ToolCard id
@@ -31,6 +32,7 @@ public class SchemaCard extends Card implements Iterable{
     public SchemaCard(int id, String xmlSrc){
         super();
 
+        int row,column;
         cell = new Cell[NUM_ROWS][NUM_COLS];
 
         File xmlFile= new File(xmlSrc);
@@ -40,20 +42,35 @@ public class SchemaCard extends Card implements Iterable{
             dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
+
             NodeList nodeList = doc.getElementsByTagName("SchemaCard");
-            for (int temp = 0; temp < nodeList.getLength() && (temp-1)!=id; temp++) {
+            for (int temp1 = 0; temp1 < nodeList.getLength() && (temp1-1)!=id; temp1++) {
 
-                Element eElement = (Element)nodeList.item(temp);
-
-                //va aggiunto caricamento constraints
+                Element eElement = (Element)nodeList.item(temp1);
 
                 if(Integer.parseInt(eElement.getAttribute("id"))==id){
                     this.name=eElement.getElementsByTagName("name").item(0).getTextContent();
                     this.id=id;
-                    this.favorTokens = Integer.parseInt(eElement.getElementsByTagName("favor").item(0).getTextContent());
+                    this.favorTokens = Integer.parseInt(eElement.getElementsByTagName("token").item(0).getTextContent());
                     this.isFirstDie=true;
+
+                    for (int temp2 = 0; temp2 < eElement.getElementsByTagName("data").getLength(); temp2++) {
+                        row = Integer.parseInt(eElement.getElementsByTagName("row").item(temp2).getTextContent());
+                        column = Integer.parseInt(eElement.getElementsByTagName("col").item(temp2).getTextContent());
+                        cell[row][column]=new Cell(eElement.getElementsByTagName("data").item(temp2).getTextContent());
+                        System.out.println(row+"  "+column+"  "+eElement.getElementsByTagName("data").item(temp2).getTextContent());
+                    }
                 }
             }
+
+            for (int i=0; i<NUM_ROWS ; i++){
+                for (int j=0; j<NUM_COLS ; j++){
+                    if (cell[i][j] == null){
+                        cell[i][j] = new Cell();
+                    }
+                }
+            }
+
         }catch (SAXException e1) {
             e1.printStackTrace();
         }catch (ParserConfigurationException e2){
@@ -61,6 +78,39 @@ public class SchemaCard extends Card implements Iterable{
         }catch (IOException e3){
             e3.printStackTrace();
         }
+    }
+
+    /**
+     * Returns the SchemaCard id
+     * @return id
+     */
+    public int getId(){
+        return this.id;
+    }
+
+    /**
+     * Returns the name of the SchemaCard
+     * @return name
+     */
+    public String getName(){ return this.name; }
+
+
+    /**
+     * Returns the SchemaCard favorTokens
+     * @return number of favorTokens
+     */
+    public int getFavorTokens(){
+        return this.favorTokens;
+    }
+
+    /**
+     * Returns the cell(row,column)
+     * @param row the cell's row
+     * @param column the cell's column
+     * @return the cell's reference
+     */
+    public Cell getCell(int row, int column){
+        return cell[row][column];
     }
 
     /**
