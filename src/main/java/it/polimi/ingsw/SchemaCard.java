@@ -113,6 +113,15 @@ public class SchemaCard extends Card implements Iterable{
     }
 
     /**
+     * Returns the schema's cell at a given index
+     * @param index the cell's index (0 to 19)
+     * @return the cell's reference
+     */
+    public Cell getCell(int index){
+        return cell[index/SchemaCard.NUM_COLS][index%SchemaCard.NUM_COLS];
+    }
+
+    /**
      * Calculates and returns a list of integers that are the indexes (from 0 to 19) where the die could be placed
      * @param die the die we want to place
      * @return the list of valid positions for the die
@@ -120,7 +129,7 @@ public class SchemaCard extends Card implements Iterable{
     public ArrayList<Integer> listPossiblePlacements(Die die){
         int row;
         int column;
-        DieIterator dice;
+        DieIterator diceIterator;
         Integer index;
         ArrayList <Integer> list= new ArrayList();
 
@@ -145,15 +154,20 @@ public class SchemaCard extends Card implements Iterable{
                 }
             }
         }else{
-            dice=new DieIterator(cell);
-            while(dice.hasNext()){
-                dice.next();
+            diceIterator=new DieIterator(this.cell);
+
+            while(diceIterator.hasNext()){
+                diceIterator.next();
+                if(die.equals(this.cell[diceIterator.getRow()][diceIterator.getColumn()].getDie())){
+                    list.clear();
+                    return list;
+                }
                 for(int i=-1; i<2; i++){
                     for(int j=-1; j<2; j++){
-                        if((i!=0 && j!=0) && (dice.getRow()+i>=0 && dice.getRow()+i<NUM_ROWS && dice.getColumn()+j>=0 && dice.getColumn()+j<NUM_COLS)){
-                            index=(dice.getRow()+i)*NUM_COLS + (dice.getColumn()+j);
+                        if((i!=0 && j!=0) && (diceIterator.getRow()+i>=0 && diceIterator.getRow()+i<NUM_ROWS && diceIterator.getColumn()+j>=0 && diceIterator.getColumn()+j<NUM_COLS)){
+                            index=(diceIterator.getRow()+i)*NUM_COLS + (diceIterator.getColumn()+j);
                             if(!list.contains(index)) {
-                                if(canBePlacedHere(dice.getRow()+i,dice.getColumn()+j,die)){
+                                if(canBePlacedHere(diceIterator.getRow()+i,diceIterator.getColumn()+j,die)){
                                     list.add(index);
                                 }
                             }
@@ -218,6 +232,7 @@ public class SchemaCard extends Card implements Iterable{
         assert this.listPossiblePlacements(die).contains(index);
 
         this.cell[index/NUM_COLS][index%NUM_COLS].setDie(die);
+        this.isFirstDie=false;
         }
 
 

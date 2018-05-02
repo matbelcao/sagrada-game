@@ -1,5 +1,7 @@
 package it.polimi.ingsw;
 
+import java.io.File;
+
 /**
  * This class represents one Die of the game with its color and shade (face). The class is immutable
  */
@@ -78,7 +80,7 @@ public class Die {
      * Returns a string representation of the die
      * @return said string
      */
-    public String toString(){ return getColor()+"\\"+getShade(); }
+    public String toString(){ return getColor() + File.separator + getShade(); }
 
     /**
      * Creates a String that renders a correctly colored die in the CLI using UTF-16 DIE FACES
