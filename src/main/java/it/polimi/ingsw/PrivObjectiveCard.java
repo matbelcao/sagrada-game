@@ -45,4 +45,18 @@ public class PrivObjectiveCard extends Card{
     public String getColor(){
         return color.toString();
     }
+
+
+    public int getCardScore(SchemaCard schema){
+        int points=0;
+        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+
+        while(diceIterator.hasNext()){
+            diceIterator.next();
+            if(color.toString().equals(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getColor())){
+                points++;
+            }
+        }
+        return points;
+    }
 }
