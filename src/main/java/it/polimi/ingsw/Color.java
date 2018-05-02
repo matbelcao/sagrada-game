@@ -1,6 +1,5 @@
 package it.polimi.ingsw;
 
-import org.jetbrains.annotations.Contract;
 
 /**
  * This enum offers the set of colors (RED, GREEN, YELLOW, BLUE, PURPLE) needed to build the dice,

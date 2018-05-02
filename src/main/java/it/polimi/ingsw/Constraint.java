@@ -29,16 +29,14 @@ public class Constraint {
      * @return a String that is the name of the shade of the constraint
      */
     public String getShade(){
-        return this.shade!=null? this.shade.toString() : null;
+        return !this.isColorConstraint()? this.shade.toString() : "null";
     }
 
     /**
      * Get the string name of the color constraint
      * @return a String that is the name of the color of the die
      */
-    public String getColor(){
-        return this.color!=null? this.color.toString() : null;
-    }
+    public String getColor(){ return this.isColorConstraint()? this.color.toString() : "null"; }
 
     /**
      * Checks which type of constraint is set
@@ -56,6 +54,12 @@ public class Constraint {
         return this.isActive;
     }
 
+    /**
+     * Returns a string containing the constraint name regardless of the type of constraint
+     * @return the name of the value of the constraint
+     */
+    @Override
+    public String toString(){ return  this.isColorConstraint() ? this.getColor() : this.getShade(); }
 
     /**
      * Changes the status of the constraint
@@ -69,8 +73,7 @@ public class Constraint {
      * Creates a printable representation of the constraint for the CLI
      * @return the string containing said representation
      */
-    @Override
-    public String toString(){
+    public String toUtf(){
         if(isColorConstraint()){
             return this.color.ansi()+Face.EMPTY+Color.RESET;
         }else{

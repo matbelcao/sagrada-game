@@ -74,6 +74,12 @@ public class Cell {
     }
 
     /**
+     * Returns whether or not the cell has a constraint
+     * @return true iff the cell has a constraint
+     */
+    public Boolean hasConstraint(){ return this.constraint!=null; }
+
+    /**
      * Returns the cell's constraint
      * @return cell's constraint
      */

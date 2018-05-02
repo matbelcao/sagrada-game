@@ -75,11 +75,16 @@ public class Die {
     }
 
     /**
-     * Creates a String that renders a correctly colored die in the CLI using UTF-16 DIE FACES
-     * @return
+     * Returns a string representation of the die
+     * @return said string
      */
-    @Override
-    public String toString(){
+    public String toString(){ return getColor()+"\\"+getShade(); }
+
+    /**
+     * Creates a String that renders a correctly colored die in the CLI using UTF-16 DIE FACES
+     * @return said string
+     */
+    public String toUtf(){
         return this.color.ansi()+this.shade.getUtf()+Color.RESET;
     }
 }
