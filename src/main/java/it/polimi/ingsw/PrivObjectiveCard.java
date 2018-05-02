@@ -41,4 +41,8 @@ public class PrivObjectiveCard extends Card{
             e3.printStackTrace();
         }
     }
+
+    public String getColor(){
+        return color.toString();
+    }
 }
