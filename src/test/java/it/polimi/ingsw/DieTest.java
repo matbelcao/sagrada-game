@@ -3,6 +3,8 @@ package it.polimi.ingsw;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -10,7 +12,7 @@ class DieTest {
     private static Die test;
 
     @BeforeEach
-    void beforeAllTests() {
+    void beforeEachTests() {
         test = new Die("ONE", "RED");
     }
 
@@ -55,6 +57,11 @@ class DieTest {
         assertEquals("FOUR", test.getShade());
         test.flipShade();
         assertEquals("THREE", test.getShade());
+    }
+
+    @Test
+    void TestToString(){
+        assertEquals("RED" + File.separator + "ONE",test.toString());
     }
 
     @Test

@@ -20,6 +20,20 @@ public class Die {
     }
 
     /**
+     * Constructs the object setting its shade and color
+     * @param shade the Face of the die
+     * @param color the Color of the die
+     */
+    Die(int shade, String color ){
+        try {
+            this.shade = Face.valueOf(shade);
+        } catch (IllegalShadeException e) {
+            e.printStackTrace();
+        }
+        this.color = Color.valueOf(color); //make sure color is all CAPS
+    }
+
+    /**
      * Gets the string name of the color of the die
      * @return a String tha is the name of the color of the die
      */

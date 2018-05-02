@@ -3,7 +3,6 @@ package it.polimi.ingsw;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ConstraintTest {
     @Test
@@ -27,7 +26,7 @@ public class ConstraintTest {
     }
 
     @Test
-    public void testIsEqual(){
+    public void isActive(){
         Constraint test = new Constraint("ONE");
         assertEquals(Boolean.TRUE,test.isActive());
         test.setActive(false);
