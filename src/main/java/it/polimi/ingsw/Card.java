@@ -1,4 +1,10 @@
 package it.polimi.ingsw;
+import java.io.File;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+
+import java.io.IOException;
+import org.xml.sax.SAXException;
 
 /**
  * This abstract class is useful to the subclasses [ToolCard , ObjectiveCard and SchemaCard] to initialize common parameters
@@ -9,19 +15,40 @@ public abstract class Card {
     private String description;
     private int id;
 
-
     /**
-     * Sets the card properties
-     * @param name card name
-     * @param imgSrc image path
-     * @param description description of the card
-     * @param id card id
+     * Read the xml file and inizialize the card's common parameter
+     * @param id card's id
+     * @param xmlSrc xml file path
+     * @param type card type
+     * @return  color string if type is PrivObjectiveCard, else null
      */
-    protected void setParam(String name, String imgSrc,String description, int id){
-        this.name = name;
-        this.imgSrc = imgSrc;
-        this.description= description;
-        this.id=id;
+    protected String xmlReader(int id, String xmlSrc, String type){
+        File xmlFile= new File(xmlSrc);
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder;
+        NodeList nodeList;
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xmlFile);
+            doc.getDocumentElement().normalize();
+
+            nodeList = doc.getElementsByTagName(type);
+
+            for (int temp = 0; temp < nodeList.getLength() && (temp-1)!=id; temp++) {
+                Element eElement = (Element)nodeList.item(temp);
+                if(Integer.parseInt(eElement.getAttribute("id"))==id){
+                    this.id=id;
+                    this.name=eElement.getElementsByTagName("name").item(0).getTextContent();
+                    this.imgSrc= eElement.getElementsByTagName("imgSrc").item(0).getTextContent().replaceAll("[\\ ]", File.separator);
+                    this.description=eElement.getElementsByTagName("description").item(0).getTextContent();
+
+                    return type.equals("PrivObjectiveCard")? eElement.getElementsByTagName("color").item(0).getTextContent() : null;
+                }
+            }
+        }catch (SAXException | ParserConfigurationException | IOException e1) {
+            e1.printStackTrace();
+        }
+        return null;
     }
 
     /**
