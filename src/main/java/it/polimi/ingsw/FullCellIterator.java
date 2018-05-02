@@ -27,7 +27,7 @@ class FullCellIterator implements Iterator <Cell>{
      * @return true if there's a valid die
      */
     public boolean hasNext() {
-        while(index < SchemaCard.NUM_COLS*SchemaCard.NUM_ROWS){
+        while(index < SchemaCard.NUM_COLS * SchemaCard.NUM_ROWS){
             if(this.cells[index/SchemaCard.NUM_COLS][index%SchemaCard.NUM_COLS].hasDie()){
                 next=this.cells[index/SchemaCard.NUM_COLS][index%SchemaCard.NUM_COLS];
                 return true;

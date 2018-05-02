@@ -126,16 +126,12 @@ public class SchemaCard implements Iterable<Cell> {
      * @return the list of valid positions for the die
      */
     public List<Integer> listPossiblePlacements(Die die) throws IllegalDieException{
-        int row;
-        int column;
         FullCellIterator diceIterator;
-        Integer index;
         ArrayList <Integer> list= new ArrayList<>();
 
         if(isFirstDie){
             //first and last rows
             checkBorder(die, list);
-
         }else{
             diceIterator=new FullCellIterator(this.cell);
 
@@ -143,30 +139,41 @@ public class SchemaCard implements Iterable<Cell> {
                 diceIterator.next();
 
                 if(die.equals(this.cell[diceIterator.getRow()][diceIterator.getColumn()].getDie())){
+                    list.clear();
                     throw new IllegalDieException();
                 }
 
-                for(int i=-1; i<2; i++){
-                    row=diceIterator.getRow()+i;
-                    for(int j=-1; j<2; j++){
-                        column=diceIterator.getColumn()+j;
-                        if( (row>=0 && row<NUM_ROWS) && (column>=0 && column<NUM_COLS)){
-
-                            index=(row * NUM_COLS + column);
-
-                            if (!list.contains(index)) {
-                                if (canBePlacedHere(row, column, die)) {
-                                    list.add(index);
-
-                                }
-                            }
-                        }
-                    }
-                }
+                checkCloseCells(die, diceIterator, list);
 
             }
         }
         return list;
+    }
+
+    /**
+     * Checks if cells close to the one given by the iterator(that contains a die) could accept the die
+     * @param die the die to be possibly put in place
+     * @param diceIterator iterates on full cells
+     * @param list the list of possible positions for the die
+     */
+    private void checkCloseCells(Die die, FullCellIterator diceIterator, ArrayList<Integer> list) {
+        int row;
+        int column;
+        Integer index;
+        for(int i = -1; i<2; i++){
+            row=diceIterator.getRow()+i;
+            for(int j=-1; j<2; j++){
+                column=diceIterator.getColumn()+j;
+                if( (row>=0 && row<NUM_ROWS) && (column>=0 && column<NUM_COLS)){
+                    index=(row * NUM_COLS + column);
+
+                    if (!list.contains(index) && canBePlacedHere(row, column, die)) {
+                        list.add(index);
+                    }
+
+                }
+            }
+        }
     }
 
     /**
