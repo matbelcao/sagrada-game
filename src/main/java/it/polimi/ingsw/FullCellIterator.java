@@ -1,13 +1,13 @@
 package it.polimi.ingsw;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
- * This class is an iterator on dice that have been placed in a given schema card
+ * This class iterates on the cells of a schema card that HAVE A DIE placed on them
  */
-public class DieIterator implements Iterator {
+class FullCellIterator implements Iterator <Cell>{
     private Cell[][] cells;
     private Cell next;
     private int index;
@@ -16,7 +16,7 @@ public class DieIterator implements Iterator {
      * Constructs the iterator object
      * @param cells the matrix containing the Cells of the schema card
      */
-    public DieIterator(Cell [][] cells) {
+    FullCellIterator(Cell [][] cells) {
         this.cells=cells;
         this.index=0;
         this.next =null;
@@ -28,13 +28,12 @@ public class DieIterator implements Iterator {
      */
     public boolean hasNext() {
         while(index < SchemaCard.NUM_COLS*SchemaCard.NUM_ROWS){
-            if(this.cells[index/SchemaCard.NUM_COLS][index%SchemaCard.NUM_COLS].getDie()!=null){
+            if(this.cells[index/SchemaCard.NUM_COLS][index%SchemaCard.NUM_COLS].hasDie()){
                 next=this.cells[index/SchemaCard.NUM_COLS][index%SchemaCard.NUM_COLS];
                 return true;
             }
             index++;
         }
-
         next=null;
         return false;
     }
@@ -42,12 +41,12 @@ public class DieIterator implements Iterator {
     /**
      * @return the next valid die
      */
-    public Object next() {
-        while(this.hasNext()){
+    public Cell next() {
+        if(this.hasNext()){
             index++;
             return next;
         }
-        return null;
+        throw new NoSuchElementException();
     }
 
     /**
@@ -66,7 +65,11 @@ public class DieIterator implements Iterator {
         return (index-1)%SchemaCard.NUM_COLS;
     }
 
-    public void remove() {
-
+    /**
+     * not implemented
+     */
+    @Override
+    public void remove(){
+        throw new UnsupportedOperationException();
     }
 }

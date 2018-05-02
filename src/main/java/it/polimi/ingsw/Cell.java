@@ -38,18 +38,12 @@ public class Cell {
             return true;
         }
 
-        if(this.constraint.isColorConstraint()){
-            if(die.getColor().equals(this.constraint.getColor())){
-                return true;
-            }
+        if( this.constraint.isColorConstraint() && die.getColor().equals(this.constraint.getColor())){
+            return true;
         }
 
-        if(!this.constraint.isColorConstraint()) {
-            if (die.getShade().equals(this.constraint.getShade())){
-                return true;
-            }
-        }
-        return false;
+        return !this.constraint.isColorConstraint() && die.getShade().equals(this.constraint.getShade());
+
     }
 
     /**
@@ -65,6 +59,10 @@ public class Cell {
         }
     }
 
+    public Boolean checkNeighbor(Die die){
+        return (this.getDie().getColor().equals(die.getColor()) || this.getDie().getShade().equals(die.getShade()));
+    }
+
     /**
      * Allows to get the die placed in the Cell
      * @return the Cell's die
@@ -78,6 +76,12 @@ public class Cell {
      * @return true iff the cell has a constraint
      */
     public Boolean hasConstraint(){ return this.constraint!=null; }
+
+    /**
+     * Returns whether or not the cell has a constraint
+     * @return true iff the cell has a constraint
+     */
+    public Boolean hasDie(){ return this.die!=null; }
 
     /**
      * Returns the cell's constraint

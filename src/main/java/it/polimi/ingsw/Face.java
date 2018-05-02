@@ -1,8 +1,6 @@
 package it.polimi.ingsw;
 
 
-import org.jetbrains.annotations.Contract;
-
 /**
  * This enum represents the possible faces (shades) of the game dice. The elements are immutable.
  */
@@ -35,7 +33,7 @@ public enum Face { // need to add address for png of the face
      * @throws IllegalShadeException this is thrown if an invalid number is passed
      */
 
-    public static Face valueOf(int shade) throws IllegalShadeException, NullPointerException{
+    public static Face valueOf(int shade) throws IllegalShadeException{
         switch(shade) {
             case 1:
                 return Face.ONE;
@@ -78,7 +76,7 @@ public enum Face { // need to add address for png of the face
      * @param shade the string to be checked
      * @return true iff the string equals the name of one of the listed shades
      */
-    public static boolean contains(String shade) {
+    public static Boolean contains(String shade) {
         for (Face c : Face.values()) {
             if (c.toString().equals(shade)) {
                 return true;

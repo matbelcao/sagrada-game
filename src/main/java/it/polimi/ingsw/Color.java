@@ -28,10 +28,11 @@ public enum Color { //need to add png address combined with Face's ones
      * Gets the ansi color code
      * @return the Color ansi code for CLI
      */
-
     public String ansi(){
         return ansi;
     }
+
+
 
     /**
      * Checks whether a string is a valid Color name

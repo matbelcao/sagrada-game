@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SchemaCardTest {
+class SchemaCardTest {
     @Test
     void testSchemaCardConstructor(){
         SchemaCard schema1 = new SchemaCard(1,"src"+ File.separator +"xml"+ File.separator +"SchemaCard.xml");
@@ -67,9 +67,13 @@ public class SchemaCardTest {
         Die die2= new Die("TWO","GREEN");
         Die die3= new Die("FOUR","RED");
         Die die4= new Die("ONE","YELLOW");
-        ArrayList <Integer> list;
+        ArrayList <Integer> list = null;
 
-        list= schema1.listPossiblePlacements(die1);
+        try {
+            list= (ArrayList<Integer>) schema1.listPossiblePlacements(die1);
+        } catch (IllegalDieException e) {
+            e.printStackTrace();
+        }
         assertEquals(5,list.size());
 
     //illegal placement of a die
@@ -87,7 +91,7 @@ public class SchemaCardTest {
 
     //legal placement of the same die ->illegal
         codeToTest= () -> schema1.putDie(13,die1);
-        Assertions.assertThrows(AssertionError.class, codeToTest);
+        Assertions.assertThrows(IllegalDieException.class, codeToTest);
 
     //illegal placement of die (non adjacent cell)
         codeToTest= () -> schema1.putDie(2,die3);
