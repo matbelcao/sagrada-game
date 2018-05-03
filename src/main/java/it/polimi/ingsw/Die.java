@@ -34,38 +34,20 @@ public class Die {
     }
 
     /**
-     * Gets the string name of the color of the die
-     * @return a String that is the name of the color of the die
+     * Gets the Color of the die
+     * @return  the Color of the die
      */
-    public String getColor(){
-        return this.color!=null? this.color.toString() : null;
+    public Color getColor(){
+        return this.color;
     }
 
     /**
-     * Gets the string name of the shade of the die
-     * @return a String that is the name of the shade of the die
+     * Gets the Shade of the die
+     * @return  the Face of the die
      */
-    public String getShade(){
-        return this.shade!=null? this.shade.toString() : null;
+    public Face getShade(){
+        return this.shade;
     }
-
-    /**
-     * Returns a number (from 0 to 4) that is the index of the color in its enum
-     * @return the ordinal of the element in the enum
-     */
-    public int getColorOrdinal(){ return this.color.ordinal(); }
-
-    /**
-     * Returns a number (from 0 to 5) that is the index of the shade in its enum
-     * @return the ordinal of the element in the enum
-     */
-    public int getShadeOrdinal(){ return this.shade.ordinal(); }
-
-    /**
-     * Returns the number (from 1 to 6) of the shade
-     * @return the ordinal of the element in the enum
-     */
-    public int getShadeInt(){ return this.shade.toInt(); }
 
     /**
      * Increases by one the shade of the die
