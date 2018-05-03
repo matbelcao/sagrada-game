@@ -23,7 +23,6 @@ public abstract class Card {
      * @return  color string if type is PrivObjectiveCard, else null
      */
     protected String xmlReader(int id, String xmlSrc, String type){
-        String imgtmp;
         File xmlFile= new File(xmlSrc);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -40,8 +39,7 @@ public abstract class Card {
                 if(Integer.parseInt(eElement.getAttribute("id"))==id){
                     this.id=id;
                     this.name=eElement.getElementsByTagName("name").item(0).getTextContent();
-                    imgtmp= eElement.getElementsByTagName("imgSrc").item(0).getTextContent();
-                    this.imgSrc=imgtmp.replaceAll("::", File.separator);
+                    this.imgSrc= eElement.getElementsByTagName("imgSrc").item(0).getTextContent().replace("::",File.separator);
                     this.description=eElement.getElementsByTagName("description").item(0).getTextContent();
 
                     return type.equals("PrivObjectiveCard")? eElement.getElementsByTagName("color").item(0).getTextContent() : null;
