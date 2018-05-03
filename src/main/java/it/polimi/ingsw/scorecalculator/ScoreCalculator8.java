@@ -1,7 +1,6 @@
 package it.polimi.ingsw.scorecalculator;
 
-import it.polimi.ingsw.FullCellIterator;
-import it.polimi.ingsw.SchemaCard;
+import it.polimi.ingsw.*;
 
 /**
  * "Different Shades" card implementation
@@ -15,14 +14,14 @@ public class ScoreCalculator8 implements ScoreCalculator{
      */
     @Override
     public int calculateScore(SchemaCard schema) {
-        int[] count = {0, 0, 0, 0, 0, 0};
+        Integer[] count = new Integer[Face.values().length];
         int min;
-
+        Cell next;
         FullCellIterator diceIterator = (FullCellIterator) schema.iterator();
 
         while (diceIterator.hasNext()) {
-            diceIterator.next();
-            count[schema.getCell(diceIterator.getRow(), diceIterator.getColumn()).getDie().getShade().ordinal()]++;
+            next=diceIterator.next();
+            count[next.getDie().getShade().ordinal()]+=1;
         }
         min = count[0];
         for (int x : count) {
@@ -31,6 +30,6 @@ public class ScoreCalculator8 implements ScoreCalculator{
             }
         }
 
-        return min*5;
+        return min*Face.values().length;
     }
 }
