@@ -21,10 +21,10 @@ public class ScoreCalculator4 implements ScoreCalculator{
         ArrayList<Integer> tmpNum = new ArrayList<>();
         boolean badColumn;
 
-        for (int col = 0; col < 5; col++) {
+        for (int col = 0; col < SchemaCard.NUM_COLS; col++) {
             tmpNum.clear();
             badColumn = false;
-            for (int row = 0; row < 4 && !badColumn; row++) {
+            for (int row = 0; row < SchemaCard.NUM_ROWS && !badColumn; row++) {
                 temp=schema.getCell(row, col).getDie().getShade().toInt();
                 if (schema.getCell(row, col).hasDie() && !tmpNum.contains(temp)) {
                     tmpNum.add(temp);
