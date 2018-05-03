@@ -1,9 +1,6 @@
 package it.polimi.ingsw.scorecalculator;
 
-import it.polimi.ingsw.Cell;
-import it.polimi.ingsw.Color;
-import it.polimi.ingsw.FullCellIterator;
-import it.polimi.ingsw.SchemaCard;
+import it.polimi.ingsw.*;
 
 /**
  * This class implements the procedure needed to calculate the score according to the tenth public objective
@@ -18,15 +15,14 @@ public class ScoreCalculator10 implements ScoreCalculator{
     @Override
     public int calculateScore(SchemaCard schema) {
         int points;
-        Integer[] count;
-        FullCellIterator fullCell = (FullCellIterator) schema.iterator();
-        Cell next;
+        int[] count = new int[Color.values().length];
+        FullCellIterator diceIterator = (FullCellIterator) schema.iterator();
+        Die die;
 
-        count = new Integer[Color.values().length];
-
-        while(fullCell.hasNext()){
-            next=fullCell.next();
-            count[next.getDie().getColor().ordinal()] += 1;
+        while(diceIterator.hasNext()){
+            diceIterator.next();
+            die=schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie();
+            count[die.getColor().ordinal()] += 1;
         }
         points=count[0];
         for(Integer i : count){
