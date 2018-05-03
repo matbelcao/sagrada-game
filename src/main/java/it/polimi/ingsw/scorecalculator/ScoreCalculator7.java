@@ -1,7 +1,11 @@
 package it.polimi.ingsw.scorecalculator;
 
+import it.polimi.ingsw.FullCellIterator;
 import it.polimi.ingsw.SchemaCard;
 
+/**
+ * "Dark Shades" card implementation
+ */
 public class ScoreCalculator7 implements ScoreCalculator{
 
     /**
@@ -11,6 +15,18 @@ public class ScoreCalculator7 implements ScoreCalculator{
      */
     @Override
     public int calculateScore(SchemaCard schema){
-        return 0;
+        int FIVE=0,SIX=0;
+        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+
+        while(diceIterator.hasNext()){
+            diceIterator.next();
+            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShadeInt()==5){
+                FIVE++;
+            }
+            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShadeInt()==6){
+                SIX++;
+            }
+        }
+        return Math.min(FIVE,SIX);
     }
 }
