@@ -109,3 +109,4 @@ buildNumber.properties
 
 #added by us
 .idea
+.DS_Store
