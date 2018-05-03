@@ -1,5 +1,4 @@
 package it.polimi.ingsw.scorecalculator;
-
 import it.polimi.ingsw.SchemaCard;
 
 /**

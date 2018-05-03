@@ -2,14 +2,16 @@ package it.polimi.ingsw.toolaction;
 import it.polimi.ingsw.Player;
 
 /**
- * This is the interface for the strategy pattern used to aim the Player using different ToolAction card
+ * This class implements the tool named "Glazing Hammer" of ToolCard
  */
-public interface ToolAction{
+public class ToolAction7 implements ToolAction{
 
     /**
      * Allows the Player given by ToolCard to use the tool during the game
      * @param player the player that wants to use the card
      * @return if the card has been used successfully
      */
-    public boolean useToolCard(Player player);
+    public boolean useToolCard(Player player){
+        return false;
+    }
 }

@@ -30,7 +30,6 @@ public class PubObjectiveCard extends Card{
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
-
     }
 
     /**
