@@ -20,8 +20,7 @@ public class ScoreCalculator10 implements ScoreCalculator{
         Die die;
 
         while(diceIterator.hasNext()){
-            diceIterator.next();
-            die=schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie();
+            die=diceIterator.next().getDie();
             count[die.getColor().ordinal()] += 1;
         }
         points=count[0];

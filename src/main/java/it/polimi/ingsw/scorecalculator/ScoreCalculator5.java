@@ -21,8 +21,7 @@ public class ScoreCalculator5 implements ScoreCalculator{
         FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
 
         while(diceIterator.hasNext()){
-            diceIterator.next();
-            die=schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie();
+            die=diceIterator.next().getDie();
 
             if(die.getShade().toInt()==1){
                 ones++;
