@@ -41,7 +41,7 @@ public abstract class Card {
                     this.id=id;
                     this.name=eElement.getElementsByTagName("name").item(0).getTextContent();
                     imgtmp= eElement.getElementsByTagName("imgSrc").item(0).getTextContent();
-                    this.imgSrc=imgtmp.replaceAll("[\\ ][\\ ]", File.separator);
+                    this.imgSrc=imgtmp.replaceAll("::", File.separator);
                     this.description=eElement.getElementsByTagName("description").item(0).getTextContent();
 
                     return type.equals("PrivObjectiveCard")? eElement.getElementsByTagName("color").item(0).getTextContent() : null;
@@ -55,7 +55,7 @@ public abstract class Card {
 
     /**
      * Returns the name of the card
-     * @return name
+     * @return namecd
      */
     public String getName(){ return this.name; }
 
