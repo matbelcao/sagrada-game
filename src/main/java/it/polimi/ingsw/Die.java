@@ -62,6 +62,12 @@ public class Die {
     public int getShadeOrdinal(){ return this.shade.ordinal(); }
 
     /**
+     * Returns the number (from 1 to 6) of the shade
+     * @return the ordinal of the element in the enum
+     */
+    public int getShadeInt(){ return this.shade.toInt(); }
+
+    /**
      * Increases by one the shade of the die
      * @throws IllegalShadeException if the shade is equal to SIX
      */

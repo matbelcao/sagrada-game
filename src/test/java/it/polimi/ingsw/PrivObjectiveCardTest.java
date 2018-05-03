@@ -66,10 +66,10 @@ class PrivObjectiveCardTest {
         }
 
         //Check scores
-        assertEquals(5,priv1.getCardScore(schema1));
-        assertEquals(2,priv2.getCardScore(schema1));
-        assertEquals(2,priv3.getCardScore(schema1));
+        assertEquals(16,priv1.getCardScore(schema1));
+        assertEquals(5,priv2.getCardScore(schema1));
+        assertEquals(8,priv3.getCardScore(schema1));
         assertEquals(1,priv4.getCardScore(schema1));
-        assertEquals(2,priv5.getCardScore(schema1));
+        assertEquals(9,priv5.getCardScore(schema1));
     }
 }

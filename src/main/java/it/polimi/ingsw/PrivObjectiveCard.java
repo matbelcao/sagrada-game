@@ -20,7 +20,7 @@ public class PrivObjectiveCard extends Card{
         while(diceIterator.hasNext()){
             diceIterator.next();
             if(color.toString().equals(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getColor())){
-                points++;
+                points+=schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShadeInt();
             }
         }
         return points;
