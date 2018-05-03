@@ -29,11 +29,24 @@ public class DiceBag {
      */
     public Die draftDie() throws EmptyDiceBagException {
         Random randomGen = new Random();
-        if(toDraft.size()>0)
+        if(!toDraft.isEmpty())
             return toDraft.remove(randomGen.nextInt(toDraft.size()));
         else
             throw new EmptyDiceBagException();
     }
+    /**
+     * @param quantity the quantity of dice to be drafted at once
+     * @return an ArrayList containing the drafted dice
+     */
+    public ArrayList<Die> draftDice(int quantity) throws EmptyDiceBagException {
+        ArrayList<Die> drafted = new ArrayList<>();
+        while(quantity > 0){
+            drafted.add(draftDie());
+            quantity--;
+        }
+        return drafted;
+    }
+
     /**
      * Puts a die in the DiceBag, to be used by tool card #11
      */
