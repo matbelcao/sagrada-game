@@ -1,5 +1,6 @@
 package it.polimi.ingsw.scorecalculator;
 
+import it.polimi.ingsw.Die;
 import it.polimi.ingsw.FullCellIterator;
 import it.polimi.ingsw.SchemaCard;
 
@@ -16,14 +17,17 @@ public class ScoreCalculator6 implements ScoreCalculator{
     @Override
     public int calculateScore(SchemaCard schema){
         int threes=0,fours=0;
+        Die die;
         FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
 
         while(diceIterator.hasNext()){
             diceIterator.next();
-            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShade().toInt()==3){
+            die=schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie();
+
+            if(die.getShade().toInt()==3){
                 threes++;
             }
-            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShade().toInt()==4){
+            if(die.getShade().toInt()==4){
                 fours++;
             }
         }
