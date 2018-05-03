@@ -24,7 +24,6 @@ public class ScoreCalculator7 implements ScoreCalculator{
         while(diceIterator.hasNext()){
             die=diceIterator.next().getDie();
 
-
             if(die.getShade().toInt()==5){
                 fives++;
             }

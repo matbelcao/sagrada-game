@@ -17,15 +17,17 @@ public class ScoreCalculator4 implements ScoreCalculator{
     @Override
     public int calculateScore(SchemaCard schema) {
         int points = 0;
-        ArrayList<Integer> tmpNum = new ArrayList();
+        int temp;
+        ArrayList<Integer> tmpNum = new ArrayList<>();
         boolean badColumn;
 
         for (int col = 0; col < 5; col++) {
             tmpNum.clear();
             badColumn = false;
             for (int row = 0; row < 4 && !badColumn; row++) {
-                if (schema.getCell(row, col).hasDie() && !tmpNum.contains(schema.getCell(row, col).getDie().getShade().toInt())) {
-                    tmpNum.add(schema.getCell(row, col).getDie().getShade().toInt());
+                temp=schema.getCell(row, col).getDie().getShade().toInt();
+                if (schema.getCell(row, col).hasDie() && !tmpNum.contains(temp)) {
+                    tmpNum.add(temp);
                 } else {
                     badColumn = true;
                 }
