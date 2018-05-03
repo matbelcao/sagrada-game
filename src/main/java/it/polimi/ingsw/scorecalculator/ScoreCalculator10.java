@@ -32,7 +32,7 @@ public class ScoreCalculator10 implements ScoreCalculator{
         for(Integer i : count){
            if(points>i){ points=i;}
         }
-        return points*Color.values().length;
+        return points*4;
     }
 
 }

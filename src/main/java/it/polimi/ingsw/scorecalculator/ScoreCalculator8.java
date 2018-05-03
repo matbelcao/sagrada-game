@@ -30,6 +30,6 @@ public class ScoreCalculator8 implements ScoreCalculator{
             }
         }
 
-        return min*Face.values().length;
+        return min*5;
     }
 }

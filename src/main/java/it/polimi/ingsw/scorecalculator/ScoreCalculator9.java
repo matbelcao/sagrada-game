@@ -5,7 +5,7 @@ import it.polimi.ingsw.FullCellIterator;
 import it.polimi.ingsw.SchemaCard;
 
 /**
- * This class implements the "Color Variety" card ScoreCalculator
+ * This class implements the "Color Diagonals" card ScoreCalculator
  */
 public class ScoreCalculator9 implements ScoreCalculator{
     /**
@@ -23,7 +23,7 @@ public class ScoreCalculator9 implements ScoreCalculator{
             if(this.checkDiagonalAdjacency(schema,fullCell,next)){ points+=1;}
 
         }
-        return points;
+        return points ;
     }
 
     /**
