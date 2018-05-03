@@ -71,6 +71,7 @@ class PubObjectiveCardTest {
         }
 
         assertEquals(6,pub1.getCardScore(schema));
+        assertEquals(20,pub2.getCardScore(schema));
         assertEquals(5,pub3.getCardScore(schema));
         assertEquals(16,pub4.getCardScore(schema));
         assertEquals(6,pub5.getCardScore(schema));
