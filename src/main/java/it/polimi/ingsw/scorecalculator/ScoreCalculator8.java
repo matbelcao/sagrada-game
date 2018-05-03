@@ -31,6 +31,6 @@ public class ScoreCalculator8 implements ScoreCalculator{
             }
         }
 
-        return min;
+        return min*5;
     }
 }

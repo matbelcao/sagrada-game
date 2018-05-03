@@ -27,6 +27,6 @@ public class ScoreCalculator5 implements ScoreCalculator{
                 TWO++;
             }
         }
-        return Math.min(ONE,TWO);
+        return Math.min(ONE,TWO)*2;
     }
 }

@@ -30,6 +30,8 @@ class PubObjectiveCardTest {
         PubObjectiveCard pub6 = new PubObjectiveCard(6,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
         PubObjectiveCard pub7 = new PubObjectiveCard(7,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
         PubObjectiveCard pub8 = new PubObjectiveCard(8,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
+        PubObjectiveCard pub9 = new PubObjectiveCard(9,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
+        PubObjectiveCard pub10 = new PubObjectiveCard(10,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
 
         //SchemaCard's dice
         Die[] die = new Die[20];
@@ -64,6 +66,12 @@ class PubObjectiveCardTest {
             e.printStackTrace();
         }
 
-        assertEquals(3,pub5.getCardScore(schema));
+        assertEquals(6,pub5.getCardScore(schema));
+        assertEquals(6,pub6.getCardScore(schema));
+        assertEquals(4,pub7.getCardScore(schema));
+        assertEquals(10,pub8.getCardScore(schema));
+        //assertEquals(15,pub9.getCardScore(schema));
+        //assertEquals(3,pub10.getCardScore(schema));
+
     }
 }

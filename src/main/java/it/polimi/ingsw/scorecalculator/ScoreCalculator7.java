@@ -27,6 +27,6 @@ public class ScoreCalculator7 implements ScoreCalculator{
                 sixes++;
             }
         }
-        return Math.min(fives,sixes);
+        return Math.min(fives,sixes)*2;
     }
 }

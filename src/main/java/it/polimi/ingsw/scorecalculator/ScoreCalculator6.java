@@ -27,6 +27,6 @@ public class ScoreCalculator6 implements ScoreCalculator{
                 fours++;
             }
         }
-        return Math.min(threes,fours);
+        return Math.min(threes,fours)*2;
     }
 }
