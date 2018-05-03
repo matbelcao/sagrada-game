@@ -26,6 +26,7 @@ class PubObjectiveCardTest {
         SchemaCard schema = new SchemaCard(11, "src" + File.separator + "xml" + File.separator + "SchemaCard.xml");
 
         //PublicObjective cards
+        PubObjectiveCard pub4 = new PubObjectiveCard(4,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
         PubObjectiveCard pub5 = new PubObjectiveCard(5,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
         PubObjectiveCard pub6 = new PubObjectiveCard(6,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
         PubObjectiveCard pub7 = new PubObjectiveCard(7,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
@@ -50,9 +51,9 @@ class PubObjectiveCardTest {
         die[12] = new Die("SIX", "GREEN");
         die[13] = new Die("ONE", "RED");
         die[14] = new Die("THREE", "PURPLE");
-        die[15] = new Die("ONE", "PURPLE");
+        die[15] = new Die("ONE", "BLUE");
         die[16] = new Die("SIX", "YELLOW");
-        die[17] = new Die("ONE", "BLUE");
+        die[17] = new Die("ONE", "PURPLE");
         die[18] = new Die("TWO", "GREEN");
         die[19] = new Die("FOUR", "RED");
 
@@ -66,6 +67,7 @@ class PubObjectiveCardTest {
             e.printStackTrace();
         }
 
+        assertEquals(12,pub4.getCardScore(schema));
         assertEquals(6,pub5.getCardScore(schema));
         assertEquals(6,pub6.getCardScore(schema));
         assertEquals(4,pub7.getCardScore(schema));
