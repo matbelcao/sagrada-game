@@ -50,6 +50,18 @@ public class Die {
     }
 
     /**
+     * Returns a number (from 0 to 4) that is the index of the color in its enum
+     * @return the ordinal of the element in the enum
+     */
+    public int getColorOrdinal(){ return this.color.ordinal(); }
+
+    /**
+     * Returns a number (from 0 to 5) that is the index of the shade in its enum
+     * @return the ordinal of the element in the enum
+     */
+    public int getShadeOrdinal(){ return this.shade.ordinal(); }
+
+    /**
      * Increases by one the shade of the die
      * @throws IllegalShadeException if the shade is equal to SIX
      */
