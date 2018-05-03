@@ -4,6 +4,9 @@ import it.polimi.ingsw.SchemaCard;
 
 import java.util.ArrayList;
 
+/**
+ * "Column Shades" card implementation
+ */
 public class ScoreCalculator4 implements ScoreCalculator{
 
     /**
