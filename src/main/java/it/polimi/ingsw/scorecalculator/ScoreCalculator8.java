@@ -20,8 +20,7 @@ public class ScoreCalculator8 implements ScoreCalculator{
         FullCellIterator diceIterator = (FullCellIterator) schema.iterator();
 
         while (diceIterator.hasNext()) {
-            diceIterator.next();
-            die=schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie();
+            die=diceIterator.next().getDie();
             count[die.getShade().ordinal()]+=1;
         }
         min = count[0];
