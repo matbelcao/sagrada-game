@@ -14,14 +14,15 @@ public class ScoreCalculator8 implements ScoreCalculator{
      */
     @Override
     public int calculateScore(SchemaCard schema) {
-        Integer[] count = new Integer[Face.values().length];
+        int[] count = new int[Face.values().length];
         int min;
-        Cell next;
+        Die die;
         FullCellIterator diceIterator = (FullCellIterator) schema.iterator();
 
         while (diceIterator.hasNext()) {
-            next=diceIterator.next();
-            count[next.getDie().getShade().ordinal()]+=1;
+            diceIterator.next();
+            die=schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie();
+            count[die.getShade().ordinal()]+=1;
         }
         min = count[0];
         for (int x : count) {
