@@ -35,7 +35,7 @@ public class Die {
 
     /**
      * Gets the string name of the color of the die
-     * @return a String tha is the name of the color of the die
+     * @return a String that is the name of the color of the die
      */
     public String getColor(){
         return this.color!=null? this.color.toString() : null;
