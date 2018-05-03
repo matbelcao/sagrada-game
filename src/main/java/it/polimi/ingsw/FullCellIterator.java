@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 /**
  * This class iterates on the cells of a schema card that HAVE A DIE placed on them
  */
-class FullCellIterator implements Iterator <Cell>{
+public class FullCellIterator implements Iterator <Cell>{
     private Cell[][] cells;
     private Cell next;
     private int index;
