@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Spliterator;
 import java.util.function.Consumer;
 
 import org.xml.sax.SAXException;
@@ -21,7 +20,7 @@ public class SchemaCard implements Iterable<Cell> {
     private String name;
     private int id;
     private int favorTokens;
-    private Cell [][] cell;
+    private final Cell [][] cell;
     private Boolean isFirstDie;
     static final int NUM_COLS=5;
     static final int NUM_ROWS=4;
@@ -126,25 +125,22 @@ public class SchemaCard implements Iterable<Cell> {
      * @return the list of valid positions for the die
      */
     public List<Integer> listPossiblePlacements(Die die) throws IllegalDieException{
-        FullCellIterator diceIterator;
         ArrayList <Integer> list= new ArrayList<>();
+        FullCellIterator diceIterator;
+        Cell fullCell;
+        diceIterator=new FullCellIterator(this.cell);
 
         if(isFirstDie){
             //first and last rows
             checkBorder(die, list);
         }else{
-            diceIterator=new FullCellIterator(this.cell);
-
             while(diceIterator.hasNext()){
-                diceIterator.next();
-
-                if(die.equals(this.cell[diceIterator.getRow()][diceIterator.getColumn()].getDie())){
+                fullCell=diceIterator.next();
+                if(die.equals(fullCell.getDie())){
                     list.clear();
-                    throw new IllegalDieException();
+                    throw new IllegalDieException("! Trying to place the same die twice");
                 }
-
                 checkCloseCells(die, diceIterator, list);
-
             }
         }
         return list;
@@ -211,34 +207,20 @@ public class SchemaCard implements Iterable<Cell> {
      * @param die the die we want to place
      * @return true iff the die can be placed there
      */
-    private Boolean canBePlacedHere(int row,int column, Die die){
-        if(!this.cell[row][column].canAcceptDie(die) || this.cell[row][column].hasDie()){
-            return false;
-        }
-        if(row > 0){
-            if(this.cell[row - 1][column].hasDie() && this.cell[row - 1][column].checkNeighbor(die)) {
-                return false;
-            }
+    @NotNull
+    private Boolean canBePlacedHere (int row, int column, Die die){
+        if(!this.cell[row][column].canAcceptDie(die)){ return false; }
 
-        }
-        if(row < NUM_ROWS-1){
-            if(this.cell[row + 1][column].hasDie() && this.cell[row + 1][column].checkNeighbor(die)) {
-                return false;
-            }
+        if(this.cell[row][column].hasDie()){ return false; }
 
-        }
-        if(column > 0){
-            if(this.cell[row][column - 1].hasDie() && this.cell[row][column - 1].checkNeighbor(die)) {
-                return false;
-            }
-        }
+        if((row > 0)                    && this.cell[row - 1][column].hasDie() && this.cell[row - 1][column].checkNeighbor(die)) { return false; }
 
-        if(column < NUM_COLS-1){
-            if(this.cell[row][column + 1].hasDie() && this.cell[row][column + 1].checkNeighbor(die)) {
-                return false;
-            }
+        if((row < (NUM_ROWS - 1))       && this.cell[row + 1][column].hasDie() && this.cell[row + 1][column].checkNeighbor(die)) { return false; }
 
-        }
+        if((column > 0)                 && this.cell[row][column - 1].hasDie() && this.cell[row][column - 1].checkNeighbor(die)) { return false; }
+
+        if((column < (NUM_COLS - 1))    && this.cell[row][column + 1].hasDie() && this.cell[row][column + 1].checkNeighbor(die)) { return false; }
+
         return true;
     }
 
@@ -255,10 +237,6 @@ public class SchemaCard implements Iterable<Cell> {
         this.isFirstDie=false;
         }
 
-
-
-
-
     /**
      * Instantiates an iterator for cells containing a die
      * @return iterator on cells that contain a die
@@ -271,19 +249,11 @@ public class SchemaCard implements Iterable<Cell> {
 
     /**
      * This method has not been implemented
-     * @param action
+     * @param action the action to be applied to each element
      */
     @Override
-    public void forEach(Consumer<? super Cell> action) {
+    public void forEach(Consumer<?super Cell> action){
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * This method hasn't been implemented
-     * @return spliterator
-     */
-    @Override
-    public Spliterator<Cell> spliterator() {
-        return null;
-    }
 }

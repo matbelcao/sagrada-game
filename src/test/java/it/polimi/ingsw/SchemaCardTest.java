@@ -60,6 +60,8 @@ class SchemaCardTest {
         assertEquals(Integer.parseInt("24"),schema2.getId());
         assertEquals(Integer.parseInt("5"),schema2.getFavorTokens());
     }
+
+
     @Test
     void testDiePlacement(){
         SchemaCard schema1 = new SchemaCard(1,"src" + File.separator + "xml"+ File.separator +"SchemaCard.xml");
