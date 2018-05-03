@@ -20,10 +20,10 @@ public class ScoreCalculator5 implements ScoreCalculator{
 
         while(diceIterator.hasNext()){
             diceIterator.next();
-            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShadeInt()==1){
+            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShade().toInt()==1){
                 ONE++;
             }
-            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShadeInt()==2){
+            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShade().toInt()==2){
                 TWO++;
             }
         }

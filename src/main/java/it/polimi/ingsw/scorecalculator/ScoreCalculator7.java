@@ -15,18 +15,18 @@ public class ScoreCalculator7 implements ScoreCalculator{
      */
     @Override
     public int calculateScore(SchemaCard schema){
-        int FIVE=0,SIX=0;
+        int fives=0,sixes=0;
         FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
 
         while(diceIterator.hasNext()){
             diceIterator.next();
-            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShadeInt()==5){
-                FIVE++;
+            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShade().toInt()==5){
+                fives++;
             }
-            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShadeInt()==6){
-                SIX++;
+            if(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShade().toInt()==6){
+                sixes++;
             }
         }
-        return Math.min(FIVE,SIX);
+        return Math.min(fives,sixes);
     }
 }

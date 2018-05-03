@@ -38,11 +38,11 @@ public class Cell {
             return true;
         }
 
-        if( this.constraint.isColorConstraint() && die.getColor().equals(this.constraint.getColor())){
+        if( this.constraint.isColorConstraint() && die.getColor().toString().equals(this.constraint.getColor().toString())){
             return true;
         }
 
-        return !this.constraint.isColorConstraint() && die.getShade().equals(this.constraint.getShade());
+        return !this.constraint.isColorConstraint() && die.getShade().toString().equals(this.constraint.getShade().toString());
 
     }
 
@@ -60,7 +60,7 @@ public class Cell {
     }
 
     public Boolean checkNeighbor(Die die){
-        return (this.getDie().getColor().equals(die.getColor()) || this.getDie().getShade().equals(die.getShade()));
+        return (this.getDie().getColor().toString().equals(die.getColor().toString()) || this.getDie().getShade().toString().equals(die.getShade().toString()));
     }
 
     /**

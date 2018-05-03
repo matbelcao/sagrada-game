@@ -1,4 +1,4 @@
 package it.polimi.ingsw;
 
-public class EmptyDiceBagException extends Throwable {
+public class EmptyDiceBagException extends Exception {
 }

@@ -42,10 +42,10 @@ class CellTest {
     @Test
     void getConstraint(){
         assertEquals(null,emptyConstraintCell.getConstraint());
-        assertEquals("RED",REDConstraintCell.getConstraint().getColor());
-        assertEquals("GREEN",GREENConstraintCell.getConstraint().getColor());
-        assertEquals("ONE",ONEConstraintCell.getConstraint().getShade());
-        assertEquals("SIX",SIXConstraintCell.getConstraint().getShade());
+        assertEquals("RED",REDConstraintCell.getConstraint().getColor().toString());
+        assertEquals("GREEN",GREENConstraintCell.getConstraint().getColor().toString());
+        assertEquals("ONE",ONEConstraintCell.getConstraint().getShade().toString());
+        assertEquals("SIX",SIXConstraintCell.getConstraint().getShade().toString());
     }
 
     @Test

@@ -25,18 +25,18 @@ public class Constraint {
     }
 
     /**
-     * Get the string name of the shade constraint
-     * @return a String that is the name of the shade of the constraint
+     * Get the Face of the constraint if it is a shade constraint
+     * @return the shade of the constraint
      */
-    public String getShade(){
-        return !this.isColorConstraint()? this.shade.toString() : "null";
+    public Face getShade(){
+        return !this.isColorConstraint()? this.shade : null;
     }
 
     /**
-     * Get the string name of the color constraint
-     * @return a String that is the name of the color of the die
+     * Get the Color of the constraint if it is a color constraint
+     * @return  the Color of the constraint
      */
-    public String getColor(){ return this.isColorConstraint()? this.color.toString() : "null"; }
+    public Color getColor(){ return this.isColorConstraint()? this.color : null; }
 
     /**
      * Checks which type of constraint is set
@@ -59,7 +59,7 @@ public class Constraint {
      * @return the name of the value of the constraint
      */
     @Override
-    public String toString(){ return  this.isColorConstraint() ? this.getColor() : this.getShade(); }
+    public String toString(){ return  this.isColorConstraint() ? this.getColor().toString() : this.getShade().toString(); }
 
     /**
      * Changes the status of the constraint

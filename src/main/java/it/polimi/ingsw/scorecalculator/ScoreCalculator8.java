@@ -14,41 +14,19 @@ public class ScoreCalculator8 implements ScoreCalculator{
      * @return the score
      */
     @Override
-    public int calculateScore(SchemaCard schema){
-        int [] num = {0,0,0,0,0,0};
+    public int calculateScore(SchemaCard schema) {
+        int[] count = {0, 0, 0, 0, 0, 0};
         int min;
 
-        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+        FullCellIterator diceIterator = (FullCellIterator) schema.iterator();
 
-        while(diceIterator.hasNext()){
+        while (diceIterator.hasNext()) {
             diceIterator.next();
-            switch (schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShadeInt()){
-                case 1:
-                    num[0]++;
-                    break;
-                case 2:
-                    num[1]++;
-                    break;
-                case 3:
-                    num[2]++;
-                    break;
-                case 4:
-                    num[3]++;
-                    break;
-                case 5:
-                    num[4]++;
-                    break;
-                case 6:
-                    num[5]++;
-                    break;
-                default:
-                    break;
-            }
+            count[schema.getCell(diceIterator.getRow(), diceIterator.getColumn()).getDie().getShade().ordinal()]++;
         }
-
-        min=num[0];
-        for(int  x : num) {
-            if ( x < min){
+        min = count[0];
+        for (int x : count) {
+            if (x < min) {
                 min = x;
             }
         }

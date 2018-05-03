@@ -4,8 +4,15 @@ import it.polimi.ingsw.Cell;
 import it.polimi.ingsw.FullCellIterator;
 import it.polimi.ingsw.SchemaCard;
 
+/**
+ * This class implements the "Color Variety" card ScoreCalculator
+ */
 public class ScoreCalculator9 implements ScoreCalculator{
-
+    /**
+     * Computes the score of the Schema Card that is given by the Public Objective
+     * @param schema the schema whom score needs to be calculated
+     * @return the score
+     */
     @Override
     public int calculateScore(SchemaCard schema) {
         int points=0;

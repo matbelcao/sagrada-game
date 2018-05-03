@@ -18,45 +18,45 @@ class DieTest {
 
     @Test
     void init() {
-        assertEquals("ONE", test.getShade());
-        assertEquals("RED", test.getColor());
+        assertEquals("ONE", test.getShade().toString());
+        assertEquals("RED", test.getColor().toString());
         assertEquals("\u001B[31m\u2680\u001B[0m", test.toUtf());
     }
 
     @Test
     void testIncreaseDecrease() throws IllegalShadeException {
         test.increaseShade();
-        assertEquals("TWO", test.getShade());
-        assertEquals("RED", test.getColor());
+        assertEquals("TWO", test.getShade().toString());
+        assertEquals("RED", test.getColor().toString());
         test.decreaseShade();
-        assertEquals("ONE", test.getShade());
-        assertEquals("RED", test.getColor());
+        assertEquals("ONE", test.getShade().toString());
+        assertEquals("RED", test.getColor().toString());
     }
 
     @Test
     void testSetShade() throws IllegalShadeException {
         test.setShade(6);
-        assertEquals("SIX", test.getShade());
-        assertEquals("RED", test.getColor());
+        assertEquals("SIX", test.getShade().toString());
+        assertEquals("RED", test.getColor().toString());
     }
 
     @Test
     void testflip() throws IllegalShadeException {
         test.flipShade();
-        assertEquals("SIX", test.getShade());
-        assertEquals("RED", test.getColor());
+        assertEquals("SIX", test.getShade().toString());
+        assertEquals("RED", test.getColor().toString());
         test.flipShade();
-        assertEquals("ONE", test.getShade());
+        assertEquals("ONE", test.getShade().toString());
         test.setShade(2);
         test.flipShade();
-        assertEquals("FIVE", test.getShade());
+        assertEquals("FIVE", test.getShade().toString());
         test.flipShade();
-        assertEquals("TWO", test.getShade());
+        assertEquals("TWO", test.getShade().toString());
         test.setShade(3);
         test.flipShade();
-        assertEquals("FOUR", test.getShade());
+        assertEquals("FOUR", test.getShade().toString());
         test.flipShade();
-        assertEquals("THREE", test.getShade());
+        assertEquals("THREE", test.getShade().toString());
     }
 
     @Test

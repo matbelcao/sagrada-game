@@ -19,8 +19,8 @@ public class DiceBagTest {
         int purple = 18;
         for(int i = 0; i<90; i++){
             testDie = testBag.draftDie();
-            assertTrue(Face.contains(testDie.getShade())); //all the shades of the created dice are valid
-            switch (testDie.getColor()){
+            assertTrue(Face.contains(testDie.getShade().toString())); //all the shades of the created dice are valid
+            switch (testDie.getColor().toString()){
                 case "RED":
                     red--;
                     break;

@@ -8,19 +8,21 @@ public class PrivObjectiveCard extends Card{
         this.color=Color.valueOf(super.xmlReader(id,xmlSrc,"PrivObjectiveCard"));
     }
 
-    public String getColor(){
-        return color.toString();
+    public Color getColor(){
+        return this.color;
     }
 
 
     public int getCardScore(SchemaCard schema){
         int points=0;
         FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+        Die tempDie;
 
         while(diceIterator.hasNext()){
             diceIterator.next();
-            if(color.toString().equals(schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getColor())){
-                points+=schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie().getShadeInt();
+            tempDie=schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie();
+            if(color.toString().equals(tempDie.toString())){
+                points+=tempDie.getShade().toInt();
             }
         }
         return points;

@@ -26,7 +26,7 @@ public class ScoreCalculator10 implements ScoreCalculator{
 
         while(fullCell.hasNext()){
             next=fullCell.next();
-            count[next.getDie().getColorOrdinal()] += 1;
+            count[next.getDie().getColor().ordinal()] += 1;
         }
         points=count[0];
         for(Integer i : count){

@@ -14,13 +14,15 @@ public class RoundTrack{
     public RoundTrack() {
         this.track = new ArrayList<ArrayList<Die>>(10);
     }
+
     /**
      * getter of the object
      * @return an Arraylist of Arraylists of dice, that is the round track
      */
     public ArrayList<ArrayList<Die>> getTrack() {
-        return track;   //WARNING: Modifying the returned object will modify the RoundTrack
+        return (ArrayList<ArrayList<Die>>) track.clone();
     }
+
     /**
      * puts a group of dice in a container corresponding to the round they where drafted in
      * @param round the position in the Round Track where the dice are put, corresponding to the current round
