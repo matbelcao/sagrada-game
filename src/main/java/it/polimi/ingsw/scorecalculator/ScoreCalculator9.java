@@ -1,11 +1,10 @@
 package it.polimi.ingsw.scorecalculator;
-
 import it.polimi.ingsw.Cell;
 import it.polimi.ingsw.FullCellIterator;
 import it.polimi.ingsw.SchemaCard;
 
 /**
- * This class implements the "Color Diagonals" card ScoreCalculator
+ * This class implements the "Color Diagonals" Public Objective Card
  */
 public class ScoreCalculator9 implements ScoreCalculator{
     /**

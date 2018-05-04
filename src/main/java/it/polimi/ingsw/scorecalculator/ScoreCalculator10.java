@@ -1,11 +1,9 @@
 package it.polimi.ingsw.scorecalculator;
-
 import it.polimi.ingsw.*;
 
 /**
- * This class implements the procedure needed to calculate the score according to the tenth public objective
+ * This class implements the "Color Variety" Public Objective Card
  */
-
 public class ScoreCalculator10 implements ScoreCalculator{
     /**
      * Calculates the score due to the tenth card among the public objectives

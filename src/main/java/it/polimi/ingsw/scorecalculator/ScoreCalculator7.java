@@ -1,11 +1,10 @@
 package it.polimi.ingsw.scorecalculator;
-
 import it.polimi.ingsw.Die;
 import it.polimi.ingsw.FullCellIterator;
 import it.polimi.ingsw.SchemaCard;
 
 /**
- * "Dark Shades" card implementation
+ * This class implements the "Dark Shades" Public Objective Card
  */
 public class ScoreCalculator7 implements ScoreCalculator{
 

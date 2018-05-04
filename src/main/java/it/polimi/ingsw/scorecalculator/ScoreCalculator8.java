@@ -1,9 +1,8 @@
 package it.polimi.ingsw.scorecalculator;
-
 import it.polimi.ingsw.*;
 
 /**
- * "Different Shades" card implementation
+ * This class implements the "Shade Variety" Public Objective Card
  */
 public class ScoreCalculator8 implements ScoreCalculator{
 

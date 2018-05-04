@@ -1,11 +1,10 @@
 package it.polimi.ingsw.scorecalculator;
-
 import it.polimi.ingsw.Die;
 import it.polimi.ingsw.FullCellIterator;
 import it.polimi.ingsw.SchemaCard;
 
 /**
- * "Medium Shades" card implementation
+ * This class implements the "Medium Shades" Public Objective Card
  */
 public class ScoreCalculator6 implements ScoreCalculator{
 

@@ -1,11 +1,9 @@
 package it.polimi.ingsw.scorecalculator;
-
 import it.polimi.ingsw.SchemaCard;
-
 import java.util.ArrayList;
 
 /**
- * This class implements the "Different Colors - Row " Public Objective Card
+ * This class implements the "Row Color Variety" Public Objective Card
  */
 public class ScoreCalculator1 implements ScoreCalculator{
 
