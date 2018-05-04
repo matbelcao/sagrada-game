@@ -87,7 +87,7 @@ public class Die {
      * Rerolls a die
      * @param die the die to be rerolled
      */
-    public void reroll(Die die) throws IllegalShadeException {
+    public static void reroll(Die die) throws IllegalShadeException {
         Random randomGen = new Random();
         die.setShade(randomGen.nextInt(6)+1);
     }

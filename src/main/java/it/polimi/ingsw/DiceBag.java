@@ -49,9 +49,15 @@ public class DiceBag {
 
     /**
      * Puts a die in the DiceBag, to be used by tool card #11
+     * @param die to be rerolled
      */
     public void putDie(Die die){
-        toDraft.add(die);
+        try {
+            Die.reroll(die);
+            toDraft.add(die);
+        } catch (IllegalShadeException e) {
+            e.printStackTrace();
+        }
     }
 
 }
