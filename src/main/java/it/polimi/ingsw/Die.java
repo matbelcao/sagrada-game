@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
 import java.io.File;
+import java.util.Random;
 
 /**
  * This class represents one Die of the game with its color and shade (face). The class is immutable
@@ -80,6 +81,15 @@ public class Die {
         } catch (IllegalShadeException e) { // this can never happen
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Rerolls a die
+     * @param die the die to be rerolled
+     */
+    public void reroll(Die die) throws IllegalShadeException {
+        Random randomGen = new Random();
+        die.setShade(randomGen.nextInt(6)+1);
     }
 
     /**
