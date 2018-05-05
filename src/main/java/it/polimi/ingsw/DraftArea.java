@@ -12,7 +12,7 @@ public class DraftArea {
      * Constructor of the class
      */
     DraftArea(){
-        drafted = new ArrayList<Die>();
+        this.drafted = new ArrayList<>();
     }
     /**
      * Adds a die to the draft area
@@ -26,12 +26,26 @@ public class DraftArea {
      * @param dice the dice to be added
      */
     void addDice(ArrayList<Die> dice){
-        assert(drafted==null);
-        drafted.addAll(dice);
+        assert(this.drafted.isEmpty());
+        this.drafted.addAll(dice);
     }
+
+    /**
+     * This method returns the die selected through the index and removes it from the draft area
+     * @param index the index of the selected die
+     * @return the Die
+     */
+    Die chooseDie(int index){
+        Die die;
+        assert index>=0 && index<this.drafted.size();
+        die = this.drafted.get(index);
+        this.drafted.remove(index);
+        return die;
+    }
+
     /**
      * @return  a reference to all the dice in the draft area
      */
-    ArrayList<Die> getDice(){ return drafted; }
+    ArrayList<Die> getDice(){ return this.drafted; }
     
 }
