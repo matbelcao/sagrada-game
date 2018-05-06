@@ -5,13 +5,13 @@ import java.util.ArrayList;
 /**
  * This class represents the area where drafted dice are put
  */
-public class DraftArea {
+public class DraftPool {
     ArrayList<Die> drafted;
 
     /**
      * Constructor of the class
      */
-    DraftArea(){
+    DraftPool(){
         this.drafted = new ArrayList<>();
     }
     /**
