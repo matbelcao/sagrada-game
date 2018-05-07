@@ -6,6 +6,8 @@ public class Player {
     private SchemaCard schema;
     private Integer favorTokens;
     private Integer finalPosition;
+    private Boolean skipsNextTurn;// true when the player has used
+    private Boolean isConnected;
     //to be continued
 
     public void chooseSchemaCard(Integer id){
