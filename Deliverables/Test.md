@@ -49,7 +49,8 @@ Verifiche su classe SchemaCard:
 
 #### Public Objective Card
 * Corretta apertura file e inizializzazione
-* Verifica calcolo punteggio su SchemaCard riempita manualmente per ogni carta
+* Verifica calcolo punteggio su SchemaCard riempita completamente per ogni carta
+* Verifica calcolo punteggio su SchemaCard parzialmente riempita per ogni carta
 
 #### Color
 * Contains
