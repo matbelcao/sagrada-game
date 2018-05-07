@@ -3,15 +3,16 @@ package it.polimi.ingsw;
 public class Player {
     private String username;
     private String password;
-    private ServerConn serverConn;
-    private PrivObjectiveCard privObjective;
-    private SchemaCard schema;
     private int favorTokens;
     private int finalPosition;
     private int score;
     private Boolean skipsNextTurn;// true when the player has used
     private Boolean isConnected;
-    //to be continued
+
+    private ServerConn serverConn;
+    private Board board;
+    private PrivObjectiveCard privObjective;
+    private SchemaCard schema;
 
     public Player(String username, String password){
         this.username=username;
@@ -19,13 +20,11 @@ public class Player {
     }
 
     /**
-     * Assign a SchemaCard to the player
-     * @param id Schemacard's id
+     * Returns the player name
+     * @return the username
      */
-    public void chooseSchemaCard(Integer id){
-        schema = new SchemaCard(id,GameController.xmlSource+"SchemaCard.xml");
-        favorTokens=schema.getFavorTokens();
-        isConnected=true;
+    public String getUsername() {
+        return username;
     }
 
     /**
@@ -45,10 +44,20 @@ public class Player {
     /**
      * Assign a SchemaCard to the player
      * @param id Schemacard's id
-     * @param schemaCardFilename xml file path
      */
-    public void chooseSchemaCard(Integer id,String schemaCardFilename){ //for extra schemacards
-        schema = new SchemaCard(id,GameController.xmlSource+schemaCardFilename);
+    public void chooseSchemaCard(Integer id){
+        schema = new SchemaCard(id,GameController.xmlSource+"SchemaCard.xml");
+        favorTokens=schema.getFavorTokens();
+        isConnected=true;
+    }
+
+    /**
+     * Assign a SchemaCard to the player
+     * @param id Schemacard's id
+     * @param fileName xml file path
+     */
+    public void chooseSchemaCard(Integer id,String fileName){ //for extra schemacards
+        schema = new SchemaCard(id,GameController.xmlSource+fileName);
     }
 
     /**
@@ -72,7 +81,49 @@ public class Player {
         return false;
     }
 
+    /**
+     * Returns the score of the player
+     * @return player's score
+     */
+    public int getScore(){
+        return this.score;
+    }
+
+    /**
+     * Calculates and sets the score of the player
+     */
     public void calculateScore(){
+        PubObjectiveCard [] pubObjectiveCards = board.getPublicObjectives();
+
+        for (int i=0;i<pubObjectiveCards.length;i++){
+            score+=pubObjectiveCards[i].getCardScore(schema);
+        }
         score+=privObjective.getCardScore(schema);
+    }
+
+
+    /**
+     * Returns the final position of the player
+     * @return player's final position
+     */
+    public int getFinalPosition() {
+        return finalPosition;
+    }
+
+
+    /**
+     * Allows tho change the player's connection status
+     * @param isConnected connection status
+     */
+    public void setConnected(Boolean isConnected){
+        this.isConnected=isConnected;
+    }
+
+    /**
+     * Returns if the player is connected on the server
+     * @return player's connection status
+     */
+    public Boolean getConnected (){
+        return this.isConnected;
     }
 }
