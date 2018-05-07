@@ -71,16 +71,14 @@ class SchemaCardTest {
         Die die4= new Die("ONE","YELLOW");
         ArrayList <Integer> list = null;
 
-        try {
-            list= (ArrayList<Integer>) schema1.listPossiblePlacements(die1);
-        } catch (IllegalDieException e) {
-            e.printStackTrace();
-        }
+
+        list= (ArrayList<Integer>) schema1.listPossiblePlacements(die1);
+
         assertEquals(5,list.size());
 
     //illegal placement of a die
         Executable codeToTest = () -> schema1.putDie(8,die1);
-        Assertions.assertThrows(AssertionError.class, codeToTest);
+        Assertions.assertThrows(IllegalDieException.class, codeToTest);
 
 
     //legal placement
@@ -91,25 +89,21 @@ class SchemaCardTest {
         }
         assertEquals(die1,schema1.getCell(9).getDie());
 
-    //legal placement of the same die ->illegal
-        codeToTest= () -> schema1.putDie(13,die1);
-        Assertions.assertThrows(IllegalDieException.class, codeToTest);
-
     //illegal placement of die (non adjacent cell)
         codeToTest= () -> schema1.putDie(2,die3);
-        Assertions.assertThrows(AssertionError.class, codeToTest);
+        Assertions.assertThrows(IllegalDieException.class, codeToTest);
 
     //illegal placement of die (a die is already there)
         codeToTest= () -> schema1.putDie(9,die3);
-        Assertions.assertThrows(AssertionError.class, codeToTest);
+        Assertions.assertThrows(IllegalDieException.class, codeToTest);
 
     //illegal placement of die (shade constraint not respected)
         codeToTest= () -> schema1.putDie(4,die2);
-        Assertions.assertThrows(AssertionError.class, codeToTest);
+        Assertions.assertThrows(IllegalDieException.class, codeToTest);
 
     //illegal placement of die (color constraint not respected)
         codeToTest= () -> schema1.putDie(14,die4);
-        Assertions.assertThrows(AssertionError.class, codeToTest);
+        Assertions.assertThrows(IllegalDieException.class, codeToTest);
 
     //legal placement of an equal die in another position
         try {

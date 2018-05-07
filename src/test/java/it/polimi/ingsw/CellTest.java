@@ -50,7 +50,7 @@ class CellTest {
 
     @Test
     void ExceptionsTest() throws IllegalDieException {
-        assertThrows(IllegalDieException.class,() -> GREENConstraintCell.setDie(testDie));
-        assertThrows(IllegalDieException.class,() -> SIXConstraintCell.setDie(testDie));
+        assertThrows(AssertionError.class,() -> GREENConstraintCell.setDie(testDie));
+        assertThrows(AssertionError.class,() -> SIXConstraintCell.setDie(testDie));
     }
 }
