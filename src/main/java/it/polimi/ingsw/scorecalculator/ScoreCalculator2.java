@@ -16,21 +16,25 @@ public class ScoreCalculator2 implements ScoreCalculator{
     public int calculateScore(SchemaCard schema){
         int points = 0;
         ArrayList<String> tmpNum = new ArrayList<>();
-        boolean badRow;
+        boolean badColumn;
         String temp;
 
         for (int col = 0; col < SchemaCard.NUM_COLS;col++) {
             tmpNum.clear();
-            badRow = false;
-            for ( int row = 0; row < SchemaCard.NUM_ROWS && !badRow; row++) {
-                temp=schema.getCell(row, col).getDie().getColor().toString();
-                if (schema.getCell(row, col).hasDie() && !tmpNum.contains(temp)) {
-                    tmpNum.add(temp);
-                } else {
-                    badRow = true;
+            badColumn = false;
+            for ( int row = 0; row < SchemaCard.NUM_ROWS && !badColumn; row++) {
+                if (schema.getCell(row, col).hasDie()){
+                    temp=schema.getCell(row, col).getDie().getColor().toString();
+                    if (!tmpNum.contains(temp)) {
+                        tmpNum.add(temp);
+                    } else {
+                        badColumn = true;
+                    }
+                }else{
+                    badColumn = true;
                 }
             }
-            if (!badRow) {
+            if (!badColumn) {
                 points += 5;
             }
         }
