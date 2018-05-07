@@ -23,10 +23,14 @@ public class ScoreCalculator3 implements ScoreCalculator{
             tmpNum.clear();
             badRow = false;
             for (int col = 0; col < SchemaCard.NUM_COLS && !badRow; col++) {
-                temp=schema.getCell(row, col).getDie().getShade().toInt();
-                if (schema.getCell(row, col).hasDie() && !tmpNum.contains(temp)) {
-                    tmpNum.add(temp);
-                } else {
+                if (schema.getCell(row, col).hasDie()) {
+                    temp = schema.getCell(row, col).getDie().getShade().toInt();
+                    if (!tmpNum.contains(temp)) {
+                        tmpNum.add(temp);
+                    } else {
+                        badRow = true;
+                    }
+                }else {
                     badRow = true;
                 }
             }

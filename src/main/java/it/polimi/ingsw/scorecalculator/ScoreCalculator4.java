@@ -23,10 +23,14 @@ public class ScoreCalculator4 implements ScoreCalculator{
             tmpNum.clear();
             badColumn = false;
             for (int row = 0; row < SchemaCard.NUM_ROWS && !badColumn; row++) {
-                temp=schema.getCell(row, col).getDie().getShade().toInt();
-                if (schema.getCell(row, col).hasDie() && !tmpNum.contains(temp)) {
-                    tmpNum.add(temp);
-                } else {
+                if (schema.getCell(row, col).hasDie()) {
+                    temp = schema.getCell(row, col).getDie().getShade().toInt();
+                    if (schema.getCell(row, col).hasDie() && !tmpNum.contains(temp)) {
+                        tmpNum.add(temp);
+                    } else {
+                        badColumn = true;
+                    }
+                }else{
                     badColumn = true;
                 }
             }
