@@ -43,11 +43,11 @@ Verifiche su classe SchemaCard:
 * Inizializzazione e verifica estrazione di 18 dadi per ogni colore
 * Lancio eccezione all'estrazione del 91-esimo dado
 
-####Private Objective Card
+#### Private Objective Card
 * Corretta apertura file e inizializzazione
 * Verifica calcolo punteggio su SchemaCard riempita manualmente per ogni carta
 
-####Public Objective Card
+#### Public Objective Card
 * Corretta apertura file e inizializzazione
 * Verifica calcolo punteggio su SchemaCard riempita manualmente per ogni carta
 
