@@ -10,16 +10,20 @@ public class Board {
     private ToolCard [] toolCards;
     private Integer numOfPlayers;
 
+    public static final int NUM_OBJECTIVES=3;
+    public static final int NUM_TOOLS=3;
 
     public List<Player> getPlayers() {
         return players;
     }
 
-    public ToolCard[] getToolCards() {
-        return toolCards;
+    public ToolCard getToolCard(int index) {
+        assert (index>=0 && index<NUM_TOOLS);
+        return toolCards[index];
     }
 
-    public PubObjectiveCard[] getPublicObjectives() {
-        return publicObjectives;
+    public PubObjectiveCard getPublicObjective(int index) {
+        assert (index>=0 && index<NUM_OBJECTIVES);
+        return publicObjectives[index];
     }
 }
