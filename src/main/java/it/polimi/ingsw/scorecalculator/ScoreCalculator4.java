@@ -25,7 +25,7 @@ public class ScoreCalculator4 implements ScoreCalculator{
             for (int row = 0; row < SchemaCard.NUM_ROWS && !badColumn; row++) {
                 if (schema.getCell(row, col).hasDie()) {
                     temp = schema.getCell(row, col).getDie().getShade().toInt();
-                    if (schema.getCell(row, col).hasDie() && !tmpNum.contains(temp)) {
+                    if (!tmpNum.contains(temp)) {
                         tmpNum.add(temp);
                     } else {
                         badColumn = true;
