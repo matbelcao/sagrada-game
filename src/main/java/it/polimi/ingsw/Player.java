@@ -17,6 +17,8 @@ public class Player {
     public Player(String username, String password){
         this.username=username;
         this.password=password;
+        this.favorTokens=0;
+        this.score=0;
     }
 
     /**
@@ -45,9 +47,9 @@ public class Player {
      * Assign a SchemaCard to the player
      * @param id Schemacard's id
      */
-    public void chooseSchemaCard(Integer id){
+    public void chooseSchemaCard(Integer id){//to be continued
         schema = new SchemaCard(id,GameController.xmlSource+"SchemaCard.xml");
-        favorTokens=schema.getFavorTokens();
+        this.favorTokens=schema.getFavorTokens();
         isConnected=true;
     }
 
@@ -74,7 +76,8 @@ public class Player {
      * @return true if the operation was successful
      */
     public boolean decreaseFavorTokens(int tokens){
-        if(tokens>0 && this.favorTokens >= tokens){
+        assert tokens>0;
+        if(this.favorTokens >= tokens){
             this.favorTokens -= tokens;
             return true;
         }
@@ -93,12 +96,17 @@ public class Player {
      * Calculates and sets the score of the player
      */
     public void calculateScore(){
-        PubObjectiveCard [] pubObjectiveCards = board.getPublicObjectives();
+        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
 
-        for (int i=0;i<pubObjectiveCards.length;i++){
-            score+=pubObjectiveCards[i].getCardScore(schema);
+        if(score!=0){
+            score=0;
         }
+        for (int i=0;i<3;i++){
+            score+=board.getPublicObjective(i).getCardScore(schema);
+        }
+        score+=favorTokens;
         score+=privObjective.getCardScore(schema);
+        score-=(SchemaCard.NUM_ROWS*SchemaCard.NUM_COLS)-diceIterator.size();
     }
 
 
