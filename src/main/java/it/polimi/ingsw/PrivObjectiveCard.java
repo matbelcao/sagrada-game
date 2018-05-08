@@ -4,6 +4,7 @@ package it.polimi.ingsw;
  */
 public class PrivObjectiveCard extends Card{
     private Color color;
+    static final int NUM_PRIV_OBJ=5;
 
     /**
      * Constructs the card setting its id, name and description
