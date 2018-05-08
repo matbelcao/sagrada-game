@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 public class ToolCard extends Card{
     private boolean used;
     private ToolAction toolAction;
+    static final int NUM_TOOL_CARDS=12;
 
     /**
      * Constructs the card setting its id, name, description and use calculating algorithm

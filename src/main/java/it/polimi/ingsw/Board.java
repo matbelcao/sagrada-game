@@ -8,10 +8,17 @@ public class Board {
     private ArrayList<Player> players;
     private PubObjectiveCard [] publicObjectives;
     private ToolCard [] toolCards;
-    private Integer numOfPlayers;
+    private int numOfPlayers;
 
     public static final int NUM_OBJECTIVES=3;
     public static final int NUM_TOOLS=3;
+
+    public Board(List<Player> players,PubObjectiveCard [] publicObjectives,ToolCard [] toolCards){
+        this.players= (ArrayList<Player>) players;
+        this.publicObjectives=publicObjectives;
+        this.toolCards=toolCards;
+        this.numOfPlayers=this.players.size();
+    }
 
     public List<Player> getPlayers() {
         return players;
@@ -26,4 +33,6 @@ public class Board {
         assert (index>=0 && index<NUM_OBJECTIVES);
         return publicObjectives[index];
     }
+
+
 }
