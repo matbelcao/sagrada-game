@@ -12,6 +12,7 @@ public class Board {
 
     public static final int NUM_OBJECTIVES=3;
     public static final int NUM_TOOLS=3;
+    public static final int NUM_ROUNDS=10;
 
     public Board(List<Player> players,PubObjectiveCard [] publicObjectives,ToolCard [] toolCards){
         this.players= (ArrayList<Player>) players;

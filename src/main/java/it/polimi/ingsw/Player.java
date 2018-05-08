@@ -93,10 +93,9 @@ public class Player {
      * Calculates and sets the score of the player
      */
     public void calculateScore(){
-        PubObjectiveCard [] pubObjectiveCards = board.getPublicObjectives();
 
-        for (int i=0;i<pubObjectiveCards.length;i++){
-            score+=pubObjectiveCards[i].getCardScore(schema);
+        for (int i=0;i<Board.NUM_OBJECTIVES;i++){
+            score+=this.board.getPublicObjective(i).getCardScore(schema);
         }
         score+=privObjective.getCardScore(schema);
     }
