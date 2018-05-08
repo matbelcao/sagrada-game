@@ -39,6 +39,28 @@ public class FullCellIterator implements Iterator <Cell>{
     }
 
     /**
+     * returns the number of full cells (that contain a die) in the schemaCard
+     * @return the number of dice in the schema card
+     */
+    public int size(){
+        int size=0;
+
+        //saving th state of the iterator
+        int tempindex=this.index;
+        Cell tempnext= this.next;
+        //reinitializing the iterator
+        this.index=0;
+        this.next =null;
+        while(hasNext()){
+            next();
+            index ++;
+        }
+        //restore original state
+        this.index=tempindex;
+        this.next=tempnext;
+        return size;
+    }
+    /**
      * @return the next valid die
      */
     public Cell next() {
