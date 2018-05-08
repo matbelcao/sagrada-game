@@ -6,7 +6,7 @@ public class Player {
     private int favorTokens;
     private int finalPosition;
     private int score;
-    private Boolean skipsNextTurn;// true when the player has used
+    private Boolean skipsNextTurn;// true when the player has used a particular toolcard
     private Boolean isConnected;
 
     private ServerConn serverConn;
@@ -34,11 +34,7 @@ public class Player {
      * @return true if the credentials matches
      */
     public Boolean login(String username,String password){
-        if(this.username==username && this.password==password){
-            return true;
-        }else{
-            return false;
-        }
+        return this.username.equals(username) && this.password.equals(password);
     }
 
     /**
