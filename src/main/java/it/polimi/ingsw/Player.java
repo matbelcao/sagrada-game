@@ -89,13 +89,17 @@ public class Player {
      * Calculates and sets the score of the player
      */
     public void calculateScore(){
-
-        for (int i=0;i<Board.NUM_OBJECTIVES;i++){
-            score+=this.board.getPublicObjective(i).getCardScore(schema);
+        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+        if (score != 0) {
+            score = 0;
         }
-        score+=privObjective.getCardScore(schema);
+        for (int i = 0; i < 3; i++) {
+            score += board.getPublicObjective(i).getCardScore(schema);
+        }
+        score += favorTokens;
+        score += privObjective.getCardScore(schema);
+        score -= (SchemaCard.NUM_ROWS * SchemaCard.NUM_COLS) - diceIterator.numOfDice();
     }
-
 
     /**
      * Returns the final position of the player
@@ -121,4 +125,5 @@ public class Player {
     public Boolean getConnected (){
         return this.isConnected;
     }
+
 }

@@ -48,6 +48,12 @@ public class ToolCard extends Card{
      * @return if the card has been used successfully
      */
     public boolean useTool(Player player){
+        if(used==false){
+            used =true;
+            player.decreaseFavorTokens(1);
+        }else{
+            player.decreaseFavorTokens(2);
+        }
         return toolAction.useToolCard(player);
     }
 
