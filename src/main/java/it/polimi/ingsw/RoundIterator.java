@@ -24,13 +24,13 @@ public class RoundIterator implements Iterator<Player> {
         this.numPlayers=players.size();
         this.next=null;
         this.i=0;
-        this.round=0;
+        this.round=-1;
     }
 
     /**
      * Resets variables to begin a new round
      */
-    public void nextRound() throws NoSuchMethodException {
+    public void nextRound(){
         if(hasNextRound()) {
             this.next = null;
             this.i = 0;
@@ -52,6 +52,7 @@ public class RoundIterator implements Iterator<Player> {
      */
     @Override
     public boolean hasNext() {
+        if(this.round==-1){this.nextRound();}
         if(i<2*numPlayers){
             if(i<numPlayers){
                 next=players.get((round + i)%numPlayers);
@@ -82,7 +83,7 @@ public class RoundIterator implements Iterator<Player> {
      * @return the next player
      */
     @Override
-    public Player next() throws NoSuchElementException {
+    public Player next(){
         if(this.hasNext()){ i++; return next;}
         throw new NoSuchElementException();
     }
