@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -10,6 +11,7 @@ import java.util.Timer;
 
 public class MasterServer {
     private static MasterServer instance;
+    private SocketListener listener;
     private String address;
     private int portRMI;
     private int portSocket;
@@ -20,7 +22,6 @@ public class MasterServer {
         address = "rmi://127.0.0.1/myabc";
         portRMI = 1099;
         portSocket = 3000;
-
     }
 
     public static MasterServer getMasterServer() {
@@ -29,9 +30,9 @@ public class MasterServer {
     }
 
     public void startRMI(){
-        if (System.getSecurityManager() == null) {
+        /*if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
-        }
+        }*/
 
         try {
             AuthenticationInt authenticator = new Authentication();
@@ -44,13 +45,23 @@ public class MasterServer {
         }
     }
 
+    public void startSocket(){
+        SocketListener listener = new SocketListener(portSocket);
+        listener.run();
+    }
+
     public boolean loginRMI(String userName, String password){
         return false;
     }
 
+    public static void loginSocket(Socket socket){
+
+    }
 
     public static void main(String[] args){
         MasterServer.getMasterServer();
+        MasterServer.getMasterServer().startRMI();
+        MasterServer.getMasterServer().startSocket();
     }
 
 
