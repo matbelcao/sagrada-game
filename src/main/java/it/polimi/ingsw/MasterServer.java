@@ -9,6 +9,9 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Timer;
 
+/**
+ * This class is the server, it handles the login of the clients and the beginning of matches
+ */
 public class MasterServer {
     private static MasterServer instance;
     private SocketListener listener;
@@ -18,24 +21,36 @@ public class MasterServer {
     private ArrayList <User> users;
     private Timer timer;
 
+    /**
+     * This is the constructor of the server, it initializes the address of the port for socket and RMI connection,
+     * it's made private as MasterServer is a Singleton
+     */
     private MasterServer() {
         address = "rmi://127.0.0.1/myabc";
         portRMI = 1099;
         portSocket = 3000;
     }
 
+    /**
+     * This is the getter of the MasterServer
+     * @return the instance of the MasterServer
+     */
     public static MasterServer getMasterServer() {
         if (instance == null) instance = new MasterServer();
         return instance;
     }
 
+    /**
+     * This method makes the MasterServer available for RMI connection. It publishes in the rmi registry
+     * an instance of the object Authenticator
+     */
     public void startRMI(){
         /*if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }*/
 
         try {
-            AuthenticationInt authenticator = new Authentication();
+            AuthenticationInt authenticator = new Authenticator();
             Registry registry = LocateRegistry.createRegistry(portRMI);
             Naming.rebind("rmi://127.0.0.1/myabc", authenticator);
         }catch (RemoteException e){
@@ -45,15 +60,28 @@ public class MasterServer {
         }
     }
 
+    /**
+     * This method starts a SocketListener thread that accepts all socket connection
+     */
     public void startSocket(){
         SocketListener listener = new SocketListener(portSocket);
         listener.run();
     }
 
-    public boolean loginRMI(String userName, String password){
+    /**
+     * This method allows a client to login to the MasterServer
+     * @param userName the username of the client who wants to login
+     * @param password the password to be coupled with the username
+     * @return true iff the Client gets logged in
+     */
+    public boolean login(String userName, String password){
         return false;
     }
 
+    /**
+     * This method allows the login for a Client connecting via socket
+     * @param socket the socket created by the SocketListener for the connection inbound
+     */
     public static void loginSocket(Socket socket){
 
     }
