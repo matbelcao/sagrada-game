@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 
-public class GameControllerTest {
+public class RoundIteratorTest {
     private static GameController controller;
     private static ArrayList<Player> players;
     @BeforeAll
