@@ -29,6 +29,7 @@ public class MasterServer {
         address = "rmi://127.0.0.1/myabc";
         portRMI = 1099;
         portSocket = 3000;
+        users = new ArrayList<>();
     }
 
     /**
@@ -53,6 +54,7 @@ public class MasterServer {
             AuthenticationInt authenticator = new Authenticator();
             Registry registry = LocateRegistry.createRegistry(portRMI);
             Naming.rebind("rmi://127.0.0.1/myabc", authenticator);
+            System.out.println("rmi auth running");
         }catch (RemoteException e){
             e.printStackTrace();
         } catch (MalformedURLException e) {
@@ -75,7 +77,16 @@ public class MasterServer {
      * @return true iff the Client gets logged in
      */
     public boolean login(String userName, String password){
-        return false;
+        User u = getUser(userName);
+            if(u != null){
+                if(u.getPassword().equals(password)) {
+                    //get connection
+                    return true;
+                }else
+                    return false;
+            }
+        users.add(new User(userName, password));
+        return true;
     }
 
     /**
@@ -86,10 +97,23 @@ public class MasterServer {
 
     }
 
+    public User getUser(String name){
+        for(User u : users) {
+            if (u.getUsername().equals(name)) {
+                return u;
+            }
+        }
+        return null;
+    }
+
+    ArrayList getUsers(){ return users; }
+
     public static void main(String[] args){
         MasterServer.getMasterServer();
         MasterServer.getMasterServer().startRMI();
-        MasterServer.getMasterServer().startSocket();
+        while(true){
+            //server infinite loop
+        }
     }
 
 
