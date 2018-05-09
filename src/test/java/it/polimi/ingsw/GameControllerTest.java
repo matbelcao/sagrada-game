@@ -62,6 +62,9 @@ public class GameControllerTest {
         next=round.next();
         assertEquals(players.get(0),next);
         assertTrue(round.hasNext());
+        next=round.next();
+        assertEquals(players.get(2),next);
+
         //round 3
         round.nextRound();
         next=round.next();
@@ -119,8 +122,10 @@ public class GameControllerTest {
         round.next();
         round.next();
         assertTrue(!round.hasNext());
+        assertTrue(round.hasNextRound());
         //round 9
         round.nextRound();
+        assertEquals(8,round.getRoundNumber());
         //round 10
         round.nextRound();
         //no more rounds
@@ -131,6 +136,7 @@ public class GameControllerTest {
         };
         Assertions.assertThrows(NoSuchElementException.class, codeToTest);
 
+        assertEquals(9,round.getRoundNumber());
 
     }
 }
