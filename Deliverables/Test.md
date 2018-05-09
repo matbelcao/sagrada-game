@@ -59,3 +59,9 @@ Verifiche su classe SchemaCard:
 * Contains
 * valueOf
 * Lancio eccezioni
+
+#### Round Iterator
+* While annidati (turni nei round) con conteggio turni e round
+* Verifica successione giocatori in turni e round
+* getRoundNumber 
+* hasNextRound hasNext (Player)

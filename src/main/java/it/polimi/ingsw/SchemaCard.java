@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 import org.xml.sax.SAXException;
@@ -320,7 +321,7 @@ public class SchemaCard implements Iterable<Cell> {
      * @param die die to be put
      * @throws IllegalDieException iff the die can't be placed there
      */
-    public void putDie (Integer index,Die die) throws IllegalDieException{
+    public void putDie (int index,Die die) throws IllegalDieException{
 
         if (!this.listPossiblePlacements(die).contains(index)) throw new IllegalDieException("You can't place this die here!");
 
@@ -335,13 +336,40 @@ public class SchemaCard implements Iterable<Cell> {
      * @param ignoreConstraint string that tells which constraint(s) can be ignored
      * @throws IllegalDieException iff the die can't be placed there
      */
-    public void putDie (Integer index,Die die, String ignoreConstraint) throws IllegalDieException {
+    public void putDie (int index,Die die, String ignoreConstraint) throws IllegalDieException {
 
         if (!this.listPossiblePlacements(die,ignoreConstraint).contains(index)) throw new IllegalDieException("You can't place this die here!");
 
         this.cell[index/NUM_COLS][index%NUM_COLS].setDie(die,ignoreConstraint);
         this.isFirstDie=false;
     }
+
+    /**
+     * Removes the die in the cell in the position indicated by index and returns it to the caller
+     * @param index the index of the cell containing the die to be removed
+     * @return the removed die
+     */
+    public Die removeDie(int index) {
+        if (this.getCell(index).hasDie()) {
+            return this.getCell(index).removeDie();
+        }
+        throw new NoSuchElementException("there's no die to remove in this cell(index:"+index+")");
+    }
+
+    /**
+     * Removes the die in the cell in the position indicated by row and column and returns it to the caller
+     * @param row the row of the cell containing the die
+     * @param column the column of the cell containing the die
+     * @return the removed die
+     */
+    public Die removeDie(int row,int column) {
+        if (this.getCell(row, column).hasDie()) {
+            return this.getCell(row, column).removeDie();
+        }
+        throw new NoSuchElementException("there's no die to remove in this cell(row,column:" +row +","+column +")");
+    }
+
+
 
     /**
      * Instantiates an iterator for cells containing a die

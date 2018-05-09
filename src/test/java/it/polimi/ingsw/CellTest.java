@@ -3,6 +3,8 @@ package it.polimi.ingsw;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Executable;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class CellTest {
@@ -27,7 +29,9 @@ class CellTest {
         assertEquals(null,emptyConstraintCell.getDie());
         emptyConstraintCell.setDie(testDie);
         assertEquals(testDie,emptyConstraintCell.getDie());
-        emptyConstraintCell.setDie(null);
+        Die nulldie=null;
+
+        assertThrows(AssertionError.class,() -> emptyConstraintCell.setDie(nulldie));
     }
 
     @Test

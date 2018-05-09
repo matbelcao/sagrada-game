@@ -44,7 +44,10 @@ public class RoundIterator implements Iterator<Player> {
      * Returns the number of the turn that is being played (0 to 9)
      * @return the round's number
      */
-    public int getRoundNumber(){ return this.round;}
+    public int getRoundNumber(){
+        if(this.round==-1){this.nextRound();}
+        return this.round;
+    }
 
     /**
      * This method checks whether the round is over
@@ -84,6 +87,7 @@ public class RoundIterator implements Iterator<Player> {
      */
     @Override
     public Player next(){
+
         if(this.hasNext()){ i++; return next;}
         throw new NoSuchElementException();
     }

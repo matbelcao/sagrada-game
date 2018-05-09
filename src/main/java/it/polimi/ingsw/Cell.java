@@ -34,6 +34,7 @@ public class Cell {
      * @return true iff the die respects the Cell constraint
      */
     public Boolean canAcceptDie(Die die){
+        if(die==null){return false;}
         if(this.constraint==null || !this.constraint.isActive()) {
             return true;
         }
@@ -53,7 +54,7 @@ public class Cell {
      * @return true iff the die respects the Cell constraint
      */
     public Boolean canAcceptDie(Die die,String ignoreConstraint){
-
+        if(die==null){return false;}
         if(ignoreConstraint.equals("ALL")){ return true; }
         if(ignoreConstraint.equals("COLOR") && this.constraint.isColorConstraint()){ return true; }
         if(ignoreConstraint.equals("SHADE") && !this.constraint.isColorConstraint()){ return true; }
@@ -76,7 +77,19 @@ public class Cell {
      */
     public void setDie(Die die) {
         assert canAcceptDie(die);
-            this.die=die;
+        this.die=die;
+    }
+
+    /**
+     * Removes the die that was placed in the cell if it has one
+     * @return a pointer to the die that is being removed
+     */
+    public Die removeDie() {
+        Die tempDie;
+        assert this.hasDie();
+        tempDie=this.die;
+        this.die=null;
+        return tempDie;
     }
 
     /**
