@@ -1,4 +1,4 @@
 package it.polimi.ingsw;
 
-public class RMIConn {
+public class RMIConn extends ServerConn {
 }
