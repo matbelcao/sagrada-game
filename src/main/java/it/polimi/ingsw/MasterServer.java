@@ -12,6 +12,7 @@ import java.util.Timer;
 /**
  * This class is the server, it handles the login of the clients and the beginning of matches
  */
+
 public class MasterServer {
     private static MasterServer instance;
     private SocketListener listener;
@@ -72,20 +73,19 @@ public class MasterServer {
 
     /**
      * This method allows a client to login to the MasterServer
-     * @param userName the username of the client who wants to login
+     * @param username the username of the client who wants to login
      * @param password the password to be coupled with the username
      * @return true iff the Client gets logged in
      */
-    public boolean login(String userName, String password){
-        User u = getUser(userName);
-            if(u != null){
-                if(u.getPassword().equals(password)) {
-                    //get connection
-                    return true;
-                }else
-                    return false;
+    public boolean login(String username, String password){
+        if(isIn(username)){
+            if(getUser(username).getPassword().equals(password)) {
+                //get connection
+                return true;
+            }else
+                return false;
             }
-        users.add(new User(userName, password));
+        users.add(new User(username, password));
         return true;
     }
 
@@ -106,7 +106,19 @@ public class MasterServer {
         return null;
     }
 
+    /**
+     * A method to get all the users registered to the MasterServer
+     * @return users the arraylist of the users
+     */
     ArrayList getUsers(){ return users; }
+
+    boolean isIn(String user){
+        for(User u : users){
+            if(u.getUsername().equals(user))
+                return true;
+        }
+        return false;
+    }
 
     public static void main(String[] args){
         MasterServer.getMasterServer();
