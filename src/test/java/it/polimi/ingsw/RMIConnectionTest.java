@@ -1,6 +1,6 @@
 package it.polimi.ingsw;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -9,25 +9,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RMIConnectionTest {
-    @BeforeAll
-    public static void beforeAllTest(){
+    @BeforeEach
+    public void beforeEachTest(){
         MasterServer.getMasterServer().startRMI();
         //MasterServer.getMasterServer().startSocket();
     }
-
     //This test logs 9 clients and verfies if they get properly saved by the master server
     @Test
     public void orderedConnection(){
         ArrayList<User> users;
-        Client c1 = new Client(false,true);
-        Client c2 = new Client(false,true);
-        Client c3 = new Client(false,true);
-        Client c4 = new Client(false,true);
-        Client c5 = new Client(false,true);
-        Client c6 = new Client(false,true);
-        Client c7 = new Client(false,true);
-        Client c8 = new Client(false,true);
-        Client c9 = new Client(false,true);
+        Client c1 = new Client("CONSOLE","RMI");
+        Client c2 = new Client("CONSOLE","RMI");
+        Client c3 = new Client("CONSOLE","RMI");
+        Client c4 = new Client("CONSOLE","RMI");
+        Client c5 = new Client("CONSOLE","RMI");
+        Client c6 = new Client("CONSOLE","RMI");
+        Client c7 = new Client("CONSOLE","RMI");
+        Client c8 = new Client("CONSOLE","RMI");
+        Client c9 = new Client("CONSOLE","RMI");
         c1.setUsername("a");
         c2.setUsername("b");
         c3.setUsername("c");

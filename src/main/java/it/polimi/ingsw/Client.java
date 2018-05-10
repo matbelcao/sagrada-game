@@ -6,14 +6,19 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 public class Client {
-    private boolean usesGUI;
-    private boolean usesRMI;
+    private UIMode uiMode;
+    private ConnectionMode connMode;
     private String username;
     private String password;
 
-    Client(boolean usesGUI,boolean usesRMI){
-        this.usesGUI = usesGUI;
-        this.usesRMI = usesRMI;
+    Client(UIMode uiMode,ConnectionMode connMode){
+        this.uiMode = uiMode;
+        this.connMode = connMode;
+    }
+
+    Client(String uiMode,String connMode){
+        this.uiMode = UIMode.valueOf(uiMode);
+        this.connMode = ConnectionMode.valueOf(connMode);
     }
 
     public String getUsername() { return username; }
@@ -25,7 +30,7 @@ public class Client {
     public void setPassword(String password) { this.password = password; }
 
     public void setupConnection(){
-        if(usesRMI){
+        if(connMode.equals(ConnectionMode.RMI)){
             loginRMI();
         }else{
             loginSocket();

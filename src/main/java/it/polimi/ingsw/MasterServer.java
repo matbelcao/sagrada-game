@@ -67,7 +67,7 @@ public class MasterServer {
      */
     public void startSocket(){
         SocketListener listener = new SocketListener(portSocket);
-        listener.run();
+        listener.start();
     }
 
     /**
