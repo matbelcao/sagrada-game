@@ -1,7 +1,6 @@
 package it.polimi.ingsw;
 
 import java.net.MalformedURLException;
-import java.net.Socket;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -77,7 +76,7 @@ public class MasterServer {
      * @param password the password to be coupled with the username
      * @return true iff the Client gets logged in
      */
-    public boolean login(String username, String password){
+    public synchronized boolean login(String username, String password){
         if(isIn(username)){
             if(getUser(username).getPassword().equals(password)) {
                 //get connection
@@ -87,14 +86,6 @@ public class MasterServer {
             }
         users.add(new User(username, password));
         return true;
-    }
-
-    /**
-     * This method allows the login for a Client connecting via socket
-     * @param socket the socket created by the SocketListener for the connection inbound
-     */
-    public static void loginSocket(Socket socket){
-
     }
 
     public User getUser(String name){

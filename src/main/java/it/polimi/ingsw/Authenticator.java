@@ -8,6 +8,7 @@ public class Authenticator extends UnicastRemoteObject implements Authentication
 
     @Override
     public boolean authenticate(String userName, String password) {
+        //create the remote object
         return MasterServer.getMasterServer().login(userName,password);
     }
 }

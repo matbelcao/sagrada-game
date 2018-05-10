@@ -22,7 +22,8 @@ public class SocketListener extends Thread {
             while(true)
             {
                 Socket socket = serverSocket.accept();
-                MasterServer.loginSocket(socket);
+                new SocketConn(socket);
+
             }
         }
         catch(Exception e)
