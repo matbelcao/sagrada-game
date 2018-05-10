@@ -88,9 +88,14 @@ public class MasterServer {
         return true;
     }
 
-    public User getUser(String name){
+    /**
+     * Metod to return the user whose name matches to the input String
+     * @param username the name of the user searched
+     * @return the searched user if present else null
+     */
+    public User getUser(String username){
         for(User u : users) {
-            if (u.getUsername().equals(name)) {
+            if (u.getUsername().equals(username)) {
                 return u;
             }
         }
