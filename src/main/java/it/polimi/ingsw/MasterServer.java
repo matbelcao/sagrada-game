@@ -114,6 +114,7 @@ public class MasterServer {
     public static void main(String[] args){
         MasterServer.getMasterServer();
         MasterServer.getMasterServer().startRMI();
+        MasterServer.getMasterServer().startSocket();
         while(true){
             //server infinite loop
         }

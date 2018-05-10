@@ -15,7 +15,6 @@ public class SocketConn extends Thread implements ServerConn  {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         start();
     }
 
@@ -29,10 +28,11 @@ public class SocketConn extends Thread implements ServerConn  {
                 e.printStackTrace();
             }
             execute(comand);
-        }
+    }
     }
 
     void execute(String comand){
+        outSocket.println("The comand was "+comand);
         //add methods to parse the string
     }
 }
