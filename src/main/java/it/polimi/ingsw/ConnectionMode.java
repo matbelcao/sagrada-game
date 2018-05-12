@@ -5,6 +5,6 @@ package it.polimi.ingsw;
  * game connecting via console or via gui
  * */
 public enum ConnectionMode {
-    RMI(),
-    SOCKET();
+    RMI,
+    SOCKET;
 }
