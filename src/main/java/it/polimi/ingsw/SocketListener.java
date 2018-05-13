@@ -10,10 +10,10 @@ import java.net.Socket;
  * newly created socket
  */
 public class SocketListener extends Thread {
-    private int port;
+    Socket socket;
 
-    SocketListener(int port){
-        this.port = port;
+    SocketListener(Socket socket){
+        this.socket=socket;
     }
 
     /**
@@ -21,39 +21,10 @@ public class SocketListener extends Thread {
      */
     @Override
     public void run(){
-        ServerSocket serverSocket=null;
-        try
-        {
-            serverSocket = new ServerSocket(port);
-            System.out.println("\nServer waiting for socket connection on port " +  serverSocket.getLocalPort());
-            // server infinite loop
-            while(true)
-            {
-                Socket socket = serverSocket.accept();
-                login(socket);
-                new SocketConn(socket);
-            }
-        }
-        catch(Exception e)
-        {
-            System.out.println(e);
-            try
-            {
-                serverSocket.close();
-            }
-            catch(Exception ex)
-            {}
-        }
-    }
-
-    /**
-     * The functions runs an infinite loop until it receives a correct username/password or new user's data
-     * @param socket the client's socket
-     */
-    private void login(Socket socket){
         BufferedReader inSocket=null;
         PrintWriter outSocket=null;
         String comand = "";
+        Boolean connected = false;
         MasterServer master=MasterServer.getMasterServer();
 
         try {
@@ -63,27 +34,25 @@ public class SocketListener extends Thread {
             e.printStackTrace();
         }
 
-        while(true){
-            try {
+        try {
+            while (connected==false){
                 comand = inSocket.readLine();
                 System.out.println(comand);
                 String params[]= comand.split(" ");
                 if (params.length==3 && params[0].equals("LOGIN") ){
-                    if (master.isIn(params[1]) && params[2].equals(master.getUser(params[1]).getPassword())){
+                    connected=master.login(params[1],params[2]);
+                    if (connected){
                         outSocket.println("LOGIN ok");
-                        return;
+                    }else{
+                        outSocket.println("LOGIN ko");
                     }
-                    if (!master.isIn(params[1])){
-                        User user = new User(params[1],params[2]);
-                        master.addUser(user);
-                        outSocket.println("LOGIN ok");
-                        return;
-                    }
-                    outSocket.println("LOGIN ko");
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+
+            new SocketConn(socket);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+
 }

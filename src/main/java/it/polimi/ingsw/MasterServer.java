@@ -1,6 +1,8 @@
 package it.polimi.ingsw;
 
 import java.net.MalformedURLException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -12,7 +14,7 @@ import java.util.Timer;
  * This class is the server, it handles the login of the clients and the beginning of matches
  */
 
-public class MasterServer {
+public class MasterServer{
     private static MasterServer instance;
     private SocketListener listener;
     private String address;
@@ -65,9 +67,31 @@ public class MasterServer {
     /**
      * This method starts a SocketListener thread that accepts all socket connection
      */
-    public void startSocket(){
-        SocketListener listener = new SocketListener(portSocket);
-        listener.start();
+    private void startSocket(){
+        ServerSocket serverSocket=null;
+        try
+        {
+            serverSocket = new ServerSocket(portSocket);
+            System.out.println("\nServer waiting for socket connection on port " +  serverSocket.getLocalPort());
+            // server infinite loop
+            while(true)
+            {
+                Socket socket = serverSocket.accept();
+                System.out.println("Client connection estabilished");
+                SocketListener listener = new SocketListener(socket);
+                listener.start();
+            }
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+            try
+            {
+                serverSocket.close();
+            }
+            catch(Exception ex)
+            {}
+        }
     }
 
     /**
@@ -76,26 +100,18 @@ public class MasterServer {
      * @param password the password to be coupled with the username
      * @return true iff the Client gets logged in
      */
-    public synchronized boolean login(String username, String password){
-        if(isIn(username)){
-            if(getUser(username).getPassword().equals(password)) {
-                //get connection
+    public synchronized boolean login(String username, String password) {
+            if (isIn(username)) {
+                User user = getUser(username);
+                if (password.equals(user.getPassword()) && user.getStatus() != UserStatus.CONNECTED) {
+                    return true;
+                }
+            } else {
+                User user = new User(username, password);
+                users.add(user);
                 return true;
-            }else
-                return false;
             }
-        users.add(new User(username, password));
-        return true;
-    }
-
-    /**
-     * Thi method adds the user to the ArrayList if does not exists
-     * @param user the user to add
-     */
-    public void addUser(User user){
-        if (!isIn(user.getUsername())){
-            users.add(user);
-        }
+            return false;
     }
 
     /**
