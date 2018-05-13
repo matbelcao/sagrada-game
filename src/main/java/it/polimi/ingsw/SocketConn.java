@@ -33,11 +33,28 @@ public class SocketConn extends Thread implements ServerConn  {
                 e.printStackTrace();
             }
             execute(comand);
+        }
     }
-    }
+
 
     void execute(String comand){
         outSocket.println("The comand was "+comand);
-        //add methods to parse the string
+        String temp=comand.replaceFirst(" ", ":");
+
+        System.out.println(temp);
+
+        String command[]= temp.split(":");
+
+        if(command[0].equals("LOGIN")){
+            String param[]=command[1].split(" ");
+            //login(param[0],param[1]);
+        }
+        if(command[0].equals("SELECT")){
+            //select(command[1]);
+        }
+        if(command[0].equals("GET")){
+            //get(command[1]);
+        }
+
     }
 }

@@ -89,6 +89,16 @@ public class MasterServer {
     }
 
     /**
+     * Thi method adds the user to the ArrayList if does not exists
+     * @param user the user to add
+     */
+    public void addUser(User user){
+        if (!isIn(user.getUsername())){
+            users.add(user);
+        }
+    }
+
+    /**
      * Metod to return the user whose name matches to the input String
      * @param username the name of the user searched
      * @return the searched user if present else null
