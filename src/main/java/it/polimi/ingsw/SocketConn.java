@@ -26,18 +26,19 @@ public class SocketConn extends Thread implements ServerConn  {
     @Override
     public void run(){
         String comand = "";
-        while(true){
+        boolean quit = false;
+        while(!quit){
             try {
                 comand = inSocket.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            execute(comand);
+            quit = execute(comand);
         }
     }
 
 
-    void execute(String comand){
+    private boolean execute(String comand){
         outSocket.println("The comand was "+comand);
         String temp=comand.replaceFirst(" ", ":");
 
@@ -45,16 +46,20 @@ public class SocketConn extends Thread implements ServerConn  {
 
         String command[]= temp.split(":");
 
-        if(command[0].equals("LOGIN")){
-            String param[]=command[1].split(" ");
-            //login(param[0],param[1]);
-        }
-        if(command[0].equals("SELECT")){
-            //select(command[1]);
+        if(command[0].equals("STATUS")){
+            if (command[1].equals("quit") && command.length==2){
+                try {
+                    socket.close();
+                    return true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         if(command[0].equals("GET")){
             //get(command[1]);
         }
+        return false;
 
     }
 }

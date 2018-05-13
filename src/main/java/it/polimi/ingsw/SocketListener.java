@@ -1,7 +1,5 @@
 package it.polimi.ingsw;
-
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
@@ -12,12 +10,12 @@ import java.net.Socket;
 public class SocketListener extends Thread {
     Socket socket;
 
-    SocketListener(Socket socket){
+    public SocketListener(Socket socket){
         this.socket=socket;
     }
 
     /**
-     * The thread starts an infinite loop listening for new connections via socket
+     * The thread starts an infinite loop upon it receives a valid credentials or new user's data
      */
     @Override
     public void run(){
@@ -50,6 +48,7 @@ public class SocketListener extends Thread {
             }
 
             new SocketConn(socket);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
