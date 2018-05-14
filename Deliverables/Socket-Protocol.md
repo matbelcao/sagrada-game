@@ -24,11 +24,11 @@ The client sends this message then waits for a response from the server. This is
 +   `ok`: the client logged in successfully
 +   `ko`: username and password did not match
 
-The server responds with this message to the login request from the client, if ko the client will be able to try with another username + password combination, if ok the user enters the `LOBBY` phase
+The server responds with this message to the login request from the client, if ko the client will be able to try with another username + password combination, if ok the user enters the `LOBBY` phase.
 
 
-## Lobby  
-### Server-side
+## Lobby
+### Server-side
 ##### `LOBBY <number_of_lobby_players>`
 +   `<number_of_lobby_players>`: number of the players waiting in the lobby to begin a new match
 
@@ -134,7 +134,7 @@ This message is sent at every beginning/end of a turn and can trigger (end) clie
 
 The client sends this message to request the updated schema card or the complete schema card (in case of reconnection or if it's the beginning of the first round). The draft option makes the server send the four schema cards the user has to choose from. 
 
-#####`GET favor_tokens <player_id>`
+##### `GET favor_tokens <player_id>`
 +   `<player_id>`: the player whose favor tokens the user wants to obtain
 
 This message is used to get the number of tokens remaining to the specified player.
