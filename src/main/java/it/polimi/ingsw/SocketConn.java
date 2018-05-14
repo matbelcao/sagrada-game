@@ -47,14 +47,12 @@ public class SocketConn extends Thread implements ServerConn  {
 
         String command[]= temp.split(":");
 
-        if(command[0].equals("STATUS")){
-            if (command[1].equals("quit") && command.length==2){
-                try {
-                    socket.close();
-                    return true;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        if(command[0].equals("quit")){
+            try {
+                socket.close();
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         if(command[0].equals("GET")){

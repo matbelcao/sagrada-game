@@ -61,9 +61,9 @@ public class MasterServer{
      * Updates the lobby queue and instatiate the new Games
      */
     protected synchronized void updateLobby(){
-        int cont;
-        ArrayList <User> players = new ArrayList<User>();
+        ArrayList <User> players = new ArrayList<>();
 
+        //Queuing users
         for(User u : users){
             if(u.getStatus()==UserStatus.CONNECTED){
                 u.setStatus(UserStatus.QUEUED);
@@ -73,13 +73,13 @@ public class MasterServer{
 
         //Creating the games with 4 players
         for (int i=0; i<(Math.floor(lobby.size()/4))*4;i++){
-            players.add(lobby.get(i));
-            lobby.remove(i);
-            if (players.size()==4){
-                System.out.println("Creazione partita da 4");
-                games.add(new Game(players));
-                players.clear();
+            for (int j=0;j<4;j++){
+                User u = lobby.get(j);
+                players.add(u);
             }
+            games.add(new Game(players));
+            lobby.removeAll(players);
+            players.clear();
         }
 
         //Creating the last game with 2<= players <4
@@ -87,7 +87,6 @@ public class MasterServer{
             for(User l : lobby){
                 players.add(l);
             }
-            System.out.println("Creazione partita meno di 4");
             lobby.clear();
             games.add(new Game(players));
         }
