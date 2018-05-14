@@ -392,6 +392,39 @@ This message can also be sent during the lobby phase, in this case the server on
 
 This message is sent to all connected users and also serves the purpose of notifying the reconnecting user that the procedure went fine (`STATUS reconnect ...`).
 
+### Example Session
+
++   __`SERVER`__ to __`PLAYER0`__ and __`PLAYER1`__
+
+	`GAME round_start 6`
+	
++   __`PLAYER1`__ to __`SERVER`__
+
+	`ACK game`
+
++   __`PLAYER0`__ to __`SERVER`__
+
+	`...`
+	
++   __`SERVER`__ to __`PLAYER1`__
+
+	`STATUS disconnect 0`
+	
++   __`PLAYER0`__ to __`SERVER`__
+
+	`LOGIN PLAYER0 p455w0rd`
+	
++   __`SERVER`__ to __`PLAYER0`__ and __`PLAYER1`__
+
+	`STATUS reconnect 0`
+
++   __`PLAYER0`__ to __`SERVER`__
+
+	`GET ...`
+	
+	`...`
+	
+
 ## Acknowledgement Messages
 ### Client-side
 ###### Notice: this type of messages is only sent from the user to the server. A client that doesn't reply with an `ACK` to every server-side message that requires that is to be considered `disconnected`.
