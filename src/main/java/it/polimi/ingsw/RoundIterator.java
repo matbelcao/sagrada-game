@@ -8,20 +8,20 @@ import java.util.NoSuchElementException;
 /**
  * This class implements an iterator on the players following Sagrada's rules for round management
  */
-public class RoundIterator implements Iterator<Player> {
-    private final Integer numPlayers;
+public class RoundIterator implements Iterator<User> {
+    private final Integer numUsers;
     private int i;
-    private ArrayList<Player> players;
-    private Player next;
+    private ArrayList<User> users;
+    private User next;
     private int round;
 
     /**
      * Constructs the iterator initializing it as necessary
      * @param players the List of players that are playing the match
      */
-    RoundIterator(List<Player> players){
-        this.players=(ArrayList<Player>) players;
-        this.numPlayers=players.size();
+    RoundIterator(List<User> users){
+        this.users=(ArrayList<User>) users;
+        this.numUsers=users.size();
         this.next=null;
         this.i=0;
         this.round=-1;
@@ -56,11 +56,11 @@ public class RoundIterator implements Iterator<Player> {
     @Override
     public boolean hasNext() {
         if(this.round==-1){this.nextRound();}
-        if(i<2*numPlayers){
-            if(i<numPlayers){
-                next=players.get((round + i)%numPlayers);
+        if(i<2*numUsers){
+            if(i<numUsers){
+                next=users.get((round + i)%numUsers);
             }else{
-                next=players.get((numPlayers - 1 + round - i%numPlayers)%numPlayers);
+                next=users.get((numUsers - 1 + round - i%numUsers)%numUsers);
             }
             return true;
         }
@@ -79,14 +79,14 @@ public class RoundIterator implements Iterator<Player> {
      * Checks whether the players are playing the first or the second turn of the round
      * @return true iff there's at least one player that
      */
-    public boolean isFirstTurn(){ return i<=numPlayers;}
+    public boolean isFirstTurn(){ return i<=numUsers;}
 
     /**
      * Gets the next player in the round
      * @return the next player
      */
     @Override
-    public Player next(){
+    public User next(){
 
         if(this.hasNext()){ i++; return next;}
         throw new NoSuchElementException();

@@ -15,18 +15,18 @@ import java.util.NoSuchElementException;
 
 
 public class RoundIteratorTest {
-    private static GameController controller;
-    private static ArrayList<Player> players;
+    private static Game controller;
+    private static ArrayList<User> users;
     private static RoundIterator round;
 
     @BeforeAll
     static void setUp(){
 
-        players=new ArrayList<>();
-        players.add(new Player("giuda","santana"));
-        players.add(new Player("marcello","password1"));
-        players.add(new Player("luca","qwerty"));
-        controller = new GameController(players);
+        users=new ArrayList<>();
+        users.add(new User("giuda","santana"));
+        users.add(new User("marcello","password1"));
+        users.add(new User("luca","qwerty"));
+        controller = new Game(users);
         controller.createBoard();
     }
     @BeforeEach
@@ -55,21 +55,21 @@ public class RoundIteratorTest {
     }
     @Test
     void testRoundIteratorRules() throws NoSuchMethodException {
-        Player next;
+        User next;
         //round 1
         next=round.next();
-        assertEquals(players.get(0),next);
+        assertEquals(users.get(0),next);
         next=round.next();
         assertEquals(0,round.getRoundNumber());
-        assertEquals(players.get(1),next);
+        assertEquals(users.get(1),next);
         next=round.next();
-        assertEquals(players.get(2),next);
+        assertEquals(users.get(2),next);
         next=round.next();
-        assertEquals(players.get(2),next);
+        assertEquals(users.get(2),next);
         next=round.next();
-        assertEquals(players.get(1),next);
+        assertEquals(users.get(1),next);
         next=round.next();
-        assertEquals(players.get(0),next);
+        assertEquals(users.get(0),next);
 
         Executable codeToTest = () -> {
             round.next();
@@ -80,49 +80,49 @@ public class RoundIteratorTest {
         round.nextRound();
         assertEquals(1,round.getRoundNumber());
         next=round.next();
-        assertEquals(players.get(1),next);
+        assertEquals(users.get(1),next);
         next=round.next();
-        assertEquals(players.get(2),next);
+        assertEquals(users.get(2),next);
         next=round.next();
-        assertEquals(players.get(0),next);
+        assertEquals(users.get(0),next);
         next=round.next();
-        assertEquals(players.get(0),next);
+        assertEquals(users.get(0),next);
         assertTrue(round.hasNext());
         next=round.next();
-        assertEquals(players.get(2),next);
+        assertEquals(users.get(2),next);
 
         //round 3
         round.nextRound();
         next=round.next();
-        assertEquals(players.get(2),next);
+        assertEquals(users.get(2),next);
         next=round.next();
-        assertEquals(players.get(0),next);
+        assertEquals(users.get(0),next);
         next=round.next();
-        assertEquals(players.get(1),next);
+        assertEquals(users.get(1),next);
         next=round.next();
-        assertEquals(players.get(1),next);
+        assertEquals(users.get(1),next);
         assertTrue(round.hasNext());
         //round 4
         round.nextRound();
         next=round.next();
-        assertEquals(players.get(0),next);
+        assertEquals(users.get(0),next);
         next=round.next();
-        assertEquals(players.get(1),next);
+        assertEquals(users.get(1),next);
         next=round.next();
-        assertEquals(players.get(2),next);
+        assertEquals(users.get(2),next);
         next=round.next();
-        assertEquals(players.get(2),next);
+        assertEquals(users.get(2),next);
         assertTrue(round.hasNext());
         //round 5
         round.nextRound();
         next=round.next();
-        assertEquals(players.get(1),next);
+        assertEquals(users.get(1),next);
         next=round.next();
-        assertEquals(players.get(2),next);
+        assertEquals(users.get(2),next);
         next=round.next();
-        assertEquals(players.get(0),next);
+        assertEquals(users.get(0),next);
         next=round.next();
-        assertEquals(players.get(0),next);
+        assertEquals(users.get(0),next);
         assertTrue(round.hasNext());
 
         round.next();
@@ -136,13 +136,13 @@ public class RoundIteratorTest {
         //round 8
         round.nextRound();
         next=round.next();
-        assertEquals(players.get(1),next);
+        assertEquals(users.get(1),next);
         next=round.next();
-        assertEquals(players.get(2),next);
+        assertEquals(users.get(2),next);
         next=round.next();
-        assertEquals(players.get(0),next);
+        assertEquals(users.get(0),next);
         next=round.next();
-        assertEquals(players.get(0),next);
+        assertEquals(users.get(0),next);
         assertTrue(round.hasNext());
 
         round.next();

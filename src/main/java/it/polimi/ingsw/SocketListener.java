@@ -41,14 +41,17 @@ public class SocketListener extends Thread {
                     connected=master.login(params[1],params[2]);
                     if (connected){
                         outSocket.println("LOGIN ok");
+
+                        //Setting Socket specific parameters
+                        User user = master.getUser(params[1]);
+                        user.setConnectionMode(ConnectionMode.SOCKET);
+                        user.setServerConn(new SocketConn(socket));
                     }else{
                         outSocket.println("LOGIN ko");
                     }
+                    outSocket.flush();
                 }
             }
-
-            new SocketConn(socket);
-
         } catch (IOException e) {
             e.printStackTrace();
         }

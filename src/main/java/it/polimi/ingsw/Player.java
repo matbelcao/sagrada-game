@@ -42,7 +42,7 @@ public class Player {
      * @param id Schemacard's id
      */
     public void chooseSchemaCard(Integer id){
-        schema = new SchemaCard(id,GameController.xmlSource+"SchemaCard.xml");
+        schema = new SchemaCard(id,Game.xmlSource+"SchemaCard.xml");
         favorTokens=schema.getFavorTokens();
         isConnected=true;
     }
@@ -53,7 +53,7 @@ public class Player {
      * @param fileName xml file path
      */
     public void chooseSchemaCard(Integer id,String fileName){ //for extra schemacards
-        schema = new SchemaCard(id,GameController.xmlSource+fileName);
+        schema = new SchemaCard(id,Game.xmlSource+fileName);
     }
 
     /**

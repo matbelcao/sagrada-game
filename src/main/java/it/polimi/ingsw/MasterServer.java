@@ -8,6 +8,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * This class is the server, it handles the login of the clients and the beginning of matches
@@ -20,7 +21,8 @@ public class MasterServer{
     private int portRMI;
     private int portSocket;
     private ArrayList <User> users;
-    private Timer timer;
+    private ArrayList <User> lobby;
+    private ArrayList <Game> games;
 
     /**
      * This is the constructor of the server, it initializes the address of the port for socket and RMI connection,
@@ -31,6 +33,7 @@ public class MasterServer{
         portRMI = 1099;
         portSocket = 3000;
         users = new ArrayList<>();
+        lobby = new ArrayList<>();
     }
 
     /**
@@ -41,6 +44,57 @@ public class MasterServer{
         if (instance == null) instance = new MasterServer();
         return instance;
     }
+
+    /**
+     * Provides the lobby feature to the Masterserver
+     */
+    private static class LobbyQueue extends TimerTask {
+
+        @Override
+        public void run() {
+            System.out.println("Updating Lobby");
+            getMasterServer().updateLobby();
+        }
+    }
+
+    /**
+     * Updates the lobby queue and instatiate the new Games
+     */
+    protected synchronized void updateLobby(){
+        int cont;
+        ArrayList <User> players = new ArrayList<User>();
+
+        for(User u : users){
+            if(u.getStatus()==UserStatus.CONNECTED){
+                u.setStatus(UserStatus.QUEUED);
+                lobby.add(u);
+            }
+        }
+
+        //Creating the games with 4 players
+        for (int i=0; i<(Math.floor(lobby.size()/4))*4;i++){
+            players.add(lobby.get(i));
+            lobby.remove(i);
+            if (players.size()==4){
+                System.out.println("Creazione partita da 4");
+                games.add(new Game(players));
+                players.clear();
+            }
+        }
+
+        //Creating the last game with 2<= players <4
+        if (lobby.size()>=2){
+            for(User l : lobby){
+                players.add(l);
+            }
+            System.out.println("Creazione partita meno di 4");
+            lobby.clear();
+            games.add(new Game(players));
+        }
+
+        return;
+    }
+
 
     /**
      * This method makes the MasterServer available for RMI connection. It publishes in the rmi registry
@@ -142,12 +196,10 @@ public class MasterServer{
     }
 
     public static void main(String[] args){
-        MasterServer.getMasterServer();
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new LobbyQueue(), 0, 30 * 1000);
         MasterServer.getMasterServer().startRMI();
         MasterServer.getMasterServer().startSocket();
-        while(true){
-            //server infinite loop
-        }
     }
 
 

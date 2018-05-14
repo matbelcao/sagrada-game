@@ -8,25 +8,28 @@ import java.util.*;
 /**
  * This class represents the controller of the game. It manages the rounds and the operations that the players make on the board
  */
-public class GameController implements Iterable{
+public class Game implements Iterable{
     public static final int NUM_ROUND=10;
     private Board board;
     static String xmlSource = "src"+ File.separator+"xml"+File.separator; //append class name + ".xml" to obtain complete path
-    private ArrayList<Player> players;
+    private ArrayList<User> users;
 
     /**
      * Constructs the class and sets the players list
      * @param players the players of the match
      */
-    public GameController(List<Player>players){
-        this.players= (ArrayList<Player>) players;
+    public Game(List<User> players){
+        this.users= (ArrayList<User>) users;
+        for(User u : users){
+            u.setStatus(UserStatus.PLAYING);
+        }
     }
 
     /**
      * Instantiates a new board for the match
      */
     public void createBoard(){
-        this.board= new Board(this.players,draftPubObjectives(),draftToolCards());
+        this.board= new Board(this.users,draftPubObjectives(),draftToolCards());
     }
 
     /**
@@ -62,7 +65,7 @@ public class GameController implements Iterable{
     @NotNull
     @Override
     public Iterator iterator() {
-        return new RoundIterator(board.getPlayers());
+        return new RoundIterator(board.getUsers());
     }
 
 }

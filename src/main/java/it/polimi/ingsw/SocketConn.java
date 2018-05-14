@@ -40,6 +40,7 @@ public class SocketConn extends Thread implements ServerConn  {
 
     private boolean execute(String comand){
         outSocket.println("The comand was "+comand);
+        outSocket.flush();
         String temp=comand.replaceFirst(" ", ":");
 
         System.out.println(temp);

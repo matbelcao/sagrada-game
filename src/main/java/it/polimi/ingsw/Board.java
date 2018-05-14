@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Board {
     private DraftPool draftPool;
-    private ArrayList<Player> players;
+    private ArrayList<User> users;
     private PubObjectiveCard [] publicObjectives;
     private ToolCard [] toolCards;
     private int numOfPlayers;
@@ -14,15 +14,15 @@ public class Board {
     public static final int NUM_TOOLS=3;
     public static final int NUM_ROUNDS=10;
 
-    public Board(List<Player> players,PubObjectiveCard [] publicObjectives,ToolCard [] toolCards){
-        this.players= (ArrayList<Player>) players;
+    public Board(List<User> users,PubObjectiveCard [] publicObjectives,ToolCard [] toolCards){
+        this.users= (ArrayList<User>) users;
         this.publicObjectives=publicObjectives;
         this.toolCards=toolCards;
-        this.numOfPlayers=this.players.size();
+        this.numOfPlayers=this.users.size();
     }
 
-    public List<Player> getPlayers() {
-        return players;
+    public List<User> getUsers() {
+        return users;
     }
 
     public ToolCard getToolCard(int index) {
