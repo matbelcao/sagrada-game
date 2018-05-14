@@ -16,9 +16,9 @@ public class Game implements Iterable{
 
     /**
      * Constructs the class and sets the players list
-     * @param players the players of the match
+     * @param users the players of the match
      */
-    public Game(List<User> players){
+    public Game(List<User> users){
         this.users= (ArrayList<User>) users;
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);

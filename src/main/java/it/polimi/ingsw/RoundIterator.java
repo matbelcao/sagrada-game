@@ -17,7 +17,7 @@ public class RoundIterator implements Iterator<User> {
 
     /**
      * Constructs the iterator initializing it as necessary
-     * @param players the List of players that are playing the match
+     * @param users the List of users that are playing the match
      */
     RoundIterator(List<User> users){
         this.users=(ArrayList<User>) users;

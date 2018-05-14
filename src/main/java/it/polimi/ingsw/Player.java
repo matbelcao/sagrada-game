@@ -6,7 +6,7 @@ public class Player {
     private int favorTokens;
     private int finalPosition;
     private int score;
-    private Boolean skipsNextTurn;// true when the player has used a particular toolcard
+    private Boolean skipsNextTurn;// true when the player has used a particular tool card on his first turn of the round
     private Boolean isConnected;
 
     private ServerConn serverConn;
@@ -49,7 +49,7 @@ public class Player {
 
     /**
      * Assign a SchemaCard to the player
-     * @param id Schemacard's id
+     * @param id SchemaCard's id
      * @param fileName xml file path
      */
     public void chooseSchemaCard(Integer id,String fileName){ //for extra schemacards
@@ -89,16 +89,16 @@ public class Player {
      * Calculates and sets the score of the player
      */
     public void calculateScore(){
-        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
-        if (score != 0) {
-            score = 0;
+        FullCellIterator diceIterator=(FullCellIterator)this.schema.iterator();
+        if (this.score != 0) {
+            this.score = 0;
         }
         for (int i = 0; i < 3; i++) {
-            score += board.getPublicObjective(i).getCardScore(schema);
+            this.score += this.board.getPublicObjective(i).getCardScore(this.schema);
         }
-        score += favorTokens;
-        score += privObjective.getCardScore(schema);
-        score -= (SchemaCard.NUM_ROWS * SchemaCard.NUM_COLS) - diceIterator.numOfDice();
+        this.score += this.favorTokens;
+        this.score += this.privObjective.getCardScore(this.schema);
+        this.score -= (SchemaCard.NUM_ROWS * SchemaCard.NUM_COLS) - diceIterator.numOfDice();
     }
 
     /**
@@ -108,6 +108,12 @@ public class Player {
     public int getFinalPosition() {
         return finalPosition;
     }
+
+    /**
+     * Sets the final position of the player
+     * @param finalPosition the player's final position
+     */
+    public void setFinalPosition(int finalPosition) { this.finalPosition=finalPosition; }
 
 
     /**
