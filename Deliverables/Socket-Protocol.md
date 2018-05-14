@@ -181,10 +181,10 @@ The server responds with this message to give information about the requested ca
 
 ##### `SEND draftpool|roundtrack|roundtrack_update [<index>,<color>,<shade>] ... `
 
-+   `draftpool`: the requested element are concerning the draftpool
-+   `roundtrack`: the requested element are concerning the roundtrack
++   `draftpool`: the requested elements concern the draftpool
++   `roundtrack`: the requested elements concern the roundtrack
 +   `roundtrack_update`: only the updated parts of the roundtrack are sent to the user
-+   `pub`: the requested element is a toolcard
++   `pub`: the requested element is a public objective card
 +   `<index>`: the die position
 +   `<color>`: the die color property
 +   `<shade>`: the die shade property
@@ -241,9 +241,9 @@ This message is used to send a list of the players of the match and their userna
 
 This message is a request to the server to specify the possible placements in the user's schema of a die that is temporarily selected by the user.
 
-##### `SELECT rerolled_die`
+##### `SELECT modified_die`
 
-This asks the server a list of possible placements for the die that has been rerolled following a `CHOOSE die_to_reroll`. It will trigger a `LIST placements` from the server towards the client. If the client receives an empty list or simply chooses to `DISCARD`, the toolcard will be marked as used (if it wasn't already) and the used favor tokens will be gone.
+This asks the server a list of possible placements for the die that has been rerolled, swapped, flipped... following a `CHOOSE`. It will trigger a `LIST placements` from the server towards the client. If the client receives an empty list or simply chooses to `DISCARD`, the toolcard will be marked as used (if it wasn't already) and the used favor tokens will be gone.
 
 ##### `SELECT tool <index>`
 +   `<index>`: the index of the toolcard in the list of toolcards that the client received with a sequence of `SEND tool` (tipically at the beginning of the match)
@@ -252,6 +252,7 @@ This message is used to signal the intention of a player to use a specific toolc
 
 
 ### Server-side
+###### Notice: the following messages of this section starting with `LIST` require an `ACK list` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
 ##### `LIST schema|roundtrack|draftpool [<index>,[<row>,<column>|<round>,<number>],<color>,<shade>] ...`
 
 +   `schema`: provides an ordered list of the positions of the player's schema that have a die in place. The client can then `SELECT` a die from this list using the command above to obtain a list of possible placements (for example while using tool cards)
@@ -296,21 +297,42 @@ This message is sent to the server when the client that received a list of possi
 
 This message is sent to the server in order to make a possibly definitive choice. the server is still going to do his checks and will reply with the next message, eventually followed by some `SEND` containing updates.
 
-##### `CHOOSE die_to_reroll <index>`
-This message can only be sent within the usage of the specific tool card that allows to roll again a die selected from the draftpool. A `GET_DICE_LIST draftpool` is required 
 
 ### Server-side
 ##### `DISCARD ack`
 
 This message is a simple acknowledgement to a previous `DISCARD` sent by the player. The server notifies that it received that and that it is waiting now for a new move.
 
-##### `CHOICE ok|ko [rerolled_die <color>,<shade>]`
-+   `rerolled_die <color>,<shade>`: follows a `CHOOSE die_to_reroll` and reports the result back to the user
+##### `CHOICE ok|ko`
 +   `ok`: this signals a valid choice
 +   `ko`: this signals an invalid choice sent to the server with `CHOOSE`
 
-
 This is the reply of the server to a `CHOOSE` message previously received from the user.
+
+### Toolcards Specific
+--
+###Client-side
+##### `CHOOSE die <index> [increase|decrease|reroll|flip|put_in_bag] `
+This message can only be sent within the usage of tool cards that require to choose a die from the draftpool, the schema or the roundtrack. A `GET_DICE_LIST ...` is required before using it. This has to be used by toolcards with id in {1,5,6,10,11}
+In toolcard #5 the chosen die is the one in the roundtrack, while the one in the draftpool is selected.
+##### `CHOOSE face <shade>`
+This is used in toolcard #11 to set the new face of the die that he has drafted from the dice bag. The die can then be selected with a `SELECT modified_die` after receiving a `CHOICE ok`.
+
+### Server-side
+##### `CHOICE ko|ok modified_die <color>[,<shade>]`
++   `modified_die <color>,<shade>`: follows a `CHOOSE die ...` and reports the result back to the user who can then select the die with a `SELECT modified_die`(with tool #11 the user needs to choose the face first)
++   `ok`: this signals a valid choice
++   `ko`: this signals an invalid choice sent to the server with `CHOOSE`
+
+This is used within the procedure of the toolcards #1,5,6,10,11 
+
+##### `CHOICE ko|ok rerolled_dice`
++   `rerolled_dice`: follows a `CHOOSE tool` where the selected tool is the #7 and reports to the user the fact that it was used (rerolling all draftpool dice)
++   `ok`: this signals a valid choice
++   `ko`: this signals an invalid choice sent to the server with `CHOOSE`
+
+This message if ok triggers the user to get an update of the draftpool 
+
 
 ### Example Session
 
@@ -428,10 +450,11 @@ This message is sent to all connected users and also serves the purpose of notif
 ## Acknowledgement Messages
 ### Client-side
 ###### Notice: this type of messages is only sent from the user to the server. A client that doesn't reply with an `ACK` to every server-side message that requires that is to be considered `disconnected`.
-##### `ACK game|send|status`
+##### `ACK game|send|list|status`
 
 +   `game`: in reply to a message regarding __Round Evolution__
 +   `send`: if replying to a `SEND` 
++   `list`: if replying to a `LIST` message from __Game management__
 +   `status`: the information received concerned the change of a player's status
 
 The receiver reports to the sender that he has received the information correctly. An `ACK` is always sent to the server in reply to every `SEND`,`GAME` or `STATUS` message.
