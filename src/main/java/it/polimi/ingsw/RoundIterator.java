@@ -76,7 +76,7 @@ public class RoundIterator implements Iterator<User> {
     }
 
     /**
-     * Checks whether the players are playing the first or the second turn of the round
+     * Checks whether the u are playing the first or the second turn of the round
      * @return true iff there's at least one player that
      */
     public boolean isFirstTurn(){ return i<=numUsers;}
