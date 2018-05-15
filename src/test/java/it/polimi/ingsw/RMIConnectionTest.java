@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -14,7 +15,8 @@ public class RMIConnectionTest {
         MasterServer.getMasterServer().startRMI();
         //MasterServer.getMasterServer().startSocket();
     }
-    //This test logs 9 clients and verfies if they get properly saved by the master server
+    //This test logs 9 clients and verifies if they get properly saved by the master server
+    @Disabled("too slow")
     @Test
     public void orderedConnection(){
         ArrayList<User> users;

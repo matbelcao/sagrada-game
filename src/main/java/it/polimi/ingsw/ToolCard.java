@@ -34,12 +34,17 @@ public class ToolCard extends Card{
         }
     }
 
+
     /**
-     * Return if the toolcard has been used during the game
-     * @return true if it has been used, false if not
+     * Checks whether the player can or can not use the tool card, based on the cost in favor tokens
+     * @param player the player that wants to use the tool card
+     * @return true iff the
      */
-    public boolean hasBeenUsed(){
-        return this.used;
+    public boolean canBeUsedBy(Player player){
+        int cost;
+        if (used) cost = 2;
+        else cost = 1;
+        return player.getFavorTokens() >= cost;
     }
 
     /**
@@ -47,13 +52,15 @@ public class ToolCard extends Card{
      * @param player the player that wants to use the card
      * @return if the card has been used successfully
      */
-    public boolean useTool(Player player){
-        if(used==false){
+    public boolean useTool(Player player) throws NegativeTokensException {
+        if(!used){
             used =true;
             player.decreaseFavorTokens(1);
         }else{
             player.decreaseFavorTokens(2);
         }
+
+        if (this.getId()==8){ player.setSkipsNextTurn(true); }
         return toolAction.useToolCard(player);
     }
 

@@ -1,59 +1,23 @@
 package it.polimi.ingsw;
 
 public class Player {
-    private String username;
-    private String password;
     private int favorTokens;
     private int finalPosition;
     private int score;
-    private Boolean skipsNextTurn;// true when the player has used a particular tool card on his first turn of the round
-    private Boolean isConnected;
-
-    private ServerConn serverConn;
+    private boolean skipsNextTurn;// true when the player has used a particular tool card on his first turn of the round
     private Board board;
     private PrivObjectiveCard privObjective;
     private SchemaCard schema;
+    private Die chosenDie;
 
-    public Player(String username, String password){
-        this.username=username;
-        this.password=password;
-    }
-
-    /**
-     * Returns the player name
-     * @return the username
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
-     * Allows the user to perform the login
-     * @param username username
-     * @param password  password
-     * @return true if the credentials matches
-     */
-    public Boolean login(String username,String password){
-        return this.username.equals(username) && this.password.equals(password);
-    }
-
-    /**
-     * Assign a SchemaCard to the player
-     * @param id Schemacard's id
-     */
-    public void chooseSchemaCard(Integer id){
-        schema = new SchemaCard(id,Game.xmlSource+"SchemaCard.xml");
-        favorTokens=schema.getFavorTokens();
-        isConnected=true;
-    }
-
-    /**
-     * Assign a SchemaCard to the player
-     * @param id SchemaCard's id
-     * @param fileName xml file path
-     */
-    public void chooseSchemaCard(Integer id,String fileName){ //for extra schemacards
-        schema = new SchemaCard(id,Game.xmlSource+fileName);
+    public Player(Board board,SchemaCard schema, PrivObjectiveCard privObjective){
+        this.board=board;
+        this.schema=schema;
+        this.privObjective=privObjective;
+        this.score=0;
+        this.finalPosition=0;
+        this.favorTokens=this.schema.getFavorTokens();
+        this.skipsNextTurn=false;
     }
 
     /**
@@ -65,16 +29,38 @@ public class Player {
     }
 
     /**
+     * Checks if the player has to skip this turn or not
+     * @return
+     */
+    public boolean isSkippingTurn() {
+        return this.skipsNextTurn;
+    }
+
+    /**
+     * This method sets the skipsNextTurn flag following the usage of the tool card number 8. Need to set this to false on every round beginning
+     * @param skips true iff the player used the tool card number 9 in the first turn of the round
+     */
+    public void setSkipsNextTurn(boolean skips){
+        this.skipsNextTurn=skips;
+    }
+
+    /**
+     * Gets the schemaCard assigned to the player
+     * @return the schema3
+     */
+    public SchemaCard getSchema(){
+        return this.schema;
+    }
+
+    /**
      * Decrease the favorTokens if possible
      * @param tokens token to subtract
-     * @return true if the operation was successful
      */
-    public boolean decreaseFavorTokens(int tokens){
-        if(tokens>0 && this.favorTokens >= tokens){
-            this.favorTokens -= tokens;
-            return true;
-        }
-        return false;
+    public void decreaseFavorTokens(int tokens) throws NegativeTokensException{
+        if((this.favorTokens - tokens) < 0){throw new NegativeTokensException();}
+        this.favorTokens -= tokens;
+
+
     }
 
     /**
@@ -116,20 +102,7 @@ public class Player {
     public void setFinalPosition(int finalPosition) { this.finalPosition=finalPosition; }
 
 
-    /**
-     * Allows tho change the player's connection status
-     * @param isConnected connection status
-     */
-    public void setConnected(Boolean isConnected){
-        this.isConnected=isConnected;
-    }
 
-    /**
-     * Returns if the player is connected on the server
-     * @return player's connection status
-     */
-    public Boolean getConnected (){
-        return this.isConnected;
-    }
+
 
 }
