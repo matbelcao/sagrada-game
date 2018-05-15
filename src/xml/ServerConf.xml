@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+
+<!-- Server configuration file -->
+
+<conf>
+	<address>rmi://127.0.0.1/myabc</address>
+	<portRMI>1099</portRMI>
+	<portSocket>3000</portSocket>
+</conf>

@@ -1,4 +1,13 @@
 package it.polimi.ingsw;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -28,9 +37,22 @@ public class MasterServer{
      * it's made private as MasterServer is a Singleton
      */
     private MasterServer() {
-        address = "rmi://127.0.0.1/myabc";
-        portRMI = 1099;
-        portSocket = 3000;
+        File xmlFile= new File("src"+File.separator+"xml"+File.separator+"ServerConf.xml");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder;
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xmlFile);
+            doc.getDocumentElement().normalize();
+
+            Element eElement = (Element)doc.getElementsByTagName("conf").item(0);
+            this.address=eElement.getElementsByTagName("address").item(0).getTextContent();
+            this.portRMI=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
+            this.portSocket=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent());
+
+        }catch (SAXException | ParserConfigurationException | IOException e1) {
+            e1.printStackTrace();
+        }
         users = new ArrayList<>();
         lobby = new ArrayList<>();
         games = new ArrayList<>();
@@ -147,7 +169,7 @@ public class MasterServer{
     public synchronized boolean login(String username, String password) {
             if (isIn(username)) {
                 User user = getUser(username);
-                if (password.equals(user.getPassword()) && user.getStatus() != UserStatus.CONNECTED) {
+                if (password.equals(user.getPassword()) && user.getStatus() != UserStatus.CONNECTED && user.getStatus() != UserStatus.QUEUED && user.getStatus() != UserStatus.PLAYING) {
                     return true;
                 }
             } else {
