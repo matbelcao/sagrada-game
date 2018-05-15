@@ -3,6 +3,9 @@ package it.polimi.ingsw;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * This class is the implementation of the SOCKET server-side connection methods
+ */
 public class SocketConn extends Thread implements ServerConn  {
     private Socket socket;
     private BufferedReader inSocket;
@@ -23,6 +26,9 @@ public class SocketConn extends Thread implements ServerConn  {
         start();
     }
 
+    /**
+     * This method runs a loop that manages the socket commands until the connection is closed
+     */
     @Override
     public void run(){
         String comand = "";
@@ -37,7 +43,11 @@ public class SocketConn extends Thread implements ServerConn  {
         }
     }
 
-
+    /**
+     * This method provides the socket messages interpretation logic
+     * @param command the socket's message recived
+     * @return true if the connection has to be closed
+     */
     private boolean execute(String command){
         outSocket.println("The comand was "+command);
         outSocket.flush();

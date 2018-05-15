@@ -7,10 +7,10 @@ import java.net.Socket;
  * for incoming requests of socket connections. Once it opens a socket, it promptly launches a SocketConn passing it the
  * newly created socket
  */
-public class SocketListener extends Thread {
+public class SocketAcceptor extends Thread {
     Socket socket;
 
-    public SocketListener(Socket socket){
+    public SocketAcceptor(Socket socket){
         this.socket=socket;
     }
 

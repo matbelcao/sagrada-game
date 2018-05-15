@@ -13,10 +13,9 @@ import java.util.TimerTask;
 /**
  * This class is the server, it handles the login of the clients and the beginning of matches
  */
-
 public class MasterServer{
     private static MasterServer instance;
-    private SocketListener listener;
+    private SocketAcceptor acceptor;
     private String address;
     private int portRMI;
     private int portSocket;
@@ -34,6 +33,7 @@ public class MasterServer{
         portSocket = 3000;
         users = new ArrayList<>();
         lobby = new ArrayList<>();
+        games = new ArrayList<>();
     }
 
     /**
@@ -46,7 +46,7 @@ public class MasterServer{
     }
 
     /**
-     * Provides the lobby feature to the Masterserver
+     * Provides timer to wakeup the updateLobby() method every X seconds
      */
     private static class LobbyQueue extends TimerTask {
 
@@ -58,7 +58,7 @@ public class MasterServer{
     }
 
     /**
-     * Updates the lobby queue and instatiate the new Games
+     * Updates the lobby queue and instantiate the new Games
      */
     protected synchronized void updateLobby(){
         ArrayList <User> players = new ArrayList<>();
@@ -82,13 +82,10 @@ public class MasterServer{
             players.clear();
         }
 
-        //Creating the last game with 2<= players <4
+        //Creating the last game with 2<=players<4
         if (lobby.size()>=2){
-            for(User l : lobby){
-                players.add(l);
-            }
+            games.add(new Game(lobby));
             lobby.clear();
-            games.add(new Game(players));
         }
 
         return;
@@ -125,24 +122,19 @@ public class MasterServer{
         {
             serverSocket = new ServerSocket(portSocket);
             System.out.println("\nServer waiting for socket connection on port " +  serverSocket.getLocalPort());
+
             // server infinite loop
-            while(true)
+            while(1==1)
             {
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connection estabilished");
-                SocketListener listener = new SocketListener(socket);
-                listener.start();
+                SocketAcceptor acceptor = new SocketAcceptor(socket);
+                acceptor.start();
             }
         }
         catch(Exception e)
         {
             System.out.println(e);
-            try
-            {
-                serverSocket.close();
-            }
-            catch(Exception ex)
-            {}
         }
     }
 
@@ -186,6 +178,11 @@ public class MasterServer{
      */
     ArrayList getUsers(){ return users; }
 
+    /**
+     * This method checks if the user is already in the list of registered users
+     * @param user the user to fing
+     * @return true if present
+     */
     boolean isIn(String user){
         for(User u : users){
             if(u.getUsername().equals(user))
@@ -200,6 +197,4 @@ public class MasterServer{
         MasterServer.getMasterServer().startRMI();
         MasterServer.getMasterServer().startSocket();
     }
-
-
 }
