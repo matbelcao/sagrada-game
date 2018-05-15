@@ -21,7 +21,7 @@ public class SocketAcceptor extends Thread {
     public void run(){
         BufferedReader inSocket=null;
         PrintWriter outSocket=null;
-        String comand = "";
+        String command = "";
         Boolean connected = false;
         MasterServer master=MasterServer.getMasterServer();
 
@@ -33,10 +33,12 @@ public class SocketAcceptor extends Thread {
         }
 
         try {
+            outSocket.println("Connection established!");
+            outSocket.flush();
             while (connected==false){
-                comand = inSocket.readLine();
-                System.out.println(comand);
-                String params[]= comand.split(" ");
+                command = inSocket.readLine();
+                System.out.println(command);
+                String params[]= command.split(" ");
                 if (params.length==3 && params[0].equals("LOGIN") ){
                     connected=master.login(params[1],params[2]);
                     if (connected){

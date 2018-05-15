@@ -31,15 +31,15 @@ public class SocketConn extends Thread implements ServerConn  {
      */
     @Override
     public void run(){
-        String comand = "";
+        String command = "";
         boolean quit = false;
         while(!quit){
             try {
-                comand = inSocket.readLine();
+                command = inSocket.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            quit = execute(comand);
+            quit = execute(command);
         }
     }
 
@@ -49,7 +49,7 @@ public class SocketConn extends Thread implements ServerConn  {
      * @return true if the connection has to be closed
      */
     private boolean execute(String command){
-        outSocket.println("The comand was "+command);
+        outSocket.println("The command was "+command);
         outSocket.flush();
         String temp=command.replaceFirst(" ", ":");
 
@@ -57,7 +57,7 @@ public class SocketConn extends Thread implements ServerConn  {
 
         String commandList[]= temp.split(":");
 
-        if(commandList[0].equals("quit")){
+        if(commandList[0].equals("QUIT")){
             try {
                 socket.close();
                 return true;
