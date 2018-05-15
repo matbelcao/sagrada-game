@@ -167,17 +167,23 @@ public class MasterServer{
      * @return true iff the Client gets logged in
      */
     public synchronized boolean login(String username, String password) {
-            if (isIn(username)) {
-                User user = getUser(username);
-                if (password.equals(user.getPassword()) && user.getStatus() != UserStatus.CONNECTED && user.getStatus() != UserStatus.QUEUED && user.getStatus() != UserStatus.PLAYING) {
-                    return true;
-                }
-            } else {
-                User user = new User(username, password);
-                users.add(user);
-                return true;
-            }
-            return false;
+        User user;
+        System.out.print(this.users);
+        if (isIn(username)) {
+            user = getUser(username);
+
+            if (password.equals(user.getPassword()) && (user.getStatus() == UserStatus.DISCONNECTED )) {
+                System.out.print(this.users);
+                user.setStatus(UserStatus.CONNECTED);
+                return true; }
+        } else {
+            user = new User(username, password);
+            users.add(user);
+            System.out.print(this.users);
+            return true;
+        }
+        System.out.print(this.users);
+        return false;
     }
 
     /**

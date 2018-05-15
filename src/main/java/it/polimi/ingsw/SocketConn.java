@@ -10,12 +10,14 @@ public class SocketConn extends Thread implements ServerConn  {
     private Socket socket;
     private BufferedReader inSocket;
     private PrintWriter outSocket;
+    private User user;
 
     /**
      * This is the constructor of the class, it starts a thread linked to an open socket
      * @param socket the socket already open used to communicate with the client
      */
-    SocketConn(Socket socket){
+    SocketConn(Socket socket, User user){
+        this.user=user;
         this.socket = socket;
         try {
             inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -39,8 +41,10 @@ public class SocketConn extends Thread implements ServerConn  {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             quit = execute(command);
         }
+        user.setStatus(UserStatus.DISCONNECTED);
     }
 
     /**
@@ -54,7 +58,9 @@ public class SocketConn extends Thread implements ServerConn  {
         String temp=command.replaceFirst(" ", ":");
 
         System.out.println(temp);
-
+        if(command == null){
+            return true;
+        }
         String commandList[]= temp.split(":");
 
         if(commandList[0].equals("QUIT")){
@@ -62,7 +68,7 @@ public class SocketConn extends Thread implements ServerConn  {
                 socket.close();
                 return true;
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("IO exceptipon thrown");
             }
         }
         if(commandList[0].equals("GET")){

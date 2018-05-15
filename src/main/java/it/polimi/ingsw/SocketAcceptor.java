@@ -35,21 +35,23 @@ public class SocketAcceptor extends Thread {
         try {
             outSocket.println("Connection established!");
             outSocket.flush();
-            while (connected==false){
+            while (!connected){
                 command = inSocket.readLine();
                 System.out.println(command);
                 String params[]= command.split(" ");
                 if (params.length==3 && params[0].equals("LOGIN") ){
-                    connected=master.login(params[1],params[2]);
-                    if (connected){
+
+                    if (master.login(params[1],params[2])){
                         outSocket.println("LOGIN ok");
+                        connected=true;
 
                         //Setting Socket specific parameters
                         User user = master.getUser(params[1]);
                         user.setConnectionMode(ConnectionMode.SOCKET);
-                        user.setServerConn(new SocketConn(socket));
+                        user.setServerConn(new SocketConn(socket,user));
                     }else{
                         outSocket.println("LOGIN ko");
+                        connected=false;
                     }
                     outSocket.flush();
                 }

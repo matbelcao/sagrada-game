@@ -25,31 +25,31 @@ public class User {
      * Return the user's username
      * @return the user's username
      */
-    public String getUsername() { return username; }
+    public synchronized String getUsername() { return username; }
 
     /**
      * Returns the user's password
      * @return the user password
      */
-    public String getPassword() { return password; }
+    public synchronized String getPassword() { return password; }
 
     /**
      * Sets the user connection status (CONNECTED, PLAYING,....)
      * @param status the connection status to be set
      */
-    public void setStatus(UserStatus status) { this.status=status; }
+    public synchronized void setStatus(UserStatus status) { this.status=status; }
 
     /**
      * Returns the user connection status (CONNECTED, PLAYING,....)
      * @return the user's connection status
      */
-    public  UserStatus getStatus() { return status; }
+    public  synchronized UserStatus getStatus() { return status; }
 
     /**
      * Sets the user connection mode ( RMI or SOCKET )
      * @param connectionMode the connection mode to be set
      */
-    public void setConnectionMode(ConnectionMode connectionMode){
+    public synchronized void setConnectionMode(ConnectionMode connectionMode){
         this.connectionMode=connectionMode;
     }
 
@@ -57,7 +57,7 @@ public class User {
      * Returns the user's connection mode ( RMI or SOCKET )
      * @return the user's connection mode
      */
-    public ConnectionMode getConnectionMode() {
+    public synchronized ConnectionMode getConnectionMode() {
         return connectionMode;
     }
 
@@ -65,7 +65,7 @@ public class User {
      * Sets the user's connection class used for the communication
      * @param serverConn the user's connection
      */
-    public void setServerConn(ServerConn serverConn){
+    public synchronized void setServerConn(ServerConn serverConn){
         this.serverConn=serverConn;
     }
 
@@ -73,7 +73,7 @@ public class User {
      * Returns the user's connection class used for the communication
      * @return the user's connection
      */
-    public ServerConn getServerConn() {
+    public synchronized ServerConn getServerConn() {
         return serverConn;
     }
 }
