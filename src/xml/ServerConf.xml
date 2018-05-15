@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<!-- Server configuration file -->
+<!-- server configuration file -->
 
 <conf>
 	<address>rmi://127.0.0.1/myabc</address>

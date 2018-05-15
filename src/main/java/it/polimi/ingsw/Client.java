@@ -1,5 +1,7 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.server.connection.AuthenticationInt;
+
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -11,12 +13,12 @@ public class Client {
     private String username;
     private String password;
 
-    Client(UIMode uiMode,ConnectionMode connMode){
+    public Client(UIMode uiMode,ConnectionMode connMode){
         this.uiMode = uiMode;
         this.connMode = connMode;
     }
 
-    Client(String uiMode,String connMode){
+    public Client(String uiMode,String connMode){
         this.uiMode = UIMode.valueOf(uiMode);
         this.connMode = ConnectionMode.valueOf(connMode);
     }
