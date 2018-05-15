@@ -2,6 +2,7 @@
 This document aims to describe the rules and the structure of the messages that the application uses to allow users to play this game through a connection via socket. The messages are divided in __Client-side__ and __Server-side__ ones and they are grouped according to the phase of a game they belong to. We tried to follow a chronological order, when possible, while sorting the following paragraphs.
 
 ## Index
++   [Welcome](#welcome)
 +   [Login](#login)
 +   [Lobby](#lobby)
 +   [Round Evolution](#round-evolution)
@@ -10,6 +11,13 @@ This document aims to describe the rules and the structure of the messages that 
 +   [Player Status](#player-status)
 +   [Acknowledgement Messages](#acknowledgement-messages)
 +   [Dice and Constraints Syntax](#dice-and-constraints-syntax)
+
+## Welcome
+### Server-side
+##### `<welcome_message>`
++   `<welcome_message>`: a message to greet the newly connected client
+
+This is the first message the server sends to the client, as soon as the connection is established.
 
 
 ## Login
@@ -35,6 +43,12 @@ The server responds with this message to the login request from the client, if k
 The server sends this message to all players in the lobby after a successful login of a player that isn't reconnecting to a match he was previously playing. The message is sent again to all said players whenever there is a change in the number of the users in the lobby.
 
 ### Example Session
+
+... CLIENT CONNECTS TO THE SERVER ...
+
++   __`SERVER`__ to __`PLAYER0`__  
+
+    `Connection established!`
 
 +   __`PLAYER0`__ to __`SERVER`__  
 
