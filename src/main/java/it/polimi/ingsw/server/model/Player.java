@@ -4,16 +4,18 @@ import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
 public class Player {
+    private final String username;
+    private final Board board;
+    private final PrivObjectiveCard privObjective;
+    private final SchemaCard schema;
     private int favorTokens;
     private int finalPosition;
     private int score;
     private boolean skipsNextTurn;// true when the player has used a particular tool card on his first turn of the round
-    private Board board;
-    private PrivObjectiveCard privObjective;
-    private SchemaCard schema;
     private Die chosenDie;
 
-    public Player(Board board,SchemaCard schema, PrivObjectiveCard privObjective){
+    public Player(String username, Board board, SchemaCard schema, PrivObjectiveCard privObjective){
+        this.username = username;
         this.board=board;
         this.schema=schema;
         this.privObjective=privObjective;

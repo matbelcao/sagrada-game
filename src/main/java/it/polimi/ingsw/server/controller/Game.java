@@ -14,17 +14,32 @@ import java.util.*;
 /**
  * This class represents the controller of the game. It manages the rounds and the operations that the players make on the board
  */
-public class Game implements Iterable{
+public class Game extends Thread implements Iterable  {
     public static final int NUM_ROUND=10;
     private Board board;
+    private boolean additionalSchemas; //to be used for additional schemas FA
     static String xmlSource = "src"+ File.separator+"xml"+File.separator; //append class name + ".xml" to obtain complete path
     private ArrayList<User> users;
 
     /**
      * Constructs the class and sets the players list
      * @param users the players of the match
+     * @param additionalSchemas true iff additional are wanted by the user
+     */
+    public Game(List<User> users,boolean additionalSchemas){
+        this.additionalSchemas=additionalSchemas;
+        this.users= (ArrayList<User>) users;
+        for(User u : users){
+            u.setStatus(UserStatus.PLAYING);
+        }
+    }
+
+    /**
+     * Constructs the class and sets the players list
+     * @param users the players of the match
      */
     public Game(List<User> users){
+        this.additionalSchemas=false;
         this.users= (ArrayList<User>) users;
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);

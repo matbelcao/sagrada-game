@@ -231,6 +231,7 @@ public class MasterServer{
     }
 
     public static void main(String[] args){
+
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new LobbyQueue(), 0, 30 * 1000);
         MasterServer.getMasterServer().startRMI();
