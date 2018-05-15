@@ -61,6 +61,32 @@ class SchemaCardTest {
         assertEquals(Integer.parseInt("5"),schema2.getFavorTokens());
     }
 
+    //toolcard #9
+    @Test
+    void testNonAdjacentPlacement(){
+        SchemaCard schema1 = new SchemaCard(1,"src"+ File.separator +"xml"+ File.separator +"SchemaCard.xml");
+        ArrayList list= (ArrayList) schema1.listPossiblePlacements(new Die("FOUR","GREEN"),IgnoredConstraint.ADJACENCY);
+        assertEquals(11,list.size());
+        try {
+            schema1.putDie(3,new Die("THREE","RED"));
+        } catch (IllegalDieException e) {
+            e.printStackTrace();
+        }
+        list= (ArrayList) schema1.listPossiblePlacements(new Die("FOUR","GREEN"),IgnoredConstraint.ADJACENCY);
+        assertEquals(10,list.size());
+
+       assertThrows(IllegalDieException.class,() -> schema1.putDie(13,new Die("FOUR","GREEN")));
+        try {
+            schema1.putDie(13,new Die("FOUR","GREEN"),IgnoredConstraint.ADJACENCY);
+        } catch (IllegalDieException e) {
+            e.printStackTrace();
+        }
+
+        list= (ArrayList) schema1.listPossiblePlacements(new Die("FOUR","GREEN"),IgnoredConstraint.ADJACENCY);
+        assertEquals(7,list.size());
+
+
+    }
 
     @Test
     void testDiePlacement(){

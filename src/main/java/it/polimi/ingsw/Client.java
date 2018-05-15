@@ -40,8 +40,8 @@ public class Client {
     void loginRMI(){
         try {
             //authenticator = (Authentication)Naming.lookup("rmi://localhost:1099/auth");
-            AuthenticationInt autenticator=(AuthenticationInt) Naming.lookup("rmi://127.0.0.1/myabc");
-            autenticator.authenticate(username,password);
+            AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://127.0.0.1/myabc");
+            authenticator.authenticate(username,password);
         } catch (NotBoundException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {

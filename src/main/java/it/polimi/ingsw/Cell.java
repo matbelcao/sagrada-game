@@ -50,14 +50,15 @@ public class Cell {
     /**
      * Tests whether a die respects the Cell specific constraint
      * @param die die to be checked if it can be possibly be placed in the Cell.
-     * @param ignoreConstraint string that signals if one type or all types of constraint can be ignored
+     * @param ignoreConstraint signals if none, one type or all types of constraint can be ignored
      * @return true iff the die respects the Cell constraint
      */
-    public Boolean canAcceptDie(Die die,String ignoreConstraint){
+    public Boolean canAcceptDie(Die die, IgnoredConstraint ignoreConstraint){
         if(die==null){return false;}
-        if(ignoreConstraint.equals("ALL")){ return true; }
-        if(ignoreConstraint.equals("COLOR") && this.constraint.isColorConstraint()){ return true; }
-        if(ignoreConstraint.equals("SHADE") && !this.constraint.isColorConstraint()){ return true; }
+        if(ignoreConstraint.equals(IgnoredConstraint.NONE)){ return canAcceptDie(die); }
+        if(ignoreConstraint.equals(IgnoredConstraint.ALL)){ return true; }
+        if(ignoreConstraint.equals(IgnoredConstraint.COLOR) && this.constraint.isColorConstraint()){ return true; }
+        if(ignoreConstraint.equals(IgnoredConstraint.SHADE) && !this.constraint.isColorConstraint()){ return true; }
 
         if(this.constraint==null || !this.constraint.isActive()) {
             return true;
@@ -96,7 +97,7 @@ public class Cell {
      * Sets the new die in place.
      * @param die die to be placed in the Cell
      */
-    public void setDie(Die die,String ignoreConstraint) {
+    public void setDie(Die die,IgnoredConstraint ignoreConstraint) {
         assert canAcceptDie(die,ignoreConstraint);
         this.die=die;
     }

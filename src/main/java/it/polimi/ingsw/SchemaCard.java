@@ -142,19 +142,32 @@ public class SchemaCard implements Iterable<Cell> {
         return list;
     }
 
-    public List<Integer> listPossiblePlacements(Die die,String ignoreConstraint) {
+    /**
+     * Calculates and returns a list of integers that are the indexes (from 0 to 19) where the die could be placed
+     * @param die the die we want to place
+     * @param ignoreConstraint the constraint to be ignored
+     * @return the list of valid positions for the die
+     */
+    public List<Integer> listPossiblePlacements(Die die, IgnoredConstraint ignoreConstraint) {
         ArrayList <Integer> list= new ArrayList<>();
         FullCellIterator diceIterator;
         diceIterator=new FullCellIterator(this.cell);
-
-        if(isFirstDie){
-            //first and last rows
-            checkBorder(die, list,ignoreConstraint);
+        if(ignoreConstraint.equals(IgnoredConstraint.ADJACENCY)){
+            for(int i=0; i < SchemaCard.NUM_COLS * SchemaCard.NUM_ROWS; i++ ){
+                if(canBePlacedHere(i/SchemaCard.NUM_COLS, i%SchemaCard.NUM_COLS , die)){
+                    list.add(i);
+                }
+            }
         }else{
-            while(diceIterator.hasNext()){
-                diceIterator.next();
+            if(isFirstDie){
+                //first and last rows
+                checkBorder(die, list,ignoreConstraint);
+            }else{
+                while(diceIterator.hasNext()){
+                    diceIterator.next();
 
-                checkCloseCells(die, diceIterator, list, ignoreConstraint);
+                    checkCloseCells(die, diceIterator, list, ignoreConstraint);
+                }
             }
         }
         return list;
@@ -194,7 +207,7 @@ public class SchemaCard implements Iterable<Cell> {
      * @param list the list of possible positions for the die
      * @param ignoreConstraint string that tells which constraint(s) can be ignored
      */
-    private void checkCloseCells(Die die, FullCellIterator diceIterator, ArrayList<Integer> list, String ignoreConstraint) {
+    private void checkCloseCells(Die die, FullCellIterator diceIterator, ArrayList<Integer> list, IgnoredConstraint ignoreConstraint) {
         int row;
         int column;
         Integer index;
@@ -213,6 +226,7 @@ public class SchemaCard implements Iterable<Cell> {
             }
         }
     }
+
 
     /**
      * Calculates a list of indexes where the die can be put, if it's the first being placed (only on the border of the schema card)
@@ -248,7 +262,7 @@ public class SchemaCard implements Iterable<Cell> {
      * @param list list of possible placements
      * @param ignoreConstraint string that tells which constraint(s) can be ignored
      */
-    private void checkBorder(Die die, ArrayList<Integer> list,String ignoreConstraint) {
+    private void checkBorder(Die die, ArrayList<Integer> list,IgnoredConstraint ignoreConstraint) {
         int row;
         int column;
         //first and last rows
@@ -289,7 +303,7 @@ public class SchemaCard implements Iterable<Cell> {
 
         if((column > 0)                 && this.cell[row][column - 1].hasDie() && this.cell[row][column - 1].checkNeighbor(die)) { return false; }
 
-        return (column >= (NUM_COLS - 1)) || !this.cell[row][column + 1].hasDie() || !this.cell[row][column + 1].checkNeighbor(die);
+        return !((column < (NUM_COLS - 1)) && this.cell[row][column + 1].hasDie() && this.cell[row][column + 1].checkNeighbor(die));
     }
 
     /**
@@ -301,7 +315,7 @@ public class SchemaCard implements Iterable<Cell> {
      * @return true iff the die can be placed there
      */
     @NotNull
-    private Boolean canBePlacedHere (int row, int column, Die die,String ignoreConstraint){
+    private Boolean canBePlacedHere (int row, int column, Die die,IgnoredConstraint ignoreConstraint){
         if(this.cell[row][column].hasDie()){ return false; }
 
         if(!this.cell[row][column].canAcceptDie(die,ignoreConstraint)){ return false; }
@@ -312,7 +326,7 @@ public class SchemaCard implements Iterable<Cell> {
 
         if((column > 0)                 && this.cell[row][column - 1].hasDie() && this.cell[row][column - 1].checkNeighbor(die)) { return false; }
 
-        return (column >= (NUM_COLS - 1)) || !this.cell[row][column + 1].hasDie() || !this.cell[row][column + 1].checkNeighbor(die);
+        return !((column < (NUM_COLS - 1)) && this.cell[row][column + 1].hasDie() && this.cell[row][column + 1].checkNeighbor(die));
     }
 
     /**
@@ -336,7 +350,7 @@ public class SchemaCard implements Iterable<Cell> {
      * @param ignoreConstraint string that tells which constraint(s) can be ignored
      * @throws IllegalDieException iff the die can't be placed there
      */
-    public void putDie (int index,Die die, String ignoreConstraint) throws IllegalDieException {
+    public void putDie (int index,Die die, IgnoredConstraint ignoreConstraint) throws IllegalDieException {
 
         if (!this.listPossiblePlacements(die,ignoreConstraint).contains(index)) throw new IllegalDieException("You can't place this die here!");
 

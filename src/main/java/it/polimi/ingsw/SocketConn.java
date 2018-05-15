@@ -38,16 +38,16 @@ public class SocketConn extends Thread implements ServerConn  {
     }
 
 
-    private boolean execute(String comand){
-        outSocket.println("The comand was "+comand);
+    private boolean execute(String command){
+        outSocket.println("The comand was "+command);
         outSocket.flush();
-        String temp=comand.replaceFirst(" ", ":");
+        String temp=command.replaceFirst(" ", ":");
 
         System.out.println(temp);
 
-        String command[]= temp.split(":");
+        String commandList[]= temp.split(":");
 
-        if(command[0].equals("quit")){
+        if(commandList[0].equals("quit")){
             try {
                 socket.close();
                 return true;
@@ -55,7 +55,7 @@ public class SocketConn extends Thread implements ServerConn  {
                 e.printStackTrace();
             }
         }
-        if(command[0].equals("GET")){
+        if(commandList[0].equals("GET")){
             //get(command[1]);
         }
         return false;
