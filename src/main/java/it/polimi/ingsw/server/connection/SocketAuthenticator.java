@@ -40,7 +40,6 @@ public class SocketAuthenticator extends Thread {
             outSocket.flush();
             while (!connected){
                 command = inSocket.readLine();
-                System.out.println(command);
                 String params[]= command.split(" ");
                 if (params.length==3 && params[0].equals("LOGIN") ){
 
@@ -59,8 +58,12 @@ public class SocketAuthenticator extends Thread {
                     outSocket.flush();
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | NullPointerException e) {
+            try {
+                socket.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 

@@ -31,6 +31,10 @@ public class MasterServer{
     private String address;
     private int portRMI;
     private int portSocket;
+    private boolean additionalSchemas; //to be used for additional schemas FA
+    public static final String xmlSource = "src"+ File.separator+"xml"+File.separator; //append class name + ".xml" to obtain complete path
+    private int timeLobby;
+    private int timeGame;
     private ArrayList <User> users;
     private ArrayList <User> lobby;
     private ArrayList <Game> games;
@@ -40,7 +44,7 @@ public class MasterServer{
      * it's made private as MasterServer is a Singleton
      */
     private MasterServer() {
-        File xmlFile= new File("src"+File.separator+"xml"+File.separator+"ServerConf.xml");
+        File xmlFile= new File(xmlSource+"ServerConf.xml");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -52,13 +56,18 @@ public class MasterServer{
             this.address=eElement.getElementsByTagName("address").item(0).getTextContent();
             this.portRMI=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
             this.portSocket=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent());
-
+            this.timeLobby=Integer.parseInt(eElement.getElementsByTagName("timeLobby").item(0).getTextContent());
+            this.timeGame=Integer.parseInt(eElement.getElementsByTagName("timeGame").item(0).getTextContent());
+            this.additionalSchemas=Boolean.parseBoolean(eElement.getElementsByTagName("additionalSchemas").item(0).getTextContent());
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
         }
         users = new ArrayList<>();
         lobby = new ArrayList<>();
         games = new ArrayList<>();
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new LobbyQueue(), 0, timeLobby* 1000);
     }
 
     /**
@@ -87,12 +96,15 @@ public class MasterServer{
      */
     protected synchronized void updateLobby(){
         ArrayList <User> players = new ArrayList<>();
+        boolean lobbyChanged=false;
+
 
         //Queuing users
         for(User u : users){
             if(u.getStatus()==UserStatus.CONNECTED){
                 u.setStatus(UserStatus.QUEUED);
                 lobby.add(u);
+                lobbyChanged=true;
             }
         }
 
@@ -102,17 +114,25 @@ public class MasterServer{
                 User u = lobby.get(j);
                 players.add(u);
             }
-            games.add(new Game(players));
+            games.add(new Game(players,additionalSchemas));
             lobby.removeAll(players);
             players.clear();
+            lobbyChanged=true;
         }
 
         //Creating the last game with 2<=players<4
         if (lobby.size()>=2){
-            games.add(new Game(lobby));
+            games.add(new Game(lobby,additionalSchemas));
             lobby.clear();
+            lobbyChanged=true;
         }
 
+        //Sending the lobby message if there are new users or new games
+        if(lobbyChanged){
+            for(User l : lobby){
+                l.getServerConn().lobbyUpdate(lobby.size());
+            }
+        }
         return;
     }
 
@@ -129,7 +149,7 @@ public class MasterServer{
         try {
             AuthenticationInt authenticator = new RMIAuthenticator();
             Registry registry = LocateRegistry.createRegistry(portRMI);
-            Naming.rebind("rmi://127.0.0.1/myabc", authenticator);
+            Naming.rebind(address, authenticator);
             System.out.println("rmi auth running");
         }catch (RemoteException e){
             e.printStackTrace();
@@ -230,10 +250,8 @@ public class MasterServer{
         return false;
     }
 
-    public static void main(String[] args){
 
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new LobbyQueue(), 0, 30 * 1000);
+    public static void main(String[] args){
         MasterServer.getMasterServer().startRMI();
         MasterServer.getMasterServer().startSocket();
     }

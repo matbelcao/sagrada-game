@@ -44,10 +44,15 @@ public class SocketConn extends Thread implements ServerConn  {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             quit = execute(command);
         }
-        user.setStatus(UserStatus.DISCONNECTED);
+        try {
+            //Broken connection / quitting managing
+            socket.close();
+            user.setStatus(UserStatus.DISCONNECTED);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -56,28 +61,46 @@ public class SocketConn extends Thread implements ServerConn  {
      * @return true if the connection has to be closed
      */
     private boolean execute(String command){
-        outSocket.println("The command was " + command);
-        outSocket.flush();
-        String temp=command.replaceFirst(" ", ":");
+        try{
+            outSocket.println("The command was " + command);
+            outSocket.flush();
+            String temp=command.replaceFirst(" ", ":");
 
-        System.out.println(temp);
-        if(command == null){
+            System.out.println(temp);
+            if(command == null){
+                return true;
+            }
+            String commandList[]= temp.split(":");
+
+            if(commandList[0].equals("QUIT")){
+                return true;
+            }
+            if(commandList[0].equals("GET")){
+                //get(command[1]);
+            }
+            return false;
+        }catch(NullPointerException e){
             return true;
         }
-        String commandList[]= temp.split(":");
 
-        if(commandList[0].equals("QUIT")){
-            try {
-                socket.close();
-                return true;
-            } catch (IOException e) {
-                System.out.println("IO exception thrown");
-            }
-        }
-        if(commandList[0].equals("GET")){
-            //get(command[1]);
-        }
-        return false;
+    }
 
+    /**
+     * Sends the "LOBBY n" update message to the user
+     * @param n number of players in the lobby
+     */
+    public void lobbyUpdate(int n){
+        outSocket.println("LOBBY "+n);
+        outSocket.flush();
+    }
+
+    /**
+     * Sends the "GAME start n id" message to the user
+     * @param n the number of connected players
+     * @param id the assigned id of the specific user
+     */
+    public void gameStart(int n,int id){
+        outSocket.println("GAME start "+n+" "+id);
+        outSocket.flush();
     }
 }
