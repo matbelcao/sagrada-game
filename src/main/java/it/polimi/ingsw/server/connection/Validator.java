@@ -1,75 +1,301 @@
 package it.polimi.ingsw.server.connection;
 
-import java.lang.String;
 import java.util.Arrays;
 import java.util.List;
 
 public class Validator {
-    public static boolean isValid(String command, List<String> parsedParams) {
+    static final String ALPHANUMERIC="[0-9a-zA-Z]+";
+    static final String BEGINS_WITH_DIGIT="^([0-9]+)[^0-9]*";
+    static final String PLAYER_ID="[0-3]";
+    static final String TWO_DIGITS_MAX = "[0-9]|([0-9][0-9])";
+    static final String CELL_INDEX = "[0-9]|([0-1][0-9])";
+    static final String TOOL_INDEX = "[0-2]";
+    static final String DIE_FACE = "[1-6]]";
+
+    private Validator(){ }
+
+
+    public static boolean isValid(String command, List<String> parsedResult) {
         String[] temp;
         String keyword;
         if (command == null) {
             return false;
         }
 
-        temp= command.trim().split("\\s+", 2);
+        assert parsedResult!=null;
+
+        temp= command.trim().split("\\s+");
         keyword = temp[0];
+        parsedResult.clear();
 
 
         switch (keyword) {
 
             case "LOGIN":
 
-                return checkLoginParams(command, parsedParams);
-
+                return checkLoginParams(temp, parsedResult);
 
             case "GET":
 
-
+                return checkGetParams(temp, parsedResult);
             case "GET_DICE_LIST":
-                break;
+                return checkGetDiceListParams(temp, parsedResult);
 
             case "SELECT":
-                break;
+                return checkSelectParams(temp, parsedResult);
 
             case "DISCARD":
-                break;
+
+                return checkOneParamCommands(temp, parsedResult);
 
             case "CHOOSE":
-                break;
+                return checkChooseParams(temp, parsedResult);
 
             case "QUIT":
-                break;
+                return checkOneParamCommands(temp, parsedResult);
 
             case "ACK":
-                break;
+                return checkAckParams(temp, parsedResult);
             default:
                 return false;
 
+        }
+    }
 
+    /**
+     *
+     * @param command
+     * @param parsedResult
+     * @return
+     */
+    private static boolean checkAckParams(String[] command, List<String> parsedResult) {
+        if(command.length==2) {
+            switch (command[1]) {
+                case "game":
+                case "send":
+                case "list":
+                case "status":
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
+
+                default:
+                    return false;
+            }
         }
         return false;
     }
 
-    public static boolean isValidUsername(String username){
-        return username.split("[^a-zA-Z0-9]").length==1 && username.length()>0;
-    }
     /**
-     * This method checks if the login parametersa are valid
-     * @param command the unparsed string containing all parameters of the command and the command itself
+     *
+     * @param command
+     * @param parsedResult
+     * @return
+     */
+    private static boolean checkChooseParams(String[] command, List<String> parsedResult) {
+        switch (command[1]){
+            case "die_placement":
+                if((command.length == 3) && command[2].matches(CELL_INDEX)){
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
+                }
+
+                return false;
+            case "die":
+                if((command.length == 3) && command[2].matches(TWO_DIGITS_MAX)){
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
+                }
+                if((command.length == 4) && command[2].matches(TWO_DIGITS_MAX)){
+                    switch (command[3]){
+                        case "increase":
+                        case "decrease":
+                        case "reroll":
+                        case "flip":
+                        case "put_in_bag":
+                            parsedResult.addAll(Arrays.asList(command));
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+
+                return false;
+
+            case "schema":
+                if((command.length == 3) && command[2].matches(PLAYER_ID)){
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
+                }
+                return false;
+
+            case "tool":
+                if((command.length == 3) && command[2].matches(TOOL_INDEX)){
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
+                }
+                return false;
+
+            case "face":
+                if((command.length == 3) && command[2].matches(DIE_FACE)){
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
+                }
+                return false;
+
+            default:
+                return false;
+        }
+    }
+
+    /**
+     *
+     * @param command
+     * @param parsedResult
+     * @return
+     */
+    private static boolean checkOneParamCommands(String[] command, List<String> parsedResult) {
+        if(command.length==1){
+            parsedResult.addAll(Arrays.asList(command));
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     *
+     * @param command
+     * @param parsedResult
+     * @return
+     */
+    private static boolean checkSelectParams(String[] command, List<String> parsedResult) {
+        if(command.length>=2) {
+            switch (command[1]){
+                case "die":
+                    if(command.length==3 && command[2].matches(TWO_DIGITS_MAX)){
+                        parsedResult.addAll(Arrays.asList(command));
+                        return true;
+                    }
+                    return false;
+
+                case "modified_die":
+                    if(command.length==2){
+                        parsedResult.addAll(Arrays.asList(command));
+                        return true;
+                    }
+                    return false;
+
+                case "tool":
+                    if(command.length==3 && command[2].matches(TOOL_INDEX)){
+                        parsedResult.addAll(Arrays.asList(command));
+                        return true;
+                    }
+                    return false;
+
+                default:
+                    return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param command
+     * @param parsedResult
+     * @return
+     */
+    private static boolean checkGetDiceListParams(String[] command, List<String> parsedResult) {
+        if(command.length==2) {
+            switch (command[1]) {
+                case "schema":
+                case "draftpool":
+                case "roundtrack":
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param command
+     * @param parsedResult
+     * @return
+     */
+    private static boolean checkGetParams(String [] command, List<String> parsedResult) {
+
+        if(command.length>=2) {
+
+            switch (command[1]) {
+
+                case "schema":
+                    if ((command.length == 3)
+                            && (command[2].equals("draft")
+                            || command[2].matches(PLAYER_ID))) {
+
+                        parsedResult.addAll(Arrays.asList(command));
+                        return true;
+                    }
+                    return false;
+
+                case "favor_tokens":
+                    if ((command.length == 3)
+                            && (command[2].matches(PLAYER_ID))) {
+
+                        parsedResult.addAll(Arrays.asList(command));
+                        return true;
+                    }
+                    return false;
+
+                case "priv":
+                case "pub":
+                case "tool":
+                case "draftpool":
+                case "roundtrack":
+                case "players":
+                    if (command.length == 2) {
+                        parsedResult.addAll(Arrays.asList(command));
+                        return true;
+                    }
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * This method checks if the login parameters are valid
+     * @param command the raw string containing all parameters of the command and the command itself
      * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
      * @return true iff the parameters are valid
      */
-    private static boolean checkLoginParams(String command, List<String> parsedResult){
-        if(parsedResult!=null){ parsedResult.clear(); }
+    private static boolean checkLoginParams(String [] command, List<String> parsedResult){
 
-        String [] temp=command.trim().split("\\s+");
-        if(temp.length!=3||!isValidUsername(temp[1])){
+        if(command.length!=3||!isValidUsername(command[1])){
             return false;
         }
 
-        parsedResult.addAll(Arrays.asList(temp));
+        parsedResult.addAll(Arrays.asList(command));
         return true;
+    }
+
+    /**
+     * Checks if the the passed username is valid (which means it doesn't contain any non-ALPHANUMERIC character
+     * and doesn't begin with a number)
+     * @param username the username to check
+     * @return true iff the username has a valid format
+     */
+    public static boolean isValidUsername(String username){
+        return  username.matches(ALPHANUMERIC)
+                && !username.matches(BEGINS_WITH_DIGIT);
     }
 
 }

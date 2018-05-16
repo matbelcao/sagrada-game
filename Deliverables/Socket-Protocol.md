@@ -28,7 +28,7 @@ This is the first message the server sends to the client, as soon as the connect
 
 The client sends this message then waits for a response from the server. This is tipically the first message exchanged between client and server.
 ### Server-side
-##### `LOGIN ok|ko [invalid_username]`
+##### `LOGIN ok|ko`
 +   `ok`: the client logged in successfully
 +   `ko`: username and password did not match
 +   `invalid_username`: the username contains prohibited characters
@@ -245,10 +245,11 @@ This message is used to send a list of the players of the match and their userna
 ## Game Management
 ### Client-side
 ##### `GET_DICE_LIST schema|roundtrack|draftpool`
++   `schema`: if the client wants a list of all the dice contained in his schema
++   `roundtrack`: if the client wants a list containing the dice in the roundtrack
++   `draftpool`: if the client wants a list of the dice that are in the draftpool
 
-+   `<index>`: the index (starting from 0) of the die in a given list (could be a list of dice from the draft-pool,schema, roundtrack ...)
-+   `<row>,<column>`: if the wanted list is the 
-+   `<index>`: the index (starting from 0) of the die in a given list (could be a list of dice from the draft-pool,schema, roundtrack ...)
+
 
 ##### `SELECT die <index>`
 
@@ -420,8 +421,8 @@ The client that wants to definitively leave the match can send this message to t
 This message can also be sent during the lobby phase, in this case the server only updates the number of players waiting for the match and sends the corresponding `LOBBY` message.
 ### Server-side
 ###### Notice: all of the server-side messages in this section are sent in broadcast to all players. The players reply with the relative `ACK status` to each message they receive.
-##### `STATUS reconnect|disconnect|quit <player_id>`
-
+##### `STATUS check|reconnect|disconnect|quit <player_id>`
++   `check`: indicates tha the server is doing a connection check on all clients
 +   `reconnect`: indicates that the player has successfully reconnected to the match he was playing
 +   `disconnect`: indicates that a player has been found to be disconnected
 +   `quit`: the player has definitively quitted the game and won't be able to reconnect in future rounds
