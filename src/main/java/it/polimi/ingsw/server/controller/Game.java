@@ -24,16 +24,55 @@ public class Game extends Thread implements Iterable  {
     /**
      * Constructs the class and sets the players list
      * @param users the players of the match
-     * @param additionalSchemas true iff additional are wanted by the user
+     * @param additionalSchemas true if additional are wanted by the user
      */
     public Game(List<User> users,boolean additionalSchemas){
         this.additionalSchemas=additionalSchemas;
         this.users= (ArrayList<User>) users;
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
-            u.getServerConn().gameStart(users.size(), users.indexOf(u));
+            u.setGame(this);
+            u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
         }
     }
+
+    /**
+     * Notify to the active users that an user has been reconnected to the game
+     * @param user the user to notify
+     */
+    public synchronized void notifyReconnectedUser(User user){
+        for(User u : users){
+            if(u.getStatus()==UserStatus.PLAYING){
+                u.getServerConn().notifyStatusUpdate("reconnect",users.indexOf(user));
+            }
+        }
+    }
+
+    /**
+     * Notify to the active users that an user has lost the connection to the game
+     * @param user the user to notify
+     */
+    public synchronized void notifyDisconnectedUser(User user){
+        for(User u : users){
+            if(u.getStatus()==UserStatus.PLAYING){
+                u.getServerConn().notifyStatusUpdate("disconnect",users.indexOf(user));
+            }
+        }
+    }
+
+    /**
+     * Notify to the active users that an user has left the game
+     * @param user the user to notify
+     */
+    public synchronized void notifyQuittedUser(User user){
+        users.remove(user);
+        for(User u : users){
+            if(u.getStatus()==UserStatus.PLAYING){
+                u.getServerConn().notifyStatusUpdate("quit",users.indexOf(user));
+            }
+        }
+    }
+
 
     /**
      * Constructs the class and sets the players list

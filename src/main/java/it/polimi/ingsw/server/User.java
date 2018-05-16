@@ -2,6 +2,7 @@ package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.ConnectionMode;
 import it.polimi.ingsw.server.connection.ServerConn;
+import it.polimi.ingsw.server.controller.Game;
 
 /**
  * This class contains the data concerning the user and the connection mode used
@@ -12,6 +13,7 @@ public class User {
     private UserStatus status;
     private ConnectionMode connectionMode;
     private ServerConn serverConn;
+    private Game game;
 
     /**
      * Instantiate the user profile and associates it's credentials
@@ -79,4 +81,21 @@ public class User {
     public ServerConn getServerConn() {
         return serverConn;
     }
+
+    /**
+     * Sets the current match(game) that the user is playing
+     * @param game the actual game
+     */
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    /**
+     * Return the current match(game) in which the player is involved
+     * @return the player's game
+     */
+    public Game getGame() {
+        return game;
+    }
+
 }

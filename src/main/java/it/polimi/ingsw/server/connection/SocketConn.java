@@ -47,15 +47,7 @@ public class SocketConn extends Thread implements ServerConn  {
             quit = execute(command);
         }
         try {
-            //Broken connection / quitting managing
-            UserStatus previousStatus=user.getStatus();
             socket.close();
-            user.setStatus(UserStatus.DISCONNECTED);
-            if(previousStatus==UserStatus.QUEUED){
-                MasterServer.getMasterServer().cleanDisconnected(user,previousStatus);
-            }else{
-                //Game-class specific cases
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,6 +68,7 @@ public class SocketConn extends Thread implements ServerConn  {
             String commandList[]= temp.split(":");
 
             if(commandList[0].equals("QUIT")){
+                quit();
                 return true;
             }
             if(commandList[0].equals("GET")){
@@ -83,6 +76,7 @@ public class SocketConn extends Thread implements ServerConn  {
             }
             return false;
         }catch(NullPointerException e){
+            disconnect();
             return true;
         }
 
@@ -92,7 +86,7 @@ public class SocketConn extends Thread implements ServerConn  {
      * Sends the "LOBBY n" update message to the user
      * @param n number of players in the lobby
      */
-    public void lobbyUpdate(int n){
+    public void notifyLobbyUpdate(int n){
         outSocket.println("LOBBY "+n);
         outSocket.flush();
     }
@@ -102,14 +96,38 @@ public class SocketConn extends Thread implements ServerConn  {
      * @param n the number of connected players
      * @param id the assigned id of the specific user
      */
-    public void gameStart(int n,int id){
+    public void notifyGameStart(int n,int id){
         outSocket.println("GAME start "+n+" "+id);
         outSocket.flush();
     }
 
     //Da rivedere!!!!!
-    public void statusUpdate (String event){
-
+    public void notifyStatusUpdate (String event,int id){
+        outSocket.println("STATUS "+event+" "+id);
+        outSocket.flush();
     }
+
+    private void quit(){
+        UserStatus previousStatus=user.getStatus();
+        user.setStatus(UserStatus.DISCONNECTED);
+        if(previousStatus==UserStatus.QUEUED){
+            MasterServer.getMasterServer().updateDisconnected(user);
+        }
+        if(previousStatus==UserStatus.PLAYING){
+            user.getGame().notifyQuittedUser(user);
+        }
+    }
+
+    private void disconnect(){
+        UserStatus previousStatus=user.getStatus();
+        user.setStatus(UserStatus.DISCONNECTED);
+        if(previousStatus==UserStatus.QUEUED){
+            MasterServer.getMasterServer().updateDisconnected(user);
+        }
+        if(previousStatus==UserStatus.PLAYING){
+                user.getGame().notifyDisconnectedUser(user);
+        }
+    }
+
 
 }

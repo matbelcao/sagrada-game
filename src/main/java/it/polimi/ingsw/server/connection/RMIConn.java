@@ -2,11 +2,15 @@ package it.polimi.ingsw.server.connection;
 
 public class RMIConn implements ServerConn {
 
-    public void lobbyUpdate(int n){
+    public void notifyLobbyUpdate(int n){
 
     }
 
-    public void gameStart(int n,int id){
+    public void notifyGameStart(int n,int id){
+
+    }
+
+    public void notifyStatusUpdate(String event, int id) {
 
     }
 }

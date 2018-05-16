@@ -120,7 +120,7 @@ public class MasterServer{
         //Sending the lobby message if there are new users or new games
         if(lobbyChanged){
             for(User l : lobby){
-                l.getServerConn().lobbyUpdate(lobby.size());
+                l.getServerConn().notifyLobbyUpdate(lobby.size());
             }
         }
         return;
@@ -131,21 +131,19 @@ public class MasterServer{
      * @param user the user to check
      */
     public synchronized void updateConnected(User user){
-        boolean alreadyInGame=false;
         if(user.getStatus()==UserStatus.CONNECTED){
             for(Game g : games){
                 if(g.getUsers().contains(user)){
-                    alreadyInGame=true;
-                    g.reconnectedUser(user);
+                    g.notifyReconnectedUser(user);
                     user.setStatus(UserStatus.PLAYING);
                 }
             }
         }
-        if(user.getStatus()==UserStatus.CONNECTED && !lobby.contains(user) && !alreadyInGame){
+        if(user.getStatus()==UserStatus.CONNECTED && !lobby.contains(user)){
             user.setStatus(UserStatus.QUEUED);
             lobby.add(user);
             for(User l : lobby){
-                l.getServerConn().lobbyUpdate(lobby.size());
+                l.getServerConn().notifyLobbyUpdate(lobby.size());
             }
         }
     }
@@ -153,15 +151,14 @@ public class MasterServer{
     /**
      * Checks if the user is disconnected and sends a message to the other users
      * @param user the user to check
-     * @param previousStatus the previous status of the user
      */
-    public synchronized void cleanDisconnected(User user,UserStatus previousStatus){
-        if(user.getStatus()==UserStatus.DISCONNECTED && previousStatus==UserStatus.QUEUED){
+    public synchronized void updateDisconnected(User user){
+        //if(lobby.contains(user)){
             lobby.remove(user);
             for(User l : lobby){
-                l.getServerConn().lobbyUpdate(lobby.size());
+                l.getServerConn().notifyLobbyUpdate(lobby.size());
             }
-        }
+        //}
     }
 
     /**
