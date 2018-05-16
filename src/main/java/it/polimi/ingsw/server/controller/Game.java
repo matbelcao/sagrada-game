@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.controller;
 
+import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.PubObjectiveCard;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
@@ -18,7 +19,6 @@ public class Game extends Thread implements Iterable  {
     public static final int NUM_ROUND=10;
     private Board board;
     private boolean additionalSchemas; //to be used for additional schemas FA
-    static String xmlSource = "src"+ File.separator+"xml"+File.separator; //append class name + ".xml" to obtain complete path
     private ArrayList<User> users;
 
     /**
@@ -31,6 +31,7 @@ public class Game extends Thread implements Iterable  {
         this.users= (ArrayList<User>) users;
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
+            u.getServerConn().gameStart(users.size(), users.indexOf(u));
         }
     }
 
@@ -61,7 +62,7 @@ public class Game extends Thread implements Iterable  {
         ToolCard[] toolCards= new ToolCard[Board.NUM_TOOLS];
         Random randomGen = new Random();
         for(int i =0; i<Board.NUM_TOOLS;i++){
-            toolCards[i]=new ToolCard(randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1,xmlSource+"ToolCard.xml");
+            toolCards[i]=new ToolCard(randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1, MasterServer.xmlSource+"ToolCard.xml");
         }
         return toolCards;
     }
@@ -74,7 +75,7 @@ public class Game extends Thread implements Iterable  {
         PubObjectiveCard[] pubObjectiveCards= new PubObjectiveCard[Board.NUM_OBJECTIVES];
         Random randomGen = new Random();
         for(int i =0; i<Board.NUM_OBJECTIVES;i++){
-            pubObjectiveCards[i]=new PubObjectiveCard(randomGen.nextInt(PubObjectiveCard.NUM_PUB_OBJ) + 1,xmlSource+"PubObjectiveCard.xml");
+            pubObjectiveCards[i]=new PubObjectiveCard(randomGen.nextInt(PubObjectiveCard.NUM_PUB_OBJ) + 1,MasterServer.xmlSource+"PubObjectiveCard.xml");
         }
         return pubObjectiveCards;
     }

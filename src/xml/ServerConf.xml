@@ -6,4 +6,7 @@
 	<address>rmi://127.0.0.1/myabc</address>
 	<portRMI>1099</portRMI>
 	<portSocket>3000</portSocket>
+    <timeLobby>30</timeLobby>
+    <timeGame>90</timeGame>
+	<additionalSchemas>false</additionalSchemas>
 </conf>
