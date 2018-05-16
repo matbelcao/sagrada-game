@@ -98,16 +98,6 @@ public class MasterServer{
         ArrayList <User> players = new ArrayList<>();
         boolean lobbyChanged=false;
 
-
-        //Queuing users
-        for(User u : users){
-            if(u.getStatus()==UserStatus.CONNECTED){
-                u.setStatus(UserStatus.QUEUED);
-                lobby.add(u);
-                lobbyChanged=true;
-            }
-        }
-
         //Creating the games with 4 players
         for (int i=0; i<(Math.floor(lobby.size()/4))*4;i++){
             for (int j=0;j<4;j++){
@@ -134,6 +124,42 @@ public class MasterServer{
             }
         }
         return;
+    }
+
+    /**
+     * Queues the users logged and connected
+     * @param user the user to check
+     */
+    public synchronized void updateConnected(User user){
+        if(user.getStatus()==UserStatus.CONNECTED && !lobby.contains(user)){
+            user.setStatus(UserStatus.QUEUED);
+            lobby.add(user);
+            for(User l : lobby){
+                l.getServerConn().lobbyUpdate(lobby.size());
+            }
+        }
+    }
+
+    /**
+     * Checks if the user is disconnected and sends a message to the other users
+     * @param user the user to check
+     * @param previousStatus the previous status of the user
+     */
+    public synchronized void cleanDisconnected(User user,UserStatus previousStatus){
+        if(user.getStatus()==UserStatus.DISCONNECTED && previousStatus==UserStatus.QUEUED){
+            lobby.remove(user);
+            for(User l : lobby){
+                l.getServerConn().lobbyUpdate(lobby.size());
+            }
+        }
+    }
+
+    /**
+     * Returns the number of players in the lobby
+     * @return the lobby size
+     */
+    public int getLobbySize(){
+        return lobby.size();
     }
 
 

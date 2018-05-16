@@ -48,8 +48,14 @@ public class SocketConn extends Thread implements ServerConn  {
         }
         try {
             //Broken connection / quitting managing
+            UserStatus previousStatus=user.getStatus();
             socket.close();
             user.setStatus(UserStatus.DISCONNECTED);
+            if(previousStatus==UserStatus.QUEUED){
+                MasterServer.getMasterServer().cleanDisconnected(user,previousStatus);
+            }else{
+                //Game-class specific cases
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -103,4 +109,10 @@ public class SocketConn extends Thread implements ServerConn  {
         outSocket.println("GAME start "+n+" "+id);
         outSocket.flush();
     }
+
+    //Da rivedere!!!!!
+    public void statusUpdate (String event){
+
+    }
+
 }

@@ -81,6 +81,14 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
+     * Returns the list of the users that are currently playing the game
+     * @return the list of users
+     */
+    public List<User> getUsers(){
+        return users;
+    }
+
+    /**
      * This method creates an iterator that implements the round's turns management system
      * @return an iterator on the players of this game
      */
