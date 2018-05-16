@@ -97,6 +97,7 @@ public class MasterServer{
     protected synchronized void updateLobby(){
         ArrayList <User> players = new ArrayList<>();
         boolean lobbyChanged=false;
+        Game game;
 
         //Creating the games with 4 players
         for (int i=0; i<(Math.floor(lobby.size()/4))*4;i++){
@@ -104,7 +105,9 @@ public class MasterServer{
                 User u = lobby.get(j);
                 players.add(u);
             }
-            games.add(new Game(players,additionalSchemas));
+            game=new Game(players,additionalSchemas);
+            games.add(game);
+            game.start();
             lobby.removeAll(players);
             players.clear();
             lobbyChanged=true;
@@ -112,7 +115,9 @@ public class MasterServer{
 
         //Creating the last game with 2<=players<4
         if (lobby.size()>=2){
-            games.add(new Game(lobby,additionalSchemas));
+            game=new Game(lobby,additionalSchemas);
+            games.add(game);
+            game.start();
             lobby.clear();
             lobbyChanged=true;
         }

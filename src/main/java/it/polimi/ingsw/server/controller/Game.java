@@ -33,6 +33,7 @@ public class Game extends Thread implements Iterable  {
             u.setStatus(UserStatus.PLAYING);
             u.setGame(this);
             u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
+            System.out.println(u.getStatus());
         }
     }
 
