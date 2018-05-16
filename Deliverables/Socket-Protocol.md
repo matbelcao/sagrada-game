@@ -28,9 +28,10 @@ This is the first message the server sends to the client, as soon as the connect
 
 The client sends this message then waits for a response from the server. This is tipically the first message exchanged between client and server.
 ### Server-side
-##### `LOGIN ok|ko`
+##### `LOGIN ok|ko [invalid_username]`
 +   `ok`: the client logged in successfully
 +   `ko`: username and password did not match
++   `invalid_username`: the username contains prohibited characters
 
 The server responds with this message to the login request from the client, if ko the client will be able to try with another username + password combination, if ok the user enters the `LOBBY` phase.
 
