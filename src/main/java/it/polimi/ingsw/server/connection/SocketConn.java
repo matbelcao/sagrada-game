@@ -73,9 +73,6 @@ public class SocketConn extends Thread implements ServerConn  {
             String temp=command.replaceFirst(" ", ":");
 
             System.out.println(temp);
-            if(command == null){
-                return true;
-            }
             String commandList[]= temp.split(":");
 
             if(commandList[0].equals("QUIT")){
