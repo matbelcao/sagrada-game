@@ -136,7 +136,8 @@ public class MasterServer{
             for(Game g : games){
                 if(g.getUsers().contains(user)){
                     alreadyInGame=true;
-                    g.reconnectUser(user);
+                    g.reconnectedUser(user);
+                    user.setStatus(UserStatus.PLAYING);
                 }
             }
         }
