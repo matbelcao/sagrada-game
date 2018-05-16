@@ -127,11 +127,20 @@ public class MasterServer{
     }
 
     /**
-     * Queues the users logged and connected
+     * Queues the users (logged and connected) or reconnect them in a match if they have previously lost the connection
      * @param user the user to check
      */
     public synchronized void updateConnected(User user){
-        if(user.getStatus()==UserStatus.CONNECTED && !lobby.contains(user)){
+        boolean alreadyInGame=false;
+        if(user.getStatus()==UserStatus.CONNECTED){
+            for(Game g : games){
+                if(g.getUsers().contains(user)){
+                    alreadyInGame=true;
+                    g.reconnectUser(user);
+                }
+            }
+        }
+        if(user.getStatus()==UserStatus.CONNECTED && !lobby.contains(user) && !alreadyInGame){
             user.setStatus(UserStatus.QUEUED);
             lobby.add(user);
             for(User l : lobby){
