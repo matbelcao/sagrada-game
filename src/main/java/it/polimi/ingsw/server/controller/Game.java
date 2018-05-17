@@ -74,14 +74,13 @@ public class Game extends Thread implements Iterable  {
      */
     public void notifyQuittedUser(User user){
         user.setStatus(UserStatus.DISCONNECTED);
-        users.remove(user);
-
         // add control for number of players still in the game...
         for(User u : users){
             if(u.getStatus()==UserStatus.PLAYING){
                 u.getServerConn().notifyStatusUpdate("quit",users.indexOf(user));
             }
         }
+        users.remove(user);
     }
 
 

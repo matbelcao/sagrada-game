@@ -48,6 +48,7 @@ public class SocketConn extends Thread implements ServerConn  {
                 e.printStackTrace();
             }finally {
                 quit=true;
+                disconnect();
             }
         }
         try {
@@ -69,14 +70,11 @@ public class SocketConn extends Thread implements ServerConn  {
 
             switch (params.get(0)) {
                 case "QUIT":
-
+                    quit();
                     return true;
-
                 default:
                     return false;
-
             }
-
         }
         return false;
     }
