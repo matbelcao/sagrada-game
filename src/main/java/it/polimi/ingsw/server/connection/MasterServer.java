@@ -138,7 +138,7 @@ public class MasterServer{
     public void updateConnected(User user){
         if(user.getStatus()==UserStatus.CONNECTED) {
             if (hasGameToReconnect(user)) {
-                getGameByUser(user).notifyReconnectedUser(user);
+                getGameByUser(user).reconnectUser(user);
             } else {
                 synchronized (this.lobby) {
                     lobby.add(user);
