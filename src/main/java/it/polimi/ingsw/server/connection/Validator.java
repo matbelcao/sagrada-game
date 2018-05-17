@@ -24,7 +24,7 @@ public class Validator {
 
         assert parsedResult!=null;
 
-        temp= command.trim().split("\\s+");
+        temp= command.trim().split("\\s+",2);
         keyword = temp[0];
         parsedResult.clear();
 
@@ -33,29 +33,29 @@ public class Validator {
 
             case "LOGIN":
 
-                return checkLoginParams(temp, parsedResult);
+                return checkLoginParams(command, parsedResult);
 
             case "GET":
 
-                return checkGetParams(temp, parsedResult);
+                return checkGetParams(command, parsedResult);
             case "GET_DICE_LIST":
-                return checkGetDiceListParams(temp, parsedResult);
+                return checkGetDiceListParams(command, parsedResult);
 
             case "SELECT":
-                return checkSelectParams(temp, parsedResult);
+                return checkSelectParams(command, parsedResult);
 
             case "DISCARD":
 
-                return checkOneParamCommands(temp, parsedResult);
+                return checkDiscardParams(command, parsedResult);
 
             case "CHOOSE":
-                return checkChooseParams(temp, parsedResult);
+                return checkChooseParams(command, parsedResult);
 
             case "QUIT":
-                return checkOneParamCommands(temp, parsedResult);
+                return checkQuitParams(command, parsedResult);
 
             case "ACK":
-                return checkAckParams(temp, parsedResult);
+                return checkAckParams(command, parsedResult);
             default:
                 return false;
 
@@ -64,11 +64,14 @@ public class Validator {
 
     /**
      *
-     * @param command
+     * @param rawCommand
      * @param parsedResult
      * @return
      */
-    private static boolean checkAckParams(String[] command, List<String> parsedResult) {
+    public static boolean checkAckParams(String rawCommand, List<String> parsedResult) {
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(!command[0].equals("ACK")){ return false; }
         if(command.length==2) {
             switch (command[1]) {
                 case "game":
@@ -87,11 +90,14 @@ public class Validator {
 
     /**
      *
-     * @param command
+     * @param rawCommand
      * @param parsedResult
      * @return
      */
-    private static boolean checkChooseParams(String[] command, List<String> parsedResult) {
+    public static boolean checkChooseParams(String rawCommand, List<String> parsedResult) {
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(!command[0].equals("CHOOSE")){ return false; }
         switch (command[1]){
             case "die_placement":
                 if((command.length == 3) && command[2].matches(CELL_INDEX)){
@@ -149,11 +155,14 @@ public class Validator {
 
     /**
      *
-     * @param command
+     * @param rawCommand
      * @param parsedResult
      * @return
      */
-    private static boolean checkOneParamCommands(String[] command, List<String> parsedResult) {
+    public static boolean checkDiscardParams(String rawCommand, List<String> parsedResult) {
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(!command[0].equals("DISCARD")){ return false; }
         if(command.length==1){
             parsedResult.addAll(Arrays.asList(command));
             return true;
@@ -161,14 +170,27 @@ public class Validator {
         return false;
     }
 
+    public static boolean checkQuitParams(String rawCommand, List<String> parsedResult) {
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(!command[0].equals("QUIT")){ return false; }
+        if(command.length==1){
+            parsedResult.addAll(Arrays.asList(command));
+            return true;
+        }
+        return false;
+    }
 
     /**
      *
-     * @param command
+     * @param rawCommand
      * @param parsedResult
      * @return
      */
-    private static boolean checkSelectParams(String[] command, List<String> parsedResult) {
+    public static boolean checkSelectParams(String rawCommand, List<String> parsedResult) {
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(!command[0].equals("SELECT")){ return false; }
         if(command.length>=2) {
             switch (command[1]){
                 case "die":
@@ -201,11 +223,14 @@ public class Validator {
 
     /**
      *
-     * @param command
+     * @param rawCommand
      * @param parsedResult
      * @return
      */
-    private static boolean checkGetDiceListParams(String[] command, List<String> parsedResult) {
+    public static boolean checkGetDiceListParams(String rawCommand, List<String> parsedResult) {
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(!command[0].equals("GET_DICE_LIST")){ return false; }
         if(command.length==2) {
             switch (command[1]) {
                 case "schema":
@@ -222,12 +247,14 @@ public class Validator {
 
     /**
      *
-     * @param command
+     * @param rawCommand
      * @param parsedResult
      * @return
      */
-    private static boolean checkGetParams(String [] command, List<String> parsedResult) {
-
+    public static boolean checkGetParams(String rawCommand, List<String> parsedResult) {
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(!command[0].equals("GET")){ return false; }
         if(command.length>=2) {
 
             switch (command[1]) {
@@ -273,12 +300,14 @@ public class Validator {
 
     /**
      * This method checks if the login parameters are valid
-     * @param command the raw string containing all parameters of the command and the command itself
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
      * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
      * @return true iff the parameters are valid
      */
-    private static boolean checkLoginParams(String [] command, List<String> parsedResult){
-
+    public static boolean checkLoginParams(String  rawCommand, List<String> parsedResult){
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(!command[0].equals("LOGIN")){ return false; }
         if(command.length!=3||!isValidUsername(command[1])){
             return false;
         }

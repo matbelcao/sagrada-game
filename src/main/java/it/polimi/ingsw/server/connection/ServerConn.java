@@ -5,9 +5,9 @@ package it.polimi.ingsw.server.connection;
  */
 public interface ServerConn {
 
-    public void notifyLobbyUpdate(int n);
+    void notifyLobbyUpdate(int n);
 
-    public void notifyGameStart(int n,int id);
+    void notifyGameStart(int n,int id);
 
-    public void notifyStatusUpdate (String event,int id);
+    void notifyStatusUpdate (String event,int id);
 }
