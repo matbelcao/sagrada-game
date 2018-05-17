@@ -19,6 +19,11 @@ This document aims to describe the rules and the structure of the messages that 
 
 This is the first message the server sends to the client, as soon as the connection is established.
 
+## Debug
+### Server-side
+##### `INVALID message`
+
+This is for debug purposes only and it simply signals that the message the server received wasn't properly constructed.
 
 ## Login
 ### Client-side

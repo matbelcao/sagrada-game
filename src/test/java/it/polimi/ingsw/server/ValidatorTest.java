@@ -38,5 +38,6 @@ public class ValidatorTest {
         assertTrue(Validator.isValidUsername("luca"));
         assertTrue(!Validator.isValidUsername("luca.ssd"));
         assertTrue(!Validator.isValidUsername("...luca"));
+        assertTrue(!Validator.isValidUsername("l uca"));
     }
 }

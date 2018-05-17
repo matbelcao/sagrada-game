@@ -1,5 +1,7 @@
 package it.polimi.ingsw.server.connection;
 
+import it.polimi.ingsw.server.controller.Game;
+
 public class RMIConn implements ServerConn {
 
     public void notifyLobbyUpdate(int n){
@@ -13,4 +15,5 @@ public class RMIConn implements ServerConn {
     public void notifyStatusUpdate(String event, int id) {
 
     }
+
 }

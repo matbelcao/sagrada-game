@@ -20,31 +20,31 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * This class is the server, it handles the login of the clients and the beginning of matches
  */
 public class MasterServer{
     private static MasterServer instance;
-    private String address;
+    private String ipAddress;
     private int portRMI;
     private int portSocket;
     private boolean additionalSchemas; //to be used for additional schemas FA
-    public static final String xmlSource = "src"+ File.separator+"xml"+File.separator; //append class name + ".xml" to obtain complete path
+    public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator; //append class name + ".xml" to obtain complete path
     private int timeLobby;
     private int timeGame;
-    private ArrayList <User> users;
-    private ArrayList <User> lobby;
-    private ArrayList <Game> games;
+    private final ArrayList <User> users;
+    private final ArrayList <User> lobby;
+    private final ArrayList <Game> games;
+    public static final int MIN_PLAYERS=2;
+    public static final int MAX_PLAYERS=4;
 
     /**
      * This is the constructor of the server, it initializes the address of the port for socket and RMI connection,
      * it's made private as MasterServer is a Singleton
      */
     private MasterServer() {
-        File xmlFile= new File(xmlSource+"ServerConf.xml");
+        File xmlFile= new File(XML_SOURCE+"ServerConf.xml");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -53,7 +53,7 @@ public class MasterServer{
             doc.getDocumentElement().normalize();
 
             Element eElement = (Element)doc.getElementsByTagName("conf").item(0);
-            this.address=eElement.getElementsByTagName("address").item(0).getTextContent();
+            this.ipAddress=eElement.getElementsByTagName("address").item(0).getTextContent();
             this.portRMI=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
             this.portSocket=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent());
             this.timeLobby=Integer.parseInt(eElement.getElementsByTagName("timeLobby").item(0).getTextContent());
@@ -66,8 +66,9 @@ public class MasterServer{
         lobby = new ArrayList<>();
         games = new ArrayList<>();
 
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new LobbyQueue(), 0, timeLobby* 1000);
+        new LobbyHandler();
+        printMessage("Starting Master Server");
+
     }
 
     /**
@@ -79,76 +80,73 @@ public class MasterServer{
         return instance;
     }
 
-    /**
-     * Provides timer to wakeup the updateLobby() method every X seconds
-     */
-    private static class LobbyQueue extends TimerTask {
-
-        @Override
-        public void run() {
-            System.out.println("Updating Lobby");
-            getMasterServer().updateLobby();
-        }
-    }
 
     /**
      * Updates the lobby queue and instantiate the new Games
      */
-    protected synchronized void updateLobby(){
-        ArrayList <User> players = new ArrayList<>();
-        boolean lobbyChanged=false;
+    protected void updateLobby() throws InterruptedException {
+
+        ArrayList<User> players = new ArrayList<>();
+        boolean lobbyChanged = false;
         Game game;
+        synchronized (lobby) {
+            while (lobby.size() < MIN_PLAYERS) {
+                wait();
+                if (lobby.size() >= MIN_PLAYERS && lobby.size() < MAX_PLAYERS) {
+                    getMasterServer().printMessage("waiting for other players");
+                    lobby.wait(timeLobby * 1000);
 
-        //Creating the games with 4 players
-        for (int i=0; i<(Math.floor(lobby.size()/4))*4;i++){
-            for (int j=0;j<4;j++){
-                User u = lobby.get(j);
-                players.add(u);
+                }
             }
-            game=new Game(players,additionalSchemas);
-            games.add(game);
-            game.start();
-            lobby.removeAll(players);
-            players.clear();
-            lobbyChanged=true;
-        }
 
-        //Creating the last game with 2<=players<4
-        if (lobby.size()>=2){
-            game=new Game(lobby,additionalSchemas);
-            games.add(game);
-            game.start();
-            lobby.clear();
-            lobbyChanged=true;
-        }
+            //Creating games with 4 players
+            while (lobby.size() >= MAX_PLAYERS) {
+                for (int j = 0; j < MAX_PLAYERS; j++) {
+                    User u = lobby.get(j);
+                    players.add(u);
+                }
+                game = new Game(players, additionalSchemas);
+                games.add(game);
+                game.start();
+                lobby.removeAll(players);
+                players.clear();
+                lobbyChanged = true;
 
-        //Sending the lobby message if there are new users or new games
-        if(lobbyChanged){
-            for(User l : lobby){
-                l.getServerConn().notifyLobbyUpdate(lobby.size());
+            }
+
+            //Creating the last game with two or three players
+            if (lobby.size() >= MIN_PLAYERS) {
+                players.addAll(lobby);
+                game = new Game(players, additionalSchemas);
+                games.add(game);
+                game.start();
+                lobby.clear();
+                lobbyChanged = true;
+            }
+
+            if (lobbyChanged && !lobby.isEmpty()) {
+                lobby.get(0).getServerConn().notifyLobbyUpdate(lobby.size());
             }
         }
-        return;
     }
 
     /**
      * Queues the users (logged and connected) or reconnect them in a match if they have previously lost the connection
      * @param user the user to check
      */
-    public synchronized void updateConnected(User user){
+    public void updateConnected(User user){
+
         if(user.getStatus()==UserStatus.CONNECTED){
-            for(Game g : games){
-                if(g.getUsers().contains(user)){
-                    g.notifyReconnectedUser(user);
-                    user.setStatus(UserStatus.PLAYING);
-                }
+            if(hasGameToReconnect(user)) {
+                getGameByUser(user).notifyReconnectedUser(user);
             }
-        }
-        if(user.getStatus()==UserStatus.CONNECTED && !lobby.contains(user)){
-            user.setStatus(UserStatus.QUEUED);
-            lobby.add(user);
-            for(User l : lobby){
-                l.getServerConn().notifyLobbyUpdate(lobby.size());
+        } else {
+            synchronized (this.lobby) {
+                lobby.add(user);
+                user.setStatus(UserStatus.LOBBY);
+                for (User l : lobby) {
+                    l.getServerConn().notifyLobbyUpdate(lobby.size());
+                }
             }
         }
     }
@@ -157,23 +155,18 @@ public class MasterServer{
      * Checks if the user is disconnected and sends a message to the other users
      * @param user the user to check
      */
-    public synchronized void updateDisconnected(User user){
-        //if(lobby.contains(user)){
-            lobby.remove(user);
-            for(User l : lobby){
-                l.getServerConn().notifyLobbyUpdate(lobby.size());
+    public void updateDisconnected(User user){
+        synchronized (this.lobby){
+            if(this.lobby.contains(user)) {
+                lobby.remove(user);
+                user.setStatus(UserStatus.DISCONNECTED);
             }
-        //}
-    }
+        }
+        for(User lobbyingUser : lobby) {
+            lobbyingUser.getServerConn().notifyLobbyUpdate(lobby.size());
+        }
 
-    /**
-     * Returns the number of players in the lobby
-     * @return the lobby size
-     */
-    public int getLobbySize(){
-        return lobby.size();
     }
-
 
     /**
      * This method makes the MasterServer available for RMI connection. It publishes in the rmi registry
@@ -184,14 +177,13 @@ public class MasterServer{
             System.setSecurityManager(new SecurityManager());
         }*/
 
+        System.setProperty("java.rmi.server.hostname",ipAddress);
         try {
             AuthenticationInt authenticator = new RMIAuthenticator();
             Registry registry = LocateRegistry.createRegistry(portRMI);
-            Naming.rebind(address, authenticator);
+            Naming.rebind("rmi://"+ipAddress+"/myabc", authenticator);
             System.out.println("rmi auth running");
-        }catch (RemoteException e){
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
+        }catch (RemoteException | MalformedURLException e){
             e.printStackTrace();
         }
     }
@@ -202,7 +194,7 @@ public class MasterServer{
      * This method starts a SocketListener thread that accepts all socket connection
      */
     private void startSocket(){
-            // server infinite loop
+        // server infinite loop
         new Thread(() -> {
             MasterServer.getMasterServer().printMessage("server waiting for connections via socket");
             while(1==1) {
@@ -226,10 +218,10 @@ public class MasterServer{
 
     /**
      * prints a message to the server's CLI
-     * @param s the message to be printed
+     * @param message the message to be printed
      */
-    private void printMessage(String s) {
-        System.out.println(s);
+    private void printMessage(String message) {
+        System.out.println(message);
     }
 
     /**
@@ -238,22 +230,58 @@ public class MasterServer{
      * @param password the password to be coupled with the username
      * @return true iff the Client gets logged in
      */
-    public synchronized boolean login(String username, String password) {
+    public boolean login(String username, String password) {
         User user;
-
-        if (isIn(username)) {
-            user = getUser(username);
-            if (password.equals(user.getPassword()) && (user.getStatus() == UserStatus.DISCONNECTED )) {
-                user.setStatus(UserStatus.CONNECTED);
+        synchronized (this.users) {
+            if (this.isIn(username)) {
+                user = getUser(username);
+                if (password.equals(user.getPassword()) && (user.getStatus() == UserStatus.DISCONNECTED)) {
+                    user.setStatus(UserStatus.CONNECTED);
+                    return true;
+                }
+            } else {
+                user = new User(username, password);
+                users.add(user);
                 return true;
+
             }
-        } else {
-            user = new User(username, password);
-            users.add(user);
-            return true;
         }
         return false;
     }
+
+    /**
+     * This method checks if the user was previously connected to a game and if this is still being played
+     * @param user the user we want to check this about
+     * @return true iff the user was previously connected to a game and if this is still being played
+     */
+    private boolean hasGameToReconnect(User user) {
+        for(Game game: this.games){
+            for(User u: game.getUsers()){
+                if(u.equals(user)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * This methods returns the game the user needs to reconnect to if it has one
+     * @param user the user who wants to reconnect
+     * @return the game he can reconnect to iff present
+     */
+    private Game getGameByUser(User user) {
+        assert hasGameToReconnect(user);
+        for(Game game: this.games){
+            for(User u: game.getUsers()){
+                if(u.equals(user)){
+                    return game;
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Metod to return the user whose name matches to the input String
@@ -261,19 +289,13 @@ public class MasterServer{
      * @return the searched user if present else null
      */
     public User getUser(String username){
-        for(User u : users) {
-            if (u.getUsername().equals(username)) {
-                return u;
+        for(User user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
             }
         }
         return null;
     }
-
-    /**
-     * A method to get all the users registered to the MasterServer
-     * @return users the arraylist of the users
-     */
-    public List getUsers(){ return users; }
 
     /**
      * This method checks if the user is already in the list of registered users
@@ -289,8 +311,35 @@ public class MasterServer{
     }
 
 
+    /**
+     *
+     * @return
+     */
+    public int getUsersSize(){
+        return users.size();
+    }
+
     public static void main(String[] args){
-        MasterServer.getMasterServer().startRMI();
         MasterServer.getMasterServer().startSocket();
+        MasterServer.getMasterServer().startRMI();
+
+    }
+
+
+    private class LobbyHandler extends Thread {
+        @Override
+        public void run(){
+
+            while(lobby.size()<=1){
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+
     }
 }

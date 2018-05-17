@@ -4,6 +4,7 @@ import it.polimi.ingsw.server.User;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  *This class runs as a thread launched by the MasterServer and opens a ServerSocket that keeps listening
@@ -25,9 +26,9 @@ public class SocketAuthenticator extends Thread {
         BufferedReader inSocket=null;
         PrintWriter outSocket=null;
         String command = "";
-        Boolean connected = false;
+        Boolean logged = false;
         MasterServer master=MasterServer.getMasterServer();
-
+        ArrayList<String> params = new ArrayList<>();
         try {
             inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
@@ -35,37 +36,37 @@ public class SocketAuthenticator extends Thread {
             e.printStackTrace();
         }
 
+        assert outSocket != null;
+        outSocket.println("connection established!");
+        outSocket.flush();
         try {
-            outSocket.println("connection established!");
-            outSocket.flush();
-            while (!connected){
+            while (!logged) {
                 command = inSocket.readLine();
-                String params[]= command.split(" ");
-                if (params.length==3 && params[0].equals("LOGIN") ){
 
-                    if (master.login(params[1],params[2])){
+                if (Validator.checkLoginParams(command, params)) {
+                    if (master.login(params.get(1), params.get(2))) {
                         outSocket.println("LOGIN ok");
-                        connected=true;
-
+                        logged = true;
                         //Setting Socket specific parameters
-                        User user = master.getUser(params[1]);
+                        User user = master.getUser(params.get(1));
                         user.setConnectionMode(ConnectionMode.SOCKET);
-                        user.setServerConn(new SocketConn(socket,user));
+                        user.setServerConn(new SocketConn(socket, user));
                         master.updateConnected(user);
-                    }else{
+                    } else {
                         outSocket.println("LOGIN ko");
-                        connected=false;
+                        logged = false;
                     }
                     outSocket.flush();
                 }
             }
         } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
             try {
+
                 socket.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
         }
     }
-
 }

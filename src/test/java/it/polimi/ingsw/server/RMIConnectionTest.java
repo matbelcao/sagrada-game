@@ -11,9 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RMIConnectionTest {
+    private static MasterServer server=MasterServer.getMasterServer();
     @BeforeEach
     public void beforeEachTest(){
-        MasterServer.getMasterServer().startRMI();
+        server.startRMI();
         //MasterServer.getMasterServer().startSocket();
     }
     //This test logs 9 clients and verifies if they get properly saved by the master server
@@ -49,28 +50,26 @@ public class RMIConnectionTest {
         c8.setPassword("8");
         c9.setPassword("9");
 
-        users = (ArrayList<User>) MasterServer.getMasterServer().getUsers();
-        assertTrue(users.isEmpty());
-
+        assertEquals(0,server.getUsersSize());
         //connection of three clients
         c1.setupConnection();
-        assertTrue(users.size()== 1);
+        assertTrue(server.getUsersSize()== 1);
         assertEquals(c1.getUsername(),MasterServer.getMasterServer().getUser(c1.getUsername()).getUsername());
         assertEquals("1",MasterServer.getMasterServer().getUser(c1.getUsername()).getPassword());
 
         c2.setupConnection();
-        assertTrue(users.size()== 2);
+        assertTrue(server.getUsersSize()== 2);
         assertEquals(c2.getUsername(),MasterServer.getMasterServer().getUser(c2.getUsername()).getUsername());
         assertEquals("2",MasterServer.getMasterServer().getUser(c2.getUsername()).getPassword());
 
         c3.setupConnection();
-        assertTrue(users.size()== 3);
+        assertTrue(server.getUsersSize()== 3);
         assertEquals(c3.getUsername(),MasterServer.getMasterServer().getUser(c3.getUsername()).getUsername());
         assertEquals("3",MasterServer.getMasterServer().getUser(c3.getUsername()).getPassword());
 
         //connection of a client already logged: no user added
         c3.setupConnection();
-        assertTrue(users.size()== 3);
+        assertTrue(server.getUsersSize()== 3);
         assertEquals(c1.getUsername(),MasterServer.getMasterServer().getUser(c1.getUsername()).getUsername());
         assertEquals(c2.getUsername(),MasterServer.getMasterServer().getUser(c2.getUsername()).getUsername());
         assertEquals(c3.getUsername(),MasterServer.getMasterServer().getUser(c3.getUsername()).getUsername());
@@ -78,16 +77,16 @@ public class RMIConnectionTest {
         //connection of a client with wrong password TO DO
 
         c4.setupConnection();
-        assertTrue(users.size()== 4);
+        assertTrue(server.getUsersSize()== 4);
         c5.setupConnection();
-        assertTrue(users.size()== 5);
+        assertTrue(server.getUsersSize()== 5);
         c6.setupConnection();
-        assertTrue(users.size()== 6);
+        assertTrue(server.getUsersSize()== 6);
         c7.setupConnection();
-        assertTrue(users.size()== 7);
+        assertTrue(server.getUsersSize()== 7);
         c8.setupConnection();
-        assertTrue(users.size()== 8);
+        assertTrue(server.getUsersSize()== 8);
         c9.setupConnection();
-        assertTrue(users.size()== 9);
+        assertTrue(server.getUsersSize()== 9);
     }
 }

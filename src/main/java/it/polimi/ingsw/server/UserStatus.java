@@ -1,8 +1,8 @@
 package it.polimi.ingsw.server;
 
 public enum UserStatus {
-    CONNECTED,
-    QUEUED,
+    LOBBY,
     PLAYING,
-    DISCONNECTED;
+    DISCONNECTED,
+    CONNECTED;
 }

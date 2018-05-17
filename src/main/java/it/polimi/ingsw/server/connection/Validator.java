@@ -16,11 +16,9 @@ public class Validator {
 
 
     public static boolean isValid(String command, List<String> parsedResult) {
+        if( command==null){ return false; }
         String[] temp;
         String keyword;
-        if (command == null) {
-            return false;
-        }
 
         assert parsedResult!=null;
 
@@ -69,6 +67,7 @@ public class Validator {
      * @return
      */
     public static boolean checkAckParams(String rawCommand, List<String> parsedResult) {
+        if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();
         if(!command[0].equals("ACK")){ return false; }
@@ -95,6 +94,7 @@ public class Validator {
      * @return
      */
     public static boolean checkChooseParams(String rawCommand, List<String> parsedResult) {
+        if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();
         if(!command[0].equals("CHOOSE")){ return false; }
@@ -160,6 +160,7 @@ public class Validator {
      * @return
      */
     public static boolean checkDiscardParams(String rawCommand, List<String> parsedResult) {
+        if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();
         if(!command[0].equals("DISCARD")){ return false; }
@@ -171,6 +172,7 @@ public class Validator {
     }
 
     public static boolean checkQuitParams(String rawCommand, List<String> parsedResult) {
+        if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();
         if(!command[0].equals("QUIT")){ return false; }
@@ -188,6 +190,7 @@ public class Validator {
      * @return
      */
     public static boolean checkSelectParams(String rawCommand, List<String> parsedResult) {
+        if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();
         if(!command[0].equals("SELECT")){ return false; }
@@ -228,6 +231,7 @@ public class Validator {
      * @return
      */
     public static boolean checkGetDiceListParams(String rawCommand, List<String> parsedResult) {
+        if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();
         if(!command[0].equals("GET_DICE_LIST")){ return false; }
@@ -252,6 +256,7 @@ public class Validator {
      * @return
      */
     public static boolean checkGetParams(String rawCommand, List<String> parsedResult) {
+        if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();
         if(!command[0].equals("GET")){ return false; }
@@ -305,6 +310,7 @@ public class Validator {
      * @return true iff the parameters are valid
      */
     public static boolean checkLoginParams(String  rawCommand, List<String> parsedResult){
+        if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();
         if(!command[0].equals("LOGIN")){ return false; }

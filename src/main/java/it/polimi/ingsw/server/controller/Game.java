@@ -27,13 +27,18 @@ public class Game extends Thread implements Iterable  {
      * @param additionalSchemas true if additional are wanted by the user
      */
     public Game(List<User> users,boolean additionalSchemas){
-        this.additionalSchemas=additionalSchemas;
+        if(additionalSchemas){
+
+            //PLACEHOLDER
+
+
+            System.out.print("additional schemas");
+        }
         this.users= (ArrayList<User>) users;
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
             u.setGame(this);
             u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
-            System.out.println(u.getStatus());
         }
     }
 
@@ -41,19 +46,21 @@ public class Game extends Thread implements Iterable  {
      * Notify to the active users that an user has been reconnected to the game
      * @param user the user to notify
      */
-    public synchronized void notifyReconnectedUser(User user){
+    public void notifyReconnectedUser(User user){
         for(User u : users){
             if(u.getStatus()==UserStatus.PLAYING){
                 u.getServerConn().notifyStatusUpdate("reconnect",users.indexOf(user));
             }
         }
+        user.setStatus(UserStatus.PLAYING);
     }
 
     /**
      * Notify to the active users that an user has lost the connection to the game
      * @param user the user to notify
      */
-    public synchronized void notifyDisconnectedUser(User user){
+    public void notifyDisconnectedUser(User user){
+        user.setStatus(UserStatus.DISCONNECTED);
         for(User u : users){
             if(u.getStatus()==UserStatus.PLAYING){
                 u.getServerConn().notifyStatusUpdate("disconnect",users.indexOf(user));
@@ -65,8 +72,11 @@ public class Game extends Thread implements Iterable  {
      * Notify to the active users that an user has left the game
      * @param user the user to notify
      */
-    public synchronized void notifyQuittedUser(User user){
+    public void notifyQuittedUser(User user){
+        user.setStatus(UserStatus.DISCONNECTED);
         users.remove(user);
+
+        // add control for number of players still in the game...
         for(User u : users){
             if(u.getStatus()==UserStatus.PLAYING){
                 u.getServerConn().notifyStatusUpdate("quit",users.indexOf(user));
@@ -99,10 +109,11 @@ public class Game extends Thread implements Iterable  {
      * @return an array containing the tools
      */
     private ToolCard[] draftToolCards() {
+
         ToolCard[] toolCards= new ToolCard[Board.NUM_TOOLS];
         Random randomGen = new Random();
         for(int i =0; i<Board.NUM_TOOLS;i++){
-            toolCards[i]=new ToolCard(randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1, MasterServer.xmlSource+"ToolCard.xml");
+            toolCards[i]=new ToolCard(randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1, MasterServer.XML_SOURCE+"ToolCard.xml");
         }
         return toolCards;
     }
@@ -115,7 +126,7 @@ public class Game extends Thread implements Iterable  {
         PubObjectiveCard[] pubObjectiveCards= new PubObjectiveCard[Board.NUM_OBJECTIVES];
         Random randomGen = new Random();
         for(int i =0; i<Board.NUM_OBJECTIVES;i++){
-            pubObjectiveCards[i]=new PubObjectiveCard(randomGen.nextInt(PubObjectiveCard.NUM_PUB_OBJ) + 1,MasterServer.xmlSource+"PubObjectiveCard.xml");
+            pubObjectiveCards[i]=new PubObjectiveCard(randomGen.nextInt(PubObjectiveCard.NUM_PUB_OBJ) + 1,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
         }
         return pubObjectiveCards;
     }

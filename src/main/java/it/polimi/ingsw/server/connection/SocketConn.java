@@ -2,9 +2,11 @@ package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.server.User;
 import it.polimi.ingsw.server.UserStatus;
+import it.polimi.ingsw.server.controller.Game;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * This class is the implementation of the SOCKET server-side connection methods
@@ -20,7 +22,7 @@ public class SocketConn extends Thread implements ServerConn  {
      * @param socket the socket already open used to communicate with the client
      */
     SocketConn(Socket socket, User user){
-        this.user=user;
+        this.user = user;
         this.socket = socket;
         try {
             inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -41,10 +43,12 @@ public class SocketConn extends Thread implements ServerConn  {
         while(!quit){
             try {
                 command = inSocket.readLine();
+                quit = execute(command);
             } catch (IOException e) {
                 e.printStackTrace();
+            }finally {
+                quit=true;
             }
-            quit = execute(command);
         }
         try {
             socket.close();
@@ -58,28 +62,23 @@ public class SocketConn extends Thread implements ServerConn  {
      * @param command the socket's message recived
      * @return true if the connection has to be closed
      */
-    private boolean execute(String command){
-        try{
-            outSocket.println("The command was " + command);
-            outSocket.flush();
-            String temp=command.replaceFirst(" ", ":");
+    private boolean execute(String command) {
+        ArrayList<String> params = new ArrayList<>();
 
-            System.out.println(temp);
-            String commandList[]= temp.split(":");
+        if (Validator.isValid(command, params)) {
 
-            if(commandList[0].equals("QUIT")){
-                quit();
-                return true;
+            switch (params.get(0)) {
+                case "QUIT":
+
+                    return true;
+
+                default:
+                    return false;
+
             }
-            if(commandList[0].equals("GET")){
-                //get(command[1]);
-            }
-            return false;
-        }catch(NullPointerException e){
-            disconnect();
-            return true;
+
         }
-
+        return false;
     }
 
     /**
@@ -107,10 +106,12 @@ public class SocketConn extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
+
+
+
     private void quit(){
         UserStatus previousStatus=user.getStatus();
-        user.setStatus(UserStatus.DISCONNECTED);
-        if(previousStatus==UserStatus.QUEUED){
+        if(previousStatus==UserStatus.LOBBY){
             MasterServer.getMasterServer().updateDisconnected(user);
         }
         if(previousStatus==UserStatus.PLAYING){
@@ -120,8 +121,7 @@ public class SocketConn extends Thread implements ServerConn  {
 
     private void disconnect(){
         UserStatus previousStatus=user.getStatus();
-        user.setStatus(UserStatus.DISCONNECTED);
-        if(previousStatus==UserStatus.QUEUED){
+        if(previousStatus==UserStatus.LOBBY){
             MasterServer.getMasterServer().updateDisconnected(user);
         }
         if(previousStatus==UserStatus.PLAYING){
