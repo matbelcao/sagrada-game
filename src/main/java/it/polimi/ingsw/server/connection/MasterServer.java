@@ -322,6 +322,10 @@ public class MasterServer{
         return users.size();
     }
 
+    public String getIpAddress(){
+        return this.ipAddress;
+    }
+
     public static void main(String[] args){
         MasterServer.getMasterServer().startRMI();
         MasterServer.getMasterServer().startSocket();
