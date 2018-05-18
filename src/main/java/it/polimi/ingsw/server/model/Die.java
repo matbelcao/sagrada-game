@@ -5,7 +5,9 @@ import it.polimi.ingsw.server.model.enums.Color;
 import it.polimi.ingsw.server.model.enums.Face;
 import it.polimi.ingsw.server.model.exceptions.*;
 
+import java.io.File;
 import java.util.Random;
+import java.util.logging.FileHandler;
 
 /**
  * This class represents one Die of the game with its color and shade (face). The class is immutable
@@ -59,9 +61,11 @@ public class Die {
     /**
      * Increases by one the shade of the die
      */
-    public void increaseShade (){
-        if(this.lightDie.getShade().toInt()<6){
-        this.setShade(this.lightDie.getShade().toInt() + 1);}
+    public void increaseShade () throws IllegalShadeException{
+        if(this.lightDie.getShade().toInt()==6){
+            throw new IllegalShadeException();
+        }
+        this.setShade(this.lightDie.getShade().toInt() + 1);
     }
 
     /**
@@ -103,7 +107,7 @@ public class Die {
      * Returns a string representation of the die
      * @return said string
      */
-    public String toString(){ return getColor() + " " + getShade(); }
+    public String toString(){ return getColor() + File.separator + getShade(); }
 
     /**
      * Creates a String that renders a correctly colored die in the CLI using UTF-16 DIE FACES

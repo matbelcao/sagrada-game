@@ -21,7 +21,7 @@ public class FaceTest {
         assertFalse(Face.contains(null));
     }
     @Test
-    void testvalueOf() throws IllegalShadeException {
+    void testvalueOf(){
         assertEquals(Face.valueOf(1), Face.ONE);
         assertEquals(Face.valueOf(2), Face.TWO);
         assertEquals(Face.valueOf(3), Face.THREE);

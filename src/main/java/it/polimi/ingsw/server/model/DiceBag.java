@@ -56,12 +56,8 @@ public class DiceBag {
      * @param die to be rerolled
      */
     public void putDie(Die die){
-        try {
-            Die.reroll(die);
-            toDraft.add(die);
-        } catch (IllegalShadeException e) {
-            e.printStackTrace();
-        }
+        Die.reroll(die);
+        toDraft.add(die);
     }
 
 }
