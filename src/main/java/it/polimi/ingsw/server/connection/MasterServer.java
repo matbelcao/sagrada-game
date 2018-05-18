@@ -19,7 +19,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 /**
  * This class is the server, it handles the login of the clients and the beginning of matches
@@ -81,23 +83,22 @@ public class MasterServer{
     }
 
 
+    private static class LobbyHandler extends TimerTask {
+        @Override
+        public void run(){
+            getMasterServer().updateLobby();
+        }
+    }
+
     /**
      * Updates the lobby queue and instantiate the new Games
      */
-    protected void updateLobby() throws InterruptedException {
+    protected void updateLobby() {
 
         ArrayList<User> players = new ArrayList<>();
         boolean lobbyChanged = false;
         Game game;
         synchronized (lobby) {
-            while (lobby.size() < MIN_PLAYERS) {
-                wait();
-                if (lobby.size() >= MIN_PLAYERS && lobby.size() < MAX_PLAYERS) {
-                    getMasterServer().printMessage("waiting for other players");
-                    lobby.wait(timeLobby * 1000);
-
-                }
-            }
 
             //Creating games with 4 players
             while (lobby.size() >= MAX_PLAYERS) {
@@ -135,17 +136,21 @@ public class MasterServer{
      * @param user the user to check
      */
     public void updateConnected(User user){
-
-        if(user.getStatus()==UserStatus.CONNECTED){
-            if(hasGameToReconnect(user)) {
-                getGameByUser(user).notifyReconnectedUser(user);
-            }
-        } else {
-            synchronized (this.lobby) {
-                lobby.add(user);
-                user.setStatus(UserStatus.LOBBY);
-                for (User l : lobby) {
-                    l.getServerConn().notifyLobbyUpdate(lobby.size());
+        if(user.getStatus()==UserStatus.CONNECTED) {
+            if (hasGameToReconnect(user)) {
+                getGameByUser(user).reconnectUser(user);
+            } else {
+                synchronized (this.lobby) {
+                    lobby.add(user);
+                    user.setStatus(UserStatus.LOBBY);
+                    for (User l : lobby) {
+                        l.getServerConn().notifyLobbyUpdate(lobby.size());
+                    }
+                    if (lobby.size() == MIN_PLAYERS) {
+                        System.out.println("TIMER STARTING " + timeLobby + " sec");
+                        Timer timer = new Timer();
+                        timer.schedule(new LobbyHandler(), timeLobby * 1000);
+                    }
                 }
             }
         }
@@ -212,15 +217,13 @@ public class MasterServer{
 
             }
         }).start();
-
-
     }
 
     /**
      * prints a message to the server's CLI
      * @param message the message to be printed
      */
-    private void printMessage(String message) {
+    public void printMessage(String message) {
         System.out.println(message);
     }
 
@@ -319,27 +322,13 @@ public class MasterServer{
         return users.size();
     }
 
+    public String getIpAddress(){
+        return this.ipAddress;
+    }
+
     public static void main(String[] args){
-        MasterServer.getMasterServer().startSocket();
         MasterServer.getMasterServer().startRMI();
-
+        MasterServer.getMasterServer().startSocket();
     }
 
-
-    private class LobbyHandler extends Thread {
-        @Override
-        public void run(){
-
-            while(lobby.size()<=1){
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-
-    }
 }

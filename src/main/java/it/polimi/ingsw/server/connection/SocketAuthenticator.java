@@ -42,7 +42,6 @@ public class SocketAuthenticator extends Thread {
         try {
             while (!logged) {
                 command = inSocket.readLine();
-
                 if (Validator.checkLoginParams(command, params)) {
                     if (master.login(params.get(1), params.get(2))) {
                         outSocket.println("LOGIN ok");
@@ -52,6 +51,7 @@ public class SocketAuthenticator extends Thread {
                         user.setConnectionMode(ConnectionMode.SOCKET);
                         user.setServerConn(new SocketConn(socket, user));
                         master.updateConnected(user);
+                        master.printMessage("LOGGED "+params.get(1)+" "+params.get(2));
                     } else {
                         outSocket.println("LOGIN ko");
                         logged = false;

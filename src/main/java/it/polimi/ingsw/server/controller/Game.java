@@ -46,7 +46,7 @@ public class Game extends Thread implements Iterable  {
      * Notify to the active users that an user has been reconnected to the game
      * @param user the user to notify
      */
-    public void notifyReconnectedUser(User user){
+    public void reconnectUser(User user){
         for(User u : users){
             if(u.getStatus()==UserStatus.PLAYING){
                 u.getServerConn().notifyStatusUpdate("reconnect",users.indexOf(user));
@@ -59,7 +59,7 @@ public class Game extends Thread implements Iterable  {
      * Notify to the active users that an user has lost the connection to the game
      * @param user the user to notify
      */
-    public void notifyDisconnectedUser(User user){
+    public void disconnectUser(User user){
         user.setStatus(UserStatus.DISCONNECTED);
         for(User u : users){
             if(u.getStatus()==UserStatus.PLAYING){
@@ -72,16 +72,15 @@ public class Game extends Thread implements Iterable  {
      * Notify to the active users that an user has left the game
      * @param user the user to notify
      */
-    public void notifyQuittedUser(User user){
+    public void quitUser(User user){
         user.setStatus(UserStatus.DISCONNECTED);
-        users.remove(user);
-
         // add control for number of players still in the game...
         for(User u : users){
             if(u.getStatus()==UserStatus.PLAYING){
                 u.getServerConn().notifyStatusUpdate("quit",users.indexOf(user));
             }
         }
+        users.remove(user);
     }
 
 
