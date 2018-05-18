@@ -14,22 +14,22 @@ public enum Color { //need to add png address combined with Face's ones
 
     public static final String RESET = "\u001B[0m"; //to be used (also) in shade restrictions
 
-    private final String ansi;
+    private final String utf;
 
     /**
      * Constructs the elements of the enum setting the corresponding ansi color code
-     * @param ansi the Color ansi code for CLI
+     * @param utf the Color utf code for CLI
      */
-    Color(String ansi){
-        this.ansi=ansi;
+    Color(String utf){
+        this.utf=utf;
     }
 
     /**
      * Gets the ansi color code
      * @return the Color ansi code for CLI
      */
-    public String ansi(){
-        return ansi;
+    public String getUtf(){
+        return utf;
     }
 
 

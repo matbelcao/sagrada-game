@@ -36,7 +36,7 @@ public class Cell {
      */
     public Boolean canAcceptDie(Die die){
         if(die==null){return false;}
-        if(this.constraint==null || !this.constraint.isActive()) {
+        if(this.constraint==null) {
             return true;
         }
 
@@ -61,7 +61,7 @@ public class Cell {
         if(ignoreConstraint.equals(IgnoredConstraint.COLOR) && this.constraint.isColorConstraint()){ return true; }
         if(ignoreConstraint.equals(IgnoredConstraint.SHADE) && !this.constraint.isColorConstraint()){ return true; }
 
-        if(this.constraint==null || !this.constraint.isActive()) {
+        if(this.constraint==null ) {
             return true;
         }
 
@@ -99,7 +99,8 @@ public class Cell {
      * @param die die to be placed in the Cell
      */
     public void setDie(Die die,IgnoredConstraint ignoreConstraint) {
-        assert canAcceptDie(die,ignoreConstraint);
+
+        assert canAcceptDie(die,ignoreConstraint) && !ignoreConstraint.equals(IgnoredConstraint.FORCE);
         this.die=die;
     }
 

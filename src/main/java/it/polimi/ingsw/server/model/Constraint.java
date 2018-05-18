@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.model;
 
+import it.polimi.ingsw.server.model.immutables.LightConstraint;
 import it.polimi.ingsw.server.model.enums.Color;
 import it.polimi.ingsw.server.model.enums.Face;
 
@@ -7,24 +8,32 @@ import it.polimi.ingsw.server.model.enums.Face;
  * This class represents a constraint set for a single cell of the Schema Card of the game
  */
 public class Constraint {
-    private Color color;
-    private Face shade;
-    private Boolean isColorConstraint;
-    private Boolean isActive;
+    private LightConstraint constraint;
 
     /**
      * Creates the object setting the correct type of constraint
      * @param constraint a String describing the constraint (whether it is a color or a shade)
      */
     public Constraint(String constraint){
-        if(Face.contains(constraint)){
-            shade = Face.valueOf(constraint);
-            isColorConstraint= Boolean.FALSE;
-        }else{
-            color = Color.valueOf(constraint);
-            isColorConstraint= Boolean.TRUE;
-        }
-        isActive=true;
+        this.constraint= new LightConstraint(constraint);
+
+    }
+
+    /**
+     * Creates the object setting the correct type of constraint
+     * @param shade a shade constraint
+     */
+    public Constraint(Face shade) {
+        this.constraint= new LightConstraint(shade);
+
+    }
+
+    /**
+     * Creates the object setting the correct type of constraint
+     * @param color a Color constraint
+     */
+    public Constraint(Color color) {
+        this.constraint= new LightConstraint(color);
     }
 
     /**
@@ -32,30 +41,23 @@ public class Constraint {
      * @return the shade of the constraint
      */
     public Face getShade(){
-        return !this.isColorConstraint()? this.shade : null;
+        return this.constraint.getShade();
     }
 
     /**
      * Get the Color of the constraint if it is a color constraint
      * @return  the Color of the constraint
      */
-    public Color getColor(){ return this.isColorConstraint()? this.color : null; }
+    public Color getColor(){ return this.constraint.getColor(); }
 
     /**
      * Checks which type of constraint is set
      * @return true if the constraint is a color constraint
      */
     public Boolean isColorConstraint() {
-        return this.isColorConstraint;
+        return this.constraint.hasColor();
     }
 
-    /**
-     * Checks if constraint is active
-     * @return true if the constraint is a color constraint
-     */
-    public Boolean isActive() {
-        return this.isActive;
-    }
 
     /**
      * Returns a string containing the constraint name regardless of the type of constraint
@@ -64,13 +66,6 @@ public class Constraint {
     @Override
     public String toString(){ return  this.isColorConstraint() ? this.getColor().toString() : this.getShade().toString(); }
 
-    /**
-     * Changes the status of the constraint
-     * @param status the new status of activity of the constraint
-     */
-    public void setActive(Boolean status){
-        this.isActive= status;
-    }
 
     /**
      * Creates a printable representation of the constraint for the CLI
@@ -78,9 +73,9 @@ public class Constraint {
      */
     public String toUtf(){
         if(isColorConstraint()){
-            return this.color.ansi()+Face.EMPTY+Color.RESET;
+            return this.constraint.getColor().getUtf()+Face.EMPTY+Color.RESET;
         }else{
-            return Color.RESET+shade.getUtf();
+            return Color.RESET+this.constraint.getShade().getUtf();
         }
 
     }

@@ -5,5 +5,6 @@ public enum IgnoredConstraint {
     NONE,
     COLOR,
     SHADE,
-    ADJACENCY
+    ADJACENCY,
+    FORCE;
 }

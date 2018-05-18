@@ -26,11 +26,4 @@ public class ConstraintTest {
         assertEquals("ONE",test.toString());
     }
 
-    @Test
-    public void isActive(){
-        Constraint test = new Constraint("ONE");
-        assertEquals(Boolean.TRUE,test.isActive());
-        test.setActive(false);
-        assertEquals(Boolean.FALSE,test.isActive());
-    }
 }

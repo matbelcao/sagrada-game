@@ -33,27 +33,16 @@ public enum Face { // need to add address for png of the face
      * Gets a die face through its int value instead of its string name
      * @param shade the number corresponding to the wanted face of the die
      * @return the instance of Face corresponding to the number
-     * @throws IllegalShadeException this is thrown if an invalid number is passed
      */
 
-    public static Face valueOf(int shade) throws IllegalShadeException{
-        switch(shade) {
-            case 1:
-                return Face.ONE;
-            case 2:
-                return Face.TWO;
-            case 3:
-                return Face.THREE;
-            case 4:
-                return Face.FOUR;
-            case 5:
-                return Face.FIVE;
-            case 6:
-                return Face.SIX;
-            default :
-                throw new IllegalShadeException();
+    public static Face valueOf(int shade) {
 
+        for (Face face : Face.values()) {
+            if (face.ordinal() == (shade - 1)) {
+                return face;
+            }
         }
+        throw new IllegalArgumentException();
     }
 
     /**

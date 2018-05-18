@@ -354,9 +354,11 @@ public class SchemaCard implements Iterable<Cell> {
      * @throws IllegalDieException iff the die can't be placed there
      */
     public void putDie (int index,Die die, IgnoredConstraint ignoreConstraint) throws IllegalDieException {
+        if(!ignoreConstraint.equals(IgnoredConstraint.FORCE)) {
 
-        if (!this.listPossiblePlacements(die,ignoreConstraint).contains(index)) throw new IllegalDieException("You can't place this die here!");
-
+            if (!this.listPossiblePlacements(die, ignoreConstraint).contains(index))
+                throw new IllegalDieException("You can't place this die here!");
+        }
         this.cell[index/NUM_COLS][index%NUM_COLS].setDie(die,ignoreConstraint);
         this.isFirstDie=false;
     }

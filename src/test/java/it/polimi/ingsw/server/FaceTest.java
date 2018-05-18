@@ -31,7 +31,7 @@ public class FaceTest {
     }
     @Test
     public void testIllegalException() {
-        assertThrows(IllegalShadeException.class,()-> Face.valueOf(7));
+        assertThrows(IllegalArgumentException.class,()-> Face.valueOf(7));
     }
     @Test
     public void testNullException() {
