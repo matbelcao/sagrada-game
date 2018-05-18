@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.Client;
 import it.polimi.ingsw.server.connection.MasterServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

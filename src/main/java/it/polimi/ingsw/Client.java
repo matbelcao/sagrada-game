@@ -8,6 +8,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 public class Client {
+
     private UIMode uiMode;
     private ConnectionMode connMode;
     private String username;
@@ -39,21 +40,20 @@ public class Client {
         }
     }
 
+    public UIMode getUiMode() {
+        return uiMode;
+    }
     void loginRMI(){
         try {
             //authenticator = (Authentication)Naming.lookup("rmi://localhost:1099/auth");
             AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://127.0.0.1/myabc");
             authenticator.authenticate(username,password);
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
             e.printStackTrace();
         }
     }
 
     void loginSocket(){
-
+        /* TODO: 18/05/2018 implement method */
     }
 }

@@ -1,13 +1,12 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.server.model.immutables.LightDie;
 import it.polimi.ingsw.server.model.enums.Color;
 import it.polimi.ingsw.server.model.enums.Face;
-import it.polimi.ingsw.server.model.exceptions.*;
+import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
+import it.polimi.ingsw.server.model.immutables.LightDie;
 
 import java.io.File;
 import java.util.Random;
-import java.util.logging.FileHandler;
 
 /**
  * This class represents one Die of the game with its color and shade (face). The class is immutable

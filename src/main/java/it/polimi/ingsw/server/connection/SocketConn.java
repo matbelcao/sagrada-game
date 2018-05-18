@@ -2,7 +2,7 @@ package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.server.User;
 import it.polimi.ingsw.server.UserStatus;
-import it.polimi.ingsw.server.controller.Game;
+import it.polimi.ingsw.server.Validator;
 
 import java.io.*;
 import java.net.Socket;
