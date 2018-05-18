@@ -17,6 +17,7 @@ public class PubObjectiveCard extends Card{
      */
     public PubObjectiveCard(int id, String xmlSrc){
         super();
+        if (!(id<=NUM_PUB_OBJ && id>=1)){throw new IllegalArgumentException();}
         super.xmlReader(id,xmlSrc,"PubObjectiveCard");
 
         String className = "ScoreCalculator" + id;

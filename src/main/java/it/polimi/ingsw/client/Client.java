@@ -1,5 +1,7 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.ConnectionMode;
+import it.polimi.ingsw.UIMode;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 
 import java.net.MalformedURLException;
@@ -22,6 +24,7 @@ public class Client {
         this.uiMode = UIMode.valueOf(uiMode);
         this.connMode = ConnectionMode.valueOf(connMode);
     }
+    public UIMode getUiMode() { return uiMode; }
 
     public String getUsername() { return username; }
 
@@ -41,19 +44,15 @@ public class Client {
 
     void loginRMI(){
         try {
-            //authenticator = (Authentication)Naming.lookup("rmi://localhost:1099/auth");
             AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://127.0.0.1/myabc");
             authenticator.authenticate(username,password);
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
             e.printStackTrace();
         }
     }
 
     void loginSocket(){
+
 
     }
 }

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.server.connection;
+package it.polimi.ingsw.server;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,17 +14,22 @@ public class Validator {
 
     private Validator(){ }
 
-
+    /**
+     * This method checks if parameters of a generic client-side command are valid
+     * @param command the raw string containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
+     * @return true iff the parameters are valid
+     */
     public static boolean isValid(String command, List<String> parsedResult) {
         if( command==null){ return false; }
         String[] temp;
         String keyword;
 
-        assert parsedResult!=null;
+        if(parsedResult==null){throw new IllegalArgumentException();}
 
         temp= command.trim().split("\\s+",2);
         keyword = temp[0];
-        parsedResult.clear();
+
 
 
         switch (keyword) {
@@ -61,10 +66,10 @@ public class Validator {
     }
 
     /**
-     *
-     * @param rawCommand
-     * @param parsedResult
-     * @return
+     * This method checks if the ACK parameters are valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
+     * @return true iff the parameters are valid
      */
     public static boolean checkAckParams(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
@@ -88,10 +93,10 @@ public class Validator {
     }
 
     /**
-     *
-     * @param rawCommand
-     * @param parsedResult
-     * @return
+     * This method checks if the CHOOSE parameters are valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
+     * @return true iff the parameters are valid
      */
     public static boolean checkChooseParams(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
@@ -107,25 +112,8 @@ public class Validator {
 
                 return false;
             case "die":
-                if((command.length == 3) && command[2].matches(TWO_DIGITS_MAX)){
-                    parsedResult.addAll(Arrays.asList(command));
-                    return true;
-                }
-                if((command.length == 4) && command[2].matches(TWO_DIGITS_MAX)){
-                    switch (command[3]){
-                        case "increase":
-                        case "decrease":
-                        case "reroll":
-                        case "flip":
-                        case "put_in_bag":
-                            parsedResult.addAll(Arrays.asList(command));
-                            return true;
-                        default:
-                            return false;
-                    }
-                }
+                return checkChooseDie(parsedResult, command);
 
-                return false;
 
             case "schema":
                 if((command.length == 3) && command[2].matches(PLAYER_ID)){
@@ -154,10 +142,37 @@ public class Validator {
     }
 
     /**
-     *
-     * @param rawCommand
-     * @param parsedResult
-     * @return
+     * This method checks if the GET parameters are valid
+     * @param command the string array containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
+     * @return true iff the parameters are valid
+     */
+    private static Boolean checkChooseDie(List<String> parsedResult, String[] command) {
+        if((command.length == 3) && command[2].matches(TWO_DIGITS_MAX)){
+            parsedResult.addAll(Arrays.asList(command));
+            return true;
+        }
+        if((command.length == 4) && command[2].matches(TWO_DIGITS_MAX)){
+            switch (command[3]){
+                case "increase":
+                case "decrease":
+                case "reroll":
+                case "flip":
+                case "put_in_bag":
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * This method checks if the DISCARD parameters are valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
+     * @return true iff the parameters are valid
      */
     public static boolean checkDiscardParams(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
@@ -171,6 +186,12 @@ public class Validator {
         return false;
     }
 
+    /**
+     * This method checks if the QUIT parameters are valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
+     * @return true iff the parameters are valid
+     */
     public static boolean checkQuitParams(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
@@ -184,10 +205,10 @@ public class Validator {
     }
 
     /**
-     *
-     * @param rawCommand
-     * @param parsedResult
-     * @return
+     * This method checks if the SELECT parameters are valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
+     * @return true iff the parameters are valid
      */
     public static boolean checkSelectParams(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
@@ -225,10 +246,10 @@ public class Validator {
     }
 
     /**
-     *
-     * @param rawCommand
-     * @param parsedResult
-     * @return
+     * This method checks if the GET_DICE_LIST parameters are valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
+     * @return true iff the parameters are valid
      */
     public static boolean checkGetDiceListParams(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
@@ -250,10 +271,10 @@ public class Validator {
     }
 
     /**
-     *
-     * @param rawCommand
-     * @param parsedResult
-     * @return
+     * This method checks if the GET parameters are valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
+     * @return true iff the parameters are valid
      */
     public static boolean checkGetParams(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
