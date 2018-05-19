@@ -186,7 +186,7 @@ public class MasterServer{
         try {
             AuthenticationInt authenticator = new RMIAuthenticator();
             Registry registry = LocateRegistry.createRegistry(portRMI);
-            Naming.rebind("rmi://"+ipAddress+"/myabc", authenticator);
+            Naming.rebind("rmi://"+ipAddress+"/auth", authenticator);
             System.out.println("rmi auth running");
         }catch (RemoteException | MalformedURLException e){
             e.printStackTrace();

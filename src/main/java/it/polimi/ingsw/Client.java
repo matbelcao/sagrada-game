@@ -1,11 +1,13 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.server.connection.AuthenticationInt;
+import it.polimi.ingsw.server.connection.RMIConnInt;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
 public class Client {
 
@@ -13,6 +15,7 @@ public class Client {
     private ConnectionMode connMode;
     private String username;
     private String password;
+    private ClientConn clientConn;
 
     public Client(UIMode uiMode,ConnectionMode connMode){
         this.uiMode = uiMode;
@@ -40,14 +43,31 @@ public class Client {
         }
     }
 
+    public void setConnection(ClientConn clientConn){
+        this.clientConn = clientConn;
+    }
+    public ClientConn getClientConn(){
+        return clientConn;
+    }
+
     public UIMode getUiMode() {
         return uiMode;
     }
+
     void loginRMI(){
         try {
-            //authenticator = (Authentication)Naming.lookup("rmi://localhost:1099/auth");
-            AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://127.0.0.1/myabc");
-            authenticator.authenticate(username,password);
+            AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://127.0.0.1/auth");
+            if(authenticator.authenticate(username,password)){
+               //get the stub of the remote object
+               RMIConnInt RMIConnStub = (RMIConnInt) Naming.lookup("rmi://127.0.0.1/"+username+password);
+               //create RMIClient with the reference of the remote obj and assign it to the Client
+               RMIClientInt rmiClient  = new RMIClient(RMIConnStub);
+               clientConn = (RMIClient)rmiClient;
+               //create a remote reference of the obj rmiClient and pass it to the server.
+               //a remote reference is passed so there's no need to add rmiClient to a Registry
+               RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiClient, 0);
+               RMIConnStub.setClientReference(remoteRef);
+            }
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             e.printStackTrace();
         }
@@ -56,4 +76,12 @@ public class Client {
     void loginSocket(){
         /* TODO: 18/05/2018 implement method */
     }
+
+    /*public static void main(String[] args){
+        Client c = new Client("CONSOLE","RMI");
+        c.setUsername("a");
+        c.setPassword("1");
+        c.loginRMI();
+        c.getClientConn().printToServer("message from client");
+    }*/
 }
