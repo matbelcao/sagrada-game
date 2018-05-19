@@ -48,7 +48,7 @@ public class User {
      * Returns the user connection status (CONNECTED, PLAYING,....)
      * @return the user's connection status
      */
-    public UserStatus getStatus() { return status; }
+    public synchronized UserStatus getStatus() { return status; }
 
     /**
      * Sets the user connection mode ( RMI or SOCKET )
@@ -62,7 +62,7 @@ public class User {
      * Returns the user's connection mode ( RMI or SOCKET )
      * @return the user's connection mode
      */
-    public ConnectionMode getConnectionMode() {
+    public synchronized ConnectionMode getConnectionMode() {
         return connectionMode;
     }
 
@@ -78,7 +78,7 @@ public class User {
      * Returns the user's connection class used for the communication
      * @return the user's connection
      */
-    public ServerConn getServerConn() {
+    public synchronized ServerConn getServerConn() {
         return serverConn;
     }
 

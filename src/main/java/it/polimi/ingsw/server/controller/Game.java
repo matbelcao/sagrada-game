@@ -1,16 +1,18 @@
 package it.polimi.ingsw.server.controller;
 
+import it.polimi.ingsw.server.User;
+import it.polimi.ingsw.server.UserStatus;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.PubObjectiveCard;
-import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import it.polimi.ingsw.server.model.ToolCard;
-import it.polimi.ingsw.server.User;
-import it.polimi.ingsw.server.UserStatus;
+import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 /**
  * This class represents the controller of the game. It manages the rounds and the operations that the players make on the board

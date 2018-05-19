@@ -23,15 +23,21 @@ public class PubObjectiveCard extends Card{
         String className = "ScoreCalculator" + id;
         String fullPathOfTheClass = "it.polimi.ingsw.server.model.scorecalculator." + className;
         Class cls = null;
+
         try {
             cls = Class.forName(fullPathOfTheClass);
-            assert cls != null;
-            this.scoreCalculator = (ScoreCalculator) cls.getDeclaredConstructor().newInstance();
-
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        try {
+            if(cls!=null){ this.scoreCalculator = (ScoreCalculator) cls.getDeclaredConstructor().newInstance(); }
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
     }
+
 
     /**
      * this method calls the card-specific method for calculating the score obtained

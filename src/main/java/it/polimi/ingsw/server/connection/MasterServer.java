@@ -72,6 +72,20 @@ public class MasterServer{
         printMessage("Starting Master Server");
 
     }
+    /**
+     * @return the port to "connect" to the server via rmi
+     */
+    public int getRMIPort() {
+        return portRMI;
+    }
+
+    /**
+     * @return the port on which the server is waiting for socket connections
+     */
+    public int getSocketPort() {
+        return portSocket;
+    }
+
 
     /**
      * This is the getter of the MasterServer

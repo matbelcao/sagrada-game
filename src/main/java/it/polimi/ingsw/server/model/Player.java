@@ -1,7 +1,10 @@
 package it.polimi.ingsw.server.model;
 
+import it.polimi.ingsw.server.User;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
+
+import java.util.NoSuchElementException;
 
 public class Player {
     private final String username;
@@ -12,6 +15,9 @@ public class Player {
     private int finalPosition;
     private int score;
     private boolean skipsNextTurn;// true when the player has used a particular tool card on his first turn of the round
+
+
+
     private Die chosenDie;
 
     public Player(String username, Board board, SchemaCard schema, PrivObjectiveCard privObjective){
@@ -50,6 +56,13 @@ public class Player {
     }
 
     /**
+     * This method checks if the player matches with a user on their usernames
+     * @param user the user to be checked
+     * @return true iff the two usernames are the same
+     */
+    public boolean matchesUser(User user){ return this.username.equals(user.getUsername()); }
+
+    /**
      * Gets the schemaCard assigned to the player
      * @return the schema3
      */
@@ -74,6 +87,28 @@ public class Player {
      */
     public int getScore(){
         return this.score;
+    }
+
+    /**
+     * Gets the player's chosen die for the current turn (make sure to set it before getting it)
+     * @return the die
+     */
+    public Die getChosenDie() {
+        if(chosenDie==null){ throw new NoSuchElementException(); }
+        return chosenDie;
+    }
+
+    /**
+     * Sets the chosen die for the turn
+     * @param chosenDie the chosen die
+     */
+    public void setChosenDie(Die chosenDie) { this.chosenDie = chosenDie; }
+
+    /**
+     * Flushes (sets to null) the chosen die of the turn
+     */
+    public void flushChosenDie() {
+        setChosenDie(null);
     }
 
     /**

@@ -10,20 +10,21 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class RMIAuthenticator extends UnicastRemoteObject implements AuthenticationInt {
-    MasterServer master = MasterServer.getMasterServer();
+
     RMIAuthenticator() throws RemoteException {}
 
     @Override
     public boolean authenticate(String username, String password) {
-        boolean logged = MasterServer.getMasterServer().login(username,password);
+        MasterServer master = MasterServer.getMasterServer();
+        boolean logged = master.login(username,password);
         if(logged){
             User user = master.getUser(username);
             user.setConnectionMode(ConnectionMode.RMI);
             try {
                 RMIConn RMIconnection = new RMIConn();
-                LocateRegistry.getRegistry(MasterServer.getMasterServer().getIpAddress(),1099) ;
-                Naming.rebind("rmi://"+MasterServer.getMasterServer().getIpAddress()+"/"+username+password, RMIconnection);
-                System.out.println("RMI service for client "+username+" published"); //delete
+                LocateRegistry.getRegistry(master.getIpAddress(),1099) ;
+                Naming.rebind("rmi://"+master.getIpAddress()+"/"+username+password, RMIconnection);
+                master.printMessage("RMI service for client "+username+" published"); //delete
                 user.setServerConn(RMIconnection);
             }catch (RemoteException | MalformedURLException e){
                 e.printStackTrace();

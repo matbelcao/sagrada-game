@@ -2,9 +2,9 @@ package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.server.model.enums.Color;
 import it.polimi.ingsw.server.model.exceptions.EmptyDiceBagException;
-import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -42,7 +42,7 @@ public class DiceBag {
      * @param quantity the quantity of dice to be drafted at once
      * @return an ArrayList containing the drafted dice
      */
-    public ArrayList<Die> draftDice(int quantity) throws EmptyDiceBagException {
+    public List<Die> draftDice(int quantity) throws EmptyDiceBagException {
         ArrayList<Die> drafted = new ArrayList<>();
         while(quantity > 0){
             drafted.add(draftDie());

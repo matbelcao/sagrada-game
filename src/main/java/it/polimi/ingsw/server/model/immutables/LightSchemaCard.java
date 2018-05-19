@@ -1,6 +1,5 @@
 package it.polimi.ingsw.server.model.immutables;
 import it.polimi.ingsw.server.model.SchemaCard;
-import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 
 import java.util.HashMap;
 import java.util.Map;
