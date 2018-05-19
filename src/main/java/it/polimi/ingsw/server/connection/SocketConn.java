@@ -60,7 +60,7 @@ public class SocketConn extends Thread implements ServerConn  {
 
     /**
      * This method provides the socket messages interpretation logic
-     * @param command the socket's message recived
+     * @param command the socket's message received
      * @return true if the connection has to be closed
      */
     private boolean execute(String command) {

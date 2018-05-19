@@ -7,16 +7,11 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class RMIConn extends UnicastRemoteObject implements ServerConn,RMIConnInt {
-    private User user;
-    private RMIClientInt clientReference;
+        private RMIClientInt clientReference;
 
 
     public RMIConn() throws RemoteException {
         super();
-    }
-
-    public  RMIConn(User user) throws RemoteException {
-        this.user = user;
     }
 
     @Override
@@ -26,7 +21,7 @@ public class RMIConn extends UnicastRemoteObject implements ServerConn,RMIConnIn
     //debugging method, to be deleted
     @Override
     public void printToTerminal(String message) throws RemoteException {
-        System.out.print(message);
+        MasterServer.getMasterServer().printMessage(message); //se è quello che intendevi
         clientReference.print("message from the server");
     }
 
