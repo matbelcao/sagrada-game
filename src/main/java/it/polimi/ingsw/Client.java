@@ -77,9 +77,9 @@ public class Client {
         /* TODO: 18/05/2018 implement method */
     }
 
-    /*public static void main(String[] args){
+   /* public static void main(String[] args){
         Client c = new Client("CONSOLE","RMI");
-        c.setUsername("a");
+        c.setUsername("c");
         c.setPassword("1");
         c.loginRMI();
         c.getClientConn().printToServer("message from client");

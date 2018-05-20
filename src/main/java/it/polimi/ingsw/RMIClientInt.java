@@ -5,4 +5,6 @@ import java.rmi.RemoteException;
 
 public interface RMIClientInt extends Remote {
     void print(String message) throws RemoteException;
+
+    boolean pong() throws RemoteException;
 }
