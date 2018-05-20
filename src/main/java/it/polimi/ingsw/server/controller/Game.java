@@ -10,6 +10,7 @@ import it.polimi.ingsw.server.model.ToolCard;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import org.jetbrains.annotations.NotNull;
 
+import javax.jws.soap.SOAPBinding;
 import java.util.*;
 
 /**
@@ -20,6 +21,7 @@ public class Game extends Thread implements Iterable  {
     private Board board;
     private boolean additionalSchemas; //to be used for additional schemas FA
     private ArrayList<User> users;
+    private SchemaCard [] draftedSchemas;
 
     /**
      * Constructs the class and sets the players list
@@ -48,25 +50,55 @@ public class Game extends Thread implements Iterable  {
      */
     @Override
     public void run(){
-        SchemaCard [] draftedSchemas = board.draftSchemas();
-        for (User u: users){
-            for (int i=(users.indexOf(u)*4);i<(users.indexOf(u)*4)+4;i++){
-                //u.getServerConn().notifySchema(draftedSchemas[i]);
-            }
-        }
-        Timer timer = new Timer();
-        //timer.schedule(new MasterServer.LobbyHandler(), timeLobby * 1000);
         try {
-            timer.wait();
+            sendSchemaCards();
+            Thread.sleep(MasterServer.timeGame*1000);
+            defaultSchemaCardAssignment();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
 
 
     }
 
-    public void bindSchema(User user, int index){
-        board.getPlayer(user);
+    /**
+     * Sends four schema cards for each user of the match
+     */
+    public void sendSchemaCards(){
+        draftedSchemas = board.draftSchemas();
+        for (User u: users){
+            for (int i=(users.indexOf(u)*4);i<(users.indexOf(u)*4)+4;i++){
+                //u.getServerConn().notifySchema(draftedSchemas[i]);
+            }
+        }
+    }
+
+    /**
+     * Sets the chosen schema card to the user's relative player instance
+     * @param user the user to set the card
+     * @param idSchema the id of the schema card
+     * @throws InterruptedException if all the players have chosen the schema card
+     */
+    public void chooseSchemaCard(User user,int idSchema) throws InterruptedException{
+        for (SchemaCard s: draftedSchemas){
+            if (s.getId()==idSchema){
+                board.getPlayer(user).setSchema(s);
+                break;
+            }
+        }
+        for (User u: users){
+            if(board.getPlayer(u).getSchema()==null){
+                return;
+            }
+        }
+        throw  new InterruptedException();
+    }
+
+    public void defaultSchemaCardAssignment(){
+        for (User u:users){
+            //if(board.getPlayer())
+
+        }
     }
 
     /**

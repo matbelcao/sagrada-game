@@ -50,7 +50,6 @@ public class User {
         }
     }
 
-
     public void quit(){
         UserStatus previousStatus=this.getStatus();
         if(previousStatus==UserStatus.LOBBY){
@@ -60,8 +59,6 @@ public class User {
             this.getGame().quitUser(this);
         }
     }
-
-
 
     /**
      * Sets the user connection status (CONNECTED, PLAYING,....)

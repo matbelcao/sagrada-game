@@ -18,6 +18,7 @@ public class Board {
     public static final int NUM_OBJECTIVES=3;
     public static final int NUM_TOOLS=3;
     public static final int NUM_ROUNDS=10;
+    public static final int NUM_PLAYER_SCHEMAS=4;
 
     public Board(List<User> users){
         this.publicObjectives=draftPubObjectives();
