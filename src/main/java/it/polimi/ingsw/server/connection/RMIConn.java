@@ -3,6 +3,7 @@ package it.polimi.ingsw.server.connection;
 import it.polimi.ingsw.client.RMIClientInt;
 import it.polimi.ingsw.server.User;
 import it.polimi.ingsw.server.UserStatus;
+import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -39,6 +40,11 @@ public class RMIConn extends UnicastRemoteObject implements ServerConn,RMIConnIn
 
     @Override
     public void notifyStatusUpdate(String event, int id) {
+
+    }
+
+    @Override
+    public void notifySchema(SchemaCard schemaCard){
 
     }
 

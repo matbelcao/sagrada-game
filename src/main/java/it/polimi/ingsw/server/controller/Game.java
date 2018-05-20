@@ -3,10 +3,7 @@ package it.polimi.ingsw.server.controller;
 import it.polimi.ingsw.server.User;
 import it.polimi.ingsw.server.UserStatus;
 import it.polimi.ingsw.server.connection.MasterServer;
-import it.polimi.ingsw.server.model.Board;
-import it.polimi.ingsw.server.model.PubObjectiveCard;
-import it.polimi.ingsw.server.model.SchemaCard;
-import it.polimi.ingsw.server.model.ToolCard;
+import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import org.jetbrains.annotations.NotNull;
 
@@ -64,11 +61,11 @@ public class Game extends Thread implements Iterable  {
     /**
      * Sends four schema cards for each user of the match
      */
-    public void sendSchemaCards(){
+    private void sendSchemaCards(){
         draftedSchemas = board.draftSchemas();
         for (User u: users){
-            for (int i=(users.indexOf(u)*4);i<(users.indexOf(u)*4)+4;i++){
-                //u.getServerConn().notifySchema(draftedSchemas[i]);
+            for (int i = (users.indexOf(u)*4); i< Board.NUM_PLAYER_SCHEMAS; i++){
+                u.getServerConn().notifySchema(draftedSchemas[(users.indexOf(u)* Board.NUM_PLAYER_SCHEMAS)*i]);
             }
         }
     }
@@ -77,9 +74,8 @@ public class Game extends Thread implements Iterable  {
      * Sets the chosen schema card to the user's relative player instance
      * @param user the user to set the card
      * @param idSchema the id of the schema card
-     * @throws InterruptedException if all the players have chosen the schema card
      */
-    public void chooseSchemaCard(User user,int idSchema) throws InterruptedException{
+    public void chooseSchemaCard(User user,int idSchema){
         for (SchemaCard s: draftedSchemas){
             if (s.getId()==idSchema){
                 board.getPlayer(user).setSchema(s);
@@ -91,13 +87,18 @@ public class Game extends Thread implements Iterable  {
                 return;
             }
         }
-        throw  new InterruptedException();
     }
 
-    public void defaultSchemaCardAssignment(){
+    /**
+     * Assigns to the users who have not chosen any schema card, the first one that was proposed them before
+     */
+    private void defaultSchemaCardAssignment(){
+        Player player;
         for (User u:users){
-            //if(board.getPlayer())
-
+            player=board.getPlayer(u);
+            if(player.getSchema()==null){
+                player.setSchema(draftedSchemas[users.indexOf(u)*Board.NUM_PLAYER_SCHEMAS]);
+            }
         }
     }
 
