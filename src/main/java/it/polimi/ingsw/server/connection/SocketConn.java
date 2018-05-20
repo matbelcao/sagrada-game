@@ -39,15 +39,15 @@ public class SocketConn extends Thread implements ServerConn  {
     @Override
     public void run(){
         String command = "";
-        boolean quit = false;
-        while(!quit){
+        boolean playing = true;
+        while(playing){
             try {
                 command = inSocket.readLine();
-                quit = execute(command);
+                playing = execute(command);
             } catch (IOException e) {
                 e.printStackTrace();
             }finally {
-                quit=true;
+                playing=true;
                 user.disconnect();
             }
         }
@@ -70,7 +70,7 @@ public class SocketConn extends Thread implements ServerConn  {
 
             switch (params.get(0)) {
                 case "QUIT":
-                    quit();
+                    user.quit();
                     return true;
                 default:
                     return false;
@@ -108,17 +108,5 @@ public class SocketConn extends Thread implements ServerConn  {
     public boolean ping() {
         return false;
     }
-
-
-    private void quit(){
-        UserStatus previousStatus=user.getStatus();
-        if(previousStatus==UserStatus.LOBBY){
-            MasterServer.getMasterServer().updateDisconnected(user);
-        }
-        if(previousStatus==UserStatus.PLAYING){
-            user.getGame().quitUser(user);
-        }
-    }
-
 
 }

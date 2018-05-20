@@ -50,6 +50,19 @@ public class User {
         }
     }
 
+
+    public void quit(){
+        UserStatus previousStatus=this.getStatus();
+        if(previousStatus==UserStatus.LOBBY){
+            MasterServer.getMasterServer().updateDisconnected(this);
+        }
+        if(previousStatus==UserStatus.PLAYING){
+            this.getGame().quitUser(this);
+        }
+    }
+
+
+
     /**
      * Sets the user connection status (CONNECTED, PLAYING,....)
      * @param status the connection status to be set
