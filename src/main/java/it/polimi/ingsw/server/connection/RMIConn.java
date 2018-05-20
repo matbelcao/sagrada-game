@@ -19,6 +19,7 @@ public class RMIConn extends UnicastRemoteObject implements ServerConn,RMIConnIn
     public void setClientReference(RMIClientInt remoteRef) {
         this.clientReference = remoteRef;
     }
+
     //debugging method, to be deleted
     @Override
     public void printToTerminal(String message) throws RemoteException {

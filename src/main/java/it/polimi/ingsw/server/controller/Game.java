@@ -31,7 +31,7 @@ public class Game extends Thread implements Iterable  {
     public Game(List<User> users,boolean additionalSchemas){
         if(additionalSchemas){
 
-            //PLACEHOLDER
+            // TODO: 21/05/2018
 
 
             System.out.print("additional schemas");
@@ -64,7 +64,7 @@ public class Game extends Thread implements Iterable  {
     /**
      * Sends four schema cards for each user of the match
      */
-    public void sendSchemaCards(){
+    private void sendSchemaCards(){
         draftedSchemas = board.draftSchemas();
         for (User u: users){
             for (int i=(users.indexOf(u)*4);i<(users.indexOf(u)*4)+4;i++){

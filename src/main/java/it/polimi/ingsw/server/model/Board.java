@@ -2,7 +2,6 @@ package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.server.User;
 import it.polimi.ingsw.server.connection.MasterServer;
-import it.polimi.ingsw.server.model.immutables.LightSchemaCard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +14,12 @@ public class Board {
     private PubObjectiveCard[] publicObjectives;
     private ToolCard[] toolCards;
 
+
     public static final int NUM_OBJECTIVES=3;
     public static final int NUM_TOOLS=3;
     public static final int NUM_ROUNDS=10;
     public static final int NUM_PLAYER_SCHEMAS=4;
+
 
     public Board(List<User> users){
         this.publicObjectives=draftPubObjectives();
@@ -37,10 +38,16 @@ public class Board {
      * @return an array containing the tools
      */
     private ToolCard[] draftToolCards() {
-        ToolCard[] toolCards= new ToolCard[Board.NUM_TOOLS];
+        toolCards= new ToolCard[Board.NUM_TOOLS];
         Random randomGen = new Random();
+        ArrayList<Integer> draftedTools= new ArrayList<>();
+        Integer id;
         for(int i =0; i<Board.NUM_TOOLS;i++){
-            toolCards[i]=new ToolCard(randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1, MasterServer.XML_SOURCE+"ToolCard.xml");
+            do{
+                id=randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1;
+            }while (draftedTools.contains(id));
+            draftedTools.add(id);
+            toolCards[i]=new ToolCard(id, MasterServer.XML_SOURCE+"ToolCard.xml");
         }
         return toolCards;
     }
@@ -52,22 +59,37 @@ public class Board {
     private PubObjectiveCard[] draftPubObjectives() {
         PubObjectiveCard[] pubObjectiveCards= new PubObjectiveCard[Board.NUM_OBJECTIVES];
         Random randomGen = new Random();
+        Integer id;
+        ArrayList<Integer> draftedPubs = new ArrayList<>();
+
         for(int i =0; i<Board.NUM_OBJECTIVES;i++){
-            pubObjectiveCards[i]=new PubObjectiveCard(randomGen.nextInt(PubObjectiveCard.NUM_PUB_OBJ) + 1,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+            do{
+                id=randomGen.nextInt(PubObjectiveCard.NUM_PUB_OBJ) + 1;
+            } while(!draftedPubs.contains(id));
+            draftedPubs.add(id);
+            pubObjectiveCards[i]=new PubObjectiveCard(id,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
         }
         return pubObjectiveCards;
     }
 
     /**
      * Select random Private Objective Cards
-     * @param numPlayers number of cards to extract
+     * @param numPlayers the number pf players of the match
      * @return an array containing the private objectives for the match
      */
-    private PrivObjectiveCard[] draftPrivObjectives(int numPlayers) {
+    private PrivObjectiveCard[] draftPrivObjectives(Integer numPlayers) {
         PrivObjectiveCard[] privObjectiveCards= new PrivObjectiveCard[numPlayers];
         Random randomGen = new Random();
+        Integer id;
+        ArrayList<Integer> draftedPrivs=new ArrayList<>();
+
         for(int i =0; i<numPlayers;i++){
-            privObjectiveCards[i]=new PrivObjectiveCard(randomGen.nextInt(PrivObjectiveCard.NUM_PRIV_OBJ) + 1,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
+            do{
+                id=randomGen.nextInt(PrivObjectiveCard.NUM_PRIV_OBJ) + 1;
+            } while(!draftedPrivs.contains(id));
+            draftedPrivs.add(id);
+
+            privObjectiveCards[i]=new PrivObjectiveCard(id,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
         }
         return privObjectiveCards;
     }
@@ -77,12 +99,20 @@ public class Board {
      * @return an array containing the schema cards
      */
     public SchemaCard[] draftSchemas() {
-        SchemaCard[]  shemSchemaCards= new SchemaCard[players.size()*4];
+        SchemaCard[]  schemaChoices= new SchemaCard[NUM_PLAYER_SCHEMAS];
         Random randomGen = new Random();
-        for(int i =0; i<players.size()*4;i++){
-            shemSchemaCards[i]=new SchemaCard(randomGen.nextInt(SchemaCard.NUM_SCHEMA) + 1,MasterServer.XML_SOURCE+"SchemaCard.xml");
+        Integer id;
+        ArrayList<Integer> draftedSchemas= new ArrayList<>();
+
+        for(int i =0; i < NUM_PLAYER_SCHEMAS*players.size();i++){
+            do{
+                id=randomGen.nextInt(SchemaCard.NUM_SCHEMA) + 1;
+            } while(!draftedSchemas.contains(id));
+
+            draftedSchemas.add(id);
+            schemaChoices[i]=new SchemaCard(id,MasterServer.XML_SOURCE+"SchemaCard.xml");
         }
-        return shemSchemaCards;
+        return schemaChoices;
     }
 
     public Player getPlayer(User user) {
