@@ -1,8 +1,7 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.Client;
+import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.server.connection.MasterServer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ public class RMIConnectionTest {
     //@Disabled("too slow")
     //@Test
     public void orderedConnection(){
+        server.startRMI();
         ArrayList<User> users;
         Client c1 = new Client("CONSOLE","RMI");
         Client c2 = new Client("CONSOLE","RMI");

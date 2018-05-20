@@ -1,7 +1,7 @@
-package it.polimi.ingsw.server.connection;
+package it.polimi.ingsw.client;
 
-public interface CientConn {
-
+public interface ClientConn {
+    void printToServer(String message);
     boolean login();
     void getPrivateObj();
     void getPublicObj();
@@ -13,5 +13,4 @@ public interface CientConn {
     void getSchema(int playerId);
     void draftSchema();
     //...
-
 }

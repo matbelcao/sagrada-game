@@ -1,5 +1,7 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.ConnectionMode;
+import it.polimi.ingsw.UIMode;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIConnInt;
 
