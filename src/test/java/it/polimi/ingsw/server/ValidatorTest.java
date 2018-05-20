@@ -78,12 +78,183 @@ public class ValidatorTest {
 
 
     }
+
     @Test
     public void testCheckSelect(){
 
+        //valid select
+        command= "          SELECT   die  9  ";
+
+        assertTrue(Validator.isValid(command,parsedResult));
+        assertTrue(Validator.checkSelectParams(command,parsedResult));
+
+        //invalid selects
+        command= "          select   die  9  ";
+
+        assertTrue(!Validator.isValid(command,parsedResult));
+        assertTrue(!Validator.checkSelectParams(command,parsedResult));
+
+        command= "          se   die  9  ";
+
+        assertTrue(!Validator.isValid(command,parsedResult));
+        assertTrue(!Validator.checkSelectParams(command,parsedResult));
+
+        command= "          SELECT   die 100  ";
+
+        assertTrue(!Validator.isValid(command,parsedResult));
+        assertTrue(!Validator.checkSelectParams(command,parsedResult));
+
+
+        command= "          SELECT   die  09  ";
+
+        assertTrue(!Validator.isValid(command,parsedResult));
+        assertTrue(!Validator.checkSelectParams(command,parsedResult));
+
+        //valid
+        command= "          SELECT   die  90  ";
+
+        assertTrue(Validator.isValid(command,parsedResult));
+        assertTrue(Validator.checkSelectParams(command,parsedResult));
+
+        command= "          SELECT   modified_die    ";
+
+        assertTrue(Validator.isValid(command,parsedResult));
+        assertTrue(Validator.checkSelectParams(command,parsedResult));
+
+        //invalid
+        command= "          SELECT    modified_die 6  ";
+
+        assertTrue(!Validator.isValid(command,parsedResult));
+        assertTrue(!Validator.checkSelectParams(command,parsedResult));
     }
 
     @Test
+    public void testCheckAck(){
+
+        //invalid
+        command= "     ACK  ";
+
+        assertTrue(!Validator.isValid(command,parsedResult));
+        assertTrue(!Validator.checkAckParams(command,parsedResult));
+        //valid
+        command= "     ACK game ";
+
+        assertTrue(Validator.isValid(command,parsedResult));
+        assertTrue(Validator.checkAckParams(command,parsedResult));
+
+        command= "     ACK status ";
+
+        assertTrue(Validator.isValid(command,parsedResult));
+        assertTrue(Validator.checkAckParams(command,parsedResult));
+
+        command= "ACK send ";
+
+        assertTrue(Validator.isValid(command,parsedResult));
+        assertTrue(Validator.checkAckParams(command,parsedResult));
+
+        command= "     ACK list";
+
+        assertTrue(Validator.isValid(command,parsedResult));
+        assertTrue(Validator.checkAckParams(command,parsedResult));
+
+        command= "     ACK game ";
+
+        assertTrue(Validator.isValid(command,parsedResult));
+        assertTrue(Validator.checkAckParams(command,parsedResult));
+
+
+        command= "     ACK games ";
+
+        assertTrue(!Validator.isValid(command,parsedResult));
+        assertTrue(!Validator.checkAckParams(command,parsedResult));
+
+        //invalid
+
+        command= "     ACK bar ";
+
+        assertTrue(!Validator.isValid(command,parsedResult));
+        assertTrue(!Validator.checkAckParams(command,parsedResult));
+    }
+
+
+    @Test
+    public void testCheckChoose() {
+
+        //valid
+        command = "CHOOSE die_placement 6";
+
+        assertTrue(Validator.isValid(command, parsedResult));
+        assertTrue(Validator.checkChooseParams(command, parsedResult));
+        //invalid number
+        command = "CHOOSE schema 6";
+
+        assertTrue(!Validator.isValid(command, parsedResult));
+        assertTrue(!Validator.checkChooseParams(command, parsedResult));
+
+        //valid schema number (0-3)
+        command = "CHOOSE schema 2";
+
+        assertTrue(Validator.isValid(command, parsedResult));
+        assertTrue(Validator.checkChooseParams(command, parsedResult));
+
+        //invalid tool number (0-2)
+        command = "CHOOSE tool 6";
+
+        assertTrue(!Validator.isValid(command, parsedResult));
+        assertTrue(!Validator.checkChooseParams(command, parsedResult));
+
+        command = "CHOOSE tool 2";
+
+        assertTrue(Validator.isValid(command, parsedResult));
+        assertTrue(Validator.checkChooseParams(command, parsedResult));
+
+        //valid number (1-6)
+        command = "CHOOSE face 6";
+
+        assertTrue(Validator.isValid(command, parsedResult));
+        assertTrue(Validator.checkChooseParams(command, parsedResult));
+
+        command = "CHOOSE die 6 increase";
+
+        assertTrue(Validator.isValid(command, parsedResult));
+        assertTrue(Validator.checkChooseParams(command, parsedResult));
+
+        command = "CHOOSE die 6 decrease";
+
+        assertTrue(Validator.isValid(command, parsedResult));
+        assertTrue(Validator.checkChooseParams(command, parsedResult));
+
+        command = "CHOOSE die 6 reroll";
+
+        assertTrue(Validator.isValid(command, parsedResult));
+        assertTrue(Validator.checkChooseParams(command, parsedResult));
+
+        //die chosen from draftpool (0-8)
+        command = "CHOOSE die 16 flip";
+
+        assertTrue(!Validator.isValid(command, parsedResult));
+        assertTrue(!Validator.checkChooseParams(command, parsedResult));
+
+        command = "CHOOSE die 1 flip";
+
+        assertTrue(Validator.isValid(command, parsedResult));
+        assertTrue(Validator.checkChooseParams(command, parsedResult));
+
+
+        command = "CHOOSE die 8 put_in_bag";
+
+        assertTrue(Validator.isValid(command, parsedResult));
+        assertTrue(Validator.checkChooseParams(command, parsedResult));
+
+
+
+
+        //valid
+
+
+    }
+
+        @Test
     public void testIsValidUsername(){
         assertTrue(Validator.isValidUsername("luca"));
         assertTrue(!Validator.isValidUsername("luca.ssd"));

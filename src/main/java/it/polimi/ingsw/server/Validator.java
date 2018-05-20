@@ -7,10 +7,11 @@ public class Validator {
     static final String ALPHANUMERIC="[0-9a-zA-Z]+";
     static final String BEGINS_WITH_DIGIT="^([0-9]+)[^0-9]*";
     static final String PLAYER_ID="[0-3]";
-    static final String TWO_DIGITS_MAX = "[0-9]|([0-9][0-9])";
-    static final String CELL_INDEX = "[0-9]|([0-1][0-9])";
+    static final String TWO_DIGITS_MAX = "[0-9]|([1-9][0-9])";
+    static final String CELL_INDEX = "[0-9]|([1][0-9])";
     static final String TOOL_INDEX = "[0-2]";
-    static final String DIE_FACE = "[1-6]]";
+    static final String DIE_FACE = "[1-6]";
+    static final String DRAFT_POOL_DIE = "[0-8]";
 
     private Validator(){ }
 
@@ -152,7 +153,7 @@ public class Validator {
             parsedResult.addAll(Arrays.asList(command));
             return true;
         }
-        if((command.length == 4) && command[2].matches(TWO_DIGITS_MAX)){
+        if((command.length == 4) && command[2].matches(DRAFT_POOL_DIE)){
             switch (command[3]){
                 case "increase":
                 case "decrease":
