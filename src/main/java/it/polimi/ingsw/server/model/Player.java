@@ -8,9 +8,10 @@ import java.util.NoSuchElementException;
 
 public class Player {
     private final String username;
+    private final int gameId;
     private final Board board;
     private final PrivObjectiveCard privObjective;
-    private final SchemaCard schema;
+    private SchemaCard schema;
     private int favorTokens;
     private int finalPosition;
     private int score;
@@ -20,15 +21,24 @@ public class Player {
 
     private Die chosenDie;
 
-    public Player(String username, Board board, SchemaCard schema, PrivObjectiveCard privObjective){
+    public Player(String username,int gameId, Board board, PrivObjectiveCard privObjective){
         this.username = username;
+        this.gameId=gameId;
         this.board=board;
-        this.schema=schema;
         this.privObjective=privObjective;
         this.score=0;
         this.finalPosition=0;
-        this.favorTokens=this.schema.getFavorTokens();
+        this.schema=null;
+        this.favorTokens=0;
         this.skipsNextTurn=false;
+    }
+
+    /**
+     * Return the player's id of the match
+     * @return the id of the match
+     */
+    public int getGameId(){
+        return this.gameId;
     }
 
     /**
@@ -63,6 +73,17 @@ public class Player {
     public boolean matchesUser(User user){ return this.username.equals(user.getUsername()); }
 
     /**
+     * This method assigns a schemaCard to the player
+     * @param schema the Schema Card to assign
+     */
+     public void setSchema(SchemaCard schema){
+        assert this.schema==null;
+
+        this.schema=schema;
+        this.favorTokens=this.schema.getFavorTokens();
+     }
+
+    /**
      * Gets the schemaCard assigned to the player
      * @return the schema3
      */
@@ -77,8 +98,6 @@ public class Player {
     public void decreaseFavorTokens(int tokens) throws NegativeTokensException {
         if((this.favorTokens - tokens) < 0){throw new NegativeTokensException();}
         this.favorTokens -= tokens;
-
-
     }
 
     /**

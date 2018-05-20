@@ -102,34 +102,7 @@ public class Game extends Thread implements Iterable  {
      * Instantiates a new board for the match
      */
     public void createBoard(){
-        this.board= new Board(this.users,draftPubObjectives(),draftToolCards());
-    }
-
-    /**
-     * Selects random ToolCards to be used in the match
-     * @return an array containing the tools
-     */
-    private ToolCard[] draftToolCards() {
-
-        ToolCard[] toolCards= new ToolCard[Board.NUM_TOOLS];
-        Random randomGen = new Random();
-        for(int i =0; i<Board.NUM_TOOLS;i++){
-            toolCards[i]=new ToolCard(randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1, MasterServer.XML_SOURCE+"ToolCard.xml");
-        }
-        return toolCards;
-    }
-
-    /**
-     * Selects random Public Objective Cards
-     * @return an array containing the public objectives for the match
-     */
-    private PubObjectiveCard[] draftPubObjectives() {
-        PubObjectiveCard[] pubObjectiveCards= new PubObjectiveCard[Board.NUM_OBJECTIVES];
-        Random randomGen = new Random();
-        for(int i =0; i<Board.NUM_OBJECTIVES;i++){
-            pubObjectiveCards[i]=new PubObjectiveCard(randomGen.nextInt(PubObjectiveCard.NUM_PUB_OBJ) + 1,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
-        }
-        return pubObjectiveCards;
+        this.board= new Board(this.users);
     }
 
     /**
