@@ -2,16 +2,17 @@ package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.RMIClientInt;
 import it.polimi.ingsw.server.User;
+import it.polimi.ingsw.server.UserStatus;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class RMIConn extends UnicastRemoteObject implements ServerConn,RMIConnInt {
         private RMIClientInt clientReference;
+        private User user;
 
-
-    public RMIConn() throws RemoteException {
-        super();
+    public RMIConn(User user) throws RemoteException{
+        this.user = user;
     }
 
     @Override
@@ -38,6 +39,28 @@ public class RMIConn extends UnicastRemoteObject implements ServerConn,RMIConnIn
 
     @Override
     public void notifyStatusUpdate(String event, int id) {
+
+    }
+
+    @Override
+    public boolean ping() {
+        try{
+            clientReference.pong();
+        } catch (Exception e) {
+            return false;
+        }
+            return true;
+    }
+
+    @Override
+    public void disconnect(){
+        UserStatus previousStatus=user.getStatus();
+        if(previousStatus==UserStatus.LOBBY){
+            MasterServer.getMasterServer().updateDisconnected(user);
+        }
+        if(previousStatus==UserStatus.PLAYING){
+            user.getGame().disconnectUser(user);
+        }
 
     }
 }

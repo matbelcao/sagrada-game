@@ -21,7 +21,7 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
             User user = master.getUser(username);
             user.setConnectionMode(ConnectionMode.RMI);
             try {
-                RMIConn RMIconnection = new RMIConn();
+                RMIConn RMIconnection = new RMIConn(user);
                 LocateRegistry.getRegistry(master.getIpAddress(),1099) ;
                 Naming.rebind("rmi://"+master.getIpAddress()+"/"+username+password, RMIconnection);
                 master.printMessage("RMI service for client "+username+" published"); //delete

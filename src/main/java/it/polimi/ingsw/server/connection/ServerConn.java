@@ -1,7 +1,5 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.server.controller.Game;
-
 /**
  * This class is an interfaces that declares the common methods between SOCKET/RMI server-side connections
  */
@@ -13,7 +11,7 @@ public interface ServerConn {
 
     void notifyStatusUpdate (String event,int id);
 
+    boolean ping();
 
-
-
+    void disconnect();
 }

@@ -192,16 +192,13 @@ public class MasterServer{
      * an instance of the object Authenticator
      */
     public void startRMI(){
-        /*if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
-        }*/
-
         System.setProperty("java.rmi.server.hostname",ipAddress);
         try {
             AuthenticationInt authenticator = new RMIAuthenticator();
             Registry registry = LocateRegistry.createRegistry(portRMI);
             Naming.rebind("rmi://"+ipAddress+"/auth", authenticator);
             System.out.println("rmi auth running");
+            new Heartbeat().run();
         }catch (RemoteException | MalformedURLException e){
             e.printStackTrace();
         }
@@ -313,6 +310,8 @@ public class MasterServer{
         }
         return null;
     }
+
+    public User getUserByIndex(int i){ return users.get(i); }
 
     /**
      * This method checks if the user is already in the list of registered users

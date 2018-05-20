@@ -28,4 +28,9 @@ public class RMIClient implements ClientConn,RMIClientInt {
     public void print(String message) {
         System.out.print(message);
     }
+
+    @Override
+    public boolean pong() throws RemoteException {
+        return true;
+    }
 }

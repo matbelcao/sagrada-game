@@ -104,7 +104,10 @@ public class SocketConn extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
-
+    @Override
+    public boolean ping() {
+        return false;
+    }
 
 
     private void quit(){
@@ -116,8 +119,8 @@ public class SocketConn extends Thread implements ServerConn  {
             user.getGame().quitUser(user);
         }
     }
-
-    private void disconnect(){
+    @Override
+    public void disconnect(){
         UserStatus previousStatus=user.getStatus();
         if(previousStatus==UserStatus.LOBBY){
             MasterServer.getMasterServer().updateDisconnected(user);
