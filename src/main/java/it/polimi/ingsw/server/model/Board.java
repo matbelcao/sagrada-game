@@ -72,17 +72,17 @@ public class Board {
     }
 
     /**
-     * Select random Private Objective Cards
-     * @return an array containing the private objectives for the match
+     * Extract the random schema cards to be chosen by users
+     * @return an array containing the schema cards
      */
-    /*public LightSchemaCard[] draftSchemas() {
-        LightSchemaCard[]  lightSchemaCards= new LightSchemaCard[players.size()*4];
+    public SchemaCard[] draftSchemas() {
+        SchemaCard[]  shemSchemaCards= new SchemaCard[players.size()*4];
         Random randomGen = new Random();
         for(int i =0; i<players.size()*4;i++){
-            lightSchemaCards[i]=new LightSchemaCard(randomGen.nextInt(SchemaCard.NUM_SCHEMA) + 1,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
+            shemSchemaCards[i]=new SchemaCard(randomGen.nextInt(SchemaCard.NUM_SCHEMA) + 1,MasterServer.XML_SOURCE+"SchemaCard.xml");
         }
-        return privObjectiveCards;
-    }*/
+        return shemSchemaCards;
+    }
 
     public Player getPlayer(User user) {
         for(Player p : players){

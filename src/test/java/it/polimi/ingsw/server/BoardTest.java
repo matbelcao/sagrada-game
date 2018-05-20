@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BoardTest {
     private static ArrayList<User> users1,users2;
@@ -42,7 +42,16 @@ public class BoardTest {
         assertEquals(2, board1.getPlayer(u3).getGameId());
 
         assertEquals(1, board2.getPlayer(u6).getGameId());
-        assertEquals(false, board2.getPlayer(u6).matchesUser(u3));
-        assertEquals(true, board2.getPlayer(u6).matchesUser(u6));
+        assertFalse(board2.getPlayer(u6).matchesUser(u3));
+        assertTrue(board2.getPlayer(u6).matchesUser(u6));
+    }
+
+    @Test
+    void testDraftSchemas(){
+        Board board1=new Board(users1);
+        Board board2=new Board(users2);
+
+        assertEquals(16,board1.draftSchemas().length);
+        assertEquals(8,board2.draftSchemas().length);
     }
 }
