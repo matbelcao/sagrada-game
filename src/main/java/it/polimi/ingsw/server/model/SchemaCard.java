@@ -28,6 +28,7 @@ public class SchemaCard implements Iterable<Cell> {
     private Boolean isFirstDie;
     public static final int NUM_COLS=5;
     public static final int NUM_ROWS=4;
+    public static final int NUM_SCHEMA=24;
 
     /**
      * Retrieves the SchemaCard(id) data from the xml file and instantiates it

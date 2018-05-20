@@ -12,14 +12,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RMIConnectionTest {
     private static MasterServer server=MasterServer.getMasterServer();
-    @BeforeEach
+    //@BeforeEach
     public void beforeEachTest(){
         server.startRMI();
         //MasterServer.getMasterServer().startSocket();
     }
     //This test logs 9 clients and verifies if they get properly saved by the master server
     //@Disabled("too slow")
-    @Test
+    //@Test
     public void orderedConnection(){
         ArrayList<User> users;
         Client c1 = new Client("CONSOLE","RMI");

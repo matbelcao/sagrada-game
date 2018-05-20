@@ -120,7 +120,7 @@ public class Game extends Thread implements Iterable  {
     @NotNull
     @Override
     public Iterator iterator() {
-        return new RoundIterator(board.getUsers());
+        return new RoundIterator(users);
     }
 
 }
