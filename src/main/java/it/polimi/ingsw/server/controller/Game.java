@@ -5,14 +5,12 @@ import it.polimi.ingsw.server.UserStatus;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.PubObjectiveCard;
+import it.polimi.ingsw.server.model.SchemaCard;
 import it.polimi.ingsw.server.model.ToolCard;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * This class represents the controller of the game. It manages the rounds and the operations that the players make on the board
@@ -42,6 +40,33 @@ public class Game extends Thread implements Iterable  {
             u.setGame(this);
             u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
         }
+        board=new Board(users);
+    }
+
+    /**
+     * This method provides the execution order of the game flow
+     */
+    @Override
+    public void run(){
+        SchemaCard [] draftedSchemas = board.draftSchemas();
+        for (User u: users){
+            for (int i=(users.indexOf(u)*4);i<(users.indexOf(u)*4)+4;i++){
+                //u.getServerConn().notifySchema(draftedSchemas[i]);
+            }
+        }
+        Timer timer = new Timer();
+        //timer.schedule(new MasterServer.LobbyHandler(), timeLobby * 1000);
+        try {
+            timer.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public void bindSchema(User user, int index){
+        board.getPlayer(user);
     }
 
     /**
