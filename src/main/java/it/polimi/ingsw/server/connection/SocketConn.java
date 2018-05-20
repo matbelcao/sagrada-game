@@ -126,11 +126,11 @@ public class SocketConn extends Thread implements ServerConn  {
         Cell cell;
 
         outSocket.print("SEND schema");
-        for (int i=0; i < SchemaCard.NUM_ROWS ; i++) {
-            for (int j=0; j < SchemaCard.NUM_COLS ;j++){
-                cell=schemaCard.getCell(i,j);
+        for (int row=0; row < SchemaCard.NUM_ROWS ; row++) {
+            for (int column=0; column < SchemaCard.NUM_COLS ;column++){
+                cell=schemaCard.getCell(row,column);
                 if(cell.hasConstraint()) {
-                    outSocket.print(" C,"+i+","+j+","+cell.getConstraint().toString());
+                    outSocket.print(" C,"+row+","+column+","+cell.getConstraint().toString());
                 }
             }
         }
