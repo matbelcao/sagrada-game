@@ -52,15 +52,6 @@ public class RMIConn extends UnicastRemoteObject implements ServerConn,RMIConnIn
             return true;
     }
 
-    @Override
-    public void disconnect(){
-        UserStatus previousStatus=user.getStatus();
-        if(previousStatus==UserStatus.LOBBY){
-            MasterServer.getMasterServer().updateDisconnected(user);
-        }
-        if(previousStatus==UserStatus.PLAYING){
-            user.getGame().disconnectUser(user);
-        }
 
-    }
+
 }

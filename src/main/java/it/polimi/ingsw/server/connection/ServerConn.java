@@ -13,5 +13,4 @@ public interface ServerConn {
 
     boolean ping();
 
-    void disconnect();
 }

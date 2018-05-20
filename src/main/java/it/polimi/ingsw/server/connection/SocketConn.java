@@ -48,7 +48,7 @@ public class SocketConn extends Thread implements ServerConn  {
                 e.printStackTrace();
             }finally {
                 quit=true;
-                disconnect();
+                user.disconnect();
             }
         }
         try {
@@ -117,16 +117,6 @@ public class SocketConn extends Thread implements ServerConn  {
         }
         if(previousStatus==UserStatus.PLAYING){
             user.getGame().quitUser(user);
-        }
-    }
-    @Override
-    public void disconnect(){
-        UserStatus previousStatus=user.getStatus();
-        if(previousStatus==UserStatus.LOBBY){
-            MasterServer.getMasterServer().updateDisconnected(user);
-        }
-        if(previousStatus==UserStatus.PLAYING){
-                user.getGame().disconnectUser(user);
         }
     }
 

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.ConnectionMode;
+import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.ServerConn;
 import it.polimi.ingsw.server.controller.Game;
 
@@ -37,6 +38,17 @@ public class User {
      * @return the user password
      */
     public String getPassword() { return password; }
+
+
+    public void disconnect(){
+        UserStatus previousStatus=this.getStatus();
+        if(previousStatus==UserStatus.LOBBY){
+            MasterServer.getMasterServer().updateDisconnected(this);
+        }
+        if(previousStatus==UserStatus.PLAYING){
+            this.getGame().disconnectUser(this);
+        }
+    }
 
     /**
      * Sets the user connection status (CONNECTED, PLAYING,....)

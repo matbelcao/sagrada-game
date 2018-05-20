@@ -24,7 +24,7 @@ public class Heartbeat extends Thread{
                 if(!user.getStatus().equals(UserStatus.DISCONNECTED) && user.getConnectionMode().equals(ConnectionMode.RMI)){
                     //if user doesn't respond to ping
                     if(!user.getServerConn().ping()){
-                        user.getServerConn().disconnect();
+                        user.disconnect();
                     }
 
                 }
