@@ -132,6 +132,9 @@ public class SocketConn extends Thread implements ServerConn  {
                 if(cell.hasConstraint()) {
                     outSocket.print(" C,"+row+","+column+","+cell.getConstraint().toString());
                 }
+                if(cell.hasDie()){
+                    outSocket.print(" D,"+row+","+column+","+cell.getDie().getColor().toString()+","+cell.getDie().getShade().toString());
+                }
             }
         }
         outSocket.println("");
