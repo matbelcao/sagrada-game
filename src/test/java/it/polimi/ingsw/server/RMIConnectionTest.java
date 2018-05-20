@@ -1,8 +1,7 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.Client;
+import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.server.connection.MasterServer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -12,15 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RMIConnectionTest {
     private static MasterServer server=MasterServer.getMasterServer();
-    @BeforeEach
-    public void beforeEachTest(){
-        server.startRMI();
-        //MasterServer.getMasterServer().startSocket();
-    }
     //This test logs 9 clients and verifies if they get properly saved by the master server
     //@Disabled("too slow")
     @Test
     public void orderedConnection(){
+        server.startRMI();
         ArrayList<User> users;
         Client c1 = new Client("CONSOLE","RMI");
         Client c2 = new Client("CONSOLE","RMI");
