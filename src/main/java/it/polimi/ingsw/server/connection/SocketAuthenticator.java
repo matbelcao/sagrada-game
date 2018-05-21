@@ -36,7 +36,7 @@ public class SocketAuthenticator extends Thread {
         }
 
         assert outSocket != null;
-        outSocket.println("connection established!");
+        outSocket.println("Connection established!");
         outSocket.flush();
         try {
             while (!logged) {
@@ -50,7 +50,6 @@ public class SocketAuthenticator extends Thread {
                         user.setConnectionMode(ConnectionMode.SOCKET);
                         user.setServerConn(new SocketServer(socket, user));
                         master.updateConnected(user);
-                        master.printMessage("LOGGED "+params.get(1)+" "+params.get(2));
                     } else {
                         outSocket.println("LOGIN ko");
                         logged = false;

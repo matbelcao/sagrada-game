@@ -42,12 +42,11 @@ public class SocketServer extends Thread implements ServerConn  {
         while(playing){
             try {
                 command = inSocket.readLine();
-                playing= execute(command);
-            } catch (IOException e) {
-                e.printStackTrace();
+                playing = execute(command);
+            } catch (IOException | IllegalArgumentException e) {
+                user.disconnect();
             }finally {
                 playing=false;
-                user.disconnect();
             }
         }
         try {
@@ -69,14 +68,14 @@ public class SocketServer extends Thread implements ServerConn  {
             switch (parsedResult.get(0)) {
                 case "QUIT":
                     user.quit();
-                    return true;
+                    return false;
                 case "CHOOSE":
                     if("schema".equals(parsedResult.get(1))){
                         user.getGame().chooseSchemaCard(user,Integer.parseInt(parsedResult.get(2)));
                     }
                     return true;
                 default:
-                    return false;
+                    return true;
             }
         }
         return false;
@@ -140,7 +139,18 @@ public class SocketServer extends Thread implements ServerConn  {
 
     @Override
     public boolean ping() {
-        return false;
+        try{
+            outSocket.print((char)0);
+            outSocket.flush();
+        } catch (Exception e) {
+            try {
+                socket.close();
+            } catch (IOException x) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+        return true;
     }
 
 }

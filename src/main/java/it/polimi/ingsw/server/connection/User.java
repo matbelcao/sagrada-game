@@ -54,15 +54,18 @@ public class User {
         if(previousStatus==UserStatus.PLAYING){
             this.getGame().disconnectUser(this);
         }
+        MasterServer.getMasterServer().printMessage("Connection lost : "+this.getUsername());
     }
 
     public void quit(){
         UserStatus previousStatus=this.getStatus();
         if(previousStatus==UserStatus.LOBBY){
             MasterServer.getMasterServer().updateDisconnected(this);
+            MasterServer.getMasterServer().printMessage("Quitted lobby : "+this.getUsername());
         }
         if(previousStatus==UserStatus.PLAYING){
             this.getGame().quitUser(this);
+            MasterServer.getMasterServer().printMessage("Quitted match : "+this.getUsername());
         }
     }
 
