@@ -196,7 +196,8 @@ public class MasterServer{
             Registry registry = LocateRegistry.createRegistry(portRMI);
             Naming.rebind("rmi://"+ipAddress+"/auth", authenticator);
             printMessage("rmi auth running");
-            new Heartbeat().run();
+            Heartbeat heartbeat = new Heartbeat();
+            heartbeat.start();
         }catch (RemoteException | MalformedURLException e){
             e.printStackTrace();
         }
