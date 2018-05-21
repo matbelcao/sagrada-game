@@ -15,6 +15,10 @@ public class Validator {
 
     private Validator(){ }
 
+    public static String [] simpleParse(String command){
+        return command.trim().split("\\s+");
+    }
+
     /**
      * This method checks if parameters of a generic client-side command are valid
      * @param command the raw string containing all parameters of the command and the command itself

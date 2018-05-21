@@ -5,6 +5,6 @@ package it.polimi.ingsw.client;
  * game via console or via gui
  */
 public enum UIMode {
-    CONSOLE,
+    CLI,
     GUI;
 }

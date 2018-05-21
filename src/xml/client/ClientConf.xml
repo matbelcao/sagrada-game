@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+
+<!-- client configuration file -->
+
+<conf>
+    <!-- default configuration -->
+        <address>127.0.0.1</address>
+        <connectionMode>SOCKET</connectionMode>
+        <UI>GUI</UI>
+        <portRMI>1099</portRMI>
+        <portSocket>3000</portSocket>
+
+</conf>

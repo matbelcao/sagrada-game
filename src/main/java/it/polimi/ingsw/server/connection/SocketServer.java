@@ -42,11 +42,11 @@ public class SocketServer extends Thread implements ServerConn  {
         while(playing){
             try {
                 command = inSocket.readLine();
-                playing = execute(command);
+                playing= execute(command);
             } catch (IOException e) {
                 e.printStackTrace();
             }finally {
-                playing=true;
+                playing=false;
                 user.disconnect();
             }
         }
