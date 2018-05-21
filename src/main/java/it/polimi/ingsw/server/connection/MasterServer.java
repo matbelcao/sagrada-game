@@ -163,6 +163,9 @@ public class MasterServer{
                         Timer timer = new Timer();
                         timer.schedule(new LobbyHandler(), timeLobby * 1000);
                     }
+                    if (lobby.size() == MAX_PLAYERS) {
+                        this.updateLobby();
+                    }
                 }
             }
         }
