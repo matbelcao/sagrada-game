@@ -1,4 +1,4 @@
-package it.polimi.ingsw.server;
+package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.server.connection.Validator;
