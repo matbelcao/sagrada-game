@@ -1,5 +1,8 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.client.connection.ClientConn;
+import it.polimi.ingsw.client.connection.RMIClient;
+import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 import org.w3c.dom.Document;

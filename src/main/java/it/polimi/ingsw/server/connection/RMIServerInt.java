@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.client.RMIClientInt;
+import it.polimi.ingsw.client.connection.RMIClientInt;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
