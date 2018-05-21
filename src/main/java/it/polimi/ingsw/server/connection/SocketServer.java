@@ -43,11 +43,10 @@ public class SocketServer extends Thread implements ServerConn  {
             try {
                 command = inSocket.readLine();
                 playing = execute(command);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }finally {
-                playing=true;
+            } catch (IOException | IllegalArgumentException e) {
                 user.disconnect();
+            }finally {
+                playing=false;
             }
         }
         try {
@@ -69,14 +68,14 @@ public class SocketServer extends Thread implements ServerConn  {
             switch (parsedResult.get(0)) {
                 case "QUIT":
                     user.quit();
-                    return true;
+                    return false;
                 case "CHOOSE":
                     if("schema".equals(parsedResult.get(1))){
                         user.getGame().chooseSchemaCard(user,Integer.parseInt(parsedResult.get(2)));
                     }
                     return true;
                 default:
-                    return false;
+                    return true;
             }
         }
         return false;

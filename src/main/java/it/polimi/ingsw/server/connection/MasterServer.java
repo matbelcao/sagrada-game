@@ -67,7 +67,7 @@ public class MasterServer{
         games = new ArrayList<>();
 
         new LobbyHandler();
-        printMessage("Starting Master Server");
+        printMessage("--> STARTING :  Master Server");
 
     }
     /**
@@ -195,7 +195,7 @@ public class MasterServer{
             AuthenticationInt authenticator = new RMIAuthenticator();
             Registry registry = LocateRegistry.createRegistry(portRMI);
             Naming.rebind("rmi://"+ipAddress+"/auth", authenticator);
-            printMessage("rmi auth running");
+            printMessage("--> SERVER WAITING CONNECTIONS VIA RMI");
             Heartbeat heartbeat = new Heartbeat();
             heartbeat.start();
         }catch (RemoteException | MalformedURLException e){
@@ -211,14 +211,14 @@ public class MasterServer{
     private void startSocket(){
         // server infinite loop
         new Thread(() -> {
-            printMessage("server waiting for connections via socket");
+            printMessage("--> SERVER WAITING CONNECTIONS VIA SOCKET");
             while(1==1) {
                 Socket socket = null;
                 try {
                     try( ServerSocket serverSocket = new ServerSocket(portSocket)) {
                         socket = serverSocket.accept();
                     }
-                    MasterServer.getMasterServer().printMessage("connection established");
+                    MasterServer.getMasterServer().printMessage("New connection established!");
                     SocketAuthenticator authenticator = new SocketAuthenticator(socket);
                     authenticator.start();
                 } catch (IOException e) {
@@ -250,13 +250,19 @@ public class MasterServer{
                 user = getUser(username);
                 if (password.equals(user.getPassword()) && (user.getStatus() == UserStatus.DISCONNECTED)) {
                     user.setStatus(UserStatus.CONNECTED);
+                    this.printMessage("Logged : "+username);
                     return true;
+                }
+                if(!password.equals(user.getPassword())){
+                    this.printMessage("Wrong password : "+username);
+                }else{
+                    this.printMessage("User already logged in : "+username);
                 }
             } else {
                 user = new User(username, password);
                 users.add(user);
+                this.printMessage("Logged : "+username);
                 return true;
-
             }
         }
         return false;

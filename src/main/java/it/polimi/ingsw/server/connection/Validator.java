@@ -22,7 +22,7 @@ public class Validator {
      * @return true iff the parameters are valid
      */
     public static boolean isValid(String command, List<String> parsedResult) {
-        if( command==null){ return false; }
+        if( command==null){ throw new IllegalArgumentException(); }
         String[] temp;
         String keyword;
 
