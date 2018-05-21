@@ -292,7 +292,8 @@ public class Client {
             }
         }
 
-
+        CLI cli=new CLI(ConnectionMode.SOCKET,"127.0.0.1",3000);
+        cli.run();
     }
 
 
