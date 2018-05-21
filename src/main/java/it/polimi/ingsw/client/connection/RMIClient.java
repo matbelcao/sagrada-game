@@ -15,7 +15,7 @@ public class RMIClient implements ClientConn,RMIClientInt {
         return RMIconn;
     }
 //debugging methods
-    @Override
+
     public void printToServer(String message) {
         try {
             RMIconn.printToTerminal(message);
@@ -25,7 +25,7 @@ public class RMIClient implements ClientConn,RMIClientInt {
     }
 
     @Override
-    public boolean login() {
+    public boolean login(String username, String password) {
         return false;
     }
 
@@ -72,6 +72,11 @@ public class RMIClient implements ClientConn,RMIClientInt {
     @Override
     public void draftSchema() {
 
+    }
+
+    @Override
+    public boolean ping() {
+        return false;
     }
 
     //debugging methods
