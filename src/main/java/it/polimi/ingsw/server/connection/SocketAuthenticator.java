@@ -1,7 +1,5 @@
 package it.polimi.ingsw.server.connection;
-import it.polimi.ingsw.ConnectionMode;
-import it.polimi.ingsw.server.User;
-import it.polimi.ingsw.server.Validator;
+import it.polimi.ingsw.client.ConnectionMode;
 
 import java.io.*;
 import java.net.Socket;
@@ -9,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  *This class runs as a thread launched by the MasterServer and opens a ServerSocket that keeps listening
- * for incoming requests of socket connections. Once it opens a socket, it promptly launches a SocketConn passing it the
+ * for incoming requests of socket connections. Once it opens a socket, it promptly launches a SocketServer passing it the
  * newly created socket
  */
 public class SocketAuthenticator extends Thread {
@@ -50,7 +48,7 @@ public class SocketAuthenticator extends Thread {
                         //Setting Socket specific parameters
                         User user = master.getUser(params.get(1));
                         user.setConnectionMode(ConnectionMode.SOCKET);
-                        user.setServerConn(new SocketConn(socket, user));
+                        user.setServerConn(new SocketServer(socket, user));
                         master.updateConnected(user);
                         master.printMessage("LOGGED "+params.get(1)+" "+params.get(2));
                     } else {

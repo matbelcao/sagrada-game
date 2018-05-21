@@ -1,18 +1,16 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.client.RMIClientInt;
-import it.polimi.ingsw.server.User;
-import it.polimi.ingsw.server.UserStatus;
 import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class RMIConn extends UnicastRemoteObject implements ServerConn,RMIConnInt {
+public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServerInt {
         private RMIClientInt clientReference;
         private User user;
 
-    public RMIConn(User user) throws RemoteException{
+    public RMIServer(User user) throws RemoteException{
         this.user = user;
     }
 

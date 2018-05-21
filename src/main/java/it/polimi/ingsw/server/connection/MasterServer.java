@@ -1,7 +1,5 @@
 package it.polimi.ingsw.server.connection;
-import it.polimi.ingsw.server.controller.Game;
-import it.polimi.ingsw.server.User;
-import it.polimi.ingsw.server.UserStatus;
+import it.polimi.ingsw.server.model.Game;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -197,8 +195,8 @@ public class MasterServer{
             AuthenticationInt authenticator = new RMIAuthenticator();
             Registry registry = LocateRegistry.createRegistry(portRMI);
             Naming.rebind("rmi://"+ipAddress+"/auth", authenticator);
-            System.out.println("rmi auth running");
-            //new Heartbeat().run();
+            printMessage("rmi auth running");
+            new Heartbeat().run();
         }catch (RemoteException | MalformedURLException e){
             e.printStackTrace();
         }
@@ -212,7 +210,7 @@ public class MasterServer{
     private void startSocket(){
         // server infinite loop
         new Thread(() -> {
-            MasterServer.getMasterServer().printMessage("server waiting for connections via socket");
+            printMessage("server waiting for connections via socket");
             while(1==1) {
                 Socket socket = null;
                 try {

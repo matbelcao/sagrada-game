@@ -1,14 +1,13 @@
-package it.polimi.ingsw.server.controller;
+package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.server.User;
-import it.polimi.ingsw.server.UserStatus;
-import it.polimi.ingsw.server.connection.MasterServer;
-import it.polimi.ingsw.server.model.*;
+import it.polimi.ingsw.server.connection.User;
+import it.polimi.ingsw.server.connection.UserStatus;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import org.jetbrains.annotations.NotNull;
 
-import javax.jws.soap.SOAPBinding;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class represents the controller of the game. It manages the rounds and the operations that the players make on the board
@@ -45,7 +44,7 @@ public class Game extends Thread implements Iterable  {
     /**
      * This method provides the execution order of the game flow
      */
-    @Override
+    /*@Override
     public void run(){
         try {
             sendSchemaCards();
@@ -56,7 +55,7 @@ public class Game extends Thread implements Iterable  {
         }
 
 
-    }
+    }*/
 
     /**
      * Sends four schema cards for each user of the match

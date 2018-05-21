@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.server.controller.Game;
+import it.polimi.ingsw.server.connection.User;
+import it.polimi.ingsw.server.model.Game;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 

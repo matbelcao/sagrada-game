@@ -1,8 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.ConnectionMode;
-import it.polimi.ingsw.server.User;
-import it.polimi.ingsw.server.UserStatus;
+import it.polimi.ingsw.client.ConnectionMode;
 
 public class Heartbeat extends Thread{
     private MasterServer master = MasterServer.getMasterServer();

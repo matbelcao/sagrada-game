@@ -1,9 +1,9 @@
 package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.model.*;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;

@@ -1,9 +1,7 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.ConnectionMode;
-import it.polimi.ingsw.UIMode;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
-import it.polimi.ingsw.server.connection.RMIConnInt;
+import it.polimi.ingsw.server.connection.RMIServerInt;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -61,7 +59,7 @@ public class Client {
             AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://127.0.0.1/auth");
             if(authenticator.authenticate(username,password)){
                //get the stub of the remote object
-               RMIConnInt RMIConnStub = (RMIConnInt) Naming.lookup("rmi://127.0.0.1/"+username+password);
+               RMIServerInt RMIConnStub = (RMIServerInt) Naming.lookup("rmi://127.0.0.1/"+username+password);
                //create RMIClient with the reference of the remote obj and assign it to the Client
                RMIClientInt rmiClient  = new RMIClient(RMIConnStub);
                clientConn = (RMIClient)rmiClient;

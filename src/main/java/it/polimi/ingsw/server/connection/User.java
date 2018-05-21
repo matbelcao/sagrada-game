@@ -1,9 +1,7 @@
-package it.polimi.ingsw.server;
+package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.ConnectionMode;
-import it.polimi.ingsw.server.connection.MasterServer;
-import it.polimi.ingsw.server.connection.ServerConn;
-import it.polimi.ingsw.server.controller.Game;
+import it.polimi.ingsw.client.ConnectionMode;
+import it.polimi.ingsw.server.model.Game;
 
 /**
  * This class contains the data concerning the user and the connection mode used
@@ -15,6 +13,7 @@ public class User {
     private ConnectionMode connectionMode;
     private ServerConn serverConn;
     private Game game;
+    private Boolean myTurn;
 
     /**
      * Instantiate the user profile and associates it's credentials
@@ -39,6 +38,13 @@ public class User {
      */
     public String getPassword() { return password; }
 
+    public Boolean isMyTurn() {
+        return myTurn;
+    }
+
+    public void setTurn(Boolean myTurn) {
+        this.myTurn = myTurn;
+    }
 
     public void disconnect(){
         UserStatus previousStatus=this.getStatus();

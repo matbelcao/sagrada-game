@@ -1,7 +1,7 @@
 package it.polimi.ingsw.server.model.iterators;
 
 import it.polimi.ingsw.server.model.Board;
-import it.polimi.ingsw.server.User;
+import it.polimi.ingsw.server.connection.User;
 
 import java.util.ArrayList;
 import java.util.Iterator;

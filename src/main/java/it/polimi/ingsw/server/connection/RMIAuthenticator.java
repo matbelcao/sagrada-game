@@ -1,7 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.ConnectionMode;
-import it.polimi.ingsw.server.User;
+import it.polimi.ingsw.client.ConnectionMode;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -21,7 +20,7 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
             User user = master.getUser(username);
             user.setConnectionMode(ConnectionMode.RMI);
             try {
-                RMIConn RMIconnection = new RMIConn(user);
+                RMIServer RMIconnection = new RMIServer(user);
                 LocateRegistry.getRegistry(master.getIpAddress(),1099) ;
                 Naming.rebind("rmi://"+master.getIpAddress()+"/"+username+password, RMIconnection);
                 master.printMessage("RMI service for client "+username+" published"); //delete

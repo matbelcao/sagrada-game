@@ -1,17 +1,17 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.server.connection.RMIConnInt;
+import it.polimi.ingsw.server.connection.RMIServerInt;
 
 import java.rmi.RemoteException;
 
 public class RMIClient implements ClientConn,RMIClientInt {
-    private RMIConnInt RMIconn;
+    private RMIServerInt RMIconn;
 
-    public RMIClient(RMIConnInt RMIconn){
+    public RMIClient(RMIServerInt RMIconn){
         this.RMIconn = RMIconn;
     }
 
-    public RMIConnInt getRMIconn() {
+    public RMIServerInt getRMIconn() {
         return RMIconn;
     }
 //debugging methods

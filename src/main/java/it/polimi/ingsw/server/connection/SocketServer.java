@@ -1,8 +1,5 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.server.User;
-import it.polimi.ingsw.server.UserStatus;
-import it.polimi.ingsw.server.Validator;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.SchemaCard;
 
@@ -13,7 +10,7 @@ import java.util.ArrayList;
 /**
  * This class is the implementation of the SOCKET server-side connection methods
  */
-public class SocketConn extends Thread implements ServerConn  {
+public class SocketServer extends Thread implements ServerConn  {
     private Socket socket;
     private BufferedReader inSocket;
     private PrintWriter outSocket;
@@ -23,7 +20,7 @@ public class SocketConn extends Thread implements ServerConn  {
      * This is the constructor of the class, it starts a thread linked to an open socket
      * @param socket the socket already open used to communicate with the client
      */
-    SocketConn(Socket socket, User user){
+    SocketServer(Socket socket, User user){
         this.user = user;
         this.socket = socket;
         try {

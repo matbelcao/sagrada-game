@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.server.User;
+import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.connection.MasterServer;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class Board {
         for(int i =0; i<Board.NUM_TOOLS;i++){
             do{
                 id=randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1;
-            }while (draftedTools.contains(id));
+            }while (!draftedTools.isEmpty() && !draftedTools.contains(id));
             draftedTools.add(id);
             toolCards[i]=new ToolCard(id, MasterServer.XML_SOURCE+"ToolCard.xml");
         }
@@ -65,7 +65,7 @@ public class Board {
         for(int i =0; i<Board.NUM_OBJECTIVES;i++){
             do{
                 id=randomGen.nextInt(PubObjectiveCard.NUM_PUB_OBJ) + 1;
-            } while(!draftedPubs.contains(id));
+            } while(!draftedPubs.isEmpty() && !draftedPubs.contains(id));
             draftedPubs.add(id);
             pubObjectiveCards[i]=new PubObjectiveCard(id,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
         }
@@ -86,7 +86,7 @@ public class Board {
         for(int i =0; i<numPlayers;i++){
             do{
                 id=randomGen.nextInt(PrivObjectiveCard.NUM_PRIV_OBJ) + 1;
-            } while(!draftedPrivs.contains(id));
+            } while(!draftedPrivs.isEmpty() && !draftedPrivs.contains(id));
             draftedPrivs.add(id);
 
             privObjectiveCards[i]=new PrivObjectiveCard(id,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
@@ -99,7 +99,7 @@ public class Board {
      * @return an array containing the schema cards
      */
     public SchemaCard[] draftSchemas() {
-        SchemaCard[]  schemaChoices= new SchemaCard[NUM_PLAYER_SCHEMAS];
+        SchemaCard[]  schemaChoices= new SchemaCard[NUM_PLAYER_SCHEMAS*players.size()];
         Random randomGen = new Random();
         Integer id;
         ArrayList<Integer> draftedSchemas= new ArrayList<>();
@@ -107,7 +107,7 @@ public class Board {
         for(int i =0; i < NUM_PLAYER_SCHEMAS*players.size();i++){
             do{
                 id=randomGen.nextInt(SchemaCard.NUM_SCHEMA) + 1;
-            } while(!draftedSchemas.contains(id));
+            } while(!draftedSchemas.isEmpty() && !draftedSchemas.contains(id));
 
             draftedSchemas.add(id);
             schemaChoices[i]=new SchemaCard(id,MasterServer.XML_SOURCE+"SchemaCard.xml");
