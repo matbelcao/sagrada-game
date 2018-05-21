@@ -22,14 +22,16 @@ public class CLI {
     }
 
     public void run(){
+        clientConn.waitGreeting();
+        outCli.println("Server Connected!");
         login();
+        while(1==1){
+
+        }
     }
 
-    private synchronized  void greeting(){
 
-    }
-
-    private synchronized void login()
+    private void login()
     {
         String username;
         String password;
@@ -42,21 +44,19 @@ public class CLI {
                 password = inKeyboard.readLine();
 
                 clientConn.login(username,password);
-                this.wait();
+
+                if(logged)
+                    outCli.println("Login effettuato correttamente");
+                else
+                    outCli.println("Login fallito");
             }
         } catch (IOException e1) {
             e1.printStackTrace();
-        } catch ( InterruptedException e) {
-            if(logged)
-                outCli.println("Login effettuato correttamente");
-            else
-                outCli.println("Login fallito");
         }
     }
 
     public void updateLogin(boolean logged){
         this.logged=logged;
-        this.notifyAll();
     }
 
     public void updateConnection(){

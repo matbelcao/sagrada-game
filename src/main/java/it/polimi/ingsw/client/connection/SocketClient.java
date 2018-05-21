@@ -24,61 +24,40 @@ public class SocketClient extends Thread implements ClientConn {
         //System.out.println("--> SOCKET STARTED");
     }
 
-    @Override
-    public void run(){
-        //String command = "";
-        boolean playing = true;
-        while(playing){
-            try {
-                try {
-                    String command = inSocket.readLine();
-                    System.out.println(command);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                /*command = inSocket.readLine();
-                playing = execute(command);*/
-            } catch ( IllegalArgumentException ignored) {
-            }finally {
-                playing=false;
-            }
-        }
+    private String readSocket(){
+        String command = null;
         try {
-            socket.close();
+            command = inSocket.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return command;
     }
 
-
-
-   /* private boolean execute(String command) {
-
-        String[] parsed=command.split(" ");
-        switch (parsed[0]) {
-            case "Connection established!":
-                cli.updateConnection();
-
-                return true;
-            case "LOGIN":
-                if("ok".equals(parsed[1])){
-                        cli.updateLogin(true);
-                }else if("ko".equals(parsedResult.get(1))){
-                        cli.updateLogin(false);
-                }
-                return true;
-                break;
-            default:
-                    return true;
+   @Override
+    public boolean waitGreeting() {
+        try {
+            while(!inSocket.readLine().equals("Connection established!")){
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return false;
+        return true;
     }
 
-*/
     @Override
     public boolean login(String username, String password) {
         outSocket.println("LOGIN "+username+" "+password);
         outSocket.flush();
+
+        ArrayList<String> parsedResult = new ArrayList<>();
+        if(Parser.checkLoginParams(readSocket(),parsedResult)){
+            if(parsedResult.get(1).equals("ok")){
+                cli.updateLogin(true);
+                return true;
+            }
+        }
+        cli.updateLogin(false);
         return false;
     }
 

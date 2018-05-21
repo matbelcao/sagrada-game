@@ -2,6 +2,7 @@ package it.polimi.ingsw.client.connection;
 
 public interface ClientConn {
     public boolean login(String username,String password);
+    public boolean waitGreeting();
     public void getPrivateObj();
     public void getPublicObj();
     public void getTools();
