@@ -139,7 +139,18 @@ public class SocketServer extends Thread implements ServerConn  {
 
     @Override
     public boolean ping() {
-        return false;
+        try{
+            outSocket.print((char)0);
+            outSocket.flush();
+        } catch (Exception e) {
+            try {
+                socket.close();
+            } catch (IOException x) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+        return true;
     }
 
 }

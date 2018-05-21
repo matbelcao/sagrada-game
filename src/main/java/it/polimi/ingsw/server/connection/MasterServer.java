@@ -199,8 +199,6 @@ public class MasterServer{
             Registry registry = LocateRegistry.createRegistry(portRMI);
             Naming.rebind("rmi://"+ipAddress+"/auth", authenticator);
             printMessage("--> SERVER WAITING CONNECTIONS VIA RMI");
-            Heartbeat heartbeat = new Heartbeat();
-            heartbeat.start();
         }catch (RemoteException | MalformedURLException e){
             e.printStackTrace();
         }
@@ -230,6 +228,14 @@ public class MasterServer{
 
             }
         }).start();
+    }
+
+    /**
+     * Starts the HeartBeat service to detect the broken connections
+     */
+    private void startHeartBeat(){
+        Heartbeat heartbeat = new Heartbeat();
+        heartbeat.start();
     }
 
     /**
@@ -350,6 +356,7 @@ public class MasterServer{
     public static void main(String[] args){
         MasterServer.getMasterServer().startRMI();
         MasterServer.getMasterServer().startSocket();
+        MasterServer.getMasterServer().startHeartBeat();
     }
 
 }
