@@ -1,19 +1,16 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.client.CLI;
+import it.polimi.ingsw.server.connection.Validator;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class SocketClient extends Thread implements ClientConn {
-    CLI cli;
     Socket socket;
     private BufferedReader inSocket;
     private PrintWriter outSocket;
 
-    public SocketClient(CLI cli, String address, int port){
-        this.cli=cli;
+    public SocketClient(String address, int port){
         try {
             socket = new Socket(address, port);
             inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -75,14 +72,32 @@ public class SocketClient extends Thread implements ClientConn {
     }
 
 */
+
+
     @Override
     public boolean login(String username, String password) {
-        outSocket.println("LOGIN "+username+" "+password);
+        String command="";
+        outSocket.println("LOGIN " + username + " " + password);
         outSocket.flush();
+        try{
+            command = inSocket.readLine();
+
+            return Validator.isLoginOk(command);
+
+        }catch ( IOException e ){e.printStackTrace();}
         return false;
     }
 
-    @Override
+    public String getGreetings(){
+        try {
+            return inSocket.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+        @Override
     public void getPrivateObj() {
 
     }

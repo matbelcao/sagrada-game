@@ -79,6 +79,11 @@ public class RMIClient implements ClientConn,RMIClientInt {
         return false;
     }
 
+    @Override
+    public String getGreetings() {
+        return null;
+    }
+
     //debugging methods
     @Override
     public void print(String message) {

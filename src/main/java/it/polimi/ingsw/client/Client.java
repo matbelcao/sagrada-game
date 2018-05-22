@@ -3,6 +3,7 @@ package it.polimi.ingsw.client;
 import it.polimi.ingsw.client.connection.ClientConn;
 import it.polimi.ingsw.client.connection.RMIClient;
 import it.polimi.ingsw.client.connection.RMIClientInt;
+import it.polimi.ingsw.client.connection.SocketClient;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 import org.w3c.dom.Document;
@@ -22,7 +23,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.System.*;
+import static java.lang.System.out;
 
 public class Client {
 
@@ -33,6 +34,7 @@ public class Client {
     private ClientConn clientConn;
     private String serverIP;
     private Integer port;
+    private CLI cli;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client"+ File.separator; //append class name + ".xml" to obtain complete path
     private static final String LONG_OPTION="\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+)";
     private static final String SHORT_OPTION="\\-[a-z]+";
@@ -57,6 +59,7 @@ public class Client {
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
         }
+
     }
 
     public Client(UIMode uiMode,ConnectionMode connMode,String serverIP){
@@ -85,6 +88,7 @@ public class Client {
         this.connMode=ConnectionMode.valueOf(connMode);
     }
 
+
     public void setUiMode(UIMode uiMode) {
         this.uiMode = uiMode;
     }
@@ -105,12 +109,9 @@ public class Client {
 
     public void setPassword(String password) { this.password = password; }
 
-    public void setupConnection(){
-        if(connMode.equals(ConnectionMode.RMI)){
-            loginRMI();
-        }else{
-            loginSocket();
-        }
+    public boolean setupConnection(){
+        if(connMode.equals(ConnectionMode.SOCKET))clientConn=  new SocketClient(serverIP,port);
+        return connMode.equals(ConnectionMode.RMI)? loginRMI(): loginSocket() ;
     }
 
 
@@ -121,6 +122,8 @@ public class Client {
     public ClientConn getClientConn(){
         return clientConn;
     }
+
+    public CLI getCli(){return cli;}
 
     public UIMode getUiMode() {
         return uiMode;
@@ -146,7 +149,17 @@ public class Client {
 
     }
 
-    private void loginRMI(){
+    public void login(){
+        boolean logged;
+        cli=new CLI(this);
+        do{
+            cli.loginProcedure();
+            logged=setupConnection();
+            cli.updateLogin(logged);
+        }while(!logged);
+
+    }
+    private boolean loginRMI(){
         try {
             AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
             if(authenticator.authenticate(username,password)){
@@ -159,14 +172,16 @@ public class Client {
                //a remote reference is passed so there's no need to add rmiClient to a Registry
                RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiClient, 0);
                rmiConnStub.setClientReference(remoteRef);
+               return true;
             }
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
-    private void loginSocket(){
-
+    private boolean loginSocket(){
+        return clientConn.login(username,password);
     }
 
     /**
@@ -292,8 +307,9 @@ public class Client {
             }
         }
 
-        CLI cli=new CLI(ConnectionMode.SOCKET,"127.0.0.1",3000);
-        cli.run();
+        client.login();
+
+
     }
 
 

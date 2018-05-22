@@ -12,5 +12,6 @@ public interface ClientConn {
     public void getSchema(int playerId);
     public void draftSchema();
     public boolean ping();
+    String getGreetings();
     //...
 }
