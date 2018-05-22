@@ -59,9 +59,7 @@ public class SocketAuthenticator extends Thread {
                 }
             }
         } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
             try {
-
                 socket.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
