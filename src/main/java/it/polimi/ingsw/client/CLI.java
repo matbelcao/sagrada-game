@@ -15,7 +15,7 @@ public class CLI {
 
 
     public void greeting() {
-        outCli.println(client.getClientConn().getGreetings);
+        outCli.println(client.getClientConn().getGreetings());
 
     }
 
