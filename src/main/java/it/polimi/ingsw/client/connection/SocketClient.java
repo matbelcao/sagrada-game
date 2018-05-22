@@ -24,58 +24,6 @@ public class SocketClient extends Thread implements ClientConn {
         }
     }
 
-    @Override
-    public void run(){
-        //String command = "";
-        boolean playing = true;
-        while(playing){
-            try {
-                try {
-                    String command = inSocket.readLine();
-                    System.out.println(command);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                /*command = inSocket.readLine();
-                playing = execute(command);*/
-            } catch ( IllegalArgumentException ignored) {
-            }finally {
-                playing=false;
-            }
-        }
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-   /* private boolean execute(String command) {
-
-        String[] parsed=command.split(" ");
-        switch (parsed[0]) {
-            case "Connection established!":
-                cli.updateConnection();
-
-                return true;
-            case "LOGIN":
-                if("ok".equals(parsed[1])){
-                        cli.updateLogin(true);
-                }else if("ko".equals(parsedResult.get(1))){
-                        cli.updateLogin(false);
-                }
-                return true;
-                break;
-            default:
-                    return true;
-        }
-        return false;
-    }
-
-*/
-
     private String readBuffer(){
         try {
             return inSocket.readLine();

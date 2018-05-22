@@ -38,7 +38,7 @@ public class Client {
     private ClientConn clientConn;
     private String serverIP;
     private Integer port;
-    private CLI cli;
+    private ClientUI clientUI;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client"+ File.separator; //append class name + ".xml" to obtain complete path
     private static final String LONG_OPTION="\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+)";
     private static final String SHORT_OPTION="\\-[a-z]+";
@@ -117,7 +117,7 @@ public class Client {
     public void setupConnection(){
         if(connMode.equals(ConnectionMode.SOCKET)) {
             clientConn = new SocketClient(serverIP, port);
-            cli.updateConnection(); //not correct for RMI, the connection can only  be established after login
+            clientUI.updateConnection(); //not correct for RMI, the connection can only  be established after login
         }
     }
 
@@ -130,7 +130,7 @@ public class Client {
         return clientConn;
     }
 
-    public CLI getCli(){return cli;}
+    public ClientUI getClientUI(){return clientUI;}
 
     public UIMode getUiMode() {
         return uiMode;
@@ -156,16 +156,21 @@ public class Client {
 
     private void setupAndLogin(){
         boolean logged;
-        cli=new CLI(this);
+        //if(uiMode==UIMode.CLI){
+            clientUI=new CLI(this);
+        /*}else{
+            clientUI=new GUI(this);
+        }*/
+
         setupConnection();
         do{
-            cli.loginProcedure();
+            clientUI.loginProcedure();
             if(connMode.equals(ConnectionMode.RMI)){
                 logged=loginRMI();
             }else{
                 logged=loginSocket();
             }
-            cli.updateLogin(logged);
+            clientUI.updateLogin(logged);
         }while(!logged);
         userStatus=UserStatus.LOBBY;
     }
@@ -173,9 +178,9 @@ public class Client {
     private void lobby(){
         while(userStatus.equals(UserStatus.LOBBY)) {
             try {
-                cli.updateLobby(clientConn.getLobby());
+                clientUI.updateLobby(clientConn.getLobby());
             } catch (GameStartedException e) {
-                cli.updateGameStart(e.getNumPlayers(),e.getPlayerId());
+                clientUI.updateGameStart(e.getNumPlayers(),e.getPlayerId());
                 userStatus = UserStatus.PLAYING;
             }
         }
@@ -183,7 +188,7 @@ public class Client {
 
     private void match(){
         while(userStatus.equals(UserStatus.PLAYING)) {
-            if (cli.getCommand().equals("QUIT")){
+            if (clientUI.getCommand().equals("QUIT")){
                 quit();
             }
         }
@@ -191,10 +196,10 @@ public class Client {
 
 
 
-    private void quit(){
+    public void quit(){
         clientConn.quit();
         userStatus=UserStatus.DISCONNECTED;
-        cli.updateConnectionClosed();
+        clientUI.updateConnectionClosed();
     }
 
     private void disconnect(){

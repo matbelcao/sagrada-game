@@ -2,7 +2,7 @@ package it.polimi.ingsw.client;
 
 import java.io.*;
 
-public class CLI {
+public class CLI implements ClientUI{
     private BufferedReader inKeyboard;
     private PrintWriter outCli;
     private Client client;
@@ -73,7 +73,8 @@ public class CLI {
         outCli.println("Starting Match : " + numUsers + " " + playerId);
     }
 
-    public void updateConnectionClosed(){
+    public void updateConnectionClosed()
+    {
         outCli.println("Connection closed!");
     }
 }
