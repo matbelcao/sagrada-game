@@ -3,6 +3,9 @@ package it.polimi.ingsw.server.connection;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This class implements various static methods that are used to validate client socket messages, it also offers a simple method to parse commands splitting them on whitespaces
+ */
 public class Validator {
     static final String ALPHANUMERIC="[0-9a-zA-Z]+";
     static final String BEGINS_WITH_DIGIT="^([0-9]+)[^0-9]*";

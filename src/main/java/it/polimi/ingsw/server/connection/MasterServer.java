@@ -219,7 +219,7 @@ public class MasterServer{
                     try( ServerSocket serverSocket = new ServerSocket(portSocket)) {
                         socket = serverSocket.accept();
                     }
-                    MasterServer.getMasterServer().printMessage("New connection established!");
+                    printMessage("New connection established via Socket!");
                     SocketAuthenticator authenticator = new SocketAuthenticator(socket);
                     authenticator.start();
                 } catch (IOException e) {
@@ -342,13 +342,15 @@ public class MasterServer{
 
 
     /**
-     *
-     * @return
+     * @return the number of users registered to the server
      */
     public int getUsersSize(){
         return users.size();
     }
 
+    /**
+     * @return the ip address of the server
+     */
     public String getIpAddress(){
         return this.ipAddress;
     }
