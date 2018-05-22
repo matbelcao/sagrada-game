@@ -7,7 +7,7 @@ import java.io.*;
 import java.net.Socket;
 
 public class SocketClient extends Thread implements ClientConn {
-    Socket socket;
+    private Socket socket;
     private BufferedReader inSocket;
     private PrintWriter outSocket;
 
@@ -19,7 +19,6 @@ public class SocketClient extends Thread implements ClientConn {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //System.out.println("--> SOCKET STARTED");
     }
 
     @Override

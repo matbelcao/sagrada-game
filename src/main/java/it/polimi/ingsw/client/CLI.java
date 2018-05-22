@@ -14,11 +14,6 @@ public class CLI {
     }
 
 
-    public void greeting() {
-        outCli.println(client.getClientConn().getGreetings());
-
-    }
-
     private void clearCLI() {
         for (int i = 0; i < 50; i++) {
             outCli.printf("\n");
@@ -53,8 +48,7 @@ public class CLI {
     }
 
     public void updateConnection() {
-        outCli.println("Connection established!");
-        outCli.flush();
+        outCli.println(client.getClientConn().getGreetings());
     }
 }
 

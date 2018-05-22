@@ -111,7 +111,7 @@ public class Client {
 
     public boolean setupConnection(){
         if(connMode.equals(ConnectionMode.SOCKET))clientConn=  new SocketClient(serverIP,port);
-        cli.greeting();
+        cli.updateConnection();
         return connMode.equals(ConnectionMode.RMI)? loginRMI(): loginSocket() ;
     }
 
@@ -192,7 +192,7 @@ public class Client {
      * @return the list of options
      * @throws IllegalArgumentException if invalid options or combinations of options are found
      */
-    public static List<String> getOptions(String[] args) throws IllegalArgumentException {
+    public static List<String> getOptions(String[] args){
         ArrayList<String> options= new ArrayList<>();
         int index;
         for(index=0;index< args.length;index++){
@@ -220,7 +220,7 @@ public class Client {
      * @param index the index in the args array
      * @param option the option to be checked
      */
-    private static void checkLongOptions(String[] args, ArrayList<String> options, int index, String option) throws IllegalArgumentException {
+    private static void checkLongOptions(String[] args, ArrayList<String> options, int index, String option) {
         switch(option){
             case "--gui":
             case "--cli":
@@ -251,7 +251,7 @@ public class Client {
      * @param index the index in the args array
      * @param option the option/options to be checked
      */
-    private static void checkShortOptions(String[] args, ArrayList<String> options, int index, String option) throws IllegalArgumentException{
+    private static void checkShortOptions(String[] args, ArrayList<String> options, int index, String option) {
         int i;
         String shortOption;
         i=1;
@@ -275,7 +275,7 @@ public class Client {
         }
     }
 
-    private static void checkValidCombinations(ArrayList<String> options) throws IllegalArgumentException{
+    private static void checkValidCombinations(ArrayList<String> options) {
         if( (options.contains("r")&& options.contains("s"))||(options.contains("g") && options.contains("c")) || (options.contains("h")&& options.size()>1) ){
             throw new IllegalArgumentException();
         }
@@ -310,7 +310,6 @@ public class Client {
         }
 
         client.login();
-        client.
 
 
     }
