@@ -26,6 +26,11 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
         clientReference.print("message from the server");
     }
 
+    @Override //remote
+    public int getLobby() throws RemoteException {
+        return MasterServer.getMasterServer().getLobby();
+    }
+
 
     @Override
     public void notifyLobbyUpdate(int n) {

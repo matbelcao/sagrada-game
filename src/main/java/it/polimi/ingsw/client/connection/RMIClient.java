@@ -33,6 +33,12 @@ public class RMIClient implements ClientConn,RMIClientInt {
 
     @Override
     public int getLobby() {
+
+        try {
+            return RMIconn.getLobby();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
