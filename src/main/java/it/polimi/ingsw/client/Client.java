@@ -23,9 +23,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.List;
-
-import static java.lang.System.out;
 
 public class Client {
 
@@ -136,23 +133,6 @@ public class Client {
         return uiMode;
     }
 
-     private static void printHelpMessage(){
-        String message="ERROR: couldn't load configuration files\n";
-
-        File xmlFile= new File(XML_SOURCE+"helpmessage.xml");
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder;
-        try {
-            dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xmlFile);
-            doc.getDocumentElement().normalize();
-
-            message = doc.getElementsByTagName("help-message").item(0).getTextContent();
-        }catch (SAXException | ParserConfigurationException | IOException e1) {
-            e1.printStackTrace();
-        }
-        out.print(message);
-    }
 
     private void setupAndLogin(){
         boolean logged;
@@ -248,11 +228,11 @@ public class Client {
                 options = (ArrayList<String>) ClientOptions.getOptions(args);
 
             } catch (IllegalArgumentException e) {
-                printHelpMessage();
+                ClientOptions.printHelpMessage();
                 return;
             }
             if(options.contains("h")){
-                printHelpMessage();
+                ClientOptions.printHelpMessage();
             }else {
                 ClientOptions.setClientPreferences(options, client);
 
