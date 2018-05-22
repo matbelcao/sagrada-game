@@ -75,6 +75,9 @@ public class CLI implements ClientUI{
     {
         outCli.println("Connection closed!");
     }
+
+    public void updateConnectionBroken() {outCli.println("Connection broken!");
+    }
 }
 
 

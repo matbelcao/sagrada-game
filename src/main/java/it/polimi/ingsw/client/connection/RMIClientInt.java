@@ -7,4 +7,6 @@ public interface RMIClientInt extends Remote {
     void print(String message) throws RemoteException;
 
     boolean pong() throws RemoteException;
+
+    void updateId(int size, int id) throws RemoteException;
 }

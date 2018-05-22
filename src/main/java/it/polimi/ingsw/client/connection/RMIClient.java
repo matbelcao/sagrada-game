@@ -1,11 +1,14 @@
 package it.polimi.ingsw.client.connection;
 
+import it.polimi.ingsw.client.exceptions.GameStartedException;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 
 import java.rmi.RemoteException;
 
 public class RMIClient implements ClientConn,RMIClientInt {
     private RMIServerInt RMIconn;
+    int size = 0;
+    int id = 0;
 
     public RMIClient(RMIServerInt RMIconn){
         this.RMIconn = RMIconn;
@@ -31,11 +34,15 @@ public class RMIClient implements ClientConn,RMIClientInt {
         return false;
     }
 
-    @Override
-    public int getLobby() {
+    @Override //to delete
+    public int getLobby() throws GameStartedException {
 
         try {
-            return RMIconn.getLobby();
+            if(size == 0) {
+                return RMIconn.getLobby();
+            }else{
+                throw new GameStartedException(size,id);
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -112,5 +119,10 @@ public class RMIClient implements ClientConn,RMIClientInt {
     @Override
     public boolean pong() throws RemoteException {
         return true;
+    }
+    @Override//remote to delete
+    public void updateId(int size, int id) throws RemoteException {
+        this.id = id;
+        this.size = size;
     }
 }
