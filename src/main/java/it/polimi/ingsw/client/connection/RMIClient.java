@@ -31,10 +31,6 @@ public class RMIClient implements ClientConn,RMIClientInt {
         return false;
     }
 
-    @Override
-    public boolean waitGreeting() {
-        return false;
-    }
 
     @Override
     public void getPrivateObj() {

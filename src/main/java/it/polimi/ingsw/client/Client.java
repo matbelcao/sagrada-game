@@ -111,6 +111,7 @@ public class Client {
 
     public boolean setupConnection(){
         if(connMode.equals(ConnectionMode.SOCKET))clientConn=  new SocketClient(serverIP,port);
+        cli.greeting();
         return connMode.equals(ConnectionMode.RMI)? loginRMI(): loginSocket() ;
     }
 
@@ -152,6 +153,7 @@ public class Client {
     public void login(){
         boolean logged;
         cli=new CLI(this);
+
         do{
             cli.loginProcedure();
             logged=setupConnection();
@@ -308,6 +310,7 @@ public class Client {
         }
 
         client.login();
+        client.
 
 
     }

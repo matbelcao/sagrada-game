@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.connection;
 
+import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.server.connection.Validator;
 
 import java.io.*;
@@ -82,7 +83,7 @@ public class SocketClient extends Thread implements ClientConn {
         try{
             command = inSocket.readLine();
 
-            return Validator.isLoginOk(command);
+            return ClientParser.isLoginOk(command);
 
         }catch ( IOException e ){e.printStackTrace();}
         return false;
