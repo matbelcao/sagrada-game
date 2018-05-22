@@ -1,4 +1,5 @@
 package it.polimi.ingsw.server.connection;
+import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.model.Game;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -30,7 +31,7 @@ public class MasterServer{
     private int portRMI;
     private int portSocket;
     private boolean additionalSchemas; //to be used for additional schemas FA
-    public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator; //append class name + ".xml" to obtain complete path
+    public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"server"+File.separator; //append class name + ".xml" to obtain complete path
     private int timeLobby;
     public static int timeGame;
     private final ArrayList <User> users;

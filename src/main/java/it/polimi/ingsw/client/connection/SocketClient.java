@@ -16,10 +16,11 @@ public class SocketClient extends Thread implements ClientConn {
     Client client;
 
     public SocketClient(Client client,String address, int port){
+        this.client=client;
         try {
             socket = new Socket(address, port);
             inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+            outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -45,9 +46,11 @@ public class SocketClient extends Thread implements ClientConn {
         outSocket.println("LOGIN " + username + " " + password);
         outSocket.flush();
         command = readBuffer();
-
-        return ClientParser.isLoginOk(command);
-
+        try {
+            return ClientParser.isLoginOk(command);
+        }catch(IllegalArgumentException e){
+            return false;
+        }
     }
 
     public String getGreetings(){
@@ -127,11 +130,6 @@ public class SocketClient extends Thread implements ClientConn {
             outSocket.print((char)0);
             outSocket.flush();
         } catch (Exception e) {
-            try {
-                socket.close();
-            } catch (IOException x) {
-                e.printStackTrace();
-            }
             return false;
         }
         return true;

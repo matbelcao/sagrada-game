@@ -1,9 +1,9 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.server.model.enums.Color;
-import it.polimi.ingsw.server.model.enums.Face;
+import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.Face;
 import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
-import it.polimi.ingsw.server.model.immutables.LightDie;
+import it.polimi.ingsw.common.immutables.LightDie;
 
 import java.io.File;
 import java.util.Random;

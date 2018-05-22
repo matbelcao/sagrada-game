@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.client.ConnectionMode;
+import it.polimi.ingsw.common.enums.ConnectionMode;
+import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.model.Game;
 
 /**

@@ -1,9 +1,8 @@
 package it.polimi.ingsw.server.connection;
-import it.polimi.ingsw.client.ConnectionMode;
+import it.polimi.ingsw.common.enums.ConnectionMode;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 
 /**

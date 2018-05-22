@@ -1,7 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.server.connection.User;
-import it.polimi.ingsw.server.connection.UserStatus;
+import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import org.jetbrains.annotations.NotNull;
 

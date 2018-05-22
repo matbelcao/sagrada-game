@@ -1,8 +1,8 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.server.model.immutables.LightConstraint;
-import it.polimi.ingsw.server.model.enums.Color;
-import it.polimi.ingsw.server.model.enums.Face;
+import it.polimi.ingsw.common.immutables.LightConstraint;
+import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.Face;
 
 /**
  * This class represents a constraint set for a single cell of the Schema Card of the game

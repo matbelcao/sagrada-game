@@ -1,4 +1,4 @@
-package it.polimi.ingsw.server.connection;
+package it.polimi.ingsw.common.enums;
 
 public enum UserStatus {
     LOBBY,

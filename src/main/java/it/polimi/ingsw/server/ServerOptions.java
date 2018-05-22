@@ -1,8 +1,5 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.client.ConnectionMode;
-import it.polimi.ingsw.client.UIMode;
 import it.polimi.ingsw.server.connection.MasterServer;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;

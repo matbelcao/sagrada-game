@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server;
 
+import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.Die;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SchemaCardTest {
     @Test
     void testSchemaCardConstructor(){
-        SchemaCard schema1 = new SchemaCard(1,"src"+ File.separator +"xml"+ File.separator +"SchemaCard.xml");
+        SchemaCard schema1 = new SchemaCard(1,MasterServer.XML_SOURCE +"SchemaCard.xml");
         assertEquals("Kaleidoscopic Dream",schema1.getName());
         assertEquals(Integer.parseInt("1"),schema1.getId());
         assertEquals(Integer.parseInt("4"),schema1.getFavorTokens());
@@ -59,7 +60,7 @@ class SchemaCardTest {
         assertEquals("BLUE",schema1.getCell(3, 3).getConstraint().toString());
         assertEquals("YELLOW",schema1.getCell(3, 4).getConstraint().toString());
 
-        SchemaCard schema2 = new SchemaCard(24,"src"+ File.separator +"xml"+ File.separator +"SchemaCard.xml");
+        SchemaCard schema2 = new SchemaCard(24,MasterServer.XML_SOURCE+"SchemaCard.xml");
         assertEquals("Industria",schema2.getName());
         assertEquals(Integer.parseInt("24"),schema2.getId());
         assertEquals(Integer.parseInt("5"),schema2.getFavorTokens());
@@ -68,7 +69,7 @@ class SchemaCardTest {
     //toolcard #9
     @Test
     void testNonAdjacentPlacement(){
-        SchemaCard schema1 = new SchemaCard(1,"src"+ File.separator +"xml"+ File.separator +"SchemaCard.xml");
+        SchemaCard schema1 = new SchemaCard(1,MasterServer.XML_SOURCE+"SchemaCard.xml");
         ArrayList list= (ArrayList) schema1.listPossiblePlacements(new Die("FOUR","GREEN"),IgnoredConstraint.ADJACENCY);
         assertEquals(11,list.size());
         try {
@@ -94,7 +95,7 @@ class SchemaCardTest {
 
     @Test
     void testDiePlacement(){
-        SchemaCard schema1 = new SchemaCard(1,"src" + File.separator + "xml"+ File.separator +"SchemaCard.xml");
+        SchemaCard schema1 = new SchemaCard(1,MasterServer.XML_SOURCE +"SchemaCard.xml");
         Die die1= new Die("FOUR","RED");
         Die die2= new Die("TWO","GREEN");
         Die die3= new Die("FOUR","RED");

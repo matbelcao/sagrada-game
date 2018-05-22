@@ -1,4 +1,4 @@
-package it.polimi.ingsw.server.model.immutables;
+package it.polimi.ingsw.common.immutables;
 import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.util.HashMap;

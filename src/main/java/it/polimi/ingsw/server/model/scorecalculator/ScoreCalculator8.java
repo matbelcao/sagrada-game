@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.model.scorecalculator;
 import it.polimi.ingsw.server.model.Die;
-import it.polimi.ingsw.server.model.enums.Face;
+import it.polimi.ingsw.common.enums.Face;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 import it.polimi.ingsw.server.model.SchemaCard;
 

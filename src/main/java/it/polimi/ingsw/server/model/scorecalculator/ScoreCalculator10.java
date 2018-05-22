@@ -1,5 +1,5 @@
 package it.polimi.ingsw.server.model.scorecalculator;
-import it.polimi.ingsw.server.model.enums.Color;
+import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.server.model.Die;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 import it.polimi.ingsw.server.model.SchemaCard;

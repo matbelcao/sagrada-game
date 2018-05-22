@@ -1,7 +1,6 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
-import it.polimi.ingsw.server.model.enums.Face;
+import it.polimi.ingsw.common.enums.Face;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

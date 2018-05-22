@@ -1,8 +1,5 @@
-package it.polimi.ingsw.server.model.enums;
+package it.polimi.ingsw.common.enums;
 
-
-
-import it.polimi.ingsw.server.model.exceptions.*;
 
 /**
  * This enum represents the possible faces (shades) of the game dice. The elements are immutable.

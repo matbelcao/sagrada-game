@@ -1,7 +1,5 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.server.connection.Validator;
-
 import java.io.*;
 
 public class CLI implements ClientUI{
@@ -27,13 +25,17 @@ public class CLI implements ClientUI{
         String password;
         //clearCLI();
         try {
-            outCli.printf("\nUSERNAME: ");
-            username = inKeyboard.readLine();
-            outCli.printf("\nPASSWORD: ");
-            password = inKeyboard.readLine();
 
-            client.setPassword(password);
-            client.setUsername(username);
+                outCli.printf("\nUSERNAME: ");
+
+                username = inKeyboard.readLine();
+
+                outCli.printf("\nPASSWORD: ");
+
+                password = inKeyboard.readLine();
+
+                client.setPassword(password);
+                client.setUsername(username);
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.client.ConnectionMode;
+import it.polimi.ingsw.common.enums.ConnectionMode;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;

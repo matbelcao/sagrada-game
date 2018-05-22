@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class RMIConnectionTest {
         //MasterServer.getMasterServer().startSocket();
     }
     //This test logs 9 clients and verifies if they get properly saved by the master server
+    @Disabled
     @Test
     public void orderedConnection(){
         ArrayList<User> users;

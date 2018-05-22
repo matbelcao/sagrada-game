@@ -3,7 +3,7 @@ package it.polimi.ingsw.server;
 import it.polimi.ingsw.server.model.exceptions.EmptyDiceBagException;
 import it.polimi.ingsw.server.model.DiceBag;
 import it.polimi.ingsw.server.model.Die;
-import it.polimi.ingsw.server.model.enums.Face;
+import it.polimi.ingsw.common.enums.Face;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

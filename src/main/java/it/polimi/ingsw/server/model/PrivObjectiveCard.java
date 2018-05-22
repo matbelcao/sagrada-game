@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.server.model.enums.Color;
+import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
 /**

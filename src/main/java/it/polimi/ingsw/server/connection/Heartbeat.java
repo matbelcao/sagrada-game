@@ -1,5 +1,7 @@
 package it.polimi.ingsw.server.connection;
 
+import it.polimi.ingsw.common.enums.UserStatus;
+
 public class Heartbeat extends Thread{
     private MasterServer master = MasterServer.getMasterServer();
     @Override

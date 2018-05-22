@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server;
 
+import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.Die;
 import it.polimi.ingsw.server.model.PubObjectiveCard;
@@ -11,13 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class PubObjectiveCardTest {
     @Test
     void  testPubObjectiveCardConstructor(){
-        PubObjectiveCard pub1 = new PubObjectiveCard(1,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
+        PubObjectiveCard pub1 = new PubObjectiveCard(1,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
         assertEquals(Integer.parseInt("1"),pub1.getId());
         assertEquals("Colori diversi - Riga [6]",pub1.getName());
         assertEquals("src"+File.separator+"img"+File.separator+"PubObjectiveCard"+File.separator+"1.png",pub1.getImgSrc());
         assertEquals("Righe senza colori ripetuti",pub1.getDescription());
 
-        PubObjectiveCard pub2 = new PubObjectiveCard(10,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
+        PubObjectiveCard pub2 = new PubObjectiveCard(10,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
         assertEquals(Integer.parseInt("10"),pub2.getId());
         assertEquals("Varietà di Colore [4]",pub2.getName());
         assertEquals("src"+File.separator+"img"+File.separator+"PubObjectiveCard"+File.separator+"10.png",pub2.getImgSrc());
@@ -27,19 +28,19 @@ class PubObjectiveCardTest {
     @Test
     void testGetCardScore1() { //Test the getCardScore method with all the cell full
         //Aurorae Magnificus schema
-        SchemaCard schema = new SchemaCard(11, "src" + File.separator + "xml" + File.separator + "SchemaCard.xml");
+        SchemaCard schema = new SchemaCard(11, MasterServer.XML_SOURCE+"SchemaCard.xml");
 
         //PublicObjective cards
-        PubObjectiveCard pub1 = new PubObjectiveCard(1,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub2 = new PubObjectiveCard(2,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub3 = new PubObjectiveCard(3,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub4 = new PubObjectiveCard(4,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub5 = new PubObjectiveCard(5,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub6 = new PubObjectiveCard(6,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub7 = new PubObjectiveCard(7,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub8 = new PubObjectiveCard(8,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub9 = new PubObjectiveCard(9,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub10 = new PubObjectiveCard(10,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
+        PubObjectiveCard pub1 = new PubObjectiveCard(1,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub2 = new PubObjectiveCard(2,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub3 = new PubObjectiveCard(3,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub4 = new PubObjectiveCard(4,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub5 = new PubObjectiveCard(5,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub6 = new PubObjectiveCard(6,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub7 = new PubObjectiveCard(7,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub8 = new PubObjectiveCard(8,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub9 = new PubObjectiveCard(9,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub10 = new PubObjectiveCard(10,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
 
         //SchemaCard's dice
         Die[] die = new Die[20];
@@ -89,19 +90,19 @@ class PubObjectiveCardTest {
     @Test
     void testGetCardScore2() { //Test the getCardScore method with some cells empty
         //Aurorae Magnificus schema
-        SchemaCard schema = new SchemaCard(11, "src" + File.separator + "xml" + File.separator + "SchemaCard.xml");
+        SchemaCard schema = new SchemaCard(11, MasterServer.XML_SOURCE+ "SchemaCard.xml");
 
         //PublicObjective cards
-        PubObjectiveCard pub1 = new PubObjectiveCard(1,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub2 = new PubObjectiveCard(2,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub3 = new PubObjectiveCard(3,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub4 = new PubObjectiveCard(4,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub5 = new PubObjectiveCard(5,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub6 = new PubObjectiveCard(6,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub7 = new PubObjectiveCard(7,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub8 = new PubObjectiveCard(8,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub9 = new PubObjectiveCard(9,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
-        PubObjectiveCard pub10 = new PubObjectiveCard(10,"src"+File.separator+"xml"+File.separator+"PubObjectiveCard.xml");
+        PubObjectiveCard pub1 = new PubObjectiveCard(1,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub2 = new PubObjectiveCard(2,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub3 = new PubObjectiveCard(3,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub4 = new PubObjectiveCard(4,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub5 = new PubObjectiveCard(5,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub6 = new PubObjectiveCard(6,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub7 = new PubObjectiveCard(7,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub8 = new PubObjectiveCard(8,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub9 = new PubObjectiveCard(9,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
+        PubObjectiveCard pub10 = new PubObjectiveCard(10,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
 
         //SchemaCard's dice
         Die[] die = new Die[20];

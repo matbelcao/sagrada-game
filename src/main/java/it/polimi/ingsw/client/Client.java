@@ -5,13 +5,14 @@ import it.polimi.ingsw.client.connection.RMIClient;
 import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.client.connection.SocketClient;
 import it.polimi.ingsw.client.exceptions.GameStartedException;
+import it.polimi.ingsw.common.enums.ConnectionMode;
+import it.polimi.ingsw.common.enums.UIMode;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
-import it.polimi.ingsw.server.connection.UserStatus;
+import it.polimi.ingsw.common.enums.UserStatus;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,16 +32,11 @@ public class Client {
     private String username;
     private String password;
     private UserStatus userStatus;
-
     private ClientConn clientConn;
     private String serverIP;
     private Integer port;
     private ClientUI clientUI;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client"+ File.separator; //append class name + ".xml" to obtain complete path
-    private static final String LONG_OPTION="\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+)";
-    private static final String SHORT_OPTION="\\-[a-z]+";
-    private static final String IP_ADDRESS="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
-
 
     public Client() {
         File xmlFile= new File(XML_SOURCE+"ClientConf.xml");
@@ -62,6 +58,21 @@ public class Client {
             e1.printStackTrace();
         }
 
+    }
+
+    public void heartbeat(){
+        new Thread(() -> {
+            while(!userStatus.equals(UserStatus.DISCONNECTED)) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+                if(!clientConn.ping()){this.disconnect();}
+            }
+
+
+        }).start();
     }
 
     public Client(UIMode uiMode,ConnectionMode connMode,String serverIP){
@@ -136,14 +147,16 @@ public class Client {
 
     private void setupAndLogin(){
         boolean logged;
+
         if (uiMode==UIMode.CLI){
             clientUI=new CLI(this);
         }else{
             System.out.println("Launchin GUI (not again implemented....");
             //clientUI=new GUI(this);
         }
-
         setupConnection();
+        userStatus=UserStatus.CONNECTED;
+        if(connMode.equals(ConnectionMode.SOCKET)){ heartbeat();}
         do{
             clientUI.loginProcedure();
             if(connMode.equals(ConnectionMode.RMI)){

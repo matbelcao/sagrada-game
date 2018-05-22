@@ -1,7 +1,7 @@
-package it.polimi.ingsw.server.model.immutables;
+package it.polimi.ingsw.common.immutables;
 
-import it.polimi.ingsw.server.model.enums.Color;
-import it.polimi.ingsw.server.model.enums.Face;
+import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.Face;
 
 /**
  * This class offers a "lighter" version of the Die by limiting the interaction with the die to the Getters only
