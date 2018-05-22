@@ -6,5 +6,5 @@ import java.rmi.RemoteException;
 
         public boolean authenticate(String userName, String password) throws RemoteException ;
 
-        void updateConnected(String username);
+        void updateConnected(String username) throws RemoteException;
     }

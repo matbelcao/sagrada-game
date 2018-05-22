@@ -110,8 +110,10 @@ public class Client {
     public void setPassword(String password) { this.password = password; }
 
     public boolean setupConnection(){
-        if(connMode.equals(ConnectionMode.SOCKET))clientConn=  new SocketClient(serverIP,port);
-        cli.updateConnection();
+        if(connMode.equals(ConnectionMode.SOCKET)) {
+            clientConn = new SocketClient(serverIP, port);
+            cli.updateConnection(); //not correct for RMI, the connection can only  be established after login
+        }
         return connMode.equals(ConnectionMode.RMI)? loginRMI(): loginSocket() ;
     }
 
