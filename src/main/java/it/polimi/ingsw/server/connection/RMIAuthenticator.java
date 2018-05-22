@@ -34,4 +34,12 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
         }
         return logged;
     }
+
+    @Override
+    public void updateConnected(String username){
+        MasterServer master = MasterServer.getMasterServer();
+        //aggingere controllo che user non sia playing
+        master.updateConnected(master.getUser(username));
+    }
+
 }

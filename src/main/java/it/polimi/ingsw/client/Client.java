@@ -174,6 +174,7 @@ public class Client {
                //a remote reference is passed so there's no need to add rmiClient to a Registry
                RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiClient, 0);
                rmiConnStub.setClientReference(remoteRef);
+                authenticator.updateConnected(username);
                return true;
             }
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
