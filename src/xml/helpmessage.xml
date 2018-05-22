@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<!-- client help message -->
+
+<message>
+    <help-message>
+        Welcome to Sagrada!
+        Usage:
+        -h/--help                               Get this help message
+        -a/--server-address ipv4_address        Set the ip address of the server
+        -s/--additional-schemas                 Choose to play with additional schemas
+        -t/--turn-time time_in_seconds          Set the maximum time for a turn
+        -l/--lobby-time time_in_seconds         Set the lobby timer length
+        By choosing no options default options will be set:
+        ip:                 127.0.0.1
+    </help-message>
+</message>
