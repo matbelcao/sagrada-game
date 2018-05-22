@@ -113,7 +113,7 @@ public class Client {
 
     public void setupConnection(){
         if(connMode.equals(ConnectionMode.SOCKET)) {
-            clientConn = new SocketClient(serverIP, port);
+            clientConn = new SocketClient(this,serverIP, port);
             clientUI.updateConnection(); //not correct for RMI, the connection can only  be established after login
         }
     }
@@ -189,9 +189,11 @@ public class Client {
         clientUI.updateConnectionClosed();
     }
 
-    private void disconnect(){
-
+    public void disconnect(){
+        userStatus=UserStatus.DISCONNECTED;
+        clientUI.updateConnectionBroken();
     }
+
 
     private boolean loginRMI(){
         try {

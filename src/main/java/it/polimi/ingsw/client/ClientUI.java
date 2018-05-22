@@ -15,4 +15,6 @@ public interface ClientUI {
     public void updateGameStart(int numUsers, int playerId);
 
     public void updateConnectionClosed();
+
+    public void updateConnectionBroken();
 }

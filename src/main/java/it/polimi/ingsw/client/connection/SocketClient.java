@@ -13,8 +13,9 @@ public class SocketClient extends Thread implements ClientConn {
     private Socket socket;
     private BufferedReader inSocket;
     private PrintWriter outSocket;
+    Client client;
 
-    public SocketClient(String address, int port){
+    public SocketClient(Client client,String address, int port){
         try {
             socket = new Socket(address, port);
             inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -27,8 +28,13 @@ public class SocketClient extends Thread implements ClientConn {
     private String readBuffer(){
         try {
             return inSocket.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | NullPointerException e) {
+            try {
+                socket.close();
+                client.disconnect();
+            } catch (IOException | NullPointerException e1) {
+                e1.printStackTrace();
+            }
         }
         return "";
     }

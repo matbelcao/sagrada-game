@@ -42,4 +42,9 @@ public class GUI implements ClientUI {
     public void updateConnectionClosed() {
 
     }
+
+    @Override
+    public void updateConnectionBroken() {
+
+    }
 }
