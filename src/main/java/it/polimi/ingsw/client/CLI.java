@@ -1,5 +1,7 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.server.connection.Validator;
+
 import java.io.*;
 
 public class CLI implements ClientUI{
@@ -25,18 +27,14 @@ public class CLI implements ClientUI{
         String password;
         //clearCLI();
         try {
-            do{
-                outCli.printf("\nUSERNAME: ");
-                username = inKeyboard.readLine();
-                outCli.printf("\nPASSWORD: ");
-                password = inKeyboard.readLine();
-                if(!username.contains(" ") && !password.contains(" ")){
-                    client.setPassword(password);
-                    client.setUsername(username);
-                }else{
-                    outCli.println("WRONG PASSWORD CHARACTERS! Please retry ...");
-                }
-            }while(client.getUsername()==null || client.getPassword()==null);
+            outCli.printf("\nUSERNAME: ");
+            username = inKeyboard.readLine();
+            outCli.printf("\nPASSWORD: ");
+            password = inKeyboard.readLine();
+
+            client.setPassword(password);
+            client.setUsername(username);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,9 +53,9 @@ public class CLI implements ClientUI{
 
     public void updateLogin(boolean logged) {
         if (logged) {
-            outCli.println("Successfully logged in as " + client.getUsername());
+            outCli.println("\nSuccessfully logged in as " + client.getUsername());
         } else {
-            outCli.println("Couldn't login correctly, please retry ...");
+            outCli.println("\nCouldn't login correctly, please retry ...");
         }
     }
 
