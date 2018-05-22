@@ -30,7 +30,7 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
                 logged = false;
                 user.quit();
             }
-            master.updateConnected(user);
+            //master.updateConnected(user);
         }
         return logged;
     }
