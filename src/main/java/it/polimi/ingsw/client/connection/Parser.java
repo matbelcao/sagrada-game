@@ -32,7 +32,7 @@ public class Parser {
         }
     }
 
-    private static boolean checkWelcome(String  rawCommand, List<String> parsedResult){
+    public static boolean checkWelcome(String  rawCommand, List<String> parsedResult){
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();
@@ -45,7 +45,7 @@ public class Parser {
         return true;
     }
 
-    private static boolean checkLoginParams(String  rawCommand, List<String> parsedResult){
+    public static boolean checkLoginParams(String  rawCommand, List<String> parsedResult){
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();

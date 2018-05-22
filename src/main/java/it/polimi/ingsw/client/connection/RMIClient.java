@@ -24,8 +24,15 @@ public class RMIClient implements ClientConn,RMIClientInt {
         }
     }
 
+
+
     @Override
     public boolean login(String username, String password) {
+        return false;
+    }
+
+    @Override
+    public boolean waitGreeting() {
         return false;
     }
 
