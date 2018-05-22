@@ -23,7 +23,7 @@ public class CLI {
     public void loginProcedure() {
         String username;
         String password;
-        clearCLI();
+        //clearCLI();
         try {
             outCli.printf("\nUSERNAME: ");
             username = inKeyboard.readLine();
@@ -39,6 +39,10 @@ public class CLI {
 
     }
 
+    public void lobbyProcedure(){
+
+    }
+
     public void updateLogin(boolean logged) {
         if (logged) {
             outCli.println("Successfully logged in as " + client.getUsername());
@@ -49,6 +53,14 @@ public class CLI {
 
     public void updateConnection() {
         outCli.println(client.getClientConn().getGreetings());
+    }
+
+    public void updateLobby(int num_users){
+        outCli.println("Lobby : " + num_users);
+    }
+
+    public void updateGameStart(int numUsers, int playerId){
+        outCli.println("Starting Match :" + numUsers + " " + playerId);
     }
 }
 

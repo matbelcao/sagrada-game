@@ -1,10 +1,12 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.exceptions.GameStartedException;
 import it.polimi.ingsw.server.connection.Validator;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class SocketClient extends Thread implements ClientConn {
     private Socket socket;
@@ -73,28 +75,40 @@ public class SocketClient extends Thread implements ClientConn {
 
 */
 
-
-    @Override
-    public boolean login(String username, String password) {
-        String command="";
-        outSocket.println("LOGIN " + username + " " + password);
-        outSocket.flush();
-        try{
-            command = inSocket.readLine();
-
-            return ClientParser.isLoginOk(command);
-
-        }catch ( IOException e ){e.printStackTrace();}
-        return false;
-    }
-
-    public String getGreetings(){
+    private String readBuffer(){
         try {
             return inSocket.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return "";
+    }
+
+    @Override
+    public boolean login(String username, String password) {
+        String command="";
+        outSocket.println("LOGIN " + username + " " + password);
+        outSocket.flush();
+        command = readBuffer();
+
+        return ClientParser.isLoginOk(command);
+
+    }
+
+    public String getGreetings(){
+        return readBuffer();
+    }
+
+    @Override
+    public int getLobby() throws GameStartedException {
+        ArrayList<String> parsedResult = new ArrayList<>();
+        String command="";
+        command = readBuffer();
+
+        if(ClientParser.isLoobbyMessage(command,parsedResult)){
+            return Integer.parseInt(parsedResult.get(1));
+        }
+        return 0;
     }
 
         @Override

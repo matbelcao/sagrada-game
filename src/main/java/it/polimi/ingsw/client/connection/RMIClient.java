@@ -31,6 +31,11 @@ public class RMIClient implements ClientConn,RMIClientInt {
         return false;
     }
 
+    @Override
+    public int getLobby() {
+        return 0;
+    }
+
 
     @Override
     public void getPrivateObj() {

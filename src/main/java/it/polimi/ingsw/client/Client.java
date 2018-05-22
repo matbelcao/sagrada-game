@@ -4,8 +4,10 @@ import it.polimi.ingsw.client.connection.ClientConn;
 import it.polimi.ingsw.client.connection.RMIClient;
 import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.client.connection.SocketClient;
+import it.polimi.ingsw.client.exceptions.GameStartedException;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
+import it.polimi.ingsw.server.connection.UserStatus;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -31,6 +33,8 @@ public class Client {
     private ConnectionMode connMode;
     private String username;
     private String password;
+    private UserStatus userStatus;
+
     private ClientConn clientConn;
     private String serverIP;
     private Integer port;
@@ -109,12 +113,11 @@ public class Client {
 
     public void setPassword(String password) { this.password = password; }
 
-    public boolean setupConnection(){
+    public void setupConnection(){
         if(connMode.equals(ConnectionMode.SOCKET)) {
             clientConn = new SocketClient(serverIP, port);
             cli.updateConnection(); //not correct for RMI, the connection can only  be established after login
         }
-        return connMode.equals(ConnectionMode.RMI)? loginRMI(): loginSocket() ;
     }
 
 
@@ -152,16 +155,31 @@ public class Client {
 
     }
 
-    public void login(){
+    public void setupAndLogin(){
         boolean logged;
         cli=new CLI(this);
-
+        setupConnection();
         do{
             cli.loginProcedure();
-            logged=setupConnection();
+            if(connMode.equals(ConnectionMode.RMI)){
+                logged=loginRMI();
+            }else{
+                logged=loginSocket();
+            }
             cli.updateLogin(logged);
         }while(!logged);
+        userStatus=UserStatus.LOBBY;
+    }
 
+    public void lobby(){
+        while(userStatus.equals(UserStatus.LOBBY)) {
+            try {
+                cli.updateLobby(clientConn.getLobby());
+            } catch (GameStartedException e) {
+                cli.updateGameStart(e.getNumPlayers(),e.getPlayerId());
+                userStatus = UserStatus.PLAYING;
+            }
+        }
     }
     private boolean loginRMI(){
         try {
@@ -312,9 +330,8 @@ public class Client {
             }
         }
 
-        client.login();
-
-
+        client.setupAndLogin();
+        client.lobby();
     }
 
 
