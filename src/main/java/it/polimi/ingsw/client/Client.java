@@ -177,9 +177,15 @@ public class Client {
     }
 
     private void lobby(){
+        int lobbySize=0;
         while(userStatus.equals(UserStatus.LOBBY)) {
             try {
-                clientUI.updateLobby(clientConn.getLobby());
+                if(connMode.equals(ConnectionMode.SOCKET)){
+                    clientUI.updateLobby(clientConn.getLobby());
+                }else if(lobbySize!=clientConn.getLobby()){
+                    lobbySize=clientConn.getLobby();
+                    clientUI.updateLobby(lobbySize);
+                }
             } catch (GameStartedException e) {
                 clientUI.updateGameStart(e.getNumPlayers(),e.getPlayerId());
                 userStatus = UserStatus.PLAYING;
