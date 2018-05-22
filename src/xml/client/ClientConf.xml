@@ -6,7 +6,7 @@
     <!-- default configuration -->
         <address>127.0.0.1</address>
         <connectionMode>SOCKET</connectionMode>
-        <UI>GUI</UI>
+        <UI>CLI</UI>
         <portRMI>1099</portRMI>
         <portSocket>3000</portSocket>
 

@@ -156,11 +156,12 @@ public class Client {
 
     private void setupAndLogin(){
         boolean logged;
-        //if(uiMode==UIMode.CLI){
+        if (uiMode==UIMode.CLI){
             clientUI=new CLI(this);
-        /*}else{
-            clientUI=new GUI(this);
-        }*/
+        }else{
+            System.out.println("Launchin GUI (not again implemented....");
+            //clientUI=new GUI(this);
+        }
 
         setupConnection();
         do{

@@ -6,7 +6,6 @@ public class GUI implements ClientUI {
     public GUI(Client client){
         this.client = client;
         System.out.println("Created gui!!");
-        client.quit();
     }
 
     @Override
