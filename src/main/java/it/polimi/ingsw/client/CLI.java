@@ -25,13 +25,18 @@ public class CLI {
         String password;
         //clearCLI();
         try {
-            outCli.printf("\nUSERNAME: ");
-            username = inKeyboard.readLine();
-            outCli.printf("\nPASSWORD: ");
-            password = inKeyboard.readLine();
-
-            client.setPassword(password);
-            client.setUsername(username);
+            do{
+                outCli.printf("\nUSERNAME: ");
+                username = inKeyboard.readLine();
+                outCli.printf("\nPASSWORD: ");
+                password = inKeyboard.readLine();
+                if(!username.contains(" ") && !password.contains(" ")){
+                    client.setPassword(password);
+                    client.setUsername(username);
+                }else{
+                    outCli.println("WRONG PASSWORD CHARACTERS! Please retry ...");
+                }
+            }while(client.getUsername()==null || client.getPassword()==null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -39,8 +44,13 @@ public class CLI {
 
     }
 
-    public void lobbyProcedure(){
-
+    public String getCommand(){
+        try {
+            return inKeyboard.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public void updateLogin(boolean logged) {
@@ -60,7 +70,11 @@ public class CLI {
     }
 
     public void updateGameStart(int numUsers, int playerId){
-        outCli.println("Starting Match :" + numUsers + " " + playerId);
+        outCli.println("Starting Match : " + numUsers + " " + playerId);
+    }
+
+    public void updateConnectionClosed(){
+        outCli.println("Connection closed!");
     }
 }
 

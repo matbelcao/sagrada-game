@@ -60,6 +60,7 @@ public class Client {
             if(connMode.equals(ConnectionMode.RMI)){
                 this.port=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
             }else{ this.port=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent()); }
+            this.userStatus = UserStatus.DISCONNECTED;
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
         }
@@ -150,12 +151,10 @@ public class Client {
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
         }
-
         out.print(message);
-
     }
 
-    public void setupAndLogin(){
+    private void setupAndLogin(){
         boolean logged;
         cli=new CLI(this);
         setupConnection();
@@ -171,7 +170,7 @@ public class Client {
         userStatus=UserStatus.LOBBY;
     }
 
-    public void lobby(){
+    private void lobby(){
         while(userStatus.equals(UserStatus.LOBBY)) {
             try {
                 cli.updateLobby(clientConn.getLobby());
@@ -181,6 +180,27 @@ public class Client {
             }
         }
     }
+
+    private void match(){
+        while(userStatus.equals(UserStatus.PLAYING)) {
+            if (cli.getCommand().equals("QUIT")){
+                quit();
+            }
+        }
+    }
+
+
+
+    private void quit(){
+        clientConn.quit();
+        userStatus=UserStatus.DISCONNECTED;
+        cli.updateConnectionClosed();
+    }
+
+    private void disconnect(){
+
+    }
+
     private boolean loginRMI(){
         try {
             AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
@@ -332,6 +352,7 @@ public class Client {
 
         client.setupAndLogin();
         client.lobby();
+        client.match();
     }
 
 

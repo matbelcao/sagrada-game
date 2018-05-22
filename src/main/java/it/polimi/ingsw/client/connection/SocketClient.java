@@ -6,6 +6,7 @@ import it.polimi.ingsw.server.connection.Validator;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 public class SocketClient extends Thread implements ClientConn {
@@ -111,7 +112,17 @@ public class SocketClient extends Thread implements ClientConn {
         return 0;
     }
 
-        @Override
+    public void quit(){
+        outSocket.println("QUIT");
+        outSocket.flush();
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void getPrivateObj() {
 
     }

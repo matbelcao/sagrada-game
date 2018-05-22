@@ -13,6 +13,8 @@ public interface ClientConn {
 
     public int getLobby() throws GameStartedException;
 
+    public void quit();
+
     /**
      * This method asks the server for the private objective of the user
      */
