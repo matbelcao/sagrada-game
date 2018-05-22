@@ -32,6 +32,9 @@ public class ClientOptionsTest {
         args=" --rmi --socket ";
         assertThrows(IllegalArgumentException.class,()-> ClientOptions.getOptions(Validator.simpleParse(args)));
 
+        args=" -sg --socket ";
+        assertThrows(IllegalArgumentException.class,()-> ClientOptions.getOptions(Validator.simpleParse(args)));
+
         args=" -a --gui";
         assertThrows(IllegalArgumentException.class,()-> ClientOptions.getOptions(Validator.simpleParse(args)));
 

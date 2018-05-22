@@ -15,10 +15,10 @@ import java.util.List;
 import static java.lang.System.out;
 
 public class ServerOptions {
-    private static final String LONG_OPTION="\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+)";
-    private static final String SHORT_OPTION="\\-[a-z]+";
-    private static final String IP_ADDRESS="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
-    private static final String SECONDS="([1-9][0-9])|[1-9]|([1-9][0-9][0-9])";
+    private static final String LONG_OPTION="(\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+))";
+    private static final String SHORT_OPTION="\\-[haAtl]+";
+    private static final String IP_ADDRESS="(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$)";
+    private static final String SECONDS="(([1-9][0-9])|[1-9]|([1-9][0-9][0-9]))";
 
 
     public static void printHelpMessage(){
@@ -49,24 +49,56 @@ public class ServerOptions {
     public static List<String> getOptions(String[] args){
         ArrayList<String> options= new ArrayList<>();
         int index;
-        for(index=0;index< args.length;index++){
-            String option=args[index];
+        try {
+            for (index = 0; index < args.length; index++) {
+                String option = args[index];
 
-            if(option.matches(LONG_OPTION)){
-                checkLongOptions(args, options, index, option);
+                if (!option.matches(LONG_OPTION + "|" + SHORT_OPTION + "|" + IP_ADDRESS + "|" + SECONDS)) {
+                    throw new IllegalArgumentException();
+                }
+
+                if (option.matches(LONG_OPTION)) {
+                    checkLongOptions(args, options, index, option);
+                }
+                if (option.matches(SHORT_OPTION)) {
+                    checkShortOptions(args, options, index, option);
+                }
+                if (option.matches(IP_ADDRESS)) {
+                    checkIPOption(options, option);
+                }
+                if (option.matches(SECONDS)) {
+                    checkSecondsOption(options, option);
+                }
             }
-            if(option.matches(SHORT_OPTION)){
-
-                checkShortOptions(args, options, index, option);
-
-            }
+        }catch (IllegalArgumentException e){
+            options.clear();
+            throw new IllegalArgumentException();
         }
-
-        checkValidCombinations(options);
-
         return options;
     }
 
+    /**
+     * checks if the seconds param is correctly placed in the command
+     * @param options the list of options that have been parsed until now
+     * @param time the parameter to be checked
+     */
+    private static void checkSecondsOption(ArrayList<String> options, String time) {
+        if(options.get(options.size()-1).equals("t") || options.get(options.size()-1).equals("l")){
+            options.add(time);
+        }else{ throw new IllegalArgumentException();}
+    }
+
+    /**
+     * checks if the ip is in a valid position in the command
+     * @param options the list of options that have been parsed until now
+     * @param ip the option (ip) to be checked
+     */
+    private static void checkIPOption(ArrayList<String> options, String ip) {
+        if(options.get(options.size()-1).equals("a")){
+            options.add(ip);
+        }else{ throw new IllegalArgumentException();}
+
+    }
     /**
      * Checks if the command-line arguments that are double-dashed options are valid and not repetitions
      * @param args the command line args
@@ -81,25 +113,31 @@ public class ServerOptions {
                 if(options.contains("a")){ throw new IllegalArgumentException(); }
                 if(args[index+1].matches(IP_ADDRESS)){
                     options.add("a");
-                    options.add(args[index+1]);
                 }else { throw new IllegalArgumentException(); }
                 break;
+
             case "--turn-time":
                 if(options.contains("t")){ throw new IllegalArgumentException(); }
                 if(args[index+1].matches(SECONDS)){
                     options.add("t");
-                    options.add(args[index+1]);
                 }else { throw new IllegalArgumentException(); }
                 break;
+
             case "--lobby-time":
                 if(options.contains("l")){ throw new IllegalArgumentException(); }
                 if(args[index+1].matches(SECONDS)){
                     options.add("l");
-                    options.add(args[index+1]);
                 }else { throw new IllegalArgumentException(); }
                 break;
+
+            case "--additional-schemas":
+                if(options.contains("A")){ throw new IllegalArgumentException(); }
+                    options.add("A");
+                break;
+
             case "--help":
-                printHelpMessage();
+                if(options.contains("h")){ throw new IllegalArgumentException(); }
+                options.add("h");
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -119,46 +157,58 @@ public class ServerOptions {
         i=1;
         while(i < option.length()){
             shortOption=option.substring(i,i+1);
-            if(shortOption.matches("[hastl]")){
+            //invalid option
+            if(!shortOption.matches("[haAtl]")){ throw new IllegalArgumentException(); }
 
-                if(options.contains(shortOption)){ throw new IllegalArgumentException(); }
+            //option already set
+            if(options.contains(shortOption)){ throw new IllegalArgumentException(); }
+
+            //options without parameters
+            if(shortOption.matches("[Ah]")){
                 options.add(shortOption);
-            }else if(shortOption.equals("a") && i==option.length()-1){
-                if(args.length>index+1 && args[index+1].matches(IP_ADDRESS)){
-                    options.add("a");
-                    options.add(args[index+1]);
-                }else {
-                    throw new IllegalArgumentException();
-                }
-            } else if (shortOption.equals("t") && i==option.length()-1) {
-                if(args.length>index+1 && args[index+1].matches(SECONDS)){
-                    options.add("t");
-                    options.add(args[index+1]);
-                }else {
-                    throw new IllegalArgumentException();
-                }
-
-            }else if (shortOption.equals("g") && i==option.length()-1) {
-                if (args.length > index + 1 && args[index + 1].matches(SECONDS)) {
-                    options.add("g");
-                    options.add(args[index + 1]);
-                } else {
-                    throw new IllegalArgumentException();
-                }
             }else {
-                throw new IllegalArgumentException();
+                //options with parameters
+                if (isLastShortOption(option, i)) {
+                    if (shortOption.equals("a")) {
+                        if ((args.length > (index + 1)) && args[index + 1].matches(IP_ADDRESS)) {
+                            options.add("a");
+                            return;
+                        }
+                        throw new IllegalArgumentException();
+                    }
+
+                    if (shortOption.equals("t")) {
+                        if ((args.length > (index + 1)) && args[index + 1].matches(SECONDS)) {
+                            options.add("t");
+                            return;
+                        }
+                        throw new IllegalArgumentException();
+                    }
+
+                    if (shortOption.equals("l")) {
+                        if ((args.length > (index + 1)) && args[index + 1].matches(SECONDS)) {
+                            options.add("l");
+                            return;
+                        }
+                        throw new IllegalArgumentException();
+                    }
+
+                }
             }
             i++;
         }
     }
 
-    private static void checkValidCombinations(ArrayList<String> options) {
-        if( (options.contains("r")&& options.contains("s"))||(options.contains("g") && options.contains("c")) || (options.contains("h")&& options.size()>1) ){
-            throw new IllegalArgumentException();
-        }
+    private static boolean isLastShortOption(String option, int i) {
+        return i==option.length()-1;
     }
 
     public static void setServerPreferences(ArrayList<String> options, MasterServer server) {
+        if(options.contains("A")){ server.setAdditionalSchemas(true);}
+        if(options.contains("a")){ server.setIpAddress(options.get(options.indexOf("a")+1));}
+        if(options.contains("t")){ server.setTimeGame(Integer.parseInt(options.get(options.indexOf("t")+1)));}
+        if(options.contains("l")){ server.setTimeLobby((Integer.parseInt(options.get(options.indexOf("l")+1))));}
+
 
     }
 }

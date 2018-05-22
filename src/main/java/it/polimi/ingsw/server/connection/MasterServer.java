@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.connection;
 import it.polimi.ingsw.common.enums.UserStatus;
+import it.polimi.ingsw.server.ServerOptions;
 import it.polimi.ingsw.server.model.Game;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -10,6 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -33,7 +35,7 @@ public class MasterServer{
     private boolean additionalSchemas; //to be used for additional schemas FA
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"server"+File.separator; //append class name + ".xml" to obtain complete path
     private int timeLobby;
-    public static int timeGame;
+    private int timeGame;
     private final ArrayList <User> users;
     private final ArrayList <User> lobby;
     private final ArrayList <Game> games;
@@ -85,6 +87,21 @@ public class MasterServer{
         return portSocket;
     }
 
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public void setAdditionalSchemas(boolean additionalSchemas) {
+        this.additionalSchemas = additionalSchemas;
+    }
+
+    public void setTimeLobby(int timeLobby) {
+        this.timeLobby = timeLobby;
+    }
+
+    public void setTimeGame(int timeGame) {
+        this.timeGame = timeGame;
+    }
 
     /**
      * This is the getter of the MasterServer
@@ -359,9 +376,27 @@ public class MasterServer{
     }
 
     public static void main(String[] args){
-        MasterServer.getMasterServer().startRMI();
-        MasterServer.getMasterServer().startSocket();
-        MasterServer.getMasterServer().startHeartBeat();
+
+        ArrayList<String> options;
+        MasterServer server=MasterServer.getMasterServer();
+        if (args.length>0) {
+
+            try {
+                options = (ArrayList<String>) ServerOptions.getOptions(args);
+
+            } catch (IllegalArgumentException e) {
+                ServerOptions.printHelpMessage();
+                return;
+            }
+            if(options.contains("h")){
+                ServerOptions.printHelpMessage();
+            }else {
+                ServerOptions.setServerPreferences(options, server);
+            }
+        }
+        server.startRMI();
+        server.startSocket();
+        server.startHeartBeat();
     }
 
 }

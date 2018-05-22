@@ -16,9 +16,9 @@ import java.util.List;
 import static java.lang.System.out;
 
 public class ClientOptions {
-    private static final String LONG_OPTION="\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+)";
-    private static final String SHORT_OPTION="\\-[a-z]+";
-    private static final String IP_ADDRESS="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
+    private static final String LONG_OPTION="(\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+))";
+    private static final String SHORT_OPTION="(\\-[hgcrsa]+)";
+    private static final String IP_ADDRESS="(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$)";
 
 
 
@@ -50,22 +50,45 @@ public class ClientOptions {
     public static List<String> getOptions(String[] args){
         ArrayList<String> options= new ArrayList<>();
         int index;
-        for(index=0;index< args.length;index++){
-            String option=args[index];
+        try {
+            for (index = 0; index < args.length; index++) {
+                String option = args[index];
 
-            if(option.matches(LONG_OPTION)){
-                checkLongOptions(args, options, index, option);
+                if (!option.matches(LONG_OPTION + "|" + SHORT_OPTION + "|" + IP_ADDRESS)) {
+                    throw new IllegalArgumentException();
+                }
+
+                if (option.matches(LONG_OPTION)) {
+                    checkLongOptions(args, options, index, option);
+                }
+                if (option.matches(SHORT_OPTION)) {
+                    checkShortOptions(args, options, index, option);
+                }
+                if (option.matches(IP_ADDRESS)) {
+                    checkIPOption(options, option);
+                }
+
             }
-            if(option.matches(SHORT_OPTION)){
-
-                checkShortOptions(args, options, index, option);
-
-            }
+        }catch (IllegalArgumentException e) {
+            options.clear();
+            throw new IllegalArgumentException();
         }
 
         checkValidCombinations(options);
 
         return options;
+    }
+
+    /**
+     * checks if the ip is in a valid position in the command
+     * @param options the list of options that have been parsed until now
+     * @param ip the option (ip) to be checked
+     */
+    private static void checkIPOption(ArrayList<String> options, String ip) {
+        if(options.get(options.size()-1).equals("a")){
+            options.add(ip);
+        }else{ throw new IllegalArgumentException();}
+
     }
 
     /**
@@ -88,7 +111,6 @@ public class ClientOptions {
                 if(options.contains("a")){ throw new IllegalArgumentException(); }
                 if(args[index+1].matches(IP_ADDRESS)){
                     options.add("a");
-                    options.add(args[index+1]);
                 }else { throw new IllegalArgumentException(); }
                 break;
             case "--help":
@@ -111,25 +133,39 @@ public class ClientOptions {
         String shortOption;
         i=1;
         while(i < option.length()){
-            shortOption=option.substring(i,i+1);
-            if(shortOption.matches("[hgcrs]")){
 
-                if(options.contains(shortOption)){ throw new IllegalArgumentException(); }
+            shortOption=option.substring(i,i+1);
+
+            //invalid option
+            if(!shortOption.matches("[hgcars]")){ throw new IllegalArgumentException(); }
+
+            //option already added
+            if(options.contains(shortOption)){ throw new IllegalArgumentException(); }
+
+            //options without parameters
+            if(shortOption.matches("[hgcrs]")){
                 options.add(shortOption);
-            }else if(shortOption.equals("a") && i==option.length()-1){
-                if(args.length>index+1 && args[index+1].matches(IP_ADDRESS)){
-                    options.add("a");
-                    options.add(args[index+1]);
-                }else {
+            }else {
+                if (isLastShortOption(option, i)) {
+                    //options with parameters
+                    if (shortOption.equals("a")) {
+                        if ((args.length > (index + 1)) && args[index + 1].matches(IP_ADDRESS)) {
+                            options.add("a");
+                            return;
+                        }
+                        throw new IllegalArgumentException();
+                    }
+                } else {
                     throw new IllegalArgumentException();
                 }
-            } else{
-                throw new IllegalArgumentException();
             }
             i++;
         }
     }
 
+    private static boolean isLastShortOption(String option, int i) {
+        return i==option.length()-1;
+    }
     private static void checkValidCombinations(ArrayList<String> options) {
         if( (options.contains("r")&& options.contains("s"))||(options.contains("g") && options.contains("c")) || (options.contains("h")&& options.size()>1) ){
             throw new IllegalArgumentException();
