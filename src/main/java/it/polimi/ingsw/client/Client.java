@@ -4,7 +4,6 @@ import it.polimi.ingsw.client.connection.ClientConn;
 import it.polimi.ingsw.client.connection.RMIClient;
 import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.client.connection.SocketClient;
-import it.polimi.ingsw.client.exceptions.GameStartedException;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UIMode;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
@@ -35,6 +34,7 @@ public class Client {
     private ConnectionMode connMode;
     private String username;
     private String password;
+    private int personalId;
     private UserStatus userStatus;
     private ClientConn clientConn;
     private String serverIP;
@@ -90,17 +90,11 @@ public class Client {
     }
 
     /**
-     * This method sets the wanted uimode and creates it
+     * This method sets the wanted uimode
      * @param uiMode the requested UI
      */
     void setUiMode(UIMode uiMode) {
         this.uiMode = uiMode;
-        if (uiMode==UIMode.CLI){
-            clientUI=new CLI(this);
-        }else{
-            System.out.println("Launching GUI (still not implemented....");
-            //clientUI=new GUI(this);
-        }
     }
 
     /**
@@ -164,13 +158,29 @@ public class Client {
         }).start();
     }
 
+
+
+    private void setup(){
+        if (uiMode.equals(UIMode.CLI)){
+            clientUI=new CLI(this);
+        }else{
+            System.out.println("Launching GUI (still not implemented....");
+            clientUI=new GUI(this);
+        }
+    }
+
+
     /**
      * This method sets up a connection accordingly to the selected mode and starts the login procedure to gather username and password of the user and try to login to the server.
      * If the login is successful the client will be put in the lobby where he will wait for the beginning of a new match
      */
-    private void connectAndLogin(){
+    private void coonectAndLogin(){
         boolean logged=false;
 
+        if(connMode.equals(ConnectionMode.SOCKET)){
+            clientConn = new SocketClient(this, serverIP, port);
+        }
+        clientUI.updateConnectionOk();
         userStatus=UserStatus.CONNECTED;
         if(connMode.equals(ConnectionMode.SOCKET)){ heartbeat();}
         do{
@@ -178,9 +188,8 @@ public class Client {
             if(connMode.equals(ConnectionMode.RMI)){
                 logged=loginRMI();
             }else{
-                logged=loginSocket();
+                logged=clientConn.login(username,password);
             }
-            clientUI.updateConnectionOk();
             clientUI.updateLogin(logged);
         }while(!logged);
         userStatus=UserStatus.LOBBY;
@@ -212,32 +221,19 @@ public class Client {
         return false;
     }
 
-    /**
-     * This method implements the login to the server via socket
-     * @return true iff the login had a positive result
-     */
-    private boolean loginSocket(){
-        clientConn = new SocketClient(this, serverIP, port);
-        return clientConn.login(username,password);
-    }
-
-
     private void lobby(){
-        int lobbySize=0;
         while(userStatus.equals(UserStatus.LOBBY)) {
-            try {
-                if(connMode.equals(ConnectionMode.SOCKET)){
-                    clientUI.updateLobby(clientConn.getLobby());
-                }else if(lobbySize!=clientConn.getLobby()){
-                    lobbySize=clientConn.getLobby();
-                    clientUI.updateLobby(lobbySize);
-                }
-            } catch (GameStartedException e) {
-                clientUI.updateGameStart(e.getNumPlayers(),e.getPlayerId());
-                userStatus = UserStatus.PLAYING;
-            }
+
         }
     }
+
+    public void updateGameStart(int numPlayers, int personalId){
+        clientUI.updateGameStart(numPlayers,personalId);
+        this.personalId=personalId;
+        userStatus=UserStatus.PLAYING;
+    }
+
+
 
     private void match(){
         while(userStatus.equals(UserStatus.PLAYING)) {
@@ -272,7 +268,8 @@ public class Client {
             }
         }
 
-        client.connectAndLogin();
+        client.setup();
+        client.coonectAndLogin();
         client.lobby();
         client.match();
     }

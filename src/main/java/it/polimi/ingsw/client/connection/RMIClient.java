@@ -1,7 +1,6 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.client.exceptions.GameStartedException;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 
 import java.rmi.RemoteException;
@@ -31,7 +30,7 @@ public class RMIClient implements ClientConn,RMIClientInt {
     }
 
 
-
+/*
     @Override
     public boolean login(String username, String password) {
         return false;
@@ -50,13 +49,18 @@ public class RMIClient implements ClientConn,RMIClientInt {
             e.printStackTrace();
         }
         return 0;
+    }*/
+
+
+    @Override
+    public boolean login(String username, String password) {
+        return false;
     }
 
     @Override
     public void quit() {
 
     }
-
 
     @Override
     public void getPrivateObj() {
@@ -106,11 +110,6 @@ public class RMIClient implements ClientConn,RMIClientInt {
     @Override
     public boolean ping() {
         return false;
-    }
-
-    @Override
-    public String getGreetings() {
-        return null;
     }
 
     //debugging methods

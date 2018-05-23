@@ -1,7 +1,5 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.client.exceptions.GameStartedException;
-
 public interface ClientConn {
     /**
      * This method tries to login by "sending" the user's credentials to the server who's then going to check whether the user can or can not login and will reply accordingly
@@ -11,8 +9,9 @@ public interface ClientConn {
      */
     public boolean login(String username,String password);
 
-    public int getLobby() throws GameStartedException;
-
+    /**
+     * This method tells the server the end of the session
+     */
     public void quit();
 
     /**
@@ -67,11 +66,4 @@ public interface ClientConn {
      * @return
      */
     public boolean ping();
-
-    /**
-     * This method is used in the initial phases of the login to gather the greeting message from the server
-     * @return the message itself
-     */
-    String getGreetings();
-    //...
 }

@@ -13,17 +13,9 @@ public class CLI implements ClientUI{
         outCli = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)), true);
     }
 
-
-    private void clearCLI() {
-        for (int i = 0; i < 50; i++) {
-            outCli.printf("\n");
-        }
-    }
-
     public void loginProcedure() {
         String username;
         String password;
-        //clearCLI();
         try {
 
                 outCli.printf("\nUSERNAME: ");
