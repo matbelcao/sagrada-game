@@ -22,17 +22,17 @@ public class RMIConnectionTest {
     //This test logs 9 clients and verifies if they get properly saved by the master server
     @Disabled
     @Test
-    public void orderedConnection(){
+    public void orderedConnection() {
         ArrayList<User> users;
-        Client c1 = new Client("CLI","RMI");
-        Client c2 = new Client("CLI","RMI");
-        Client c3 = new Client("CLI","RMI");
-        Client c4 = new Client("CLI","RMI");
-        Client c5 = new Client("CLI","RMI");
-        Client c6 = new Client("CLI","RMI");
-        Client c7 = new Client("CLI","RMI");
-        Client c8 = new Client("CLI","RMI");
-        Client c9 = new Client("CLI","RMI");
+        Client c1 = new Client("CLI", "RMI");
+        Client c2 = new Client("CLI", "RMI");
+        Client c3 = new Client("CLI", "RMI");
+        Client c4 = new Client("CLI", "RMI");
+        Client c5 = new Client("CLI", "RMI");
+        Client c6 = new Client("CLI", "RMI");
+        Client c7 = new Client("CLI", "RMI");
+        Client c8 = new Client("CLI", "RMI");
+        Client c9 = new Client("CLI", "RMI");
         c1.setUsername("a");
         c2.setUsername("b");
         c3.setUsername("c");
@@ -52,9 +52,9 @@ public class RMIConnectionTest {
         c8.setPassword("8");
         c9.setPassword("9");
 
-        assertEquals(0,server.getUsersSize());
+        assertEquals(0, server.getUsersSize());
         //connection of three clients
-        c1.setupConnection();
+        /*c1.setupConnection();
         assertTrue(server.getUsersSize()== 1);
         assertEquals(c1.getUsername(),MasterServer.getMasterServer().getUser(c1.getUsername()).getUsername());
         assertEquals("1",MasterServer.getMasterServer().getUser(c1.getUsername()).getPassword());
@@ -89,6 +89,6 @@ public class RMIConnectionTest {
         c8.setupConnection();
         assertTrue(server.getUsersSize()== 8);
         c9.setupConnection();
-        assertTrue(server.getUsersSize()== 9);
+        assertTrue(server.getUsersSize()== 9);*/
     }
 }

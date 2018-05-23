@@ -10,12 +10,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.System.out;
 
 public class ClientOptions {
+
+    private ClientOptions(){}
+
     private static final String LONG_OPTION="(\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+))";
     private static final String SHORT_OPTION="(\\-[hgcrsa]+)";
     private static final String IP_ADDRESS="(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$)";
@@ -70,12 +72,12 @@ public class ClientOptions {
                 }
 
             }
+
+        checkValidCombinations(options);
         }catch (IllegalArgumentException e) {
             options.clear();
             return false;
         }
-
-        checkValidCombinations(options);
 
         return true;
     }

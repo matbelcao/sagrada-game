@@ -60,9 +60,48 @@ public class Client {
 
     }
 
+    public Client(UIMode uiMode,ConnectionMode connMode){
+        this();
+        this.uiMode=uiMode;
+        this.connMode=connMode;
+    }
+
+
+    public Client(String uiMode,String connMode){
+        this();
+        this.uiMode=UIMode.valueOf(uiMode);
+        this.connMode=ConnectionMode.valueOf(connMode);
+    }
+
+    public void setUiMode(UIMode uiMode) { this.uiMode = uiMode; }
+
+    public void setConnMode(ConnectionMode connMode) { this.connMode = connMode; }
+
+    public void setServerIP(String serverIP) { this.serverIP = serverIP; }
+
+    public void setUsername(String username){ this.username = username; }
+
+    public void setPassword(String password) { this.password = password; }
+
+    public void setConnection(ClientConn clientConn){ this.clientConn = clientConn; }
+
+    public String getUsername() { return username; }
+
+    public String getPassword(){ return password; }
+
+    public ClientConn getClientConn(){ return clientConn; }
+
+    public ClientUI getClientUI(){return clientUI;}
+
+    public UIMode getUiMode() { return uiMode; }
+
+
+
+
     public void printMessage(String s){
         clientUI.printmsg(s);
     }
+
 
     public void heartbeat(){
         new Thread(() -> {
@@ -77,75 +116,6 @@ public class Client {
 
 
         }).start();
-    }
-
-    public Client(UIMode uiMode,ConnectionMode connMode,String serverIP){
-        this();
-        this.uiMode=uiMode;
-        this.connMode=connMode;
-        this.serverIP=serverIP;
-    }
-
-    public Client(UIMode uiMode,ConnectionMode connMode){
-        this();
-        this.uiMode=uiMode;
-        this.connMode=connMode;
-    }
-
-    public Client(String uiMode,String connMode,String serverIP){
-        this();
-        this.uiMode=UIMode.valueOf(uiMode);
-        this.connMode=ConnectionMode.valueOf(connMode);
-        this.serverIP=serverIP;
-    }
-
-    public Client(String uiMode,String connMode){
-        this();
-        this.uiMode=UIMode.valueOf(uiMode);
-        this.connMode=ConnectionMode.valueOf(connMode);
-    }
-
-
-    public void setUiMode(UIMode uiMode) {
-        this.uiMode = uiMode;
-    }
-
-    public void setConnMode(ConnectionMode connMode) {
-        this.connMode = connMode;
-    }
-
-    public void setServerIP(String serverIP) {
-        this.serverIP = serverIP;
-    }
-
-    public String getUsername() { return username; }
-
-    public String getPassword(){ return password; }
-
-    public void setUsername(String username){ this.username = username; }
-
-    public void setPassword(String password) { this.password = password; }
-
-    public void setupConnection(){
-        if(connMode.equals(ConnectionMode.SOCKET)) {
-            clientConn = new SocketClient(this,serverIP, port);
-            clientUI.updateConnection(); //not correct for RMI, the connection can only  be established after login
-        }
-    }
-
-
-
-    public void setConnection(ClientConn clientConn){
-        this.clientConn = clientConn;
-    }
-    public ClientConn getClientConn(){
-        return clientConn;
-    }
-
-    public ClientUI getClientUI(){return clientUI;}
-
-    public UIMode getUiMode() {
-        return uiMode;
     }
 
 
@@ -171,6 +141,39 @@ public class Client {
             clientUI.updateLogin(logged);
         }while(!logged);
         userStatus=UserStatus.LOBBY;
+    }
+
+    private void setupConnection(){
+        if(connMode.equals(ConnectionMode.SOCKET)) {
+            clientConn = new SocketClient(this,serverIP, port);
+            clientUI.updateConnection(); //not correct for RMI, the connection can only  be established after login
+        }
+    }
+
+    private boolean loginRMI(){
+        try {
+            AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
+            if(authenticator.authenticate(username,password)){
+                //get the stub of the remote object
+                RMIServerInt rmiConnStub = (RMIServerInt) Naming.lookup("rmi://"+serverIP+"/"+username+password);
+                //create RMIClient with the reference of the remote obj and assign it to the Client
+                RMIClientInt rmiClient  = new RMIClient(rmiConnStub);
+                clientConn = (RMIClient)rmiClient;
+                //create a remote reference of the obj rmiClient and pass it to the server.
+                //a remote reference is passed so there's no need to add rmiClient to a Registry
+                RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiClient, 0);
+                rmiConnStub.setClientReference(remoteRef);
+                authenticator.updateConnected(username);
+                return true;
+            }
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean loginSocket(){
+        return clientConn.login(username,password);
     }
 
     private void lobby(){
@@ -211,32 +214,6 @@ public class Client {
         clientUI.updateConnectionBroken();
     }
 
-
-    private boolean loginRMI(){
-        try {
-            AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
-            if(authenticator.authenticate(username,password)){
-               //get the stub of the remote object
-               RMIServerInt rmiConnStub = (RMIServerInt) Naming.lookup("rmi://"+serverIP+"/"+username+password);
-               //create RMIClient with the reference of the remote obj and assign it to the Client
-               RMIClientInt rmiClient  = new RMIClient(rmiConnStub);
-               clientConn = (RMIClient)rmiClient;
-               //create a remote reference of the obj rmiClient and pass it to the server.
-               //a remote reference is passed so there's no need to add rmiClient to a Registry
-               RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiClient, 0);
-               rmiConnStub.setClientReference(remoteRef);
-                authenticator.updateConnected(username);
-               return true;
-            }
-        } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    private boolean loginSocket(){
-        return clientConn.login(username,password);
-    }
 
     public static void main(String[] args){
         ArrayList<String> options=new ArrayList<>();

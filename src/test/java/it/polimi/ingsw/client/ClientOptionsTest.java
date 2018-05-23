@@ -14,10 +14,11 @@ public class ClientOptionsTest {
     public void testArgs(){
 
         args="   -h      ";
-        assertTrue(ClientOptions.getOptions(Validator.simpleParse(args)).contains("h"));
+        assertTrue(ClientOptions.getOptions(Validator.simpleParse(args),options));
+        assertTrue(options.contains("h"));
 
         args=" --socket   -ga  192.168.1.1";
-        options= (ArrayList<String>) ClientOptions.getOptions(Validator.simpleParse(args));
+        assertTrue(ClientOptions.getOptions(Validator.simpleParse(args),options));
 
         assertEquals("s",options.get(0));
         assertEquals("g",options.get(1));
@@ -25,23 +26,24 @@ public class ClientOptionsTest {
         assertEquals("192.168.1.1",options.get(3));
 
         args=" -g --gui";
-        assertThrows(IllegalArgumentException.class,()-> ClientOptions.getOptions(Validator.simpleParse(args)));
+        assertTrue(!ClientOptions.getOptions(Validator.simpleParse(args),options));
         args=" --gui -c";
-        assertThrows(IllegalArgumentException.class,()-> ClientOptions.getOptions(Validator.simpleParse(args)));
-
+        assertTrue(!ClientOptions.getOptions(Validator.simpleParse(args),options));
         args=" --rmi --socket ";
-        assertThrows(IllegalArgumentException.class,()-> ClientOptions.getOptions(Validator.simpleParse(args)));
-
+        assertTrue(!ClientOptions.getOptions(Validator.simpleParse(args),options));
         args=" -sg --socket ";
-        assertThrows(IllegalArgumentException.class,()-> ClientOptions.getOptions(Validator.simpleParse(args)));
-
+        assertTrue(!ClientOptions.getOptions(Validator.simpleParse(args),options));
         args=" -a --gui";
-        assertThrows(IllegalArgumentException.class,()-> ClientOptions.getOptions(Validator.simpleParse(args)));
 
+        assertTrue(!ClientOptions.getOptions(Validator.simpleParse(args),options));
 
+        ArrayList<String> options2=new ArrayList<>();
         args=" -r -g -a 192.168.1.2";
         String args2=" -rga 192.168.1.2";
-        assertEquals(ClientOptions.getOptions(Validator.simpleParse(args)),ClientOptions.getOptions(Validator.simpleParse(args2)));
+        assertTrue(ClientOptions.getOptions(Validator.simpleParse(args),options));
+        assertTrue(ClientOptions.getOptions(Validator.simpleParse(args2),options2));
+        assertEquals(options2,options);
+
 
 
 
