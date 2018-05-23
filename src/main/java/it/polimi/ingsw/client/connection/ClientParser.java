@@ -50,15 +50,29 @@ public class ClientParser {
         }
     }
 
-
+    /**
+     * This method checks if the LOGIN parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * @param parsedResult the parsed parameters of the command
+     * @return true iff the parameters are valid
+     */
     private static boolean checkLogin(List<String> parsedResult){
         return parsedResult.size() == 2;
     }
 
+    /**
+     * This method checks if the LOBBY parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * @param parsedResult the parsed parameters of the command
+     * @return true iff the parameters are valid
+     */
     private static boolean checkLobby(List<String> parsedResult){
         return parsedResult.size() == 2;
     }
 
+    /**
+     * This method checks if the GAME parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * @param parsedResult the parsed parameters of the command
+     * @return true iff the parameters are valid
+     */
     private static boolean checkGame(List<String> parsedResult){
         if(parsedResult.size()<3){return false;}
         switch(parsedResult.get(1)){
@@ -83,6 +97,11 @@ public class ClientParser {
         }
     }
 
+    /**
+     * This method checks if the SEND parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * @param parsedResult the parsed parameters of the command
+     * @return true iff the parameters are valid
+     */
     private static boolean checkSend(List<String> parsedResult){
         if(parsedResult.size()<3){return false;}
         if(parsedResult.get(1).equals("schema")||parsedResult.get(1).equals("schema_update")) {
@@ -100,6 +119,11 @@ public class ClientParser {
         return false;
     }
 
+    /**
+     * Tis method checks if the "SEND schema" parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * @param parsedResult the parsed parameters of the command
+     * @return true iff the parameters are valid
+     */
     private static boolean checkSendSchema(List<String> parsedResult) {
         for (int i = 2; i < parsedResult.size(); i++) {
             String[] args = parsedResult.get(i).split(",");
@@ -116,6 +140,11 @@ public class ClientParser {
         return true;
     }
 
+    /**
+     * Tis method checks if the "SEND xxxx" parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * @param parsedResult the parsed parameters of the command
+     * @return true iff the parameters are valid
+     */
     private static boolean checkCommaParametersLength(int validLength,List<String> parsedResult){
         for(int i=validLength;i<parsedResult.size();i++)
             if (parsedResult.get(i).split(",").length != 2) {
@@ -124,7 +153,11 @@ public class ClientParser {
         return true;
     }
 
-
+    /**
+     * This method checks if the LIST parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * @param parsedResult the parsed parameters of the command
+     * @return true iff the parameters are valid
+     */
     private static boolean checkList(List<String> parsedResult){
         if(parsedResult.size()<3){return false;}
         if(parsedResult.get(1).equals("schema")||parsedResult.get(1).equals("roundtrack")||parsedResult.get(1).equals("draftpool")) {
@@ -146,10 +179,20 @@ public class ClientParser {
         return parsedResult.get(1).equals("tool_details") && parsedResult.size() == 6;
     }
 
+    /**
+     * This method checks if the DISCARD parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * @param parsedResult the parsed parameters of the command
+     * @return true iff the parameters are valid
+     */
     private static boolean checkDiscard(List<String> parsedResult){
         return parsedResult.size() == 2;
     }
 
+    /**
+     * This method checks if the CHOICE parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * @param parsedResult the parsed parameters of the command
+     * @return true iff the parameters are valid
+     */
     private static boolean checkChoice(List<String> parsedResult){
         if(parsedResult.size()<2){return false;}
         if(parsedResult.get(2).equals("modified_die")){

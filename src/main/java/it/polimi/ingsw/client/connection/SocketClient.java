@@ -7,12 +7,22 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is the implementation of the SOCKET client-side connection methods
+ */
 public class SocketClient extends Thread implements ClientConn {
     private Socket socket;
     private BufferedReader inSocket;
     private PrintWriter outSocket;
     Client client;
 
+    /**
+     * Thi is the class constructor, it instantiates the new socket and the input/output buffers for the communications
+     * @param client the Client class reference
+     * @param address the server's IP address
+     * @param port the server's network port
+     * @throws IOException iff there are problems on contacting the server
+     */
     public SocketClient(Client client,String address, int port) throws IOException {
         this.client=client;
         socket = new Socket(address, port);
@@ -22,6 +32,10 @@ public class SocketClient extends Thread implements ClientConn {
         client.getClientUI().updateConnectionOk();
     }
 
+    /**
+     * This method generates a new thread that listens to the incoming messages of the socket and notifies their
+     * reception to the update method
+     */
     public void startListening(){
         new Thread(() -> {
             while(socket!=null) {
@@ -36,6 +50,10 @@ public class SocketClient extends Thread implements ClientConn {
         }).start();
     }
 
+    /**
+     * This method receives the server's message and calls the proper updateXxxx() method (providing the parsed command)
+     * @param rawCommand the server's message
+     */
     private void update(String rawCommand){
         ArrayList<String> parsedResult = new ArrayList<>();
 
@@ -64,6 +82,12 @@ public class SocketClient extends Thread implements ClientConn {
         }
     }
 
+    /**
+     * This methods provides the client-side login functionality to a socket connection
+     * @param username the username of the user trying to login
+     * @param password the password of the user
+     * @return true iff the user has been logged into the server
+     */
     @Override
     public boolean login(String username, String password) {
         ArrayList<String> parsedResult = new ArrayList<>();
@@ -84,6 +108,9 @@ public class SocketClient extends Thread implements ClientConn {
         return false;
     }
 
+    /**
+     * This method notifies the server of the closure of the communication and closes the socket.
+     */
     @Override
     public void quit(){
         outSocket.println("QUIT");
@@ -141,10 +168,18 @@ public class SocketClient extends Thread implements ClientConn {
 
     }
 
-    private void updateLobby(String outcome){
-        client.getClientUI().updateLobby(Integer.parseInt(outcome));
+    /**
+     * This method notifies to the view that the number of player in the lobby has changed
+     * @param lobbySize the new number of players
+     */
+    private void updateLobby(String lobbySize){
+        client.getClientUI().updateLobby(Integer.parseInt(lobbySize));
     }
 
+    /**
+     * This method notifies to the client that there has been a change in the status of the match
+     * @param outcomes the server's parsed message
+     */
     private void updateGame(List<String> outcomes){
         int i;
         switch(outcomes.get(1)){
@@ -173,6 +208,10 @@ public class SocketClient extends Thread implements ClientConn {
         }
     }
 
+    /**
+     * This method provides the ping functionality for the client-side hearthBreath thread
+     * @return false iff the connection has broken
+     */
     @Override
     public boolean ping() {
         try{

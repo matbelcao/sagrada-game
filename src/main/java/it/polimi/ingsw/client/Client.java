@@ -159,7 +159,9 @@ public class Client {
     }
 
 
-
+    /**
+     * This method instantiates the user interface
+     */
     private void setup(){
         if (uiMode.equals(UIMode.CLI)){
             clientUI=new CLI(this);
@@ -222,6 +224,9 @@ public class Client {
         return false;
     }
 
+    /**
+     * This method provides the lobby functionality. It remains in execution until the player is assigned to a match or decides to quit
+     */
     private void lobby(){
         while(userStatus.equals(UserStatus.LOBBY)) {
             if (clientUI.getCommand().equals("QUIT")){
@@ -229,7 +234,7 @@ public class Client {
             }
         }
     }
-
+    
     public void updateGameStart(int numPlayers, int personalId){
         clientUI.updateGameStart(numPlayers,personalId);
         this.personalId=personalId;
