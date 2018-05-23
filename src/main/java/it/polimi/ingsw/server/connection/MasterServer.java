@@ -11,7 +11,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -34,8 +33,8 @@ public class MasterServer{
     private int portSocket;
     private boolean additionalSchemas; //to be used for additional schemas FA
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"server"+File.separator; //append class name + ".xml" to obtain complete path
-    private int timeLobby;
-    private int timeGame;
+    private int lobbyTime;
+    private int turnTime;
     private final ArrayList <User> users;
     private final ArrayList <User> lobby;
     private final ArrayList <Game> games;
@@ -59,8 +58,8 @@ public class MasterServer{
             this.ipAddress=eElement.getElementsByTagName("address").item(0).getTextContent();
             this.portRMI=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
             this.portSocket=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent());
-            this.timeLobby=Integer.parseInt(eElement.getElementsByTagName("timeLobby").item(0).getTextContent());
-            this.timeGame=Integer.parseInt(eElement.getElementsByTagName("timeGame").item(0).getTextContent());
+            this.lobbyTime=Integer.parseInt(eElement.getElementsByTagName("timeLobby").item(0).getTextContent());
+            this.turnTime=Integer.parseInt(eElement.getElementsByTagName("timeGame").item(0).getTextContent());
             this.additionalSchemas=Boolean.parseBoolean(eElement.getElementsByTagName("additionalSchemas").item(0).getTextContent());
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
@@ -96,11 +95,11 @@ public class MasterServer{
     }
 
     public void setTimeLobby(int timeLobby) {
-        this.timeLobby = timeLobby;
+        this.lobbyTime = timeLobby;
     }
 
     public void setTimeGame(int timeGame) {
-        this.timeGame = timeGame;
+        this.turnTime = timeGame;
     }
 
     /**
@@ -179,9 +178,9 @@ public class MasterServer{
                         l.getServerConn().notifyLobbyUpdate(lobby.size());
                     }
                     if (lobby.size() == MIN_PLAYERS) {
-                        System.out.println("TIMER STARTING " + timeLobby + " sec");
+                        System.out.println("TIMER STARTING " + lobbyTime + " sec");
                         Timer timer = new Timer();
-                        timer.schedule(new LobbyHandler(), timeLobby * 1000);
+                        timer.schedule(new LobbyHandler(), lobbyTime * 1000);
                     }
                     if (lobby.size() == MAX_PLAYERS) {
                         this.updateLobby();
@@ -377,18 +376,10 @@ public class MasterServer{
 
     public static void main(String[] args){
 
-        ArrayList<String> options;
+        ArrayList<String> options=new ArrayList<>();
         MasterServer server=MasterServer.getMasterServer();
         if (args.length>0) {
-
-            try {
-                options = (ArrayList<String>) ServerOptions.getOptions(args);
-
-            } catch (IllegalArgumentException e) {
-                ServerOptions.printHelpMessage();
-                return;
-            }
-            if(options.contains("h")){
+            if(!ServerOptions.getOptions(args,options) || options.contains("h")){
                 ServerOptions.printHelpMessage();
             }else {
                 ServerOptions.setServerPreferences(options, server);

@@ -46,8 +46,9 @@ public class ServerOptions {
      * @return the list of options
      * @throws IllegalArgumentException if invalid options or combinations of options are found
      */
-    public static List<String> getOptions(String[] args){
-        ArrayList<String> options= new ArrayList<>();
+    public static boolean getOptions(String[] args,List<String> options){
+        if(options==null){ throw new IllegalArgumentException();}
+        options.clear();
         int index;
         try {
             for (index = 0; index < args.length; index++) {
@@ -72,9 +73,9 @@ public class ServerOptions {
             }
         }catch (IllegalArgumentException e){
             options.clear();
-            throw new IllegalArgumentException();
+            return false;
         }
-        return options;
+        return true;
     }
 
     /**
@@ -82,7 +83,7 @@ public class ServerOptions {
      * @param options the list of options that have been parsed until now
      * @param time the parameter to be checked
      */
-    private static void checkSecondsOption(ArrayList<String> options, String time) {
+    private static void checkSecondsOption(List<String> options, String time) {
         if(options.get(options.size()-1).equals("t") || options.get(options.size()-1).equals("l")){
             options.add(time);
         }else{ throw new IllegalArgumentException();}
@@ -93,7 +94,7 @@ public class ServerOptions {
      * @param options the list of options that have been parsed until now
      * @param ip the option (ip) to be checked
      */
-    private static void checkIPOption(ArrayList<String> options, String ip) {
+    private static void checkIPOption(List<String> options, String ip) {
         if(options.get(options.size()-1).equals("a")){
             options.add(ip);
         }else{ throw new IllegalArgumentException();}
@@ -106,7 +107,7 @@ public class ServerOptions {
      * @param index the index in the args array
      * @param option the option to be checked
      */
-    private static void checkLongOptions(String[] args, ArrayList<String> options, int index, String option) {
+    private static void checkLongOptions(String[] args, List<String> options, int index, String option) {
         switch(option){
 
             case "--server-address":
@@ -151,7 +152,7 @@ public class ServerOptions {
      * @param index the index in the args array
      * @param option the option/options to be checked
      */
-    private static void checkShortOptions(String[] args, ArrayList<String> options, int index, String option) {
+    private static void checkShortOptions(String[] args, List<String> options, int index, String option) {
         int i;
         String shortOption;
         i=1;
@@ -203,7 +204,7 @@ public class ServerOptions {
         return i==option.length()-1;
     }
 
-    public static void setServerPreferences(ArrayList<String> options, MasterServer server) {
+    public static void setServerPreferences(List<String> options, MasterServer server) {
         if(options.contains("A")){ server.setAdditionalSchemas(true);}
         if(options.contains("a")){ server.setIpAddress(options.get(options.indexOf("a")+1));}
         if(options.contains("t")){ server.setTimeGame(Integer.parseInt(options.get(options.indexOf("t")+1)));}

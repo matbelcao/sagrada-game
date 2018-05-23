@@ -47,8 +47,9 @@ public class ClientOptions {
      * @return the list of options
      * @throws IllegalArgumentException if invalid options or combinations of options are found
      */
-    public static List<String> getOptions(String[] args){
-        ArrayList<String> options= new ArrayList<>();
+    public static boolean getOptions(String[] args, List<String> options){
+        if(options==null){ throw new IllegalArgumentException();}
+        options.clear();
         int index;
         try {
             for (index = 0; index < args.length; index++) {
@@ -71,12 +72,12 @@ public class ClientOptions {
             }
         }catch (IllegalArgumentException e) {
             options.clear();
-            throw new IllegalArgumentException();
+            return false;
         }
 
         checkValidCombinations(options);
 
-        return options;
+        return true;
     }
 
     /**
@@ -84,7 +85,7 @@ public class ClientOptions {
      * @param options the list of options that have been parsed until now
      * @param ip the option (ip) to be checked
      */
-    private static void checkIPOption(ArrayList<String> options, String ip) {
+    private static void checkIPOption(List<String> options, String ip) {
         if(options.get(options.size()-1).equals("a")){
             options.add(ip);
         }else{ throw new IllegalArgumentException();}
@@ -98,7 +99,7 @@ public class ClientOptions {
      * @param index the index in the args array
      * @param option the option to be checked
      */
-    private static void checkLongOptions(String[] args, ArrayList<String> options, int index, String option) {
+    private static void checkLongOptions(String[] args, List<String> options, int index, String option) {
         switch(option){
             case "--gui":
             case "--cli":
@@ -128,7 +129,7 @@ public class ClientOptions {
      * @param index the index in the args array
      * @param option the option/options to be checked
      */
-    private static void checkShortOptions(String[] args, ArrayList<String> options, int index, String option) {
+    private static void checkShortOptions(String[] args, List<String> options, int index, String option) {
         int i;
         String shortOption;
         i=1;
@@ -172,7 +173,7 @@ public class ClientOptions {
         }
     }
 
-    public static void setClientPreferences(ArrayList<String> options, Client client) {
+    public static void setClientPreferences(List<String> options, Client client) {
         if(options.contains("r")){ client.setConnMode(ConnectionMode.RMI);}
         if(options.contains("s")){ client.setConnMode(ConnectionMode.SOCKET);}
         if(options.contains("g")){ client.setUiMode(UIMode.GUI);}

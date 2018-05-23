@@ -239,22 +239,13 @@ public class Client {
     }
 
     public static void main(String[] args){
-        ArrayList<String> options;
+        ArrayList<String> options=new ArrayList<>();
         Client client = new Client();
         if (args.length>0) {
-
-            try {
-                options = (ArrayList<String>) ClientOptions.getOptions(args);
-
-            } catch (IllegalArgumentException e) {
-                ClientOptions.printHelpMessage();
-                return;
-            }
-            if(options.contains("h")){
+            if(!ClientOptions.getOptions(args,options) || options.contains("h")){
                 ClientOptions.printHelpMessage();
             }else {
                 ClientOptions.setClientPreferences(options, client);
-
             }
         }
 
