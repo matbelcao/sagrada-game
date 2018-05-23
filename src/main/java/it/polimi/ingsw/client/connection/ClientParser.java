@@ -1,39 +1,165 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.client.exceptions.GameStartedException;
-import it.polimi.ingsw.server.connection.Validator;
-
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This class implements the static methods that is used to validate(and parse) the server-side socket messages.
+ */
 public class ClientParser {
 
-    /**
-     * This method is used by the client to check  whether the server responded with a LOGIN ok or a LOGIN ko
-     * @param command
-     * @return true iff LOGIN ok
-     */
-    public static boolean isLoginOk(String command) {
-        String [] parsed=Validator.simpleParse(command);
+    private ClientParser(){}
 
-        if(parsed[0].equals("LOGIN") ){
-            if(parsed[1].equals("ok")){ return true; }
-            if(parsed[1].equals("ko")){ return false; }
+    /**
+     * This method checks if parameters of a generic server-side command have a valid length
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters have a valid length
+     * @return true iff the parameters are valid
+     */
+    public static boolean parse(String rawCommand, List<String> parsedResult) {
+        if( rawCommand==null){ throw new IllegalArgumentException(); }
+        String[] command;
+        String keyword;
+
+        if(parsedResult==null){throw new IllegalArgumentException();}
+
+        command= rawCommand.trim().split("\\s+");
+        keyword = command[0];
+
+        parsedResult.addAll(Arrays.asList(command));
+
+        switch (keyword) {
+
+            case "LOGIN":
+                return checkLogin(parsedResult);
+            case "LOBBY":
+                return checkLobby(parsedResult);
+            case "GAME":
+                return checkGame(parsedResult);
+            case "SEND":
+                return checkSend(parsedResult);
+            case "LIST":
+                return checkList(parsedResult);
+            case "DISCARD":
+                return checkDiscard(parsedResult);
+            case "CHOICE":
+                return checkChoice(parsedResult);
+            default:
+                parsedResult.clear();
+                return false;
         }
-        throw new IllegalArgumentException();
     }
 
-    public static boolean isLoobbyMessage(String command, List<String> parsedResult) throws GameStartedException {
-        String [] parsed=Validator.simpleParse(command);
 
-        if(parsed.length==2 && parsed[0].equals("LOBBY")){
-            parsedResult.addAll(Arrays.asList(parsed));
+    private static boolean checkLogin(List<String> parsedResult){
+        return parsedResult.size() == 2;
+    }
+
+    private static boolean checkLobby(List<String> parsedResult){
+        return parsedResult.size() == 2;
+    }
+
+    private static boolean checkGame(List<String> parsedResult){
+        if(parsedResult.size()<3){return false;}
+        switch(parsedResult.get(1)){
+            case "start":
+                return parsedResult.size() == 4;
+            case "end":
+                for(int i=2;i<parsedResult.size();i++)
+                    if (parsedResult.get(i).split(",").length != 3) {
+                        return false;
+                    }
+                return true;
+            case "round_start":
+                return parsedResult.size() == 3;
+            case "round_end":
+                return parsedResult.size() == 3;
+            case "turn_start":
+                return parsedResult.size() == 4;
+            case "turn_end":
+                return parsedResult.size() == 4;
+            default:
+                return false;
+        }
+    }
+
+    private static boolean checkSend(List<String> parsedResult){
+        if(parsedResult.size()<3){return false;}
+        if(parsedResult.get(1).equals("schema")||parsedResult.get(1).equals("schema_update")) {
+            return checkSendSchema(parsedResult);
+        }
+        if(parsedResult.get(1).equals("priv")||parsedResult.get(1).equals("pub")||parsedResult.get(1).equals("tool")){
+            return parsedResult.size() == 6 || parsedResult.size() == 5;
+        }
+        if(parsedResult.get(1).equals("draftpool")||parsedResult.get(1).equals("roundtrack")||parsedResult.get(1).equals("roundtrack_update")){
+            return checkCommaParametersLength(3,parsedResult);
+        }
+        if(parsedResult.get(1).equals("players")){
+            return checkCommaParametersLength(2,parsedResult);
+        }
+        return false;
+    }
+
+    private static boolean checkSendSchema(List<String> parsedResult) {
+        for (int i = 2; i < parsedResult.size(); i++) {
+            String[] args = parsedResult.get(i).split(",");
+            if (args[0].equals("E") && args.length != 3) {
+                return false;
+            }
+            if (args[0].equals("D") && args.length != 5) {
+                return false;
+            }
+            if (args[0].equals("C") && args.length != 4) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean checkCommaParametersLength(int validLength,List<String> parsedResult){
+        for(int i=validLength;i<parsedResult.size();i++)
+            if (parsedResult.get(i).split(",").length != 2) {
+                return false;
+            }
+        return true;
+    }
+
+
+    private static boolean checkList(List<String> parsedResult){
+        if(parsedResult.size()<3){return false;}
+        if(parsedResult.get(1).equals("schema")||parsedResult.get(1).equals("roundtrack")||parsedResult.get(1).equals("draftpool")) {
+            for (int i = 2; i < parsedResult.size(); i++) {
+                if (parsedResult.get(i).split(",").length != 5) {
+                    return false;
+                }
+            }
             return true;
         }
-        if(parsed.length==4 && parsed[0].equals("GAME") && parsed[1].equals("start")){
-            throw new GameStartedException(Integer.parseInt(parsed[2]),Integer.parseInt(parsed[3]));
+        if(parsedResult.get(1).equals("placements")){
+            for (int i = 2; i < parsedResult.size(); i++) {
+                if (parsedResult.get(i).split(",").length != 2) {
+                    return false;
+                }
+            }
+            return true;
         }
-        throw new IllegalArgumentException();
+        return parsedResult.get(1).equals("tool_details") && parsedResult.size() == 6;
     }
 
+    private static boolean checkDiscard(List<String> parsedResult){
+        return parsedResult.size() == 2;
+    }
+
+    private static boolean checkChoice(List<String> parsedResult){
+        if(parsedResult.size()<2){return false;}
+        if(parsedResult.get(2).equals("modified_die")){
+            for (int i = 3; i < parsedResult.size(); i++) {
+                if (parsedResult.get(i).split(",").length != 2) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return parsedResult.get(2).equals("rerolled_dice") && parsedResult.size() == 3 ;
+    }
 }

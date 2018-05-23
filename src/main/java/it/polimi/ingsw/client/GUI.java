@@ -47,4 +47,9 @@ public class GUI implements ClientUI {
     public void updateConnectionBroken() {
 
     }
+
+    @Override
+    public void printmsg(String msg) {
+
+    }
 }

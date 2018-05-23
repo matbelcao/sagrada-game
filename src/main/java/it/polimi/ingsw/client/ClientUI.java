@@ -17,4 +17,7 @@ public interface ClientUI {
     public void updateConnectionClosed();
 
     public void updateConnectionBroken();
+
+    public void printmsg(String msg);
+
 }

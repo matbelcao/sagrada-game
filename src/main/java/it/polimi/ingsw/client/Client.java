@@ -60,6 +60,10 @@ public class Client {
 
     }
 
+    public void printMessage(String s){
+        clientUI.printmsg(s);
+    }
+
     public void heartbeat(){
         new Thread(() -> {
             while(!userStatus.equals(UserStatus.DISCONNECTED)) {

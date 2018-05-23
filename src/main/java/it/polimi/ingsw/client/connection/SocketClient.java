@@ -21,37 +21,39 @@ public class SocketClient extends Thread implements ClientConn {
             socket = new Socket(address, port);
             inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
+            startListening();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private String readBuffer(){
-        try {
-            return inSocket.readLine();
-        } catch (IOException | NullPointerException e) {
-            try {
-                socket.close();
-                client.disconnect();
-            } catch (IOException | NullPointerException e1) {
-                e1.printStackTrace();
+    public void startListening(){
+        new Thread(() -> {
+            while(socket!=null) {
+                try {
+                    if(inSocket.ready()){
+                        update(inSocket.readLine());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        return "";
+        }).start();
     }
 
-    @Override
-    public boolean login(String username, String password) {
-        String command="";
+    private void update(String rawCommand){
+        ArrayList<String> parsedResult = new ArrayList<>();
+
+        ClientParser.parse(rawCommand,parsedResult);
+    }
+
+
+    /*@Override
+    public void notifyLogin(String username, String password) {
         outSocket.println("LOGIN " + username + " " + password);
         outSocket.flush();
-        command = readBuffer();
-        try {
-            return ClientParser.isLoginOk(command);
-        }catch(IllegalArgumentException e){
-            return false;
-        }
     }
+
 
     public String getGreetings(){
         return readBuffer();
@@ -66,6 +68,16 @@ public class SocketClient extends Thread implements ClientConn {
         if(ClientParser.isLoobbyMessage(command,parsedResult)){
             return Integer.parseInt(parsedResult.get(1));
         }
+        return 0;
+    }*/
+
+    @Override
+    public boolean login(String username, String password) {
+        return false;
+    }
+
+    @Override
+    public int getLobby() throws GameStartedException {
         return 0;
     }
 
@@ -133,5 +145,10 @@ public class SocketClient extends Thread implements ClientConn {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String getGreetings() {
+        return null;
     }
 }

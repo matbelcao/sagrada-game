@@ -80,6 +80,10 @@ public class CLI implements ClientUI{
 
     public void updateConnectionBroken() {outCli.println("Connection broken!");
     }
+
+    public void printmsg(String msg){
+        outCli.println(msg);
+    }
 }
 
 
