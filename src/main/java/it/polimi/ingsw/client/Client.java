@@ -177,30 +177,33 @@ public class Client {
     private void coonectAndLogin(){
         boolean logged=false;
 
-        if(connMode.equals(ConnectionMode.SOCKET)){
-            clientConn = new SocketClient(this, serverIP, port);
-        }
-        clientUI.updateConnectionOk();
-        userStatus=UserStatus.CONNECTED;
-        if(connMode.equals(ConnectionMode.SOCKET)){ heartbeat();}
-        do{
-            clientUI.loginProcedure();
-            if(connMode.equals(ConnectionMode.RMI)){
-                logged=loginRMI();
-            }else{
-                logged=clientConn.login(username,password);
+        try {
+            userStatus = UserStatus.CONNECTED;
+            if (connMode.equals(ConnectionMode.SOCKET)) {
+                clientConn = new SocketClient(this, serverIP, port);
+                heartbeat();
             }
-            clientUI.updateLogin(logged);
-        }while(!logged);
-        userStatus=UserStatus.LOBBY;
+            do {
+                clientUI.loginProcedure();
+                if (connMode.equals(ConnectionMode.RMI)) {
+                    logged = loginRMI();
+                } else {
+                    logged = clientConn.login(username, password);
+                }
+                clientUI.updateLogin(logged);
+            } while (!logged);
+            userStatus = UserStatus.LOBBY;
+        }catch(Exception e){
+            userStatus=UserStatus.DISCONNECTED;
+            clientUI.updateConnectionBroken();
+        }
     }
 
     /**
      * This method implements the login to the server via rmi
      * @return true iff the login had a positive result
      */
-    private boolean loginRMI(){
-        try {
+    private boolean loginRMI() throws RemoteException, MalformedURLException, NotBoundException {
             AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
             if(authenticator.authenticate(username,password)){
                 //get the stub of the remote object
@@ -212,18 +215,18 @@ public class Client {
                 //a remote reference is passed so there's no need to add rmiClient to a Registry
                 RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiClient, 0);
                 rmiConnStub.setClientReference(remoteRef);
+                clientUI.updateConnectionOk();
                 authenticator.updateConnected(username);
                 return true;
             }
-        } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            e.printStackTrace();
-        }
         return false;
     }
 
     private void lobby(){
         while(userStatus.equals(UserStatus.LOBBY)) {
-
+            if (clientUI.getCommand().equals("QUIT")){
+                quit();
+            }
         }
     }
 

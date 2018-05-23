@@ -13,28 +13,24 @@ public class SocketClient extends Thread implements ClientConn {
     private PrintWriter outSocket;
     Client client;
 
-    public SocketClient(Client client,String address, int port){
+    public SocketClient(Client client,String address, int port) throws IOException {
         this.client=client;
-        try {
-            socket = new Socket(address, port);
-            inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
-            inSocket.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        socket = new Socket(address, port);
+        inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
+        inSocket.readLine();
+        client.getClientUI().updateConnectionOk();
     }
 
     public void startListening(){
         new Thread(() -> {
-            //client.updateGreeting();
             while(socket!=null) {
                 try {
-                    if(inSocket.ready()){
+                    if(!socket.isClosed() && inSocket.ready()){
                         update(inSocket.readLine());
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException  | NullPointerException e) {
+                    socket=null;
                 }
             }
         }).start();
@@ -94,6 +90,7 @@ public class SocketClient extends Thread implements ClientConn {
         outSocket.flush();
         try {
             socket.close();
+            socket=null;
         } catch (IOException e) {
             e.printStackTrace();
         }
