@@ -61,9 +61,7 @@ public class CLI implements ClientUI{
         }
     }
 
-    public void updateConnection() {
-        outCli.println(client.getClientConn().getGreetings());
-    }
+    public void updateConnectionOk() { outCli.println("\nConnection established correctly!"); }
 
     public void updateLobby(int num_users){
         outCli.println("Lobby : " + num_users);

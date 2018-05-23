@@ -8,7 +8,7 @@ public interface ClientUI {
 
     public void updateLogin(boolean logged);
 
-    public void updateConnection();
+    public void updateConnectionOk();
 
     public void updateLobby(int num_users);
 

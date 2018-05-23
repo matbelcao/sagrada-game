@@ -73,7 +73,15 @@ public class Client {
         this.connMode=ConnectionMode.valueOf(connMode);
     }
 
-    public void setUiMode(UIMode uiMode) { this.uiMode = uiMode; }
+    public void setUiMode(UIMode uiMode) {
+        this.uiMode = uiMode;
+        if (uiMode==UIMode.CLI){
+            clientUI=new CLI(this);
+        }else{
+            System.out.println("Launching GUI (still not implemented....");
+            //clientUI=new GUI(this);
+        }
+    }
 
     public void setConnMode(ConnectionMode connMode) { this.connMode = connMode; }
 
@@ -119,16 +127,9 @@ public class Client {
     }
 
 
-    private void setupAndLogin(){
-        boolean logged;
+    private void connectAndLogin(){
+        boolean logged=false;
 
-        if (uiMode==UIMode.CLI){
-            clientUI=new CLI(this);
-        }else{
-            System.out.println("Launchin GUI (not again implemented....");
-            //clientUI=new GUI(this);
-        }
-        setupConnection();
         userStatus=UserStatus.CONNECTED;
         if(connMode.equals(ConnectionMode.SOCKET)){ heartbeat();}
         do{
@@ -138,16 +139,10 @@ public class Client {
             }else{
                 logged=loginSocket();
             }
+            clientUI.updateConnectionOk();
             clientUI.updateLogin(logged);
         }while(!logged);
         userStatus=UserStatus.LOBBY;
-    }
-
-    private void setupConnection(){
-        if(connMode.equals(ConnectionMode.SOCKET)) {
-            clientConn = new SocketClient(this,serverIP, port);
-            clientUI.updateConnection(); //not correct for RMI, the connection can only  be established after login
-        }
     }
 
     private boolean loginRMI(){
@@ -173,6 +168,7 @@ public class Client {
     }
 
     private boolean loginSocket(){
+        clientConn = new SocketClient(this, serverIP, port);
         return clientConn.login(username,password);
     }
 
@@ -226,7 +222,7 @@ public class Client {
             }
         }
 
-        client.setupAndLogin();
+        client.connectAndLogin();
         client.lobby();
         client.match();
     }

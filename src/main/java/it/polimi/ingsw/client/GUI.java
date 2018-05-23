@@ -24,7 +24,7 @@ public class GUI implements ClientUI {
     }
 
     @Override
-    public void updateConnection() {
+    public void updateConnectionOk() {
 
     }
 
