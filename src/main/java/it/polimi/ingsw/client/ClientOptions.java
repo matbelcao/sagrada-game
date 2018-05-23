@@ -167,7 +167,8 @@ public class ClientOptions {
     private static boolean isLastShortOption(String option, int i) {
         return i==option.length()-1;
     }
-    private static void checkValidCombinations(ArrayList<String> options) {
+
+    private static void checkValidCombinations(List<String> options) {
         if( (options.contains("r")&& options.contains("s"))||(options.contains("g") && options.contains("c")) || (options.contains("h")&& options.size()>1) ){
             throw new IllegalArgumentException();
         }
