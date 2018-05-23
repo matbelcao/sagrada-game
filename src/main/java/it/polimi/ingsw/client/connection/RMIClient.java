@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.connection;
 
+import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.client.exceptions.GameStartedException;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 
@@ -7,11 +8,13 @@ import java.rmi.RemoteException;
 
 public class RMIClient implements ClientConn,RMIClientInt {
     private RMIServerInt RMIconn;
+    private Client client;
     int size = 0;
     int id = 0;
 
-    public RMIClient(RMIServerInt RMIconn){
+    public RMIClient(RMIServerInt RMIconn, Client client){
         this.RMIconn = RMIconn;
+        this.client = client;
     }
 
     public RMIServerInt getRMIconn() {
