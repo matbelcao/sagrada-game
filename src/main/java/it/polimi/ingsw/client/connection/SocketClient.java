@@ -98,6 +98,7 @@ public class SocketClient extends Thread implements ClientConn {
             if (ClientParser.parse(inSocket.readLine(),parsedResult) && parsedResult.get(0).equals("LOGIN")) {
                 if(parsedResult.get(1).equals("ok")){
                     startListening();
+                    client.getClientUI().updateLogin(true);
                     return true;
                 }
             }
@@ -105,6 +106,7 @@ public class SocketClient extends Thread implements ClientConn {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        client.getClientUI().updateLogin(false);
         return false;
     }
 

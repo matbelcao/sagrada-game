@@ -35,7 +35,7 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
     @Override
     public void notifyLobbyUpdate(int n) {
         try {
-            clientReference.print("LOBBY "+n+"\n");
+            clientReference.updateLobby(n);
         } catch (RemoteException e) {
             user.disconnect();
         }
@@ -43,11 +43,11 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
 
     @Override//to delete
     public void notifyGameStart(int n, int id) {
-        try {
-            clientReference.updateId(n,id);
+       /* try {
+            //clientReference.updateId(n,id);
         } catch (RemoteException e) {
             user.disconnect();
-        }
+        }*/
     }
 
     @Override

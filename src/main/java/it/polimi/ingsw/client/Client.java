@@ -192,7 +192,6 @@ public class Client {
                 } else {
                     logged = clientConn.login(username, password);
                 }
-                clientUI.updateLogin(logged);
             } while (!logged);
             userStatus = UserStatus.LOBBY;
         }catch(Exception e){
@@ -218,9 +217,11 @@ public class Client {
                 RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiClient, 0);
                 rmiConnStub.setClientReference(remoteRef);
                 clientUI.updateConnectionOk();
+                clientUI.updateLogin(true);
                 authenticator.updateConnected(username);
                 return true;
             }
+        clientUI.updateLogin(false);
         return false;
     }
 
@@ -234,7 +235,7 @@ public class Client {
             }
         }
     }
-    
+
     public void updateGameStart(int numPlayers, int personalId){
         clientUI.updateGameStart(numPlayers,personalId);
         this.personalId=personalId;
