@@ -13,6 +13,7 @@ public class Board {
     private ArrayList<Player> players;
     private PubObjectiveCard[] publicObjectives;
     private ToolCard[] toolCards;
+    boolean additionalSchemas;
 
 
     public static final int NUM_OBJECTIVES=3;
@@ -21,7 +22,8 @@ public class Board {
     public static final int NUM_PLAYER_SCHEMAS=4;
 
 
-    public Board(List<User> users){
+    public Board(List<User> users, boolean additionalSchemas){
+        this.additionalSchemas=additionalSchemas;
         this.publicObjectives=draftPubObjectives();
         this.toolCards=draftToolCards();
 

@@ -25,20 +25,16 @@ public class Game extends Thread implements Iterable  {
      * @param additionalSchemas true if additional are wanted by the user
      */
     public Game(List<User> users,boolean additionalSchemas){
-        if(additionalSchemas){
-
-            // TODO: 21/05/2018
 
 
-            System.out.print("additional schemas");
-        }
         this.users= (ArrayList<User>) users;
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
             u.setGame(this);
             u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
         }
-        board=new Board(users);
+
+        board=new Board(users,additionalSchemas);
     }
 
     /**
@@ -159,7 +155,7 @@ public class Game extends Thread implements Iterable  {
      * Instantiates a new board for the match
      */
     public void createBoard(){
-        this.board= new Board(this.users);
+        this.board= new Board(this.users, additionalSchemas);
     }
 
     /**

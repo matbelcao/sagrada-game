@@ -144,7 +144,7 @@ public class Client {
 
     /**
      * This method launches a thread that periodically checks if the user is correctly connected towards the server
-     */
+
     public void heartbeat(){
         new Thread(() -> {
             while(!userStatus.equals(UserStatus.DISCONNECTED)) {
@@ -158,7 +158,7 @@ public class Client {
         }).start();
     }
 
-
+*/
     /**
      * This method instantiates the user interface
      */
@@ -176,14 +176,15 @@ public class Client {
      * This method sets up a connection accordingly to the selected mode and starts the login procedure to gather username and password of the user and try to login to the server.
      * If the login is successful the client will be put in the lobby where he will wait for the beginning of a new match
      */
-    private void coonectAndLogin(){
+    private void connectAndLogin(){
         boolean logged=false;
 
         try {
             userStatus = UserStatus.CONNECTED;
             if (connMode.equals(ConnectionMode.SOCKET)) {
                 clientConn = new SocketClient(this, serverIP, port);
-                heartbeat();
+
+                //heartbeat();
             }
             do {
                 clientUI.loginProcedure();
@@ -194,8 +195,8 @@ public class Client {
                 }
             } while (!logged);
             userStatus = UserStatus.LOBBY;
-        }catch(Exception e){
-            userStatus=UserStatus.DISCONNECTED;
+        } catch (IOException | NotBoundException e) {
+            userStatus = UserStatus.DISCONNECTED;
             clientUI.updateConnectionBroken();
         }
     }
@@ -225,21 +226,6 @@ public class Client {
         return false;
     }
 
-    /**
-     * This method provides the lobby functionality. It remains in execution until the player is assigned to a match or decides to quit
-     */
-    private void lobby(){
-        String command;
-        while(userStatus.equals(UserStatus.LOBBY)) {
-            command=clientUI.getCommand();
-            if (command.equals("QUIT")){
-                quit();
-            }
-            if(command.equals("TEST")){
-                clientUI.printmsg(clientConn.getPrivateObj().toString());
-            }
-        }
-    }
 
     public void updateGameStart(int numPlayers, int personalId){
         clientUI.updateGameStart(numPlayers,personalId);
@@ -250,9 +236,17 @@ public class Client {
 
 
     private void match(){
+        String command;
+        while(userStatus.equals(UserStatus.LOBBY)) {
+
+        }
         while(userStatus.equals(UserStatus.PLAYING)) {
-            if (clientUI.getCommand().equals("QUIT")){
+            command=clientUI.getCommand();
+            if (command.equals("QUIT")){
                 quit();
+            }
+            if(command.equals("TEST")){
+                clientUI.printmsg(clientConn.getPrivateObj().toString());
             }
         }
     }
@@ -283,8 +277,7 @@ public class Client {
         }
 
         client.setup();
-        client.coonectAndLogin();
-        client.lobby();
+        client.connectAndLogin();
         client.match();
     }
 

@@ -1,18 +1,20 @@
 package it.polimi.ingsw.server.connection;
 
+import it.polimi.ingsw.common.connection.QueuedInSocket;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is the implementation of the SOCKET server-side connection methods
  */
 public class SocketServer extends Thread implements ServerConn  {
     private Socket socket;
-    private BufferedReader inSocket;
+    private QueuedInSocket inSocket;
     private PrintWriter outSocket;
     private User user;
 
@@ -24,10 +26,11 @@ public class SocketServer extends Thread implements ServerConn  {
         this.user = user;
         this.socket = socket;
         try {
-            inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+            inSocket = new QueuedInSocket(new BufferedReader(new InputStreamReader(socket.getInputStream())));
+            outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
         start();
     }
@@ -38,14 +41,17 @@ public class SocketServer extends Thread implements ServerConn  {
     @Override
     public void run(){
         String command = "";
+        ArrayList<String> result= new ArrayList<>();
         boolean playing = true;
         while(playing){
             try {
-                command = inSocket.readLine();
-                playing = execute(command);
+                do {
+                    inSocket.add();
+                }while (inSocket.isEmpty());
+
+
             } catch (IOException | IllegalArgumentException e) {
                 user.disconnect();
-            }finally {
                 playing=false;
             }
         }
@@ -139,18 +145,23 @@ public class SocketServer extends Thread implements ServerConn  {
 
     @Override
     public boolean ping() {
-        /*try{
-            outSocket.print((char)0);
+        List<String> result= new ArrayList<>();
+        try{
+            outSocket.println("STATUS check");
             outSocket.flush();
+            inSocket.add();
+            if(Validator.checkAckParams(inSocket.getln(),result) && result.get(1).equals("status")){
+                return true;
+            }
         } catch (Exception e) {
             try {
                 socket.close();
             } catch (IOException x) {
                 e.printStackTrace();
             }
-            return false;
-        }*/
-        return true;
+
+        }
+        return false;
     }
 
 }

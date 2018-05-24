@@ -44,12 +44,59 @@ public class ClientParser {
                 return checkDiscard(parsedResult);
             case "CHOICE":
                 return checkChoice(parsedResult);
+            case "STATUS":
+                return checkStatus(parsedResult);
             default:
                 parsedResult.clear();
                 return false;
         }
     }
 
+
+
+    public static boolean isLogin(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("LOGIN");
+
+    }
+    public static boolean isLobby(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("LOBBY");
+
+    }
+    public static boolean isGame(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("GAME");
+
+    }
+    public static boolean isSend(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("SEND");
+
+    }
+    public static boolean isList(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("LIST");
+
+    }
+    public static boolean isDiscard(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("DISCARD");
+
+    }
+    public static boolean isChoice(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("CHOICE");
+
+    }
+    public static boolean isStatus(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("STATUS");
+
+    }
+    private static boolean checkStatus(List<String> parsedResult) {
+        return parsedResult.size() == 2||parsedResult.size() == 3;
+    }
     /**
      * This method checks if the LOGIN parameters have a correct number of arguments (nothing has been lost during the communication) and format
      * @param parsedResult the parsed parameters of the command

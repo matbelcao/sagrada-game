@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BoardTest {
     private static ArrayList<User> users1,users2;
     private static User u3,u6;
+    private static boolean additionalSchemas=false;
 
     @BeforeAll
     static void setUp(){
@@ -36,8 +37,8 @@ public class BoardTest {
 
     @Test
     void testBoardConstructor(){
-        Board board1=new Board(users1);
-        Board board2=new Board(users2);
+        Board board1=new Board(users1, additionalSchemas);
+        Board board2=new Board(users2, additionalSchemas);
 
 
         assertEquals(2, board1.getPlayer(u3).getGameId());
@@ -49,8 +50,8 @@ public class BoardTest {
 
     @Test
     void testDraftSchemas(){
-        Board board1=new Board(users1);
-        Board board2=new Board(users2);
+        Board board1=new Board(users1, additionalSchemas);
+        Board board2=new Board(users2, additionalSchemas);
 
         assertEquals(16,board1.draftSchemas().length);
         assertEquals(8,board2.draftSchemas().length);

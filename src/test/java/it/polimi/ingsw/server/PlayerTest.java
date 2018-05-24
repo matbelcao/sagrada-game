@@ -16,7 +16,7 @@ public class PlayerTest {
     private static User u1,u2;
     private static Board board;
     private static SchemaCard schema;
-
+    private static boolean additionalSchemas=false;
 
     @BeforeAll
     static void setUp() {
@@ -27,7 +27,7 @@ public class PlayerTest {
         users.add(u1);
         users.add(u2);
 
-        board = new Board(users);
+        board = new Board(users, additionalSchemas);
 
         schema = new SchemaCard(1, MasterServer.XML_SOURCE + "SchemaCard.xml");
     }
