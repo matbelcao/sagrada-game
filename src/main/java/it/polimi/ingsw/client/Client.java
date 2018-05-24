@@ -229,10 +229,14 @@ public class Client {
      * This method provides the lobby functionality. It remains in execution until the player is assigned to a match or decides to quit
      */
     private void lobby(){
+        String command;
         while(userStatus.equals(UserStatus.LOBBY)) {
-            if (clientUI.getCommand().equals("QUIT")){
-                clientUI.printmsg(clientConn.getPrivateObj().toString());
+            command=clientUI.getCommand();
+            if (command.equals("QUIT")){
                 quit();
+            }
+            if(command.equals("TEST")){
+                clientUI.printmsg(clientConn.getPrivateObj().toString());
             }
         }
     }

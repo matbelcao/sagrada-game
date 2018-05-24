@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class is the implementation of the SOCKET client-side connection methods
@@ -14,7 +15,8 @@ public class SocketClient extends Thread implements ClientConn {
     private Socket socket;
     private BufferedReader inSocket;
     private PrintWriter outSocket;
-    Client client;
+    private Client client;
+    private final ReentrantLock lock = new ReentrantLock();
 
     /**
      * Thi is the class constructor, it instantiates the new socket and the input/output buffers for the communications
@@ -39,14 +41,14 @@ public class SocketClient extends Thread implements ClientConn {
     public void startListening(){
         new Thread(() -> {
             while(socket!=null) {
-                synchronized (inSocket) {
-                    try {
-                        if (!socket.isClosed() && inSocket.ready()) {
-                            update(inSocket.readLine());
-                        }
-                    } catch (IOException | NullPointerException e) {
-                        socket = null;
+                try {
+                    lock.lock();
+                    if (!socket.isClosed() && inSocket.ready()) {
+                        update(inSocket.readLine());
                     }
+                    lock.unlock();
+                } catch (IOException | NullPointerException e) {
+                    socket = null;
                 }
             }
         }).start();
@@ -129,17 +131,19 @@ public class SocketClient extends Thread implements ClientConn {
 
     @Override
     public Integer getPrivateObj() {
-        Integer i= 3;
-        synchronized (inSocket) {
-            outSocket.println("ciao");
-            outSocket.flush();
+        Integer i = 3;
 
-            try {
-                i = Integer.parseInt(inSocket.readLine());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        lock.lock();
+        outSocket.println("ciao");
+        outSocket.flush();
+        System.out.println("Sequenza critica!!!");
+        /*try {
+            //i = Integer.parseInt(inSocket.readLine());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+        lock.unlock();
+        System.out.println("END critica!!!");
         return i;
     }
 

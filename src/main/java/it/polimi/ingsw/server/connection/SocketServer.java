@@ -42,11 +42,7 @@ public class SocketServer extends Thread implements ServerConn  {
         while(playing){
             try {
                 command = inSocket.readLine();
-                //playing = execute(command);
-                if(command.equals("ciao")){
-                    outSocket.println("2");
-                    outSocket.flush();
-                }
+                playing = execute(command);
             } catch (IOException | IllegalArgumentException e) {
                 user.disconnect();
             }finally {
@@ -82,7 +78,7 @@ public class SocketServer extends Thread implements ServerConn  {
                     return true;
             }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -143,7 +139,7 @@ public class SocketServer extends Thread implements ServerConn  {
 
     @Override
     public boolean ping() {
-        try{
+        /*try{
             outSocket.print((char)0);
             outSocket.flush();
         } catch (Exception e) {
@@ -153,7 +149,7 @@ public class SocketServer extends Thread implements ServerConn  {
                 e.printStackTrace();
             }
             return false;
-        }
+        }*/
         return true;
     }
 
