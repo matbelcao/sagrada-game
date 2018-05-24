@@ -33,6 +33,8 @@ public class RMIClient implements ClientConn,RMIClientInt {
         client.getClientUI().updateLobby(lobbySize);
     }
 
+    @Override
+    public void updateGameStart(int n, int id) throws RemoteException { client.getClientUI().updateGameStart(n,id); }
 
     @Override
     public boolean login(String username, String password) {
@@ -101,7 +103,5 @@ public class RMIClient implements ClientConn,RMIClientInt {
     }
 
     @Override
-    public boolean pong() throws RemoteException {
-        return true;
-    }
+    public boolean pong() throws RemoteException { return true; }
 }

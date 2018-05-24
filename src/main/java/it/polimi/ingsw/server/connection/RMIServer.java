@@ -41,13 +41,13 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
         }
     }
 
-    @Override//to delete
+    @Override
     public void notifyGameStart(int n, int id) {
-       /* try {
-            //clientReference.updateId(n,id);
+       try {
+            clientReference.updateGameStart(n,id);
         } catch (RemoteException e) {
             user.disconnect();
-        }*/
+        }
     }
 
     @Override
