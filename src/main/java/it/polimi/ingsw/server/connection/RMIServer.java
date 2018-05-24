@@ -19,19 +19,6 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
         this.clientReference = remoteRef;
     }
 
-    //debugging method, to be deleted
-    @Override
-    public void printToTerminal(String message) throws RemoteException {
-        MasterServer.getMasterServer().printMessage(message); //se è quello che intendevi
-        clientReference.print("message from the server");
-    }
-
-    @Override //remote
-    public int getLobby() throws RemoteException {
-        return MasterServer.getMasterServer().getLobby();
-    }
-
-
     @Override
     public void notifyLobbyUpdate(int n) {
         try {

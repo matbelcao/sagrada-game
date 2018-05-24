@@ -3,13 +3,9 @@ package it.polimi.ingsw.client.connection;
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 
-import java.rmi.RemoteException;
-
 public class RMIClient implements ClientConn,RMIClientInt {
     private RMIServerInt RMIconn;
     private Client client;
-    int size = 0;
-    int id = 0;
 
     public RMIClient(RMIServerInt RMIconn, Client client){
         this.RMIconn = RMIconn;
@@ -19,22 +15,14 @@ public class RMIClient implements ClientConn,RMIClientInt {
     public RMIServerInt getRMIconn() {
         return RMIconn;
     }
-//debugging methods
 
-    public void printToServer(String message) {
-        try {
-            RMIconn.printToTerminal(message);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
+    @Override
     public void updateLobby(int lobbySize){
         client.getClientUI().updateLobby(lobbySize);
     }
 
     @Override
-    public void updateGameStart(int n, int id) throws RemoteException { client.getClientUI().updateGameStart(n,id); }
+    public void updateGameStart(int n, int id) { client.getClientUI().updateGameStart(n,id); }
 
     @Override
     public boolean login(String username, String password) {
@@ -97,12 +85,6 @@ public class RMIClient implements ClientConn,RMIClientInt {
         return false;
     }
 
-    //debugging methods
     @Override
-    public void print(String message) {
-        System.out.print(message);
-    }
-
-    @Override
-    public boolean pong() throws RemoteException { return true; }
+    public boolean pong() { return true; }
 }

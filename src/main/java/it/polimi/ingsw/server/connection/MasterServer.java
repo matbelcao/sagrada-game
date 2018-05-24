@@ -110,10 +110,6 @@ public class MasterServer{
         if (instance == null) instance = new MasterServer();
         return instance;
     }
-
-    public int getLobby(){
-        return this.lobby.size();
-    }
     private static class LobbyHandler extends TimerTask {
         @Override
         public void run(){
