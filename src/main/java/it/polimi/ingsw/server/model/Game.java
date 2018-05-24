@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.model;
 
+import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
@@ -40,18 +41,19 @@ public class Game extends Thread implements Iterable  {
     /**
      * This method provides the execution order of the game flow
      */
-    /*@Override
+    @Override
     public void run(){
-        try {
-            sendSchemaCards();
-            Thread.sleep(MasterServer.timeGame*1000);
-            defaultSchemaCardAssignment();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+
+            /*sendSchemaCards();
+            Thread.sleep(MasterServer.getMasterServer().get*1000);
+            defaultSchemaCardAssignment();*/
+            notifyStartOfMatch();
 
 
-    }*/
+
+
+
+    }
 
     /**
      * Sends four schema cards for each user of the match
@@ -94,6 +96,13 @@ public class Game extends Thread implements Iterable  {
             if(player.getSchema()==null){
                 player.setSchema(draftedSchemas[users.indexOf(u)*Board.NUM_PLAYER_SCHEMAS]);
             }
+        }
+    }
+
+    private void notifyStartOfMatch(){
+        for(int i=0; i<users.size();i++){
+            users.get(i).setStatus(UserStatus.PLAYING);
+            users.get(i).getServerConn().notifyGameStart(users.size(),i);
         }
     }
 

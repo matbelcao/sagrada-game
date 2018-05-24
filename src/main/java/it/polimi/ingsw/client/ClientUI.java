@@ -4,8 +4,6 @@ public interface ClientUI {
 
     public void loginProcedure();
 
-    public String getCommand();
-
     public void updateLogin(boolean logged);
 
     public void updateConnectionOk();
@@ -20,4 +18,5 @@ public interface ClientUI {
 
     public void printmsg(String msg);
 
+    String getCommand();
 }

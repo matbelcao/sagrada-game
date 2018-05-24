@@ -1,15 +1,17 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.common.connection.QueuedInReader;
+
 import java.io.*;
 
 public class CLI implements ClientUI{
-    private BufferedReader inKeyboard;
+    private QueuedInReader inKeyboard;
     private PrintWriter outCli;
     private Client client;
 
     public CLI(Client client) {
         this.client = client;
-        inKeyboard = new BufferedReader(new InputStreamReader(System.in));
+        inKeyboard = new QueuedInReader(new BufferedReader(new InputStreamReader(System.in)));
         outCli = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)), true);
     }
 
@@ -18,16 +20,16 @@ public class CLI implements ClientUI{
         String password;
         try {
 
-                outCli.printf("\nUSERNAME: ");
+            outCli.printf("\nUSERNAME: ");
+            inKeyboard.add();
+            username = inKeyboard.getln();
 
-                username = inKeyboard.readLine();
+            outCli.printf("\nPASSWORD: ");
+            inKeyboard.add();
+            password = inKeyboard.getln();
 
-                outCli.printf("\nPASSWORD: ");
-
-                password = inKeyboard.readLine();
-
-                client.setPassword(password);
-                client.setUsername(username);
+            client.setPassword(password);
+            client.setUsername(username);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -36,14 +38,6 @@ public class CLI implements ClientUI{
 
     }
 
-    public String getCommand(){
-        try {
-            return inKeyboard.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
 
     public void updateLogin(boolean logged) {
         if (logged) {
@@ -73,6 +67,17 @@ public class CLI implements ClientUI{
 
     public void printmsg(String msg){
         outCli.println(msg);
+    }
+
+    @Override
+    public String getCommand() {
+        try {
+            if(inKeyboard.isEmpty()){inKeyboard.add();}
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "ERR Couldn't read from keyboard!";
+        }
+        return inKeyboard.getln();
     }
 }
 

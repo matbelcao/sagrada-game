@@ -13,10 +13,6 @@ public class GUI implements ClientUI {
 
     }
 
-    @Override
-    public String getCommand() {
-        return null;
-    }
 
     @Override
     public void updateLogin(boolean logged) {
@@ -51,5 +47,10 @@ public class GUI implements ClientUI {
     @Override
     public void printmsg(String msg) {
 
+    }
+
+    @Override
+    public String getCommand() {
+        return null;
     }
 }

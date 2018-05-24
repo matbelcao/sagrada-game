@@ -143,23 +143,6 @@ public class Client {
 
 
     /**
-     * This method launches a thread that periodically checks if the user is correctly connected towards the server
-
-    public void heartbeat(){
-        new Thread(() -> {
-            while(!userStatus.equals(UserStatus.DISCONNECTED)) {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-                if(!clientConn.ping()){this.disconnect();}
-            }
-        }).start();
-    }
-
-*/
-    /**
      * This method instantiates the user interface
      */
     private void setup(){

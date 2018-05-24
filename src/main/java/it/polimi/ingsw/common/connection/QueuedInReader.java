@@ -4,12 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class QueuedInSocket {
+public class QueuedInReader {
     private BufferedReader inSocket;
     private String temp;
     private final ArrayList<String> queue=new ArrayList<>();
 
-    public QueuedInSocket(BufferedReader inSocket) {
+    public QueuedInReader(BufferedReader inSocket) {
         this.inSocket = inSocket;
     }
 

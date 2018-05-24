@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.common.connection.QueuedInSocket;
+import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.SchemaCard;
 
@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class SocketServer extends Thread implements ServerConn  {
     private Socket socket;
-    private QueuedInSocket inSocket;
+    private QueuedInReader inSocket;
     private PrintWriter outSocket;
     private User user;
 
@@ -26,7 +26,7 @@ public class SocketServer extends Thread implements ServerConn  {
         this.user = user;
         this.socket = socket;
         try {
-            inSocket = new QueuedInSocket(new BufferedReader(new InputStreamReader(socket.getInputStream())));
+            inSocket = new QueuedInReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
             outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
         } catch (IOException e) {
             e.printStackTrace();
@@ -45,9 +45,7 @@ public class SocketServer extends Thread implements ServerConn  {
         boolean playing = true;
         while(playing){
             try {
-                do {
-                    inSocket.add();
-                }while (inSocket.isEmpty());
+                inSocket.add();
 
 
             } catch (IOException | IllegalArgumentException e) {
@@ -149,7 +147,7 @@ public class SocketServer extends Thread implements ServerConn  {
         try{
             outSocket.println("STATUS check");
             outSocket.flush();
-            inSocket.add();
+            if(inSocket.isEmpty()){inSocket.add();}
             if(Validator.checkAckParams(inSocket.getln(),result) && result.get(1).equals("status")){
                 return true;
             }

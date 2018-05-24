@@ -1,8 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.common.connection.QueuedInSocket;
-import it.polimi.ingsw.server.connection.Validator;
+import it.polimi.ingsw.common.connection.QueuedInReader;
 
 import java.io.*;
 import java.net.Socket;
@@ -15,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class SocketClient extends Thread implements ClientConn {
     private Socket socket;
-    private QueuedInSocket inSocket;
+    private QueuedInReader inSocket;
     private PrintWriter outSocket;
     private Client client;
     private final ReentrantLock lock = new ReentrantLock();
@@ -30,7 +29,7 @@ public class SocketClient extends Thread implements ClientConn {
     public SocketClient(Client client,String address, int port) throws IOException {
         this.client=client;
         socket = new Socket(address, port);
-        inSocket = new QueuedInSocket(new BufferedReader(new InputStreamReader(socket.getInputStream())));
+        inSocket = new QueuedInReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
         outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
         inSocket.add();
         inSocket.pop();
@@ -49,14 +48,22 @@ public class SocketClient extends Thread implements ClientConn {
 
                 try {
                     inSocket.add();
-                    if(ClientParser.isStatus(inSocket.readln())){
-                        if(result.get(1).equals("check")){
+                    if(ClientParser.parse(inSocket.readln(),result)) {
+                        if (ClientParser.isStatus(inSocket.readln())) {
                             inSocket.pop();
-                            ping();
+                            if (result.get(1).equals("check")) {
+                                this.ping();
+                            }
+                        }
+
+                        if (ClientParser.isLobby(inSocket.readln())) {
+                            updateLobby(result.get(1));
+                        }
+
+                        if(ClientParser.isGame(inSocket.readln())) {
+                            updateGame(result);
                         }
                     }
-
-
                 } catch (IOException | NullPointerException e) {
                     socket = null;
                 }
@@ -74,9 +81,7 @@ public class SocketClient extends Thread implements ClientConn {
         if (ClientParser.parse(rawCommand,parsedResult)) {
             switch (parsedResult.get(0)) {
 
-                case "LOBBY":
-                    updateLobby(parsedResult.get(1));
-                    break;
+
                 case "GAME":
                     updateGame(parsedResult);
                     break;
@@ -116,7 +121,9 @@ public class SocketClient extends Thread implements ClientConn {
             return false;
         }
 
-        if (ClientParser.parse(inSocket.getln(),parsedResult) && parsedResult.get(0).equals("LOGIN")) {
+        if (ClientParser.isLogin(inSocket.readln())) {
+            ClientParser.parse(inSocket.readln(),parsedResult);
+            inSocket.pop();
             if (parsedResult.get(1).equals("ok")) {
                 startListening();
                 client.getClientUI().updateLogin(true);
