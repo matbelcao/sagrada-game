@@ -20,6 +20,9 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
     }
 
     @Override
+    public void quit() { user.quit(); }
+
+    @Override
     public void notifyLobbyUpdate(int n) {
         try {
             clientReference.updateLobby(n);

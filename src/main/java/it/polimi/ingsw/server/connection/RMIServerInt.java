@@ -9,4 +9,6 @@ public interface RMIServerInt extends Remote {
 
 
     void setClientReference(RMIClientInt remoteRef) throws RemoteException;
+
+    void quit() throws RemoteException;
 }

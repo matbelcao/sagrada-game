@@ -232,7 +232,7 @@ public class Client {
         while(userStatus.equals(UserStatus.LOBBY)) {
             if (clientUI.getCommand().equals("QUIT")){
                 clientUI.printmsg(clientConn.getPrivateObj().toString());
-                //quit();
+                quit();
             }
         }
     }

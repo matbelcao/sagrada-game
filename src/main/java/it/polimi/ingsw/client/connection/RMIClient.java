@@ -3,6 +3,8 @@ package it.polimi.ingsw.client.connection;
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 
+import java.rmi.RemoteException;
+
 public class RMIClient implements ClientConn,RMIClientInt {
     private RMIServerInt RMIconn;
     private Client client;
@@ -31,7 +33,10 @@ public class RMIClient implements ClientConn,RMIClientInt {
 
     @Override
     public void quit() {
-
+        try {
+            RMIconn.quit();
+            //do nothing, client is already disconnecting
+        } catch (RemoteException e) { }
     }
 
     @Override
