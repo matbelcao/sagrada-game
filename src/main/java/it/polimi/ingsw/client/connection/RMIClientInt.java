@@ -8,5 +8,7 @@ public interface RMIClientInt extends Remote {
 
     boolean pong() throws RemoteException;
 
-    void updateId(int size, int id) throws RemoteException;
+    public void updateLobby(int lobbySize) throws RemoteException;
+
+    void updateGameStart(int n, int id) throws RemoteException;
 }
