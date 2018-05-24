@@ -230,7 +230,8 @@ public class Client {
     private void lobby(){
         while(userStatus.equals(UserStatus.LOBBY)) {
             if (clientUI.getCommand().equals("QUIT")){
-                quit();
+                clientUI.printmsg(clientConn.getPrivateObj().toString());
+                //quit();
             }
         }
     }

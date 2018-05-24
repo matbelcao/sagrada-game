@@ -63,7 +63,8 @@ public class RMIClient implements ClientConn,RMIClientInt {
     }
 
     @Override
-    public void getPrivateObj() {
+    public Integer getPrivateObj() {
+        return 0;
 
     }
 

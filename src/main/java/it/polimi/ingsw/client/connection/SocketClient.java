@@ -39,12 +39,14 @@ public class SocketClient extends Thread implements ClientConn {
     public void startListening(){
         new Thread(() -> {
             while(socket!=null) {
-                try {
-                    if(!socket.isClosed() && inSocket.ready()){
-                        update(inSocket.readLine());
+                synchronized (inSocket) {
+                    try {
+                        if (!socket.isClosed() && inSocket.ready()) {
+                            update(inSocket.readLine());
+                        }
+                    } catch (IOException | NullPointerException e) {
+                        socket = null;
                     }
-                } catch (IOException  | NullPointerException e) {
-                    socket=null;
                 }
             }
         }).start();
@@ -124,8 +126,19 @@ public class SocketClient extends Thread implements ClientConn {
     }
 
     @Override
-    public void getPrivateObj() {
+    public Integer getPrivateObj() {
+        Integer i= 3;
+        synchronized (inSocket) {
+            outSocket.println("ciao");
+            outSocket.flush();
 
+            try {
+                i = Integer.parseInt(inSocket.readLine());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return i;
     }
 
     @Override

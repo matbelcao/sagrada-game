@@ -42,7 +42,11 @@ public class SocketServer extends Thread implements ServerConn  {
         while(playing){
             try {
                 command = inSocket.readLine();
-                playing = execute(command);
+                //playing = execute(command);
+                if(command.equals("ciao")){
+                    outSocket.println("2");
+                    outSocket.flush();
+                }
             } catch (IOException | IllegalArgumentException e) {
                 user.disconnect();
             }finally {
