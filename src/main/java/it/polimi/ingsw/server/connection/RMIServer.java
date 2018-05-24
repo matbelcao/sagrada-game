@@ -19,9 +19,16 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
         this.clientReference = remoteRef;
     }
 
+    /**
+     * Quits the user
+     */
     @Override
     public void quit() { user.quit(); }
 
+    /**
+     * Notifies the client waiting in a lobby that the lobby has updated
+     * @param n lobby's current size
+     */
     @Override
     public void notifyLobbyUpdate(int n) {
         try {
@@ -31,6 +38,11 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
         }
     }
 
+    /**
+     * Notifies the client that the game has started
+     * @param n the number of players playing the game
+     * @param id the client's identification number in the game
+     */
     @Override
     public void notifyGameStart(int n, int id) {
        try {
@@ -50,6 +62,10 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
 
     }
 
+    /**
+     * Pings the client invoking a remote method
+     * @ truee iff the remote call doesn't throw an exception, therefore the connession between client and server is still up
+     */
     @Override
     public boolean ping() {
         try{
