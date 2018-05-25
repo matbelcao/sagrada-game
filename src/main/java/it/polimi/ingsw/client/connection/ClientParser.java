@@ -94,9 +94,7 @@ public class ClientParser {
         return message.trim().split("\\s+",2)[0].equals("STATUS");
 
     }
-    private static boolean checkStatus(List<String> parsedResult) {
-        return parsedResult.size() == 2||parsedResult.size() == 3;
-    }
+
     /**
      * This method checks if the LOGIN parameters have a correct number of arguments (nothing has been lost during the communication) and format
      * @param parsedResult the parsed parameters of the command
@@ -193,8 +191,8 @@ public class ClientParser {
      * @return true iff the parameters are valid
      */
     private static boolean checkCommaParametersLength(int validLength,List<String> parsedResult){
-        for(int i=validLength;i<parsedResult.size();i++)
-            if (parsedResult.get(i).split(",").length != 2) {
+        for(int i=2;i<parsedResult.size();i++)
+            if (parsedResult.get(i).split(",").length != validLength) {
                 return false;
             }
         return true;
@@ -242,6 +240,7 @@ public class ClientParser {
      */
     private static boolean checkChoice(List<String> parsedResult){
         if(parsedResult.size()<2){return false;}
+        if(parsedResult.size()==2){return true;}
         if(parsedResult.get(2).equals("modified_die")){
             for (int i = 3; i < parsedResult.size(); i++) {
                 if (parsedResult.get(i).split(",").length != 2) {
@@ -251,5 +250,9 @@ public class ClientParser {
             return true;
         }
         return parsedResult.get(2).equals("rerolled_dice") && parsedResult.size() == 3 ;
+    }
+
+    private static boolean checkStatus(List<String> parsedResult) {
+        return parsedResult.size() == 2||parsedResult.size() == 3;
     }
 }
