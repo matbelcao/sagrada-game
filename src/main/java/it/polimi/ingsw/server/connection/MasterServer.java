@@ -178,7 +178,7 @@ public class MasterServer{
                         Timer timer = new Timer();
                         timer.schedule(new LobbyHandler(), lobbyTime * 1000);
                     }
-                    if (lobby.size() == MAX_PLAYERS) {
+                    if (lobby.size() >= MAX_PLAYERS) {
                         this.updateLobby();
                     }
                 }
@@ -377,6 +377,7 @@ public class MasterServer{
         if (args.length>0) {
             if(!ServerOptions.getOptions(args,options) || options.contains("h")){
                 ServerOptions.printHelpMessage();
+                return;
             }else {
                 ServerOptions.setServerPreferences(options, server);
             }

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.common.connection.QueuedInReader;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class SocketClient extends Thread implements ClientConn {
     private Socket socket;
-    private BufferedReader inSocket;
+    private QueuedInReader inSocket;
     private PrintWriter outSocket;
     private Client client;
     private final ReentrantLock lock = new ReentrantLock();
@@ -28,9 +29,10 @@ public class SocketClient extends Thread implements ClientConn {
     public SocketClient(Client client,String address, int port) throws IOException {
         this.client=client;
         socket = new Socket(address, port);
-        inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        inSocket = new QueuedInReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
         outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
-        inSocket.readLine();
+        inSocket.add();
+        inSocket.pop();
         client.getClientUI().updateConnectionOk();
     }
 
@@ -39,14 +41,29 @@ public class SocketClient extends Thread implements ClientConn {
      * reception to the update method
      */
     public void startListening(){
+
         new Thread(() -> {
+            ArrayList<String> result= new ArrayList<>();
             while(socket!=null) {
+
                 try {
-                    lock.lock();
-                    if (!socket.isClosed() && inSocket.ready()) {
-                        update(inSocket.readLine());
+                    inSocket.add();
+                    if(ClientParser.parse(inSocket.readln(),result)) {
+                        if (ClientParser.isStatus(inSocket.readln())) {
+                            inSocket.pop();
+                            if (result.get(1).equals("check")) {
+                                this.ping();
+                            }
+                        }
+
+                        if (ClientParser.isLobby(inSocket.readln())) {
+                            updateLobby(result.get(1));
+                        }
+
+                        if(ClientParser.isGame(inSocket.readln())) {
+                            updateGame(result);
+                        }
                     }
-                    lock.unlock();
                 } catch (IOException | NullPointerException e) {
                     socket = null;
                 }
@@ -64,9 +81,7 @@ public class SocketClient extends Thread implements ClientConn {
         if (ClientParser.parse(rawCommand,parsedResult)) {
             switch (parsedResult.get(0)) {
 
-                case "LOBBY":
-                    updateLobby(parsedResult.get(1));
-                    break;
+
                 case "GAME":
                     updateGame(parsedResult);
                     break;
@@ -99,17 +114,23 @@ public class SocketClient extends Thread implements ClientConn {
         outSocket.println("LOGIN " + username + " " + password);
         outSocket.flush();
         try {
-            if (ClientParser.parse(inSocket.readLine(),parsedResult) && parsedResult.get(0).equals("LOGIN")) {
-                if(parsedResult.get(1).equals("ok")){
-                    startListening();
-                    client.getClientUI().updateLogin(true);
-                    return true;
-                }
-            }
-
+            inSocket.add();
         } catch (IOException e) {
-            e.printStackTrace();
+            client.getClientUI().updateLogin(false);
+            client.getClientUI().updateLogin(false);
+            return false;
         }
+
+        if (ClientParser.isLogin(inSocket.readln())) {
+            ClientParser.parse(inSocket.readln(),parsedResult);
+            inSocket.pop();
+            if (parsedResult.get(1).equals("ok")) {
+                startListening();
+                client.getClientUI().updateLogin(true);
+                return true;
+            }
+        }
+
         client.getClientUI().updateLogin(false);
         return false;
     }
@@ -234,7 +255,7 @@ public class SocketClient extends Thread implements ClientConn {
     @Override
     public boolean ping() {
         try{
-            outSocket.print((char)0);
+            outSocket.println("ACK status");
             outSocket.flush();
         } catch (Exception e) {
             return false;

@@ -1,4 +1,5 @@
 package it.polimi.ingsw.server.connection;
+import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 
 import java.io.*;
@@ -22,17 +23,18 @@ public class SocketAuthenticator extends Thread {
      */
     @Override
     public void run(){
-        BufferedReader inSocket=null;
+        QueuedInReader inSocket=null;
         PrintWriter outSocket=null;
-        String command = "";
+        String command = null;
         Boolean logged = false;
         MasterServer master=MasterServer.getMasterServer();
         ArrayList<String> params = new ArrayList<>();
         try {
-            inSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            inSocket = new QueuedInReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
             outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
 
         assert outSocket != null;
@@ -40,7 +42,10 @@ public class SocketAuthenticator extends Thread {
         outSocket.flush();
         try {
             while (!logged) {
-                command = inSocket.readLine();
+
+                inSocket.add();
+                command = inSocket.readln();
+                inSocket.pop();
                 if (Validator.checkLoginParams(command, params)) {
                     if (master.login(params.get(1), params.get(2))) {
                         outSocket.println("LOGIN ok");

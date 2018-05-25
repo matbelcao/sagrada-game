@@ -24,20 +24,16 @@ public class Game extends Thread implements Iterable  {
      * @param additionalSchemas true if additional are wanted by the user
      */
     public Game(List<User> users,boolean additionalSchemas){
-        if(additionalSchemas){
-
-            // TODO: 21/05/2018
 
 
-            System.out.print("additional schemas");
-        }
         this.users= (ArrayList<User>) users;
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
             u.setGame(this);
             u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
         }
-        board=new Board(users);
+
+        board=new Board(users,additionalSchemas);
     }
 
     private static class GameHandler extends TimerTask {
@@ -58,6 +54,7 @@ public class Game extends Thread implements Iterable  {
         timer.schedule(new GameHandler(), MasterServer.turnTime * 1000);
         timer.cancel();
         defaultSchemaCardAssignment();
+
     }
 
     /**
@@ -101,6 +98,13 @@ public class Game extends Thread implements Iterable  {
             if(player.getSchema()==null){
                 player.setSchema(draftedSchemas[users.indexOf(u)*Board.NUM_PLAYER_SCHEMAS]);
             }
+        }
+    }
+
+    private void startOfMatch(){
+        for(int i=0; i<users.size();i++){
+            users.get(i).setStatus(UserStatus.PLAYING);
+            users.get(i).getServerConn().notifyGameStart(users.size(),i);
         }
     }
 
@@ -162,7 +166,7 @@ public class Game extends Thread implements Iterable  {
      * Instantiates a new board for the match
      */
     public void createBoard(){
-        this.board= new Board(this.users);
+        this.board= new Board(this.users, additionalSchemas);
     }
 
     /**
