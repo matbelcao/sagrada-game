@@ -34,7 +34,7 @@ public class MasterServer{
     private boolean additionalSchemas; //to be used for additional schemas FA
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"server"+File.separator; //append class name + ".xml" to obtain complete path
     private int lobbyTime;
-    private int turnTime;
+    public static int turnTime;
     private final ArrayList <User> users;
     private final ArrayList <User> lobby;
     private final ArrayList <Game> games;
