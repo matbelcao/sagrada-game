@@ -18,7 +18,7 @@ public class CLI implements ClientUI{
     public void loginProcedure() {
         String username;
         String password;
-        try {
+
 
             outCli.printf("\nUSERNAME: ");
             inKeyboard.add();
@@ -30,11 +30,6 @@ public class CLI implements ClientUI{
 
             client.setPassword(password);
             client.setUsername(username);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
 
     }
 
@@ -71,12 +66,9 @@ public class CLI implements ClientUI{
 
     @Override
     public String getCommand() {
-        try {
+
             if(inKeyboard.isEmpty()){inKeyboard.add();}
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "ERR Couldn't read from keyboard!";
-        }
+
         return inKeyboard.getln();
     }
 }

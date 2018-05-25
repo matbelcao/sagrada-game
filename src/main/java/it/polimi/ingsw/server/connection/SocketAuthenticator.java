@@ -53,7 +53,7 @@ public class SocketAuthenticator extends Thread {
                         //Setting Socket specific parameters
                         User user = master.getUser(params.get(1));
                         user.setConnectionMode(ConnectionMode.SOCKET);
-                        user.setServerConn(new SocketServer(socket, user));
+                        user.setServerConn(new SocketServer(socket, user,inSocket,outSocket));
                         master.updateConnected(user);
                     } else {
                         outSocket.println("LOGIN ko");
@@ -64,7 +64,7 @@ public class SocketAuthenticator extends Thread {
                     outSocket.println("LOGIN ko");
                 }
             }
-        } catch (IOException | NullPointerException e) {
+        } catch ( NullPointerException e) {
             try {
                 socket.close();
             } catch (IOException e1) {

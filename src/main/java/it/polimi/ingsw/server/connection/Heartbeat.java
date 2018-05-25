@@ -19,7 +19,9 @@ public class Heartbeat extends Thread{
             for(int i = 0; i<master.getUsersSize(); i++){
                     User user = master.getUserByIndex(i);
                     try{
-                        if(!user.getStatus().equals(UserStatus.DISCONNECTED)  && !user.getServerConn().ping()){
+                        if((user.getStatus().equals(UserStatus.LOBBY)
+                                ||user.getStatus().equals(UserStatus.PLAYING))
+                                && !user.getServerConn().ping()){
                             user.disconnect();
                         }
                     }catch(NullPointerException e) { // because the thread isn't synchronized to the user constructor

@@ -31,7 +31,9 @@ public class SocketClient extends Thread implements ClientConn {
         socket = new Socket(address, port);
         inSocket = new QueuedInReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
         outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
-        inSocket.add();
+
+            inSocket.add();
+
         inSocket.pop();
         client.getClientUI().updateConnectionOk();
     }
@@ -44,28 +46,36 @@ public class SocketClient extends Thread implements ClientConn {
 
         new Thread(() -> {
             ArrayList<String> result= new ArrayList<>();
-            while(socket!=null) {
+            while(!socket.isClosed()) {
 
                 try {
-                    inSocket.add();
+
+                        inSocket.add();
+
                     if(ClientParser.parse(inSocket.readln(),result)) {
                         if (ClientParser.isStatus(inSocket.readln())) {
                             inSocket.pop();
                             if (result.get(1).equals("check")) {
                                 this.ping();
                             }
-                        }
-
-                        if (ClientParser.isLobby(inSocket.readln())) {
+                        }else if (ClientParser.isLobby(inSocket.readln())) {
                             updateLobby(result.get(1));
-                        }
-
-                        if(ClientParser.isGame(inSocket.readln())) {
+                            inSocket.pop();
+                        }else if(ClientParser.isGame(inSocket.readln())) {
                             updateGame(result);
+                            inSocket.pop();
+                        }else{
+                            System.out.println("ERR: control error caused by:  "+inSocket.readln());
+                            inSocket.pop();
                         }
                     }
-                } catch (IOException | NullPointerException e) {
-                    socket = null;
+                } catch ( NullPointerException e) {
+                    try {
+                        socket.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+
+                    }
                 }
             }
         }).start();
@@ -113,13 +123,9 @@ public class SocketClient extends Thread implements ClientConn {
 
         outSocket.println("LOGIN " + username + " " + password);
         outSocket.flush();
-        try {
-            inSocket.add();
-        } catch (IOException e) {
-            client.getClientUI().updateLogin(false);
-            client.getClientUI().updateLogin(false);
-            return false;
-        }
+
+        inSocket.add();
+
 
         if (ClientParser.isLogin(inSocket.readln())) {
             ClientParser.parse(inSocket.readln(),parsedResult);
@@ -144,7 +150,6 @@ public class SocketClient extends Thread implements ClientConn {
         outSocket.flush();
         try {
             socket.close();
-            socket=null;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -254,9 +259,11 @@ public class SocketClient extends Thread implements ClientConn {
      */
     @Override
     public boolean ping() {
+        System.out.println("ping_buono!!  "+inSocket.readln());
         try{
             outSocket.println("ACK status");
             outSocket.flush();
+
         } catch (Exception e) {
             return false;
         }

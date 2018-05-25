@@ -13,15 +13,25 @@ public class QueuedInReader {
         this.inSocket = inSocket;
     }
 
-    public void add() throws IOException {
-        while(!inSocket.ready()){
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+    public void add(){
+        try {
+            synchronized (inSocket) {
+                while (!inSocket.ready()) {
+                    inSocket.wait(100);
+                }
+                temp = inSocket.readLine();
+
+                //System.out.println("\t\t\t\t\t"+temp);//debug
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            //debug
+            System.out.println("ERR interrupt");
+        } catch (IOException e) {
+            e.printStackTrace();
+            //debug
+            System.out.println("ERR io");
         }
-        temp=inSocket.readLine();
         put();
     }
 

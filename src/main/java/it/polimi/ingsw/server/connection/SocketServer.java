@@ -22,16 +22,12 @@ public class SocketServer extends Thread implements ServerConn  {
      * This is the constructor of the class, it starts a thread linked to an open socket
      * @param socket the socket already open used to communicate with the client
      */
-    SocketServer(Socket socket, User user){
+    SocketServer(Socket socket, User user,QueuedInReader inSocket,PrintWriter outSocket){
+        this.inSocket=inSocket;
+        this.outSocket=outSocket;
         this.user = user;
         this.socket = socket;
-        try {
-            inSocket = new QueuedInReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
-            outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
+
         start();
     }
 
@@ -47,8 +43,11 @@ public class SocketServer extends Thread implements ServerConn  {
             try {
                 inSocket.add();
 
+                if(Validator.checkAckParams(inSocket.readln(),result)&& result.get(1).equals("status")){
+                    inSocket.pop();
+                }
 
-            } catch (IOException | IllegalArgumentException e) {
+            } catch ( IllegalArgumentException e) {
                 user.disconnect();
                 playing=false;
             }
@@ -147,8 +146,14 @@ public class SocketServer extends Thread implements ServerConn  {
         try{
             outSocket.println("STATUS check");
             outSocket.flush();
-            if(inSocket.isEmpty()){inSocket.add();}
-            if(Validator.checkAckParams(inSocket.getln(),result) && result.get(1).equals("status")){
+            System.out.println(inSocket.isEmpty());
+            while(inSocket.isEmpty()){
+                Thread.sleep(50);
+            }
+            if(Validator.isValid(inSocket.readln(),result) ){
+                if(Validator.checkAckParams(inSocket.readln(),result)&& result.get(1).equals("status")){
+                    inSocket.pop();
+                }
                 return true;
             }
         } catch (Exception e) {

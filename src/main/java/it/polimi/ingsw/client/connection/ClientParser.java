@@ -26,8 +26,8 @@ public class ClientParser {
         command= rawCommand.trim().split("\\s+");
         keyword = command[0];
 
+        parsedResult.clear();
         parsedResult.addAll(Arrays.asList(command));
-
         switch (keyword) {
 
             case "LOGIN":
