@@ -1,5 +1,10 @@
 package it.polimi.ingsw.client.connection;
 
+import it.polimi.ingsw.common.immutables.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public interface ClientConn {
     /**
      * This method tries to login by "sending" the user's credentials to the server who's then going to check whether the user can or can not login and will reply accordingly
@@ -17,49 +22,49 @@ public interface ClientConn {
     /**
      * This method asks the server for the private objective of the user
      */
-    Integer getPrivateObj();
+    LightCard getPrivateObj();
 
     /**
      * This method asks the server for the public objectives of the match, the server will send all three of them following this request
      */
-    void getPublicObj();
+    LightCard getPublicObj();
 
     /**
      * This method asks the server for the tools of the match, the server will send all three of them following this request
      */
-    void getTools();
+    LightTool getTools();
 
     /**
      * This method asks the serverfor an updated version of the draftpool
      */
-    void getDraftPool();
+    List<IndexedCellContent> getDraftPool();
 
     /**
      * This method asks the serverfor an updated version of the roundtrack
      */
-    void getRoundtrack();
+    List<IndexedCellContent> getRoundtrack();
 
     /**
      * this method queries the server for a list of the users that are playing the match that the user making the request is playing
      */
-    void getPlayers();
+    List<LightPlayer> getPlayers();
 
     /**
      * this method asks the server for the remaining favor tokens of a player given his id
      * @param playerId the id of the player (0 to 3)
      */
-    void getFavorTokens(int playerId);
+    int getFavorTokens(int playerId);
 
     /**
      * this method gets an updated version of the schema of a player given his playerId
      * @param playerId the id of the player
      */
-    void getSchema(int playerId);
+    LightSchemaCard getSchema(int playerId);
 
     /**
      * This method asks the server to draft four schemas for the initial choice of the player's schema
      */
-    void draftSchema();
+    ArrayList<LightSchemaCard> draftSchema();
 
     /**
      * This method is used to check the state of the connection of the user associated with the ClientConn

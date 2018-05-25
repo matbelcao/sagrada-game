@@ -20,11 +20,11 @@ public class CLI implements ClientUI{
         String password;
 
 
-            outCli.printf("\nUSERNAME: ");
+            outCli.printf("%nUSERNAME: ");
             inKeyboard.add();
             username = inKeyboard.getln();
 
-            outCli.printf("\nPASSWORD: ");
+            outCli.printf("%nPASSWORD: ");
             inKeyboard.add();
             password = inKeyboard.getln();
 
@@ -36,16 +36,16 @@ public class CLI implements ClientUI{
 
     public void updateLogin(boolean logged) {
         if (logged) {
-            outCli.println("\nSuccessfully logged in as " + client.getUsername());
+            outCli.println("%nSuccessfully logged in as " + client.getUsername());
         } else {
-            outCli.println("\nCouldn't login correctly, please retry ...");
+            outCli.println("%nCouldn't login correctly, please retry ...");
         }
     }
 
     public void updateConnectionOk() { outCli.println("\nConnection established correctly!"); }
 
-    public void updateLobby(int num_users){
-        outCli.println("Lobby : " + num_users);
+    public void updateLobby(int numUsers){
+        outCli.println("Lobby : " + numUsers);
     }
 
     public void updateGameStart(int numUsers, int playerId){

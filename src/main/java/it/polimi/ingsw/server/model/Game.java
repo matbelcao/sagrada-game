@@ -101,12 +101,6 @@ public class Game extends Thread implements Iterable  {
         }
     }
 
-    private void startOfMatch(){
-        for(int i=0; i<users.size();i++){
-            users.get(i).setStatus(UserStatus.PLAYING);
-            users.get(i).getServerConn().notifyGameStart(users.size(),i);
-        }
-    }
 
     /**
      * Notify to the active users that an user has been reconnected to the game

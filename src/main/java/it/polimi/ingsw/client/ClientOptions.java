@@ -12,8 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static java.lang.System.out;
-
 public class ClientOptions {
 
     private ClientOptions(){}
@@ -39,7 +37,7 @@ public class ClientOptions {
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
         }
-        out.print(message);
+        System.out.print(message);
     }
 
 
@@ -111,13 +109,13 @@ public class ClientOptions {
                 options.add(option.substring(2,3));
                 break;
             case "--server-address":
-                if(options.contains("a")){ throw new IllegalArgumentException(); }
-                if(args[index+1].matches(IP_ADDRESS)){
-                    options.add("a");
-                }else { throw new IllegalArgumentException(); }
+                if(!checkOptionWithParam(options,args,index,IP_ADDRESS,"a")){
+                    throw new IllegalArgumentException();
+                }
                 break;
             case "--help":
-                printHelpMessage();
+                if(!options.contains("h")){ throw new IllegalArgumentException(); }
+                options.add("h");
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -139,31 +137,33 @@ public class ClientOptions {
 
             shortOption=option.substring(i,i+1);
 
-            //invalid option
-            if(!shortOption.matches("[hgcars]")){ throw new IllegalArgumentException(); }
-
-            //option already added
-            if(options.contains(shortOption)){ throw new IllegalArgumentException(); }
+            //invalid option or already set
+            if(!shortOption.matches("[hgcars]")|| options.contains(shortOption)){
+                throw new IllegalArgumentException();
+            }
 
             //options without parameters
             if(shortOption.matches("[hgcrs]")){
                 options.add(shortOption);
             }else {
-                if (isLastShortOption(option, i)) {
-                    //options with parameters
-                    if (shortOption.equals("a")) {
-                        if ((args.length > (index + 1)) && args[index + 1].matches(IP_ADDRESS)) {
-                            options.add("a");
-                            return;
-                        }
-                        throw new IllegalArgumentException();
-                    }
-                } else {
+                if (!isLastShortOption(option, i)) {
                     throw new IllegalArgumentException();
                 }
+                //options with parameters
+                if (!checkOptionWithParam(options,args,index,IP_ADDRESS,shortOption)) { throw new IllegalArgumentException();}
             }
             i++;
         }
+    }
+
+    private static boolean checkOptionWithParam(List<String> options, String[] args, int index, String paramType, String shortOption) {
+        if (!options.contains(shortOption)
+                && (args.length > (index + 1))
+                && args[index + 1].matches(paramType)) {
+            options.add(shortOption);
+            return true;
+        }
+        return false;
     }
 
     private static boolean isLastShortOption(String option, int i) {

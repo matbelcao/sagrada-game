@@ -2,22 +2,21 @@ package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.immutables.*;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class is the implementation of the SOCKET client-side connection methods
  */
-public class SocketClient extends Thread implements ClientConn {
+public class SocketClient implements ClientConn {
     private Socket socket;
     private QueuedInReader inSocket;
     private PrintWriter outSocket;
     private Client client;
-    private final ReentrantLock lock = new ReentrantLock();
 
     /**
      * Thi is the class constructor, it instantiates the new socket and the input/output buffers for the communications
@@ -50,20 +49,24 @@ public class SocketClient extends Thread implements ClientConn {
 
                 try {
 
-                        inSocket.add();
+                    inSocket.add();
 
                     if(ClientParser.parse(inSocket.readln(),result)) {
+
                         if (ClientParser.isStatus(inSocket.readln())) {
                             inSocket.pop();
                             if (result.get(1).equals("check")) {
                                 this.ping();
                             }
+
                         }else if (ClientParser.isLobby(inSocket.readln())) {
                             updateLobby(result.get(1));
                             inSocket.pop();
+
                         }else if(ClientParser.isGame(inSocket.readln())) {
                             updateGame(result);
                             inSocket.pop();
+
                         }else{
                             System.out.println("ERR: control error caused by:  "+inSocket.readln());
                             inSocket.pop();
@@ -156,61 +159,58 @@ public class SocketClient extends Thread implements ClientConn {
     }
 
     @Override
-    public Integer getPrivateObj() {
-        Integer i = 3;
+    public LightCard getPrivateObj() {
 
-        lock.lock();
-        outSocket.println("ciao");
-        outSocket.flush();
-        System.out.println("Sequenza critica!!!");
-        /*try {
-            //i = Integer.parseInt(inSocket.readLine());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        lock.unlock();
-        System.out.println("END critica!!!");
-        return i;
+
+        return null;
     }
 
     @Override
-    public void getPublicObj() {
+    public LightCard getPublicObj() {
 
+        return null;
     }
 
     @Override
-    public void getTools() {
+    public LightTool getTools() {
 
+        return null;
     }
 
     @Override
-    public void getDraftPool() {
+    public List<IndexedCellContent> getDraftPool() {
 
+        return null;
     }
 
     @Override
-    public void getRoundtrack() {
+    public List<IndexedCellContent> getRoundtrack() {
 
+        return null;
     }
 
     @Override
-    public void getPlayers() {
+    public List<LightPlayer> getPlayers() {
 
+        return null;
     }
 
     @Override
-    public void getFavorTokens(int playerId) {
+    public int getFavorTokens(int playerId) {
 
+        return 0;
     }
 
     @Override
-    public void getSchema(int playerId) {
+    public LightSchemaCard getSchema(int playerId) {
 
+        return null;
     }
 
     @Override
-    public void draftSchema() {
+    public ArrayList<LightSchemaCard> draftSchema() {
 
+        return null;
     }
 
     /**

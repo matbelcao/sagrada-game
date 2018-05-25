@@ -25,7 +25,7 @@ public class GUI implements ClientUI {
     }
 
     @Override
-    public void updateLobby(int num_users) {
+    public void updateLobby(int numUsers) {
 
     }
 

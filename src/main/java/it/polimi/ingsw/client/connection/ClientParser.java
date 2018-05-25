@@ -242,10 +242,7 @@ public class ClientParser {
         if(parsedResult.size()<2){return false;}
         if(parsedResult.size()==2){return true;}
         if(parsedResult.get(2).equals("modified_die")){
-            if (parsedResult.get(3).split(",").length > 2) {
-                return false;
-            }
-            return true;
+            return parsedResult.get(3).split(",").length <= 2;
         }
         return parsedResult.get(2).equals("rerolled_dice") && parsedResult.size() == 3 ;
     }

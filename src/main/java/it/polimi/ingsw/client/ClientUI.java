@@ -8,7 +8,7 @@ public interface ClientUI {
 
     public void updateConnectionOk();
 
-    public void updateLobby(int num_users);
+    public void updateLobby(int numUsers);
 
     public void updateGameStart(int numUsers, int playerId);
 

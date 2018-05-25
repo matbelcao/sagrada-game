@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static java.lang.System.out;
+
 
 public class ServerOptions {
     private ServerOptions(){}
@@ -37,7 +37,7 @@ public class ServerOptions {
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
         }
-        out.print(message);
+        System.out.print(message);
     }
 
 
@@ -112,24 +112,21 @@ public class ServerOptions {
         switch(option){
 
             case "--server-address":
-                if(options.contains("a")){ throw new IllegalArgumentException(); }
-                if(args[index+1].matches(IP_ADDRESS)){
-                    options.add("a");
-                }else { throw new IllegalArgumentException(); }
+                if(!checkOptionWithParam(options, args, index, IP_ADDRESS, "a")) {
+                throw new IllegalArgumentException();
+            }
                 break;
 
             case "--turn-time":
-                if(options.contains("t")){ throw new IllegalArgumentException(); }
-                if(args[index+1].matches(SECONDS)){
-                    options.add("t");
-                }else { throw new IllegalArgumentException(); }
+                if(!checkOptionWithParam(options, args, index, SECONDS, "t")) {
+                throw new IllegalArgumentException();
+            }
                 break;
 
             case "--lobby-time":
-                if(options.contains("l")){ throw new IllegalArgumentException(); }
-                if(args[index+1].matches(SECONDS)){
-                    options.add("l");
-                }else { throw new IllegalArgumentException(); }
+                if(!checkOptionWithParam(options, args, index, SECONDS, "l")) {
+                    throw new IllegalArgumentException();
+                }
                 break;
 
             case "--additional-schemas":
@@ -156,50 +153,55 @@ public class ServerOptions {
     private static void checkShortOptions(String[] args, List<String> options, int index, String option) {
         int i;
         String shortOption;
-        i=1;
-        while(i < option.length()){
-            shortOption=option.substring(i,i+1);
-            //invalid option
-            if(!shortOption.matches("[haAtl]")){ throw new IllegalArgumentException(); }
+        i = 1;
+        while (i < option.length()) {
+            shortOption = option.substring(i, i + 1);
 
-            //option already set
-            if(options.contains(shortOption)){ throw new IllegalArgumentException(); }
+            //invalid option or already set
+            if (!shortOption.matches("[haAtl]") || options.contains(shortOption)) {
+                throw new IllegalArgumentException();
+            }
 
             //options without parameters
-            if(shortOption.matches("[Ah]")){
+            if (shortOption.matches("[Ah]")) {
                 options.add(shortOption);
-            }else {
-                //options with parameters
-                if (isLastShortOption(option, i)) {
-                    if (shortOption.equals("a")) {
-                        if ((args.length > (index + 1)) && args[index + 1].matches(IP_ADDRESS)) {
-                            options.add("a");
-                            return;
-                        }
-                        throw new IllegalArgumentException();
-                    }
-
-                    if (shortOption.equals("t")) {
-                        if ((args.length > (index + 1)) && args[index + 1].matches(SECONDS)) {
-                            options.add("t");
-                            return;
-                        }
-                        throw new IllegalArgumentException();
-                    }
-
-                    if (shortOption.equals("l")) {
-                        if ((args.length > (index + 1)) && args[index + 1].matches(SECONDS)) {
-                            options.add("l");
-                            return;
-                        }
-                        throw new IllegalArgumentException();
-                    }
-
-                }
+            } else if (!isLastShortOption(option, i)) {
+                //options with parameters must be at the end of a set of short options following the same '-'
+                throw new IllegalArgumentException();
             }
+            switch (shortOption) {
+                case "l":
+                case "t":
+                    if (!checkOptionWithParam(options, args, index, SECONDS, shortOption)) {
+                        throw new IllegalArgumentException();
+                    }
+                    break;
+                case "a":
+                    if (!checkOptionWithParam(options, args, index, IP_ADDRESS, shortOption)) {
+                        throw new IllegalArgumentException();
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException();
+            }
+
+
             i++;
         }
     }
+
+    private static boolean checkOptionWithParam(List<String> options, String[] args, int index, String paramType, String shortOption) {
+        if (!options.contains(shortOption)
+                && (args.length > (index + 1))
+                && args[index + 1].matches(paramType)) {
+            options.add(shortOption);
+            return true;
+        }
+        return false;
+    }
+
+
+
 
     private static boolean isLastShortOption(String option, int i) {
         return i==option.length()-1;
@@ -208,8 +210,8 @@ public class ServerOptions {
     public static void setServerPreferences(List<String> options, MasterServer server) {
         if(options.contains("A")){ server.setAdditionalSchemas(true);}
         if(options.contains("a")){ server.setIpAddress(options.get(options.indexOf("a")+1));}
-        if(options.contains("t")){ server.setTimeGame(Integer.parseInt(options.get(options.indexOf("t")+1)));}
-        if(options.contains("l")){ server.setTimeLobby((Integer.parseInt(options.get(options.indexOf("l")+1))));}
+        if(options.contains("t")){ server.setTurnTime(Integer.parseInt(options.get(options.indexOf("t")+1)));}
+        if(options.contains("l")){ server.setLobbyTime((Integer.parseInt(options.get(options.indexOf("l")+1))));}
 
 
     }
