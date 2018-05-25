@@ -242,10 +242,8 @@ public class ClientParser {
         if(parsedResult.size()<2){return false;}
         if(parsedResult.size()==2){return true;}
         if(parsedResult.get(2).equals("modified_die")){
-            for (int i = 3; i < parsedResult.size(); i++) {
-                if (parsedResult.get(i).split(",").length != 2) {
-                    return false;
-                }
+            if (parsedResult.get(3).split(",").length > 2) {
+                return false;
             }
             return true;
         }

@@ -235,7 +235,7 @@ public class ClientParserTest {
 
         assertFalse(ClientParser.parse("CHOICE", parsedResult));
         assertFalse(ClientParser.parse("CHOICE ok ko", parsedResult));
-        assertFalse(ClientParser.parse("CHOICE ok modified_die RED", parsedResult));
+        assertTrue(ClientParser.parse("CHOICE ok modified_die RED", parsedResult));
         assertFalse(ClientParser.parse("CHOICE ok modified_die RED,THREE,4", parsedResult));
         assertFalse(ClientParser.parse("CHOICE ok rerolled_dice 3 4", parsedResult));
     }
