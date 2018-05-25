@@ -56,7 +56,7 @@ public class SocketClient implements ClientConn {
                         if (ClientParser.isStatus(inSocket.readln())) {
                             inSocket.pop();
                             if (result.get(1).equals("check")) {
-                                this.ping();
+                                this.pong();
                             }
 
                         }else if (ClientParser.isLobby(inSocket.readln())) {
@@ -258,7 +258,7 @@ public class SocketClient implements ClientConn {
      * @return false iff the connection has broken
      */
     @Override
-    public boolean ping() {
+    public boolean pong() {
         System.out.println("ping_buono!!  "+inSocket.readln());
         try{
             outSocket.println("ACK status");

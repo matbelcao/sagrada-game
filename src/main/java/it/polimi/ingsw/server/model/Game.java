@@ -51,7 +51,7 @@ public class Game extends Thread implements Iterable  {
         Timer timer;
         sendSchemaCards();
         timer = new Timer();
-        timer.schedule(new GameHandler(), MasterServer.turnTime * 1000);
+        timer.schedule(new GameHandler(), MasterServer.getMasterServer().getTurnTime() * 1000);
         timer.cancel();
         defaultSchemaCardAssignment();
 

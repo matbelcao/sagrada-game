@@ -1,15 +1,18 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RMIClient implements ClientConn,RMIClientInt {
     private RMIServerInt RMIconn;
     private Client client;
 
-    public RMIClient(RMIServerInt RMIconn, Client client){
+    public RMIClient(RMIServerInt RMIconn, Client client) {
         this.RMIconn = RMIconn;
         this.client = client;
     }
@@ -20,20 +23,24 @@ public class RMIClient implements ClientConn,RMIClientInt {
 
     /**
      * Updates the view of the lobby's current size
+     *
      * @param lobbySize the current size of the lobby
      */
     @Override
-    public void updateLobby(int lobbySize){
+    public void updateLobby(int lobbySize) {
         client.getClientUI().updateLobby(lobbySize);
     }
 
     /**
-     *Updates the view of the beginning of the match
-     * @param n number of players of the match
+     * Updates the view of the beginning of the match
+     *
+     * @param n  number of players of the match
      * @param id the id of the player running the application
      */
     @Override
-    public void updateGameStart(int n, int id) { client.getClientUI().updateGameStart(n,id); }//
+    public void updateGameStart(int n, int id) {
+        client.getClientUI().updateGameStart(n, id);
+    }//
 
     @Override
     public boolean login(String username, String password) {
@@ -48,58 +55,59 @@ public class RMIClient implements ClientConn,RMIClientInt {
         try {
             RMIconn.quit();
             //do nothing, client is already disconnecting
-        } catch (RemoteException e) { }
+        } catch (RemoteException e) {
+        }
     }
 
     @Override
-    public Integer getPrivateObj() {
+    public LightCard getPrivateObj() {
+        return null;
+
+    }
+
+    @Override
+    public LightCard getPublicObj() {
+        return null;
+    }
+
+    @Override
+    public LightTool getTools() {
+        return null;
+    }
+
+    @Override
+    public List<IndexedCellContent> getDraftPool() {
+        return null;
+    }
+
+    @Override
+    public List<IndexedCellContent> getRoundtrack() {
+        return null;
+    }
+
+    @Override
+    public List<LightPlayer> getPlayers() {
+        return null;
+    }
+
+    @Override
+    public int getFavorTokens(int playerId) {
         return 0;
-
     }
 
     @Override
-    public void getPublicObj() {
-
+    public LightSchemaCard getSchema(int playerId) {
+        return null;
     }
 
     @Override
-    public void getTools() {
-
+    public ArrayList<LightSchemaCard> draftSchema() {
+        return null;
     }
 
     @Override
-    public void getDraftPool() {
-
+    public boolean pong() {
+        return false;
     }
-
-    @Override
-    public void getRoundtrack() {
-
-    }
-
-    @Override
-    public void getPlayers() {
-
-    }
-
-    @Override
-    public void getFavorTokens(int playerId) {
-
-    }
-
-    @Override
-    public void getSchema(int playerId) {
-
-    }
-
-    @Override
-    public void draftSchema() {
-
-    }
-
-    @Override
-    public boolean ping() { return false; }
-
-    @Override
-    public boolean pong() { return true; }
 }
+

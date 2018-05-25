@@ -70,5 +70,5 @@ public interface ClientConn {
      * This method is used to check the state of the connection of the user associated with the ClientConn
      * @return
      */
-    boolean ping();
+    boolean pong();
 }
