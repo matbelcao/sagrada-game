@@ -179,7 +179,9 @@ public class Client {
         boolean logged=false;
 
         try {
-            userStatus = UserStatus.CONNECTED;
+            synchronized (userStatus) {
+                userStatus = UserStatus.CONNECTED;
+            }
             if (connMode.equals(ConnectionMode.SOCKET)) {
                 clientConn = new SocketClient(this, serverIP, port);
 
@@ -192,9 +194,13 @@ public class Client {
                     logged = clientConn.login(username, password);
                 }
             } while (!logged);
-            userStatus = UserStatus.LOBBY;
+            synchronized (userStatus) {
+                userStatus = UserStatus.LOBBY;
+            }
         } catch (IOException | NotBoundException e) {
-            userStatus = UserStatus.DISCONNECTED;
+            synchronized (userStatus) {
+                userStatus = UserStatus.DISCONNECTED;
+            }
             clientUI.updateConnectionBroken();
         }
     }
@@ -233,7 +239,10 @@ public class Client {
     public void updateGameStart(int numPlayers, int playerId){
         clientUI.updateGameStart(numPlayers,playerId);
         this.playerId=playerId;
-        userStatus=UserStatus.PLAYING;
+        synchronized (userStatus){
+            userStatus=UserStatus.PLAYING;
+            notifyAll();
+        }
         this.match();
     }
 
@@ -244,6 +253,16 @@ public class Client {
 
     private void match(){
         String command;
+        synchronized (userStatus){
+            while(userStatus.equals(UserStatus.LOBBY)){
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         while(userStatus.equals(UserStatus.PLAYING)) {
             System.out.println("CLIENT: Ancora dentro!");
             command=clientUI.getCommand();
@@ -264,12 +283,16 @@ public class Client {
      */
     public void quit(){
         clientConn.quit();
-        userStatus=UserStatus.DISCONNECTED;
+        synchronized (userStatus) {
+            userStatus = UserStatus.DISCONNECTED;
+        }
         clientUI.updateConnectionClosed();
     }
 
     public void disconnect(){
-        userStatus=UserStatus.DISCONNECTED;
+        synchronized (userStatus) {
+            userStatus = UserStatus.DISCONNECTED;
+        }
         clientUI.updateConnectionBroken();
     }
 
@@ -287,6 +310,6 @@ public class Client {
 
         client.setupUI();
         client.connectAndLogin();
-
+        client.match();
     }
 }
