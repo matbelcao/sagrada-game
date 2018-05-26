@@ -17,6 +17,7 @@ public class Game extends Thread implements Iterable  {
     private boolean additionalSchemas; //to be used for additional schemas FA
     private ArrayList<User> users;
     private SchemaCard [] draftedSchemas;
+    private Timer timer;
 
     /**
      * Constructs the class and sets the players list
@@ -36,10 +37,19 @@ public class Game extends Thread implements Iterable  {
         board=new Board(users,additionalSchemas);
     }
 
-    private static class GameHandler extends TimerTask {
+    /**
+     * Assigns to the users who have not chosen any schema card, the first one that was proposed them before
+     */
+    private class DefaultSchemaAssignment extends TimerTask {
         @Override
         public void run(){
-            //getMasterServer().updateLobby();
+            Player player;
+            for (User u:users){
+                player=board.getPlayer(u);
+                if(player.getSchema()==null){
+                    player.setSchema(draftedSchemas[users.indexOf(u)*Board.NUM_PLAYER_SCHEMAS]);
+                }
+            }
         }
     }
 
@@ -48,12 +58,9 @@ public class Game extends Thread implements Iterable  {
      */
     @Override
     public void run(){
-        Timer timer;
         sendSchemaCards();
         timer = new Timer();
-        timer.schedule(new GameHandler(), MasterServer.getMasterServer().getTurnTime() * 1000);
-        timer.cancel();
-        defaultSchemaCardAssignment();
+        timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * 1000);
 
     }
 
@@ -62,15 +69,17 @@ public class Game extends Thread implements Iterable  {
      */
     private void sendSchemaCards(){
         draftedSchemas = board.draftSchemas();
+
         for (User u: users){
-            for (int i = (users.indexOf(u)*4); i< Board.NUM_PLAYER_SCHEMAS; i++){
-                u.getServerConn().notifySchema(draftedSchemas[(users.indexOf(u)* Board.NUM_PLAYER_SCHEMAS)*i]);
+            for (int i = 0; i< Board.NUM_PLAYER_SCHEMAS; i++){
+                u.getServerConn().notifySchema(draftedSchemas[(users.indexOf(u)* Board.NUM_PLAYER_SCHEMAS)+i]);
             }
         }
     }
 
     /**
-     * Sets the chosen schema card to the user's relative player instance
+     * Sets the chosen schema card to the user's relative player instance, if all the player have choose a schema card
+     * the timer will be stopped
      * @param user the user to set the card
      * @param idSchema the id of the schema card
      */
@@ -86,19 +95,7 @@ public class Game extends Thread implements Iterable  {
                 return;
             }
         }
-    }
-
-    /**
-     * Assigns to the users who have not chosen any schema card, the first one that was proposed them before
-     */
-    private void defaultSchemaCardAssignment(){
-        Player player;
-        for (User u:users){
-            player=board.getPlayer(u);
-            if(player.getSchema()==null){
-                player.setSchema(draftedSchemas[users.indexOf(u)*Board.NUM_PLAYER_SCHEMAS]);
-            }
-        }
+        timer.cancel();
     }
 
 

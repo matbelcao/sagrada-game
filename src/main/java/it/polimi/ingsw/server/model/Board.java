@@ -47,7 +47,7 @@ public class Board {
         for(int i =0; i<Board.NUM_TOOLS;i++){
             do{
                 id=randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1;
-            }while (!draftedTools.isEmpty() && !draftedTools.contains(id));
+            }while (draftedTools.contains(id));
             draftedTools.add(id);
             toolCards[i]=new ToolCard(id, MasterServer.XML_SOURCE+"ToolCard.xml");
         }
@@ -67,7 +67,7 @@ public class Board {
         for(int i =0; i<Board.NUM_OBJECTIVES;i++){
             do{
                 id=randomGen.nextInt(PubObjectiveCard.NUM_PUB_OBJ) + 1;
-            } while(!draftedPubs.isEmpty() && !draftedPubs.contains(id));
+            } while(draftedPubs.contains(id));
             draftedPubs.add(id);
             pubObjectiveCards[i]=new PubObjectiveCard(id,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
         }
@@ -88,7 +88,7 @@ public class Board {
         for(int i =0; i<numPlayers;i++){
             do{
                 id=randomGen.nextInt(PrivObjectiveCard.NUM_PRIV_OBJ) + 1;
-            } while(!draftedPrivs.isEmpty() && !draftedPrivs.contains(id));
+            } while(draftedPrivs.contains(id));
             draftedPrivs.add(id);
 
             privObjectiveCards[i]=new PrivObjectiveCard(id,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
@@ -109,7 +109,7 @@ public class Board {
         for(int i =0; i < NUM_PLAYER_SCHEMAS*players.size();i++){
             do{
                 id=randomGen.nextInt(SchemaCard.NUM_SCHEMA) + 1;
-            } while(!draftedSchemas.isEmpty() && !draftedSchemas.contains(id));
+            } while(draftedSchemas.contains(id));
 
             draftedSchemas.add(id);
             schemaChoices[i]=new SchemaCard(id,MasterServer.XML_SOURCE+"SchemaCard.xml");
