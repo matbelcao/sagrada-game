@@ -93,7 +93,7 @@ public class SocketClient implements ClientConn {
 
         //STATUS reconnect
         if (parsed.get(1).equals("reconnect")) {
-            this.pong();
+
         }
 
         //STATUS disconnect

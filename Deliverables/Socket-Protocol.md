@@ -426,12 +426,12 @@ The client that wants to definitively leave the match can send this message to t
 This message can also be sent during the lobby phase, in this case the server only updates the number of players waiting for the match and sends the corresponding `LOBBY` message.
 ### Server-side
 ###### Notice: all of the server-side messages in this section are sent in broadcast to all players. The players reply with the relative `ACK status` to each message they receive.
-##### `STATUS check|reconnect|disconnect|quit <player_id>`
+##### `STATUS check|reconnect|disconnect|quit [<player_id>]`
 +   `check`: indicates tha the server is doing a connection check on all clients
 +   `reconnect`: indicates that the player has successfully reconnected to the match he was playing
 +   `disconnect`: indicates that a player has been found to be disconnected
 +   `quit`: the player has definitively quitted the game and won't be able to reconnect in future rounds
-+   `<player_id>`: the assigned number of the user involved
++   `<player_id>`: the assigned number of the user involved (not used after `check`)
 
 This message is sent to all connected users and also serves the purpose of notifying the reconnecting user that the procedure went fine (`STATUS reconnect ...`).
 

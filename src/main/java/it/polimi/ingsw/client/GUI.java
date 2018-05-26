@@ -37,6 +37,12 @@ public class GUI implements ClientUI {
     }
 
     @Override
+    public void updateStatusMessage(String statusChange, int playerid) {
+
+    }
+
+
+    @Override
     public void updateConnectionClosed() {
 
     }

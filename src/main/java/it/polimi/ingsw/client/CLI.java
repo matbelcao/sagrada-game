@@ -26,7 +26,7 @@ public class CLI implements ClientUI{
         String password;
         //try {
 
-            outCli.printf("%nUSERNAME: ");
+            outCli.printf("%n%nUSERNAME: ");
             inKeyboard.add();
             username = inKeyboard.getln();
 
@@ -49,11 +49,11 @@ public class CLI implements ClientUI{
         if (logged) {
             outCli.printf(uimsg.getMessage("login-ok"), client.getUsername());
         } else {
-            outCli.println(uimsg.getMessage("login-ko"));
+            outCli.printf(uimsg.getMessage("login-ko"));
         }
     }
 
-    public void updateConnectionOk() { outCli.printf("%nConnection established correctly!%n"); }
+    public void updateConnectionOk() { outCli.printf(uimsg.getMessage("connection-ok")); }
 
     public void updateLobby(int numUsers){
         outCli.printf(uimsg.getMessage("lobby-update"),numUsers);
@@ -62,6 +62,12 @@ public class CLI implements ClientUI{
     public void updateGameStart(int numUsers, int playerId){
         outCli.printf(uimsg.getMessage("game-start"),numUsers,playerId);
     }
+
+    @Override
+    public void updateStatusMessage(String statusChange, int playerid) {
+
+    }
+
 
     public void updateConnectionClosed()
     {

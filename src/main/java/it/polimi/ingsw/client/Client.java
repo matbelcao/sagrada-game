@@ -58,6 +58,7 @@ public class Client {
             this.uiMode=UIMode.valueOf(eElement.getElementsByTagName("UI").item(0).getTextContent());
             this.serverIP=eElement.getElementsByTagName("address").item(0).getTextContent();
             this.connMode=ConnectionMode.valueOf(eElement.getElementsByTagName("connectionMode").item(0).getTextContent());
+            this.lang=UILanguage.valueOf(eElement.getElementsByTagName("language").item(0).getTextContent());
             if(connMode.equals(ConnectionMode.RMI)){
                 this.port=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
             }else{ this.port=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent()); }
@@ -157,13 +158,10 @@ public class Client {
      */
     public ClientUI getClientUI(){return clientUI;}
 
-
-
-
     /**
      * This method instantiates the user interface
      */
-    private void setup(){
+    private void setupUI(){
         if (uiMode.equals(UIMode.CLI)){
             clientUI=new CLI(this,lang);
         }else{
@@ -227,6 +225,11 @@ public class Client {
     }
 
 
+    /**
+     * this method signals that a new match is about to begin and
+     * @param numPlayers the number of participants
+     * @param playerId the id of the user
+     */
     public void updateGameStart(int numPlayers, int playerId){
         clientUI.updateGameStart(numPlayers,playerId);
         this.playerId=playerId;
@@ -235,6 +238,9 @@ public class Client {
     }
 
 
+    /**
+     * this method manages the game itself in its parts
+     */
 
     private void match(){
         String command;
@@ -253,7 +259,9 @@ public class Client {
     }
 
 
-
+    /**
+     * this method quits the player from the game, he/she will not be able to resume the game
+     */
     public void quit(){
         clientConn.quit();
         userStatus=UserStatus.DISCONNECTED;
@@ -277,7 +285,7 @@ public class Client {
             }
         }
 
-        client.setup();
+        client.setupUI();
         client.connectAndLogin();
 
     }

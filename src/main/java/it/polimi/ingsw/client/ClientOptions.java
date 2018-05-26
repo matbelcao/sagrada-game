@@ -186,8 +186,8 @@ public class ClientOptions {
         if(options.contains("s")){ client.setConnMode(ConnectionMode.SOCKET);}
         if(options.contains("g")){ client.setUiMode(UIMode.GUI);}
         if(options.contains("c")){ client.setUiMode(UIMode.CLI);}
-        if(options.contains("g")){ client.setLang(UILanguage.eng);}
-        if(options.contains("c")){ client.setLang(UILanguage.ita);}
+        if(options.contains("e")){ client.setLang(UILanguage.eng);}
+        if(options.contains("i")){ client.setLang(UILanguage.ita);}
         if(options.contains("a")){ client.setServerIP(options.get(options.indexOf("a")+1));}
     }
 }

@@ -1,11 +1,23 @@
 <?xml version="1.0" ?>
 <messages>
+    <connection-ok>
+        <eng>Connection established!</eng>
+        <ita>Connessione stabilita!</ita>
+    </connection-ok>
+    <login-ok>
+        <eng>Welcome %s!</eng>
+        <ita>Benvenuto %s!</ita>
+    </login-ok>
+    <login-ko>
+        <eng>Could not login, please try again ...</eng>
+        <ita>Impossibile effettuare il login, per favore riprova ...</ita>
+    </login-ko>
     <lobby-update>
-        <eng>%nWaiting for other players to connect ... %n%d players are waiting for the start of the game ...</eng>
-        <ita>%nIn attesa della connessione di altri giocatori ... %n%d giocatori stanno aspettando di iniziare la partita ...</ita>
+        <eng>Waiting for other players to connect ... %n%d players are waiting for the start of the game ...</eng>
+        <ita>In attesa della connessione di altri giocatori ... %n%d giocatori stanno aspettando di iniziare la partita ...</ita>
     </lobby-update>
     <game-start>
-        <eng>%nA new match is starting right now with %d players %nYou are player number %d %n%nGood luck!</eng>
-        <ita>%nUna nuova partita sta per iniziare con %d giocatori %nSei il giocatore numero %d %n%nBuona fortuna!</ita>
+        <eng>A new match is starting right now with %d players %nYou are player number %d %n%nGood luck!</eng>
+        <ita>Una nuova partita sta per iniziare con %d giocatori %nSei il giocatore numero %d %n%nBuona fortuna!</ita>
     </game-start>
 </messages>

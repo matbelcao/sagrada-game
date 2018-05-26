@@ -19,6 +19,7 @@ Welcome to Sagrada!
             ip:                 127.0.0.1
             ui:                 GUI
             connection mode:    socket
+            language:           ita
 
     </help-message>
 </message>
