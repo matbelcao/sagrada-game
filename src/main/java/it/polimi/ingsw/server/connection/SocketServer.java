@@ -6,6 +6,7 @@ import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +42,11 @@ public class SocketServer extends Thread implements ServerConn  {
         boolean playing = true;
         while(playing){
             try {
-                inSocket.add();
+                try {
+                    inSocket.add();
+                } catch (SocketException e) {
+                    user.disconnect();
+                }
 
                 if(Validator.checkAckParams(inSocket.readln(),result)&& result.get(1).equals("status")){
                     inSocket.pop();

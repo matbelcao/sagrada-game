@@ -6,6 +6,7 @@ import it.polimi.ingsw.common.immutables.*;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,6 +78,9 @@ public class SocketClient implements ClientConn {
                         }
                     }
                 } catch (NullPointerException e) {
+                    this.quit();
+                } catch (SocketException e) {
+                    e.printStackTrace();
                     this.quit();
                 }
             }
@@ -154,7 +158,12 @@ public class SocketClient implements ClientConn {
         outSocket.flush();
 
 
-        inSocket.add();
+        try {
+            inSocket.add();
+        } catch (SocketException e) {
+            e.printStackTrace();
+            this.quit();
+        }
 
         if (ClientParser.isLogin(inSocket.readln())) {
             ClientParser.parse(inSocket.readln(),parsedResult);

@@ -247,7 +247,6 @@ public class Client {
             userStatus=UserStatus.PLAYING;
             lockStatus.notifyAll();
         }
-        this.match();
     }
 
 

@@ -2,6 +2,7 @@ package it.polimi.ingsw.common.connection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 public class QueuedInReader {
@@ -15,7 +16,7 @@ public class QueuedInReader {
         this.inReader= inReader;
     }
 
-    public void add(){
+    public void add() throws SocketException {
         try {
             synchronized (lockReader) {
                 while ((temp = inReader.readLine())==null) {

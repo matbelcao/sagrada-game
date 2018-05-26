@@ -3,6 +3,7 @@ package it.polimi.ingsw.client;
 import it.polimi.ingsw.common.connection.QueuedInReader;
 
 import java.io.*;
+import java.net.SocketException;
 
 public class CLI implements ClientUI{
     private QueuedInReader inKeyboard;
@@ -24,7 +25,7 @@ public class CLI implements ClientUI{
     public void loginProcedure() {
         String username;
         String password;
-        //try {
+        try {
 
             outCli.printf("%n%nUSERNAME: ");
             inKeyboard.add();
@@ -39,9 +40,10 @@ public class CLI implements ClientUI{
 
             client.setPassword(password);
             client.setUsername(username);
-        /*} catch (IOException e) {
+        } catch (SocketException e) {
             e.printStackTrace();
-        }*/
+            client.disconnect();
+        }
     }
 
 
@@ -84,7 +86,13 @@ public class CLI implements ClientUI{
     @Override
     public String getCommand() {
         //String s="";
-        if(inKeyboard.isEmpty()){inKeyboard.add();}
+        if(inKeyboard.isEmpty()){
+
+            try {
+                inKeyboard.add();
+            } catch (SocketException e) {
+            }
+        }
         return inKeyboard.getln();
         /*try {
             s=inKeyboard.readLine();

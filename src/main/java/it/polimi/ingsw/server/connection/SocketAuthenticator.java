@@ -4,6 +4,7 @@ import it.polimi.ingsw.common.enums.ConnectionMode;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 /**
@@ -64,7 +65,7 @@ public class SocketAuthenticator extends Thread {
                     outSocket.println("LOGIN ko");
                 }
             }
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | SocketException e) {
             try {
                 socket.close();
             } catch (IOException e1) {
