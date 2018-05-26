@@ -146,7 +146,8 @@ public class SocketServer extends Thread implements ServerConn  {
         try{
             outSocket.println("STATUS check");
             outSocket.flush();
-            System.out.println(inSocket.isEmpty());
+            //debug
+            //System.out.println(inSocket.isEmpty());
             while(inSocket.isEmpty()){
                 Thread.sleep(50);
             }

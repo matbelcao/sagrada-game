@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<messages>
+    <lobby-update>
+        <eng>%nWaiting for other players to connect ... %n%d players are waiting for the start of the game ...</eng>
+        <ita>%nIn attesa della connessione di altri giocatori ... %n%d giocatori stanno aspettando di iniziare la partita ...</ita>
+    </lobby-update>
+    <game-start>
+        <eng>%nA new match is starting right now with %d players %nYou are player number %d %n%nGood luck!</eng>
+        <ita>%nUna nuova partita sta per iniziare con %d giocatori %nSei il giocatore numero %d %n%nBuona fortuna!</ita>
+    </game-start>
+</messages>

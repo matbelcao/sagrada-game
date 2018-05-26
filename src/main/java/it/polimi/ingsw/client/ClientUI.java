@@ -1,6 +1,9 @@
 package it.polimi.ingsw.client;
 
+import java.io.File;
+
 public interface ClientUI {
+    static final String MESSAGES_FILE="src"+ File.separator+"xml"+File.separator+"client"+File.separator+"UIMessages.xml";
 
     public void loginProcedure();
 

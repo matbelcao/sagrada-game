@@ -34,12 +34,13 @@ public class Client {
     private ConnectionMode connMode;
     private String username;
     private String password;
-    private int personalId;
+    private int playerId;
     private UserStatus userStatus;
     private ClientConn clientConn;
     private String serverIP;
     private Integer port;
     private ClientUI clientUI;
+    private UILanguage lang;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client"+ File.separator; //append class name + ".xml" to obtain complete path
 
     /**
@@ -98,6 +99,21 @@ public class Client {
     }
 
     /**
+     * @return the set language
+     */
+    public UILanguage getLang() {
+        return lang;
+    }
+
+    /**
+     * This method sets the wanted language
+     * @param lang the requested language
+     */
+    public void setLang(UILanguage lang) {
+        this.lang = lang;
+    }
+
+    /**
      * This method sets the wanted connection mode
      * @param connMode the requested connection mode
      */
@@ -142,15 +158,17 @@ public class Client {
     public ClientUI getClientUI(){return clientUI;}
 
 
+
+
     /**
      * This method instantiates the user interface
      */
     private void setup(){
         if (uiMode.equals(UIMode.CLI)){
-            clientUI=new CLI(this);
+            clientUI=new CLI(this,lang);
         }else{
             System.out.println("Launching GUI (still not implemented....");
-            clientUI=new GUI(this);
+            clientUI=new GUI(this,lang);
         }
     }
 
@@ -167,8 +185,7 @@ public class Client {
             if (connMode.equals(ConnectionMode.SOCKET)) {
                 clientConn = new SocketClient(this, serverIP, port);
 
-                //heartbeat();
-            }
+                }
             do {
                 clientUI.loginProcedure();
                 if (connMode.equals(ConnectionMode.RMI)) {
@@ -210,17 +227,17 @@ public class Client {
     }
 
 
-    public void updateGameStart(int numPlayers, int personalId){
-        clientUI.updateGameStart(numPlayers,personalId);
-        this.personalId=personalId;
+    public void updateGameStart(int numPlayers, int playerId){
+        clientUI.updateGameStart(numPlayers,playerId);
+        this.playerId=playerId;
         userStatus=UserStatus.PLAYING;
+        this.match();
     }
 
 
 
     private void match(){
         String command;
-        while(userStatus.equals(UserStatus.LOBBY)){}
         while(userStatus.equals(UserStatus.PLAYING)) {
             System.out.println("CLIENT: Ancora dentro!");
             command=clientUI.getCommand();
@@ -262,6 +279,6 @@ public class Client {
 
         client.setup();
         client.connectAndLogin();
-        client.match();
+
     }
 }

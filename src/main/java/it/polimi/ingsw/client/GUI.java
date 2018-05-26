@@ -2,8 +2,10 @@ package it.polimi.ingsw.client;
 
 public class GUI implements ClientUI {
     private Client client;
+    private UIMessages uimsg;
 
-    public GUI(Client client){
+    public GUI(Client client, UILanguage lang){
+        this.uimsg=new UIMessages(lang);
         this.client = client;
         System.out.println("Created gui!!");
     }

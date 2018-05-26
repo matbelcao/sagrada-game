@@ -9,8 +9,12 @@ public class CLI implements ClientUI{
     //private BufferedReader inKeyboard;
     private PrintWriter outCli;
     private Client client;
+    private UIMessages uimsg;
 
-    public CLI(Client client) {
+
+    public CLI(Client client,UILanguage lang) {
+
+        this.uimsg=new UIMessages(lang);
         this.client = client;
         inKeyboard = new QueuedInReader(new BufferedReader(new InputStreamReader(System.in)));
         //inKeyboard=new BufferedReader(new InputStreamReader(System.in));
@@ -43,20 +47,20 @@ public class CLI implements ClientUI{
 
     public void updateLogin(boolean logged) {
         if (logged) {
-            outCli.println("Successfully logged in as " + client.getUsername());
+            outCli.printf(uimsg.getMessage("login-ok"), client.getUsername());
         } else {
-            outCli.println("Couldn't login correctly, please retry ...");
+            outCli.println(uimsg.getMessage("login-ko"));
         }
     }
 
-    public void updateConnectionOk() { outCli.println("\nConnection established correctly!"); }
+    public void updateConnectionOk() { outCli.printf("%nConnection established correctly!%n"); }
 
     public void updateLobby(int numUsers){
-        outCli.println("Lobby : " + numUsers);
+        outCli.printf(uimsg.getMessage("lobby-update"),numUsers);
     }
 
     public void updateGameStart(int numUsers, int playerId){
-        outCli.println("Starting Match : " + numUsers + " " + playerId);
+        outCli.printf(uimsg.getMessage("game-start"),numUsers,playerId);
     }
 
     public void updateConnectionClosed()

@@ -31,7 +31,7 @@ public class SocketClient implements ClientConn {
         inSocket = new QueuedInReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
         outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
 
-            inSocket.add();
+        inSocket.add();
 
         inSocket.pop();
         client.getClientUI().updateConnectionOk();
@@ -51,19 +51,25 @@ public class SocketClient implements ClientConn {
 
                     if(ClientParser.parse(inSocket.readln(),result)) {
 
+                        //STATUS
+
                         if (ClientParser.isStatus(inSocket.readln())) {
                             inSocket.pop();
-                            if (result.get(1).equals("check")) {
-                                this.pong();
-                            }
+                            manageStatusMsg(result);
+
+                        //LOBBY
 
                         }else if (ClientParser.isLobby(inSocket.readln())) {
                             updateLobby(result.get(1));
                             inSocket.pop();
 
+                        //GAME
+
                         }else if(ClientParser.isGame(inSocket.readln())) {
                             updateGame(result);
                             inSocket.pop();
+
+                        //ERR
 
                         }else{
                             System.out.println("ERR: control error caused by:  "+inSocket.readln());
@@ -76,6 +82,33 @@ public class SocketClient implements ClientConn {
             }
         }).start();
     }
+
+
+    private void manageStatusMsg(List<String> parsed){
+
+        //STATUS check
+        if (parsed.get(1).equals("check")) {
+            this.pong();
+        }
+
+        //STATUS reconnect
+        if (parsed.get(1).equals("reconnect")) {
+            this.pong();
+        }
+
+        //STATUS disconnect
+        if (parsed.get(1).equals("disconnect")) {
+            this.pong();
+        }
+
+        //STATUS quit
+        if (parsed.get(1).equals("quit")) {
+            this.pong();
+        }
+    }
+
+
+
 
     /**
      * This method receives the server's message and calls the proper updateXxxx() method (providing the parsed command)

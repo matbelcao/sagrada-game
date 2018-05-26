@@ -105,6 +105,8 @@ public class ClientOptions {
             case "--cli":
             case "--rmi":
             case "--socket":
+            case "--italian":
+            case "--english":
                 if(options.contains(option.substring(2,3))){ throw new IllegalArgumentException(); }
                 options.add(option.substring(2,3));
                 break;
@@ -138,12 +140,12 @@ public class ClientOptions {
             shortOption=option.substring(i,i+1);
 
             //invalid option or already set
-            if(!shortOption.matches("[hgcars]")|| options.contains(shortOption)){
+            if(!shortOption.matches("[hgcarsie]")|| options.contains(shortOption)){
                 throw new IllegalArgumentException();
             }
 
             //options without parameters
-            if(shortOption.matches("[hgcrs]")){
+            if(shortOption.matches("[hgcrsie]")){
                 options.add(shortOption);
             }else {
                 if (!isLastShortOption(option, i)) {
@@ -171,7 +173,10 @@ public class ClientOptions {
     }
 
     private static void checkValidCombinations(List<String> options) {
-        if( (options.contains("r")&& options.contains("s"))||(options.contains("g") && options.contains("c")) || (options.contains("h")&& options.size()>1) ){
+        if( (options.contains("r")&& options.contains("s"))
+                || (options.contains("g") && options.contains("c"))
+                || (options.contains("i") && options.contains("e"))
+                || (options.contains("h")&& options.size()>1) ){
             throw new IllegalArgumentException();
         }
     }
@@ -181,6 +186,8 @@ public class ClientOptions {
         if(options.contains("s")){ client.setConnMode(ConnectionMode.SOCKET);}
         if(options.contains("g")){ client.setUiMode(UIMode.GUI);}
         if(options.contains("c")){ client.setUiMode(UIMode.CLI);}
+        if(options.contains("g")){ client.setLang(UILanguage.eng);}
+        if(options.contains("c")){ client.setLang(UILanguage.ita);}
         if(options.contains("a")){ client.setServerIP(options.get(options.indexOf("a")+1));}
     }
 }
