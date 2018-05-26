@@ -6,39 +6,46 @@ import java.io.*;
 
 public class CLI implements ClientUI{
     private QueuedInReader inKeyboard;
+    //private BufferedReader inKeyboard;
     private PrintWriter outCli;
     private Client client;
 
     public CLI(Client client) {
         this.client = client;
         inKeyboard = new QueuedInReader(new BufferedReader(new InputStreamReader(System.in)));
+        //inKeyboard=new BufferedReader(new InputStreamReader(System.in));
         outCli = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)), true);
     }
 
     public void loginProcedure() {
         String username;
         String password;
-
+        //try {
 
             outCli.printf("%nUSERNAME: ");
             inKeyboard.add();
             username = inKeyboard.getln();
 
+            //username=inKeyboard.readLine();
+
             outCli.printf("%nPASSWORD: ");
             inKeyboard.add();
             password = inKeyboard.getln();
+            //password=inKeyboard.readLine();
 
             client.setPassword(password);
             client.setUsername(username);
-
+        /*} catch (IOException e) {
+            e.printStackTrace();
+        }*/
     }
 
 
     public void updateLogin(boolean logged) {
         if (logged) {
-            outCli.println("%nSuccessfully logged in as " + client.getUsername());
+            outCli.println("Successfully logged in as " + client.getUsername());
         } else {
-            outCli.println("%nCouldn't login correctly, please retry ...");
+            outCli.println("Couldn't login correctly, please retry ...");
         }
     }
 
@@ -66,10 +73,15 @@ public class CLI implements ClientUI{
 
     @Override
     public String getCommand() {
-
-            if(inKeyboard.isEmpty()){inKeyboard.add();}
-
+        //String s="";
+        if(inKeyboard.isEmpty()){inKeyboard.add();}
         return inKeyboard.getln();
+        /*try {
+            s=inKeyboard.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+        //return s;
     }
 }
 

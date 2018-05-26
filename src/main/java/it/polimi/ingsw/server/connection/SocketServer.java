@@ -47,7 +47,7 @@ public class SocketServer extends Thread implements ServerConn  {
                     inSocket.pop();
                 }
 
-            } catch ( IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 user.disconnect();
                 playing=false;
             }

@@ -46,9 +46,7 @@ public class SocketClient implements ClientConn {
         new Thread(() -> {
             ArrayList<String> result= new ArrayList<>();
             while(!socket.isClosed()) {
-
                 try {
-
                     inSocket.add();
 
                     if(ClientParser.parse(inSocket.readln(),result)) {
@@ -72,13 +70,8 @@ public class SocketClient implements ClientConn {
                             inSocket.pop();
                         }
                     }
-                } catch ( NullPointerException e) {
-                    try {
-                        socket.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-
-                    }
+                } catch (NullPointerException e) {
+                    this.quit();
                 }
             }
         }).start();
@@ -127,8 +120,8 @@ public class SocketClient implements ClientConn {
         outSocket.println("LOGIN " + username + " " + password);
         outSocket.flush();
 
-        inSocket.add();
 
+        inSocket.add();
 
         if (ClientParser.isLogin(inSocket.readln())) {
             ClientParser.parse(inSocket.readln(),parsedResult);
@@ -153,6 +146,8 @@ public class SocketClient implements ClientConn {
         outSocket.flush();
         try {
             socket.close();
+            socket=null;
+            inSocket=null;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -259,7 +254,8 @@ public class SocketClient implements ClientConn {
      */
     @Override
     public boolean pong() {
-        System.out.println("ping_buono!!  "+inSocket.readln());
+        //Debug
+        //System.out.println("ping_buono!!");
         try{
             outSocket.println("ACK status");
             outSocket.flush();

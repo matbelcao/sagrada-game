@@ -221,9 +221,10 @@ public class Client {
     private void match(){
         String command;
         while(userStatus.equals(UserStatus.LOBBY)) {
-
+            //System.out.println("------nON QUI!");
         }
         while(userStatus.equals(UserStatus.PLAYING)) {
+            System.out.println("------Ancora dentro!");
             command=clientUI.getCommand();
             if (command.equals("QUIT")){
                 quit();
@@ -231,7 +232,9 @@ public class Client {
             if(command.equals("TEST")){
                 clientUI.printmsg(clientConn.getPrivateObj().toString());
             }
+            System.out.println("------Ancora dentro!");
         }
+        System.out.println("------USCITO!");
     }
 
 
@@ -263,6 +266,4 @@ public class Client {
         client.connectAndLogin();
         client.match();
     }
-
-
 }

@@ -20,8 +20,8 @@ public class QueuedInReader {
                     inSocket.wait(100);
                 }
                 temp = inSocket.readLine();
-
-                //System.out.println("\t\t\t\t\t"+temp);//debug
+                //debug
+                //System.out.println("\t\t\t\t\t"+temp);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
