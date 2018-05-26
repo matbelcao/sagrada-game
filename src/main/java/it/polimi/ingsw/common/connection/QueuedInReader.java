@@ -5,21 +5,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class QueuedInReader {
-    private BufferedReader inSocket;
+    private BufferedReader inReader;
+    private final Object lockReader = new Object();
+    private final Object lockQueue = new Object();
     private String temp;
-    private final ArrayList<String> queue=new ArrayList<>();
+    private ArrayList<String> queue = new ArrayList<>();
 
-    public QueuedInReader(BufferedReader inSocket) {
-        this.inSocket = inSocket;
+    public QueuedInReader(BufferedReader inReader) {
+        this.inReader= inReader;
     }
 
     public void add(){
         try {
-            synchronized (inSocket) {
-                while (!inSocket.ready()) {
-                    inSocket.wait(100);
+            synchronized (lockReader) {
+                while ((temp = inReader.readLine())==null) {
+                    lockReader.wait(100);
                 }
-                temp = inSocket.readLine();
+
+                lockReader.notifyAll();
                 //debug
                 //System.out.println("\t\t\t\t\t"+temp);
             }
@@ -36,8 +39,9 @@ public class QueuedInReader {
     }
 
     private void put(){
-        synchronized(queue) {
+        synchronized(lockQueue) {
             queue.add(temp);
+            lockQueue.notifyAll();
         }
             temp=null;
     }
@@ -48,23 +52,27 @@ public class QueuedInReader {
 
     public String getln(){
 
-        synchronized(queue) {
+        synchronized(lockQueue) {
             assert(!queue.isEmpty());
             String line = queue.get(0);
             queue.remove(0);
+            lockQueue.notifyAll();
             return line;
         }
     }
 
     public void pop(){
-        synchronized(queue) {
+        synchronized(lockQueue) {
             assert(!queue.isEmpty());
             queue.remove(0);
-
+            lockQueue.notifyAll();
         }
     }
 
     public boolean isEmpty(){
-        return queue.isEmpty();
+        synchronized (lockQueue) {
+            lockQueue.notifyAll();
+            return queue.isEmpty();
+        }
     }
 }

@@ -47,20 +47,20 @@ public class CLI implements ClientUI{
 
     public void updateLogin(boolean logged) {
         if (logged) {
-            outCli.printf(uimsg.getMessage("login-ok"), client.getUsername());
+            outCli.printf("%n"+uimsg.getMessage("login-ok"), client.getUsername());
         } else {
-            outCli.printf(uimsg.getMessage("login-ko"));
+            outCli.printf("%n"+uimsg.getMessage("login-ko"));
         }
     }
 
-    public void updateConnectionOk() { outCli.printf(uimsg.getMessage("connection-ok")); }
+    public void updateConnectionOk() { outCli.printf("%n"+uimsg.getMessage("connection-ok")); }
 
     public void updateLobby(int numUsers){
-        outCli.printf(uimsg.getMessage("lobby-update"),numUsers);
+        outCli.printf("%n"+uimsg.getMessage("lobby-update"),numUsers);
     }
 
     public void updateGameStart(int numUsers, int playerId){
-        outCli.printf(uimsg.getMessage("game-start"),numUsers,playerId);
+        outCli.printf("%n"+uimsg.getMessage("game-start"),numUsers,playerId);
     }
 
     @Override

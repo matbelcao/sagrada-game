@@ -36,6 +36,7 @@ public class Client {
     private String password;
     private int playerId;
     private UserStatus userStatus;
+    private final Object lockStatus=new Object();
     private ClientConn clientConn;
     private String serverIP;
     private Integer port;
@@ -177,11 +178,12 @@ public class Client {
      */
     private void connectAndLogin(){
         boolean logged=false;
-
+        synchronized (lockStatus) {
+            userStatus = UserStatus.CONNECTED;
+            lockStatus.notifyAll();
+        }
         try {
-            synchronized (userStatus) {
-                userStatus = UserStatus.CONNECTED;
-            }
+
             if (connMode.equals(ConnectionMode.SOCKET)) {
                 clientConn = new SocketClient(this, serverIP, port);
 
@@ -194,12 +196,14 @@ public class Client {
                     logged = clientConn.login(username, password);
                 }
             } while (!logged);
-            synchronized (userStatus) {
+            synchronized (lockStatus) {
                 userStatus = UserStatus.LOBBY;
+                lockStatus.notifyAll();
             }
         } catch (IOException | NotBoundException e) {
-            synchronized (userStatus) {
+            synchronized (lockStatus) {
                 userStatus = UserStatus.DISCONNECTED;
+                lockStatus.notifyAll();
             }
             clientUI.updateConnectionBroken();
         }
@@ -239,9 +243,9 @@ public class Client {
     public void updateGameStart(int numPlayers, int playerId){
         clientUI.updateGameStart(numPlayers,playerId);
         this.playerId=playerId;
-        synchronized (userStatus){
+        synchronized (lockStatus){
             userStatus=UserStatus.PLAYING;
-            notifyAll();
+            lockStatus.notifyAll();
         }
         this.match();
     }
@@ -253,13 +257,14 @@ public class Client {
 
     private void match(){
         String command;
-        synchronized (userStatus){
+        synchronized (lockStatus){
             while(userStatus.equals(UserStatus.LOBBY)){
                 try {
-                    wait();
+                   lockStatus.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                lockStatus.notifyAll();
             }
         }
 
@@ -283,15 +288,17 @@ public class Client {
      */
     public void quit(){
         clientConn.quit();
-        synchronized (userStatus) {
+        synchronized (lockStatus) {
             userStatus = UserStatus.DISCONNECTED;
+            lockStatus.notifyAll();
         }
         clientUI.updateConnectionClosed();
     }
 
     public void disconnect(){
-        synchronized (userStatus) {
+        synchronized (lockStatus) {
             userStatus = UserStatus.DISCONNECTED;
+            lockStatus.notifyAll();
         }
         clientUI.updateConnectionBroken();
     }
@@ -303,6 +310,7 @@ public class Client {
         if (args.length>0) {
             if(!ClientOptions.getOptions(args,options) || options.contains("h")){
                 ClientOptions.printHelpMessage();
+                return;
             }else {
                 ClientOptions.setClientPreferences(options, client);
             }

@@ -17,7 +17,7 @@ public class ClientOptions {
     private ClientOptions(){}
 
     private static final String LONG_OPTION="(\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+))";
-    private static final String SHORT_OPTION="(\\-[hgcrsa]+)";
+    private static final String SHORT_OPTION="(\\-[hgcrsaie]+)";
     private static final String IP_ADDRESS="(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$)";
 
 

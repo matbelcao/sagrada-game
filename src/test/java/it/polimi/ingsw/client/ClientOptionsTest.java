@@ -17,6 +17,9 @@ public class ClientOptionsTest {
         assertTrue(ClientOptions.getOptions(Validator.simpleParse(args),options));
         assertTrue(options.contains("h"));
 
+        args="   -i     ";
+        assertTrue(ClientOptions.getOptions(Validator.simpleParse(args),options));
+
         args=" --socket   -ga  192.168.1.1";
         assertTrue(ClientOptions.getOptions(Validator.simpleParse(args),options));
 
