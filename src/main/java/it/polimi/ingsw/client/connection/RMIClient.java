@@ -39,7 +39,7 @@ public class RMIClient implements ClientConn,RMIClientInt {
      */
     @Override
     public void updateGameStart(int n, int id) {
-        client.getClientUI().updateGameStart(n, id);
+        client.updateGameStart(n, id);
     }//
 
     @Override
