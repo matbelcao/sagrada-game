@@ -34,9 +34,7 @@ public class UIMessages {
    }
    public String getMessage(String msgName){
         Element msg= (Element) msgFile.getElementsByTagName(msgName).item(0);
-       return lang.equals(UILanguage.eng)?
-                msg.getElementsByTagName(lang.toString()).item(0).getTextContent():
-                msg.getElementsByTagName(lang.toString()).item(0).getTextContent();
+       return msg.getElementsByTagName(lang.toString()).item(0).getTextContent();
    }
 
 }
