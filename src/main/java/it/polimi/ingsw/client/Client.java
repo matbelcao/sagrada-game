@@ -214,22 +214,23 @@ public class Client {
      * @return true iff the login had a positive result
      */
     private boolean loginRMI() throws RemoteException, MalformedURLException, NotBoundException {
-            AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
-            if(authenticator.authenticate(username,password)){
-                //get the stub of the remote object
-                RMIServerInt rmiConnStub = (RMIServerInt) Naming.lookup("rmi://"+serverIP+"/"+username+password);
-                //create RMIClient with the reference of the remote obj and assign it to the Client
-                RMIClientInt rmiClient  = new RMIClient(rmiConnStub,this);
-                clientConn = (RMIClient)rmiClient;
-                //create a remote reference of the obj rmiClient and pass it to the server.
-                //a remote reference is passed so there's no need to add rmiClient to a Registry
-                RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiClient, 0);
-                rmiConnStub.setClientReference(remoteRef);
-                clientUI.updateConnectionOk();
-                clientUI.updateLogin(true);
-                authenticator.updateConnected(username);
-                return true;
-            }
+        System.setProperty("java.rmi.server.hostname",serverIP);
+        AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
+        if(authenticator.authenticate(username,password)){
+            //get the stub of the remote object
+            RMIServerInt rmiConnStub = (RMIServerInt) Naming.lookup("rmi://"+serverIP+"/"+username+password);
+            //create RMIClient with the reference of the remote obj and assign it to the Client
+            RMIClientInt rmiClient  = new RMIClient(rmiConnStub,this);
+            clientConn = (RMIClient)rmiClient;
+            //create a remote reference of the obj rmiClient and pass it to the server.
+            //a remote reference is passed so there's no need to add rmiClient to a Registry
+            RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiClient, 0);
+            rmiConnStub.setClientReference(remoteRef);
+            clientUI.updateConnectionOk();
+            clientUI.updateLogin(true);
+            authenticator.updateConnected(username);
+            return true;
+        }
         clientUI.updateLogin(false);
         return false;
     }

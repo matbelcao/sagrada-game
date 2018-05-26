@@ -3,7 +3,6 @@ package it.polimi.ingsw.client;
 import it.polimi.ingsw.common.connection.QueuedInReader;
 
 import java.io.*;
-import java.net.SocketException;
 
 public class CLI implements ClientUI{
     private QueuedInReader inKeyboard;
@@ -40,7 +39,7 @@ public class CLI implements ClientUI{
 
             client.setPassword(password);
             client.setUsername(username);
-        } catch (SocketException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             client.disconnect();
         }
@@ -49,20 +48,20 @@ public class CLI implements ClientUI{
 
     public void updateLogin(boolean logged) {
         if (logged) {
-            outCli.printf("%n"+uimsg.getMessage("login-ok"), client.getUsername());
+            outCli.printf(String.format("%n%s", uimsg.getMessage("login-ok")), client.getUsername());
         } else {
-            outCli.printf("%n"+uimsg.getMessage("login-ko"));
+            outCli.printf(String.format("%n%s", uimsg.getMessage("login-ko")));
         }
     }
 
-    public void updateConnectionOk() { outCli.printf("%n"+uimsg.getMessage("connection-ok")); }
+    public void updateConnectionOk() { outCli.printf(String.format("%n%s", uimsg.getMessage("connection-ok"))); }
 
     public void updateLobby(int numUsers){
-        outCli.printf("%n"+uimsg.getMessage("lobby-update"),numUsers);
+        outCli.printf(String.format("%n%s", uimsg.getMessage("lobby-update")),numUsers);
     }
 
     public void updateGameStart(int numUsers, int playerId){
-        outCli.printf("%n"+uimsg.getMessage("game-start"),numUsers,playerId);
+        outCli.printf(String.format("%n%s", uimsg.getMessage("game-start")),numUsers,playerId);
     }
 
     @Override
@@ -86,13 +85,10 @@ public class CLI implements ClientUI{
     @Override
     public String getCommand() {
         //String s="";
-        if(inKeyboard.isEmpty()){
-
-            try {
-                inKeyboard.add();
-            } catch (SocketException e) {
-            }
+        if(inKeyboard.isEmpty()) {
+            inKeyboard.add();
         }
+
         return inKeyboard.getln();
         /*try {
             s=inKeyboard.readLine();

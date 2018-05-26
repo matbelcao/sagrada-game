@@ -4,9 +4,9 @@ import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.SchemaCard;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class SocketServer extends Thread implements ServerConn  {
             try {
                 try {
                     inSocket.add();
-                } catch (SocketException e) {
+                } catch (Exception e) {
                     user.disconnect();
                 }
 

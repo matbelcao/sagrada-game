@@ -6,7 +6,6 @@ import it.polimi.ingsw.common.immutables.*;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,10 +76,7 @@ public class SocketClient implements ClientConn {
                             inSocket.pop();
                         }
                     }
-                } catch (NullPointerException e) {
-                    this.quit();
-                } catch (SocketException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
                     this.quit();
                 }
             }
@@ -160,8 +156,7 @@ public class SocketClient implements ClientConn {
 
         try {
             inSocket.add();
-        } catch (SocketException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
             this.quit();
         }
 

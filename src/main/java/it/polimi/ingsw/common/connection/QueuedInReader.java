@@ -16,7 +16,7 @@ public class QueuedInReader {
         this.inReader= inReader;
     }
 
-    public void add() throws SocketException {
+    public void add() {
         try {
             synchronized (lockReader) {
                 while ((temp = inReader.readLine())==null) {
