@@ -18,8 +18,8 @@ public class Game extends Thread implements Iterable  {
     private ArrayList<User> users;
     private SchemaCard [] draftedSchemas;
     private RoundIterator round;
-    private Boolean endTurn;
-    private final Object lockObj;
+    private Boolean endLock;
+    private final Object lockRun;
     private User userPlaying;
     private Timer timer;
 
@@ -38,8 +38,23 @@ public class Game extends Thread implements Iterable  {
             u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
         }
         this.board=new Board(users,additionalSchemas);
-        this.lockObj = new Object();
+        this.lockRun = new Object();
+        this.draftedSchemas = board.draftSchemas();
+    }
 
+    /**
+     * Constructs the class and sets the players list
+     * @param users the players of the match
+     */
+    public Game(List<User> users){
+        this.additionalSchemas=false;
+        this.users= (ArrayList<User>) users;
+        for(User u : users){
+            u.setStatus(UserStatus.PLAYING);
+        }
+        this.board=new Board(users,additionalSchemas);
+        this.lockRun = new Object();
+        draftedSchemas = board.draftSchemas();
     }
 
     /**
@@ -55,6 +70,10 @@ public class Game extends Thread implements Iterable  {
                     player.setSchema(draftedSchemas[users.indexOf(u)*Board.NUM_PLAYER_SCHEMAS]);
                 }
             }
+            synchronized (lockRun) {
+                endLock = true;
+                lockRun.notifyAll();
+            }
         }
     }
 
@@ -64,9 +83,24 @@ public class Game extends Thread implements Iterable  {
     private class PlayerTurn extends TimerTask {
         @Override
         public void run(){
-            synchronized (lockObj) {
-                endTurn = true;
-                //endTurn.notifyAll();
+            synchronized (lockRun) {
+                endLock = true;
+                lockRun.notifyAll();
+            }
+        }
+    }
+
+    /**
+     * Stops the execution flow of Run () until the desired action occurs
+     */
+    private void waitAction(){
+        while (!endLock) {
+            synchronized (lockRun) {
+                try {
+                    lockRun.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -76,47 +110,57 @@ public class Game extends Thread implements Iterable  {
      */
     @Override
     public void run(){
-        sendCards();
+        endLock=false;
         timer = new Timer();
-        timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * 1000);
         round = (RoundIterator) this.iterator();
+
+        timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * 1000);
+        waitAction();
+
         while (round.hasNextRound()){
             while(round.hasNext()){
                 userPlaying = round.next();
-                endTurn=false;
+
+                endLock=false;
                 timer.schedule(new PlayerTurn(), MasterServer.getMasterServer().getTurnTime() * 1000);
-                synchronized (lockObj) {
-                    while (!endTurn) {
-                        /*try {
-                            endTurn.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }*/
-                    }
-                }
+
+                waitAction();
             }
             round.nextRound();
         }
     }
 
     /**
-     * Sends four schema cards for each user of the match, three public objectives and one private objective
+     * Responds to the request by sending one private objective card to the user of the match
      */
-    private void sendCards(){
-        int i;
-        draftedSchemas = board.draftSchemas();
+    private void sendPrivCards(User user){
+        user.getServerConn().notifyPrivateObjective(board.getPlayer(user).getPrivObjective());
+    }
 
-        for (User u: users){
-            for ( i=0 ; i < Board.NUM_PLAYER_SCHEMAS ; i++ ){
-                u.getServerConn().notifySchema(draftedSchemas[(users.indexOf(u)* Board.NUM_PLAYER_SCHEMAS)+i]);
-            }
-            for ( i=0 ; i < Board.NUM_TOOLS ; i++ ){
-                u.getServerConn().notifyToolCard(board.getToolCard(i));
-            }
-            for ( i=0 ; i < Board.NUM_OBJECTIVES ; i++ ){
-                u.getServerConn().notifyPublicObjective(board.getPublicObjective(i));
-            }
-            u.getServerConn().notifyPrivateObjective(board.getPlayer(u).getPrivObjective());
+    /**
+     * Responds to the request by sending three public objective cards to the user of the match
+     */
+    private void sendPubCards(User user){
+        for (int i=0 ; i < Board.NUM_OBJECTIVES ; i++ ) {
+            user.getServerConn().notifyPublicObjective(board.getPublicObjective(i));
+        }
+    }
+
+    /**
+     * Responds to the request by sending three tool cards to the user of the match
+     */
+    private void sendToolCards(User user){
+        for (int i = 0; i < Board.NUM_TOOLS; i++) {
+            user.getServerConn().notifyToolCard(board.getToolCard(i));
+        }
+    }
+
+    /**
+     * Responds to the request by sending four schema cards for each user of the match
+     */
+    private void sendSchemaCards(User user){
+        for (int i=0 ; i < Board.NUM_PLAYER_SCHEMAS ; i++ ){
+                user.getServerConn().notifySchema(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]);
         }
     }
 
@@ -181,20 +225,6 @@ public class Game extends Thread implements Iterable  {
             }
         }
         users.remove(user);
-    }
-
-
-    /**
-     * Constructs the class and sets the players list
-     * @param users the players of the match
-     */
-    public Game(List<User> users){
-        this.additionalSchemas=false;
-        this.users= (ArrayList<User>) users;
-        for(User u : users){
-            u.setStatus(UserStatus.PLAYING);
-        }
-        this.lockObj = new Object();;
     }
 
     /**
