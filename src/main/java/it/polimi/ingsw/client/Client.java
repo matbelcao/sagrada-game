@@ -7,12 +7,13 @@ import it.polimi.ingsw.client.connection.SocketClient;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UIMode;
+import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
-import it.polimi.ingsw.common.enums.UserStatus;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -72,6 +73,13 @@ public class Client {
 
     }
 
+    public int getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
 
     /**
      * This method constructs the class and overwrites uimode and connmode according to the passed params
