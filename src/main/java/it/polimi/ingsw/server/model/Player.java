@@ -50,6 +50,12 @@ public class Player {
     }
 
     /**
+     * Returns the private objective card of the player
+     * @return the card
+     */
+    public PrivObjectiveCard getPrivObjective(){return this.privObjective;}
+
+    /**
      * Checks if the player has to skip this turn or not
      * @return
      */
@@ -85,7 +91,7 @@ public class Player {
 
     /**
      * Gets the schemaCard assigned to the player
-     * @return the schema3
+     * @return the schema
      */
     public SchemaCard getSchema(){
         return this.schema;

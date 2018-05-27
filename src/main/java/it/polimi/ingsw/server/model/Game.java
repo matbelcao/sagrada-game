@@ -37,9 +37,9 @@ public class Game extends Thread implements Iterable  {
             u.setGame(this);
             u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
         }
-
         this.board=new Board(users,additionalSchemas);
-        this.lockObj = new Object();;
+        this.lockObj = new Object();
+
     }
 
     /**
@@ -66,7 +66,7 @@ public class Game extends Thread implements Iterable  {
         public void run(){
             synchronized (lockObj) {
                 endTurn = true;
-                endTurn.notifyAll();
+                //endTurn.notifyAll();
             }
         }
     }
@@ -76,7 +76,7 @@ public class Game extends Thread implements Iterable  {
      */
     @Override
     public void run(){
-        sendSchemaCards();
+        sendCards();
         timer = new Timer();
         timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * 1000);
         round = (RoundIterator) this.iterator();
@@ -85,15 +85,13 @@ public class Game extends Thread implements Iterable  {
                 userPlaying = round.next();
                 endTurn=false;
                 timer.schedule(new PlayerTurn(), MasterServer.getMasterServer().getTurnTime() * 1000);
-
-
                 synchronized (lockObj) {
                     while (!endTurn) {
-                        try {
+                        /*try {
                             endTurn.wait();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
-                        }
+                        }*/
                     }
                 }
             }
@@ -102,15 +100,23 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     * Sends four schema cards for each user of the match
+     * Sends four schema cards for each user of the match, three public objectives and one private objective
      */
-    private void sendSchemaCards(){
+    private void sendCards(){
+        int i;
         draftedSchemas = board.draftSchemas();
 
         for (User u: users){
-            for (int i = 0; i< Board.NUM_PLAYER_SCHEMAS; i++){
+            for ( i=0 ; i < Board.NUM_PLAYER_SCHEMAS ; i++ ){
                 u.getServerConn().notifySchema(draftedSchemas[(users.indexOf(u)* Board.NUM_PLAYER_SCHEMAS)+i]);
             }
+            for ( i=0 ; i < Board.NUM_TOOLS ; i++ ){
+                u.getServerConn().notifyToolCard(board.getToolCard(i));
+            }
+            for ( i=0 ; i < Board.NUM_OBJECTIVES ; i++ ){
+                u.getServerConn().notifyPublicObjective(board.getPublicObjective(i));
+            }
+            u.getServerConn().notifyPrivateObjective(board.getPlayer(u).getPrivObjective());
         }
     }
 

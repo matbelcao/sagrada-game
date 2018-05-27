@@ -9,7 +9,6 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 
 public class Board {
-    private DraftPool draftPool;
     private ArrayList<Player> players;
     private PubObjectiveCard[] publicObjectives;
     private ToolCard[] toolCards;

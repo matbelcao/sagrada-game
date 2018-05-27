@@ -1,7 +1,10 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.client.connection.RMIClientInt;
+import it.polimi.ingsw.server.model.PrivObjectiveCard;
+import it.polimi.ingsw.server.model.PubObjectiveCard;
 import it.polimi.ingsw.server.model.SchemaCard;
+import it.polimi.ingsw.server.model.ToolCard;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -59,6 +62,21 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
 
     @Override
     public void notifySchema(SchemaCard schemaCard){
+
+    }
+
+    @Override
+    public void notifyToolCard(ToolCard toolCard) {
+
+    }
+
+    @Override
+    public void notifyPublicObjective(PubObjectiveCard pubObjectiveCard) {
+
+    }
+
+    @Override
+    public void notifyPrivateObjective(PrivObjectiveCard privObjectiveCard) {
 
     }
 

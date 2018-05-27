@@ -1,8 +1,7 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.connection.QueuedInReader;
-import it.polimi.ingsw.server.model.Cell;
-import it.polimi.ingsw.server.model.SchemaCard;
+import it.polimi.ingsw.server.model.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -90,8 +89,8 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the "LOBBY n" update message to the user
-     * @param n number of players in the lobby
+     * Sends the lobby update message to the user
+     * @param n the number of players in the lobby
      */
     @Override
     public void notifyLobbyUpdate(int n){
@@ -100,7 +99,7 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the "GAME start n id" message to the user
+     * Sends the match starting message to the user
      * @param n the number of connected players
      * @param id the assigned id of the specific user
      */
@@ -122,7 +121,7 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Send the user a text description of the schema card passed as a parameter
+     * Sends the user a text description of the schema card passed as a parameter
      * @param schemaCard the schema card to send
      */
     @Override
@@ -144,6 +143,38 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.println("");
         outSocket.flush();
     }
+
+    /**
+     * Sends the user a text description of the tool card passed as a parameter
+     * @param toolCard the tool card to send
+     */
+    @Override
+    public void notifyToolCard(ToolCard toolCard){
+            outSocket.println("SEND tool "+toolCard.getId()+" "+toolCard.getName().replaceAll(" ", "_")+" "+toolCard.getDescription().replaceAll(" ", "_"));
+            outSocket.flush();
+    }
+
+    /**
+     * Sends the user a text description of the public objective card passed as a parameter
+     * @param pubObjectiveCard the public objective card to send
+     */
+    @Override
+    public void notifyPublicObjective(PubObjectiveCard pubObjectiveCard){
+        outSocket.println("SEND pub "+pubObjectiveCard.getId()+" "+pubObjectiveCard.getName().replaceAll(" ", "_")+" "+pubObjectiveCard.getDescription().replaceAll(" ", "_"));
+        outSocket.flush();
+    }
+
+    /**
+     * Sends the user a text description of the private objective card passed as a parameter
+     * @param privObjectiveCard the private objective card to send
+     */
+    @Override
+    public void notifyPrivateObjective(PrivObjectiveCard privObjectiveCard){
+        outSocket.println("SEND priv "+privObjectiveCard.getId()+" "+privObjectiveCard.getName().replaceAll(" ", "_")+" "+privObjectiveCard.getDescription().replaceAll(" ", "_"));
+        outSocket.flush();
+    }
+
+
 
     @Override
     public boolean ping() {
