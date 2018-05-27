@@ -28,6 +28,14 @@ public class LightSchemaCard {
     }
 
     /**
+     * @return a copy of the map of the content of the schema
+     */
+    public Map<Integer,CellContent> getCellsMap(){
+        return (Map<Integer, CellContent>) cells.clone();
+    }
+
+
+    /**
      * This method checks if the parameter contentMap is valid
      * @param contentMap the map that needs to be checked
      * @return true iff contentmap is valid

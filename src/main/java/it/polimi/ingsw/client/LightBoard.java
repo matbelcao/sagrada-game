@@ -16,12 +16,14 @@ public class LightBoard {
 
     private ArrayList<LightTool> tools;
     private ArrayList<LightCard> pubObj;
+    private int numPlayers;
     private LightCard privObj;
     private HashMap<Integer,LightPlayer> players;
     private HashMap<Integer,LightDie> draftPool;
     private HashMap<Integer,LightDie> roundTrack;
 
-    public LightBoard() {
+    public LightBoard(int numPlayers) {
+        this.numPlayers=numPlayers;
         tools=new ArrayList<>();
         pubObj= new ArrayList<>();
         players=new HashMap<>();
@@ -30,7 +32,7 @@ public class LightBoard {
     }
 
     public void addPlayer(LightPlayer player){
-        assert(players.size()<MAX_PLAYERS);
+        assert(players.size()<numPlayers);
         players.put(player.getPlayerId(),player);
     }
 

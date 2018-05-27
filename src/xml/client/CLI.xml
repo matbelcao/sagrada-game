@@ -1,16 +1,5 @@
 <?xml version="1.0" ?>
 <cli-components>
-    <small-schema>
-        ––––––––––––––––
-        |%s|%s|%s|%s|%s|
-        ––––––––––––––––
-        |%s|%s|%s|%s|%s|
-        ––––––––––––––––
-        |%s|%s|%s|%s|%s|
-        ––––––––––––––––
-        |%s|%s|%s|%s|%s|
-        ––––––––––––––––
-    </small-schema>
     <ONE> _____ ::|     |::|  ●  |::|_____|</ONE>
     <TWO> _____ ::|●    |::|     |::|____●|</TWO>
     <THREE> _____ ::|●    |::|  ●  |::|____●|</THREE>
@@ -19,4 +8,7 @@
     <SIX> _____ ::|●   ●|::|●   ●|::|●___●|</SIX>
     <FILLED> _____ ::|█████|::|█████|::|█████|</FILLED>
     <EMPTI> _____ ::|     |::|     |::|_____|</EMPTI>
+    <player-info>User: %s               %s %s                       %s %d</player-info>
+    <username-id> %s %s %d</username-id>
+    <schema-border> ––––––––––––––––––––––––––––––––––––––––– </schema-border>
 </cli-components>

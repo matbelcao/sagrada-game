@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.connection;
+package it.polimi.ingsw.client.uielements;
 
 import it.polimi.ingsw.client.Client;
 import org.w3c.dom.Document;
@@ -37,8 +37,17 @@ public class CLIElems {
 
     public String getBigDie(String face){
         if(face.matches(BIG_EL)) {
-            return elemFile.getElementsByTagName(face).item(0).getTextContent();
+            return getElem(face);
         }
         throw new IllegalArgumentException();
     }
+
+    public String getElem(String elem){
+        try {
+            return elemFile.getElementsByTagName(elem).item(0).getTextContent();
+        }catch(NullPointerException e){
+            throw new IllegalArgumentException();
+        }
+    }
+
 }
