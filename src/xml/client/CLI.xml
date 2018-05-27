@@ -10,5 +10,7 @@
     <EMPTI> _____ ::|     |::|     |::|_____|</EMPTI>
     <player-info>User: %s               %s %s                       %s %d</player-info>
     <username-id> %s %s %d</username-id>
-    <schema-border> ––––––––––––––––––––––––––––––––––––––––– </schema-border>
+    <schema-border>–––––––––––––––––––––––––––––––––––</schema-border>
+    <tokens-info>%s %s</tokens-info>
+    <tool-index>%s %d</tool-index>
 </cli-components>

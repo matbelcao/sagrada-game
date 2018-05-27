@@ -28,4 +28,20 @@
         <eng>Player number:</eng>
         <ita>Giocatore numero:</ita>
     </player-number>
+    <pub-obj>
+        <eng>Public objectives:</eng>
+        <ita>Obiettivi pubblici:</ita>
+    </pub-obj>
+    <priv-obj>
+        <eng>Private objective:</eng>
+        <ita>Obiettivo privato:</ita>
+    </priv-obj>
+    <tokens>
+        <eng>Favor tokens:</eng>
+        <ita>Gettoni favore:</ita>
+    </tokens>
+    <tool-number>
+        <eng>Tool number:</eng>
+        <ita>Utensile numero:</ita>
+    </tool-number>
 </messages>

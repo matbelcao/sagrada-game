@@ -15,6 +15,7 @@ public class Validator {
     static final String TOOL_INDEX = "[0-2]";
     static final String DIE_FACE = "[1-6]";
     static final String DRAFT_POOL_DIE = "[0-8]";
+    private static final int MAX_USERNAME_LENGTH = 16;
 
     private Validator(){ }
 
@@ -359,7 +360,8 @@ public class Validator {
      */
     public static boolean isValidUsername(String username){
         return  username.matches(ALPHANUMERIC)
-                && !username.matches(BEGINS_WITH_DIGIT);
+                && !username.matches(BEGINS_WITH_DIGIT)
+                && username.length()<=MAX_USERNAME_LENGTH;
     }
 
 

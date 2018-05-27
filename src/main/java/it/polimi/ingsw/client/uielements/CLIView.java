@@ -2,33 +2,52 @@ package it.polimi.ingsw.client.uielements;
 
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
-import it.polimi.ingsw.common.immutables.CellContent;
-import it.polimi.ingsw.common.immutables.LightCard;
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.SchemaCard;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CLIView {
-    private static final int SCHEMA_WIDTH = 38 ;
+    private static final int SCHEMA_WIDTH = 38;
     private static final int SCHEMA_HEIGHT = 16;
+    private static final int OBJ_LENGTH = 34;
     private final ArrayList<String> topInfo= new ArrayList<>();
-    private String topSectionDetails="";
-    private ArrayList<String> topSection= new ArrayList<>();
-    private String topSectionSeparators;
+    private HashMap<Integer,ArrayList<String>> schemas= new HashMap<>();
+    private ArrayList<String> objectives= new ArrayList<>();
+    private final ArrayList<String> tools= new ArrayList<>();
     private String tracksDetails;
     private final ArrayList<String> tracks= new ArrayList<>();
     private String bottomDetails;
     private final ArrayList<String> bottom=new ArrayList<>();
     private static final CLIElems cliElems= new CLIElems();
     private final UIMessages uiMsg;
-    public CLIView(UILanguage lang){
+    private final int playerId;
+
+    public CLIView(UILanguage lang, int playerId){
         this.uiMsg=new UIMessages(lang);
+        this.playerId = playerId;
     }
+
+
+    /**
+     * creates the representation of the player's schema and puts it into the map
+     * @param player the player whose schema we want to create/update
+     */
+    public void updateSchema(LightPlayer player){
+        schemas.put(player.getPlayerId(), (ArrayList<String>) buildSchema(player));
+    }
+
+
+    public void updateTools(List<LightTool> tools){
+        for(int i=0;i < Board.NUM_TOOLS;i++){
+            this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),i));
+            this.tools.addAll(buildTool(tools.get(i)));
+        }
+    }
+
+
+
 
 
 
@@ -39,7 +58,7 @@ public class CLIView {
      * @param to the index of the last one
      * @return the said representation
      */
-    public static List<String> buildBigRow(Map<Integer,CellContent> elems, int from, int to){
+    public static List<String> buildCellRow(Map<Integer,CellContent> elems, int from, int to){
         assert(from<=to && from>=0);
         ArrayList<String> result=new ArrayList<>();
         result.add("");
@@ -81,21 +100,34 @@ public class CLIView {
 
             assert (result.size() == 4);
             //append new cell/die/constraint
-            result = (ArrayList<String>) appendBigRows(result, Arrays.asList(rows));
+            result = (ArrayList<String>) appendRows(result, Arrays.asList(rows));
         }
         return result;
     }
 
     /**
      * builds a list containing strings that represent the schema of a player
-     * @param schema
-     * @return
+     * @return the representation of the schema
      */
-    public static List<String> buildSchema(LightSchemaCard schema){
+    private List<String> buildSchema(LightPlayer player){
         ArrayList<String> schem= new ArrayList<>();
+
+        //add top info
+        schem.addAll(fitInLength(buildSchemaInfo(player),SCHEMA_WIDTH));
+
+        //add top border
+        schem.add(cliElems.getElem("schema-border"));
+
+        //build schema
         for(int row=0; row< SchemaCard.NUM_ROWS;row++){
-            schem.addAll(buildBigRow(schema.getCellsMap(),row*SchemaCard.NUM_COLS,(row+1)*SchemaCard.NUM_COLS ));
+            schem.addAll(buildCellRow(player.getSchema().getCellsMap(),row*SchemaCard.NUM_COLS,(row+1)*SchemaCard.NUM_COLS ));
         }
+        //add bottom border
+        schem.add(cliElems.getElem("schema-border"));
+
+        //add left/right borders
+        schem= (ArrayList<String>) appendRows(appendRows(buildSchemaSeparator(),schem),buildSchemaSeparator());
+
         return schem;
     }
     /**
@@ -120,64 +152,103 @@ public class CLIView {
 
 
     /**
-     * this puts the schemas at the beginning of the top portions ( it will also clear what was previously in all topSection related strings ).
-     * Must be called before all others topSection-related builders
-     * @param players the map containing the participants
-     * @param playerId the player id whose view we are building
-     * @param numPlayers the number of participants
+     * this creates the info section of a schema card
+     * @param player one of the participants
      */
-    private void buildTopSectionSchemas(Map<Integer,LightPlayer> players, int playerId,int numPlayers){
-        //create separator of the appropriate size
-        topSectionSeparators=new String(new char[numPlayers-1]).replace("\0", cliElems.getElem("schema-border"));
+    private String buildSchemaInfo(LightPlayer player) {
+        if(player==null){throw new IllegalArgumentException();}
 
-        if(players.isEmpty() || numPlayers<2||numPlayers>4 || playerId>numPlayers-1||playerId<0){
-            throw new IllegalArgumentException();
-        }
-        topSection.clear();
-        topSection=(ArrayList<String>) appendBigRows(topSection,buildSchemaSeparator());
-
-        StringBuilder builder= new StringBuilder();
-
-        for(int i=0; i < numPlayers; i++){
-            if(i!=playerId){
-                //append others schemas to the top section
-                topSection=(ArrayList<String>) appendBigRows(topSection,buildSchema(players.get(i).getSchema()));
-                //append chars to separate schemas each one from another
-                topSection=(ArrayList<String>) appendBigRows(topSection,buildSchemaSeparator());
-
-                String playerDetails=String.format(cliElems.getElem("username-id"),
-                        players.get(i).getUsername(),
-                        uiMsg.getMessage("player-number"),
-                        players.get(i).getPlayerId());
-
-                builder.append(padUntil(playerDetails,SCHEMA_WIDTH));
-            }
-        }
-        topSectionDetails=builder.toString();
+        return String.format(cliElems.getElem("username-id"),
+                player.getUsername(),
+                uiMsg.getMessage("player-number"),
+                player.getPlayerId());
     }
 
-    private void buildTopSectionAppendObjectives(ArrayList<LightCard> pubObj,LightCard privObj){
-        topSection=(ArrayList<String>) appendBigRows(topSection,buildObjectives(pubObj,privObj));
-        // TODO: 27/05/2018
-    }
-
+    /**
+     * creates a list containing the details about the objectives fitting them in a defined length
+     * @param pubObj the public objectives
+     * @param privObj the private objective
+     * @return a list of strings with a max length defined by OBJ_LENGTH
+     */
     private List<String> buildObjectives(ArrayList<LightCard> pubObj,LightCard privObj){
         ArrayList<String> result=new ArrayList<>();
-        // TODO: 27/05/2018
+
+        result.add(uiMsg.getMessage("pub-obj"));
+        for(LightCard card : pubObj){
+            result.addAll(buildCard(card));
+            result.add("     ");
+        }
+        result.add(uiMsg.getMessage("priv-obj"));
+        result.addAll(buildCard( privObj));
+
         return result;
     }
+
     /**
-     * creates a list containing characters needed to visually separate schemas on the screen
+     * builds a single generic card(name and description)
+     * @param card the card to be represented
+     * @return a list that is the card's representation
+     */
+    private List<String> buildCard( LightCard card) {
+        ArrayList<String> result=new ArrayList<>();
+
+        result.add(card.getName());
+        result.addAll(fitInLength(card.getDescription(), OBJ_LENGTH));
+        return result;
+    }
+
+    private List<String> buildTool(LightTool tool){
+        ArrayList<String> result=new ArrayList<>();
+        result= (ArrayList<String>) buildCard(tool);
+        result.add(String.format(cliElems.getElem("token-info"),
+                uiMsg.getMessage("tokens"),
+                tool.isUsed()?"2":"1"));
+        return result;
+    }
+
+    /**
+     * This method creates a list of string with a fixed maximum length that put together represent the original string
+     * @param line the string to be split
+     * @param length the desired maximum length
+     * @return a list of strings that are parts of the original line
+     */
+    private static List<String> fitInLength(String line, int length ){
+        if(line == null || length <= 0){throw new IllegalArgumentException();}
+        ArrayList<String> result=new ArrayList<>();
+
+        String lineToFit= line;
+        while(lineToFit.length()>length){
+            int i = length - 1;
+            while(lineToFit.charAt(i) == ' '){
+                i--;
+            }
+            result.add(lineToFit.substring(0,i));
+            lineToFit=lineToFit.substring(i + 1).trim();
+        }
+        result.add(lineToFit);
+        return result;
+    }
+
+    /**
+     * Creates a list containing characters needed to visually separate schemas on the screen
      * @return said list
      */
     private List<String> buildSchemaSeparator(){
         ArrayList<String> separator= new ArrayList<>();
+        separator.add("   ");
         for(int i=0;i< SCHEMA_HEIGHT;i++){
             separator.add(" | ");
         }
+        separator.add("   ");
         return separator;
     }
 
+    /**
+     * appends spaces to a string until a defined length is reached
+     * @param toPad the string to be padded
+     * @param finalLenght the total final length of the padded string
+     * @return the padded string
+     */
     private String padUntil(String toPad, int finalLenght){
         if(finalLenght<0|| toPad==null||toPad.length()>finalLenght){throw new IllegalArgumentException();}
 
@@ -216,7 +287,7 @@ public class CLIView {
      * @param b the list of strings being appended to a
      * @return the result of appending, string by string, a to b
      */
-    public static List<String> appendBigRows(List<String> a,List<String> b){
+    public static List<String> appendRows(List<String> a, List<String> b){
         if(a==null || b==null || (!a.isEmpty() && a.size()<b.size())){
             throw new IllegalArgumentException();
         }
