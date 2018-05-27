@@ -17,6 +17,10 @@ public class Game extends Thread implements Iterable  {
     private boolean additionalSchemas; //to be used for additional schemas FA
     private ArrayList<User> users;
     private SchemaCard [] draftedSchemas;
+    private RoundIterator round;
+    private Boolean endTurn;
+    private final Object lockObj;
+    private User userPlaying;
     private Timer timer;
 
     /**
@@ -34,7 +38,8 @@ public class Game extends Thread implements Iterable  {
             u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
         }
 
-        board=new Board(users,additionalSchemas);
+        this.board=new Board(users,additionalSchemas);
+        this.lockObj = new Object();;
     }
 
     /**
@@ -54,6 +59,19 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
+     * Allows the enabled user to perform the desired actions during his turn ( until it isn't executed )
+     */
+    private class PlayerTurn extends TimerTask {
+        @Override
+        public void run(){
+            synchronized (lockObj) {
+                endTurn = true;
+                endTurn.notifyAll();
+            }
+        }
+    }
+
+    /**
      * This method provides the execution order of the game flow
      */
     @Override
@@ -61,7 +79,26 @@ public class Game extends Thread implements Iterable  {
         sendSchemaCards();
         timer = new Timer();
         timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * 1000);
+        round = (RoundIterator) this.iterator();
+        while (round.hasNextRound()){
+            while(round.hasNext()){
+                userPlaying = round.next();
+                endTurn=false;
+                timer.schedule(new PlayerTurn(), MasterServer.getMasterServer().getTurnTime() * 1000);
 
+
+                synchronized (lockObj) {
+                    while (!endTurn) {
+                        try {
+                            endTurn.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+            round.nextRound();
+        }
     }
 
     /**
@@ -151,6 +188,7 @@ public class Game extends Thread implements Iterable  {
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
         }
+        this.lockObj = new Object();;
     }
 
     /**
