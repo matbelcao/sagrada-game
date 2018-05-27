@@ -106,10 +106,10 @@ public class SocketServer extends Thread implements ServerConn  {
                         game.sendToolCards(user);
                         break;
                     case "draftpool":
-                        //to implement
+                        game.sendDraftPool(user);
                         break;
                     case "roundtrack":
-                        //to implement
+                        game.sendRoundTrack(user);
                         break;
                     case "players":
                         game.sendPlayers(user);
@@ -183,9 +183,6 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
-    public void notifyDraftPool(DraftPool pool){
-        //
-    }
 
     /**
      * Sends the client a text description of the tool card passed as a parameter
@@ -218,6 +215,43 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
+     * Sends the client a textual list of the dice in the DraftPool
+     * @param draftedDice the dice list
+     */
+    @Override
+    public void notifyDraftPool(List<Die> draftedDice){
+        Die die;
+
+        outSocket.print("SEND draftpool");
+        for (int i=0;i<draftedDice.size();i++){
+            die=draftedDice.get(i);
+            System.out.print(" "+i+","+die.getColor().toString()+","+die.getShade().toString());
+        }
+        outSocket.println("");
+        outSocket.flush();
+    }
+
+    /**
+     * Sends the client a textual list of the dice in the RoundTrack (can be multiple die at the same index)
+     * @param trackList the dice list (index,die)
+     */
+    @Override
+    public void notifyRoundTrack(ArrayList<ArrayList<Die>> trackList){
+        ArrayList<Die> dieList;
+
+        outSocket.print("SEND roundtrack");
+        for(int i=0;i<trackList.size();i++){
+            dieList=trackList.get(i);
+            for(Die d:dieList){
+                outSocket.print(" "+i+","+d.getColor().toString()+","+d.getShade().toString());
+            }
+        }
+        outSocket.println("");
+        outSocket.flush();
+    }
+
+    /**{
+     *
      * Sends the client a text description of the users that are currently playing in the match
      * @param players the player's list to send
      */

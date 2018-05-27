@@ -14,7 +14,6 @@ import java.util.*;
  */
 public class Game extends Thread implements Iterable  {
     public static final int NUM_ROUND=10;
-    private DraftPool draftPool;
     private Board board;
     private boolean additionalSchemas; //to be used for additional schemas FA
     private ArrayList<User> users;
@@ -37,7 +36,6 @@ public class Game extends Thread implements Iterable  {
             u.setGame(this);
             u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
         }
-        this.draftPool=new DraftPool();
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         this.draftedSchemas = board.draftSchemas();
@@ -53,7 +51,6 @@ public class Game extends Thread implements Iterable  {
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
         }
-        this.draftPool=new DraftPool();
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         draftedSchemas = board.draftSchemas();
@@ -120,7 +117,7 @@ public class Game extends Thread implements Iterable  {
         waitAction();
 
         while (round.hasNextRound()){
-            //estrazione casuale dadi draftpool
+            board.getDraftPool().draftDice(users.size());
             while(round.hasNext()){
                 userPlaying = round.next();
 
@@ -129,6 +126,7 @@ public class Game extends Thread implements Iterable  {
 
                 waitAction();
             }
+            board.getDraftPool().clearDraftPool(round.getRoundNumber());
             round.nextRound();
         }
     }
@@ -187,7 +185,15 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      */
     public void sendDraftPool(User user){
-        //user.getServerConn().notifyDraftPool(draftPool);
+        user.getServerConn().notifyDraftPool(board.getDraftPool().getDraftedDice());
+    }
+
+    /**
+     * Responds to the request by sending the list of the dice that are present in the roundTrack (and their relative index)
+     * @param user the user who made the request
+     */
+    public void sendRoundTrack(User user){
+        user.getServerConn().notifyRoundTrack(board.getDraftPool().getRoundTrack().getTrack());
     }
 
     /**

@@ -1,8 +1,5 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.common.immutables.LightCard;
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.common.immutables.LightTool;
 import it.polimi.ingsw.server.model.*;
 
 import java.util.ArrayList;
@@ -28,6 +25,10 @@ public interface ServerConn {
     void notifyPrivateObjective(PrivObjectiveCard privObjectiveCard);
 
     void notifyPlayers(List<Player> players);
+
+    void notifyDraftPool(List<Die> draftedDice);
+
+    void notifyRoundTrack(ArrayList<ArrayList<Die>> trackList);
 
     void notifyFavorTokens(int favorTokens);
 

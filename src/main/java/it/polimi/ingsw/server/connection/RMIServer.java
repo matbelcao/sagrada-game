@@ -87,6 +87,16 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
 
     }
 
+    @Override
+    public void notifyDraftPool(List<Die> draftedDice) {
+        
+    }
+
+    @Override
+    public void notifyRoundTrack(ArrayList<ArrayList<Die>> trackList) {
+
+    }
+
 
     @Override
     public void notifyFavorTokens(int favorTokens) {
