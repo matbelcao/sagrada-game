@@ -1,31 +1,37 @@
 package it.polimi.ingsw.server.model;
 
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents the area where drafted dice are put
  */
 public class DraftPool {
-    ArrayList<Die> drafted;
+    private ArrayList<Die> drafted;
+    private DiceBag diceBag;
+    private RoundTrack roundTrack;
 
     /**
      * Constructor of the class
      */
-    DraftPool(){
+    public DraftPool(){
         this.drafted = new ArrayList<>();
+        diceBag=new DiceBag();
+        roundTrack=new RoundTrack();
     }
     /**
      * Adds a die to the draft area
      * @param die the die to be added
      */
-    void addDie(Die die){drafted.add(die);}
+    public void addDie(Die die){drafted.add(die);}
 
     /**
      * Adds a group of dice to the draft area, during a game this can happen only after drafting
      * from the dice bag, when the draft area is empty
      * @param dice the dice to be added
      */
-    void addDice(ArrayList<Die> dice){
+    public void addDice(ArrayList<Die> dice){
         assert(this.drafted.isEmpty());
         this.drafted.addAll(dice);
     }
@@ -35,7 +41,7 @@ public class DraftPool {
      * @param index the index of the selected die
      * @return the Die
      */
-    Die chooseDie(int index){
+    public Die chooseDie(int index){
         Die die;
         assert index>=0 && index<this.drafted.size();
         die = this.drafted.get(index);
@@ -43,9 +49,23 @@ public class DraftPool {
         return die;
     }
 
-    /**
-     * @return  a reference to all the dice in the draft area
-     */
-    ArrayList<Die> getDice(){ return this.drafted; }
+    public List<Die> getDraftedDice(){
+        return this.drafted;
+    }
+
+    public List<Die> draftDice(int numPlayers) {
+        drafted=new ArrayList<>();
+        drafted = (ArrayList<Die>) diceBag.draftDice(numPlayers);
+        return drafted;
+    }
+
+    public RoundTrack getRoundTrack(){
+        return this.roundTrack;
+    }
+
+    public void clearDraftPool(int round){
+        roundTrack.putDice(round,drafted);
+        drafted=new ArrayList<>();
+    }
     
 }

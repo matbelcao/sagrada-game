@@ -34,6 +34,14 @@ public class Player {
     }
 
     /**
+     * Returns the associated username (the same in the relative User class)
+     * @return the player's username
+     */
+    public String getUsername(){
+        return this.username;
+    }
+
+    /**
      * Return the player's id of the match
      * @return the id of the match
      */

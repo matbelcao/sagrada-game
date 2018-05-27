@@ -42,11 +42,16 @@ public class DiceBag {
      * @param quantity the quantity of dice to be drafted at once
      * @return an ArrayList containing the drafted dice
      */
-    public List<Die> draftDice(int quantity) throws EmptyDiceBagException {
+    public List<Die> draftDice(int quantity) {
         ArrayList<Die> drafted = new ArrayList<>();
-        while(quantity > 0){
-            drafted.add(draftDie());
-            quantity--;
+        try {
+            while(quantity > 0) {
+
+                drafted.add(draftDie());
+                quantity--;
+            }
+        }catch (EmptyDiceBagException e) {
+            return drafted;
         }
         return drafted;
     }

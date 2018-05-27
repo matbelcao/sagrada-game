@@ -1,8 +1,6 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.common.immutables.LightCard;
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.common.immutables.LightTool;
+
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.common.enums.UserStatus;
@@ -16,7 +14,6 @@ import java.util.*;
  */
 public class Game extends Thread implements Iterable  {
     public static final int NUM_ROUND=10;
-    private DraftPool draftPool;
     private Board board;
     private boolean additionalSchemas; //to be used for additional schemas FA
     private ArrayList<User> users;
@@ -39,7 +36,6 @@ public class Game extends Thread implements Iterable  {
             u.setGame(this);
             u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
         }
-        this.draftPool=new DraftPool();
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         this.draftedSchemas = board.draftSchemas();
@@ -55,7 +51,6 @@ public class Game extends Thread implements Iterable  {
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
         }
-        this.draftPool=new DraftPool();
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         draftedSchemas = board.draftSchemas();
@@ -122,7 +117,7 @@ public class Game extends Thread implements Iterable  {
         waitAction();
 
         while (round.hasNextRound()){
-            //estrazione casuale dadi draftpool
+            board.getDraftPool().draftDice(users.size());
             while(round.hasNext()){
                 userPlaying = round.next();
 
@@ -131,6 +126,7 @@ public class Game extends Thread implements Iterable  {
 
                 waitAction();
             }
+            board.getDraftPool().clearDraftPool(round.getRoundNumber());
             round.nextRound();
         }
     }
@@ -140,9 +136,7 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      */
     public void sendPrivCard(User user){
-        PrivObjectiveCard privCard = board.getPlayer(user).getPrivObjective();
-        LightCard lightCard =new LightCard(privCard.getName(),privCard.getDescription(),privCard.getImgSrc(),privCard.getId());
-        user.getServerConn().notifyPrivateObjective(lightCard);
+        user.getServerConn().notifyPrivateObjective(board.getPlayer(user).getPrivObjective());
     }
 
     /**
@@ -151,9 +145,7 @@ public class Game extends Thread implements Iterable  {
      */
     public void sendPubCards(User user){
         for (int i=0 ; i < Board.NUM_OBJECTIVES ; i++ ) {
-            PubObjectiveCard pubCard = board.getPublicObjective(i);
-            LightCard lightCard =new LightCard(pubCard.getName(),pubCard.getDescription(),pubCard.getImgSrc(),pubCard.getId());
-            user.getServerConn().notifyPublicObjective(lightCard);
+            user.getServerConn().notifyPublicObjective(board.getPublicObjective(i));
         }
     }
 
@@ -162,12 +154,8 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      */
     public void sendToolCards(User user){
-        LightTool lightTool;
-
         for (int i = 0; i < Board.NUM_TOOLS; i++) {
-            ToolCard toolCard=board.getToolCard(i);
-            lightTool=new LightTool(toolCard.getName(),toolCard.getDescription(),toolCard.getImgSrc(),toolCard.getId(),toolCard.hasAlreadyUsed());
-            user.getServerConn().notifyToolCard(lightTool);
+            user.getServerConn().notifyToolCard(board.getToolCard(i));
         }
     }
 
@@ -177,7 +165,7 @@ public class Game extends Thread implements Iterable  {
      */
     public void sendSchemaCards(User user){
         for (int i=0 ; i < Board.NUM_PLAYER_SCHEMAS ; i++ ){
-                user.getServerConn().notifySchema(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]);
+            user.getServerConn().notifySchema(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]);
         }
     }
 
@@ -197,17 +185,33 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      */
     public void sendDraftPool(User user){
-        //user.getServerConn().notifyDraftPool(draftPool);
+        user.getServerConn().notifyDraftPool(board.getDraftPool().getDraftedDice());
     }
 
+    /**
+     * Responds to the request by sending the list of the dice that are present in the roundTrack (and their relative index)
+     * @param user the user who made the request
+     */
+    public void sendRoundTrack(User user){
+        user.getServerConn().notifyRoundTrack(board.getDraftPool().getRoundTrack().getTrack());
+    }
+
+    /**
+     * Responds to the request by sending the list of the match's players (and their id inside the Player class)
+     * @param user the user who made the request
+     */
     public void sendPlayers(User user){
-        ArrayList<LightPlayer> players= new ArrayList<>();
+        ArrayList<Player> players= new ArrayList<>();
         for (User u:users){
-            players.add(new LightPlayer(u.getUsername(),board.getPlayer(u).getGameId()));
+            players.add(board.getPlayer(u));
         }
         user.getServerConn().notifyPlayers(players);
     }
 
+    /**
+     * Responds by sending the favortokens to the user that made the request
+     * @param user the user who made the request
+     */
     public void sendFavorTokens(User user){
         Player player=board.getPlayer(user);
         if(player.getSchema()!=null){

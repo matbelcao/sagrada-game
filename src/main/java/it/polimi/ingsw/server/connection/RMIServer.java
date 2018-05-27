@@ -1,17 +1,16 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.client.connection.RMIClientInt;
-import it.polimi.ingsw.common.immutables.LightCard;
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.common.immutables.LightTool;
-import it.polimi.ingsw.server.model.PrivObjectiveCard;
-import it.polimi.ingsw.server.model.PubObjectiveCard;
-import it.polimi.ingsw.server.model.SchemaCard;
-import it.polimi.ingsw.server.model.ToolCard;
+import it.polimi.ingsw.common.immutables.CellContent;
+import it.polimi.ingsw.common.immutables.LightConstraint;
+import it.polimi.ingsw.common.immutables.LightDie;
+import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.server.model.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServerInt {
         private RMIClientInt clientReference;
@@ -69,25 +68,58 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
 
     }
 
+    /**
+     * Returns the light version of the given schema card
+     * @param schemaCard the schema card to be used as a template for the new light schema
+     * @return the newly created LightSchema
+     */
+    private LightSchemaCard toLightSchema(SchemaCard schemaCard){
+        HashMap<Integer,CellContent> contentMap = new HashMap<>(30);
+        for(int i=0;i<20;i++){
+           Cell cell = schemaCard.getCell(i);
+           if(cell.hasDie()){
+               contentMap.put(i,new LightDie(cell.getDie().getShade(),cell.getDie().getColor()));
+           }else if(cell.hasConstraint()){
+               Constraint constraint = cell.getConstraint();
+               if(constraint.isColorConstraint())
+                   contentMap.put(i,new LightConstraint(constraint.getColor()));
+               else
+                   contentMap.put(i,new LightConstraint(constraint.getShade()));
+           }
+        }
+        return new LightSchemaCard(schemaCard.getName(),contentMap,schemaCard.getFavorTokens());
+    }
+
     @Override
-    public void notifyToolCard(LightTool toolCard) {
+    public void notifyToolCard(ToolCard toolCard) {
 
     }
 
     @Override
-    public void notifyPublicObjective(LightCard pubObjectiveCard) {
+    public void notifyPublicObjective(PubObjectiveCard pubObjectiveCard) {
 
     }
 
     @Override
-    public void notifyPrivateObjective(LightCard privObjectiveCard) {
+    public void notifyPrivateObjective(PrivObjectiveCard privObjectiveCard) {
 
     }
 
     @Override
-    public void notifyPlayers(ArrayList<LightPlayer> players) {
+    public void notifyPlayers(List<Player> players) {
 
     }
+
+    @Override
+    public void notifyDraftPool(List<Die> draftedDice) {
+        
+    }
+
+    @Override
+    public void notifyRoundTrack(ArrayList<ArrayList<Die>> trackList) {
+
+    }
+
 
     @Override
     public void notifyFavorTokens(int favorTokens) {

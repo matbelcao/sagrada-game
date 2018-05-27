@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 
 public class Board {
+    private DraftPool draftPool;
     private ArrayList<Player> players;
     private PubObjectiveCard[] publicObjectives;
     private ToolCard[] toolCards;
@@ -22,6 +23,7 @@ public class Board {
 
 
     public Board(List<User> users, boolean additionalSchemas){
+        this.draftPool=new DraftPool();
         this.additionalSchemas=additionalSchemas;
         this.publicObjectives=draftPubObjectives();
         this.toolCards=draftToolCards();
@@ -133,6 +135,10 @@ public class Board {
     public PubObjectiveCard getPublicObjective(int index) {
         assert (index>=0 && index<NUM_OBJECTIVES);
         return publicObjectives[index];
+    }
+
+    public DraftPool getDraftPool(){
+        return this.draftPool;
     }
 
 }
