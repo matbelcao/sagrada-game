@@ -1,5 +1,8 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.client.uielements.UILanguage;
+import it.polimi.ingsw.client.uielements.UIMessages;
+
 public class GUI implements ClientUI {
     private Client client;
     private UIMessages uimsg;

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client;
+package it.polimi.ingsw.client.uielements;
 
 public enum UILanguage {
     ita,
