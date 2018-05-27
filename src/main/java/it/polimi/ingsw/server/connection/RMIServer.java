@@ -9,6 +9,7 @@ import it.polimi.ingsw.server.model.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -60,6 +61,21 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
 
     @Override
     public void notifyStatusUpdate(String event, int id) {
+
+    }
+
+    @Override
+    public void notifyGameEnd(List<Player> players) {
+
+    }
+
+    @Override
+    public void notifyRoundEvent(String event, int roundNumber) {
+
+    }
+
+    @Override
+    public void notifyTurnEvent(String event, int playerId, int turnNumber) {
 
     }
 
