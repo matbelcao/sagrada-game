@@ -3,11 +3,10 @@ package it.polimi.ingsw.server.connection;
 import it.polimi.ingsw.common.immutables.LightCard;
 import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.common.immutables.LightTool;
-import it.polimi.ingsw.server.model.PrivObjectiveCard;
-import it.polimi.ingsw.server.model.PubObjectiveCard;
-import it.polimi.ingsw.server.model.SchemaCard;
+import it.polimi.ingsw.server.model.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is an interfaces that declares the common methods between SOCKET/RMI server-side connections
@@ -22,13 +21,13 @@ public interface ServerConn {
 
     void notifySchema(SchemaCard schemaCard);
 
-    void notifyToolCard(LightTool toolCard);
+    void notifyToolCard(ToolCard toolCard);
 
-    void notifyPublicObjective(LightCard pubObjectiveCard);
+    void notifyPublicObjective(PubObjectiveCard pubObjectiveCard);
 
-    void notifyPrivateObjective(LightCard privObjectiveCard);
+    void notifyPrivateObjective(PrivObjectiveCard privObjectiveCard);
 
-    void notifyPlayers(ArrayList<LightPlayer> players);
+    void notifyPlayers(List<Player> players);
 
     void notifyFavorTokens(int favorTokens);
 

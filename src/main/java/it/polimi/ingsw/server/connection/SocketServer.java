@@ -192,7 +192,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param toolCard the tool card to send
      */
     @Override
-    public void notifyToolCard(LightTool toolCard){
+    public void notifyToolCard(ToolCard toolCard){
             outSocket.println("SEND tool "+toolCard.getId()+" "+toolCard.getName().replaceAll(" ", "_")+" "+toolCard.getDescription().replaceAll(" ", "_"));
             outSocket.flush();
     }
@@ -202,7 +202,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param pubObjectiveCard the public objective card to send
      */
     @Override
-    public void notifyPublicObjective(LightCard pubObjectiveCard){
+    public void notifyPublicObjective(PubObjectiveCard pubObjectiveCard){
         outSocket.println("SEND pub "+pubObjectiveCard.getId()+" "+pubObjectiveCard.getName().replaceAll(" ", "_")+" "+pubObjectiveCard.getDescription().replaceAll(" ", "_"));
         outSocket.flush();
     }
@@ -212,7 +212,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param privObjectiveCard the private objective card to send
      */
     @Override
-    public void notifyPrivateObjective(LightCard privObjectiveCard){
+    public void notifyPrivateObjective(PrivObjectiveCard privObjectiveCard){
         outSocket.println("SEND priv "+privObjectiveCard.getId()+" "+privObjectiveCard.getName().replaceAll(" ", "_")+" "+privObjectiveCard.getDescription().replaceAll(" ", "_"));
         outSocket.flush();
     }
@@ -222,10 +222,10 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param players the player's list to send
      */
     @Override
-    public void notifyPlayers(ArrayList<LightPlayer> players) {
+    public void notifyPlayers(List<Player> players) {
         outSocket.print("SEND players");
-        for (LightPlayer p:players){
-            outSocket.print(" "+p.getPlayerId()+","+p.getUsername());
+        for (Player p:players){
+            outSocket.print(" "+p.getGameId()+","+p.getUsername());
         }
         outSocket.println("");
         outSocket.flush();

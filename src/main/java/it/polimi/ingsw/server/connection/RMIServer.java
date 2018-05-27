@@ -4,14 +4,12 @@ import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.common.immutables.LightCard;
 import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.common.immutables.LightTool;
-import it.polimi.ingsw.server.model.PrivObjectiveCard;
-import it.polimi.ingsw.server.model.PubObjectiveCard;
-import it.polimi.ingsw.server.model.SchemaCard;
-import it.polimi.ingsw.server.model.ToolCard;
+import it.polimi.ingsw.server.model.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.List;
 
 public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServerInt {
         private RMIClientInt clientReference;
@@ -70,24 +68,25 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
     }
 
     @Override
-    public void notifyToolCard(LightTool toolCard) {
+    public void notifyToolCard(ToolCard toolCard) {
 
     }
 
     @Override
-    public void notifyPublicObjective(LightCard pubObjectiveCard) {
+    public void notifyPublicObjective(PubObjectiveCard pubObjectiveCard) {
 
     }
 
     @Override
-    public void notifyPrivateObjective(LightCard privObjectiveCard) {
+    public void notifyPrivateObjective(PrivObjectiveCard privObjectiveCard) {
 
     }
 
     @Override
-    public void notifyPlayers(ArrayList<LightPlayer> players) {
+    public void notifyPlayers(List<Player> players) {
 
     }
+
 
     @Override
     public void notifyFavorTokens(int favorTokens) {
