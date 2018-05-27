@@ -1,11 +1,13 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.common.immutables.LightCard;
+import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.common.immutables.LightTool;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class LightBoard {
     public static final int NUM_TOOLS=3;
@@ -16,10 +18,15 @@ public class LightBoard {
     private ArrayList<LightCard> pubObj;
     private LightCard privObj;
     private HashMap<Integer,LightPlayer> players;
+    private HashMap<Integer,LightDie> draftPool;
+    private HashMap<Integer,LightDie> roundTrack;
 
     public LightBoard() {
         tools=new ArrayList<>();
         pubObj= new ArrayList<>();
+        players=new HashMap<>();
+        draftPool=new HashMap<>();
+        roundTrack= new HashMap<>();
     }
 
     public void addPlayer(LightPlayer player){
@@ -40,7 +47,23 @@ public class LightBoard {
         this.tools.add(tool);
     }
 
-    public void addPubobj(LightTool tool){
+    public Map<Integer, LightDie> getDraftPool() {
+        return draftPool;
+    }
+
+    public void setDraftPool(Map<Integer, LightDie> draftPool) {
+        this.draftPool = (HashMap<Integer, LightDie>) draftPool;
+    }
+
+    public Map<Integer, LightDie> getRoundTrack() {
+        return roundTrack;
+    }
+
+    public void setRoundTrack(Map<Integer, LightDie> roundTrack) {
+        this.roundTrack = (HashMap<Integer, LightDie>) roundTrack;
+    }
+
+    public void addPubObj(LightTool tool){
         assert(tools.size()<NUM_PUB_OBJ );
         this.tools.add(tool);
     }
