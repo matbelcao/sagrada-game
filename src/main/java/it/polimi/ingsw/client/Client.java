@@ -42,6 +42,7 @@ public class Client {
     private Integer port;
     private ClientUI clientUI;
     private UILanguage lang;
+    private LightBoard board;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client"+ File.separator; //append class name + ".xml" to obtain complete path
 
     /**
@@ -67,8 +68,9 @@ public class Client {
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
         }
-
+        this.board= new LightBoard();
     }
+
 
     /**
      * This method constructs the class and overwrites uimode and connmode according to the passed params
@@ -90,6 +92,10 @@ public class Client {
         this();
         this.uiMode=UIMode.valueOf(uiMode);
         this.connMode=ConnectionMode.valueOf(connMode);
+    }
+
+    public LightBoard getBoard() {
+        return board;
     }
 
     /**

@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class UIMessages {
-    private static Element msgFile;
+    private Element msgFile;
     private static final String MSG="messages";
     private final UILanguage lang;
 

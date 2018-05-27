@@ -4,6 +4,7 @@ import it.polimi.ingsw.common.immutables.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public interface ClientConn {
     /**
@@ -37,12 +38,12 @@ public interface ClientConn {
     /**
      * This method asks the serverfor an updated version of the draftpool
      */
-    List<IndexedCellContent> getDraftPool();
+    Map<Integer,CellContent> getDraftPool();
 
     /**
      * This method asks the serverfor an updated version of the roundtrack
      */
-    List<IndexedCellContent> getRoundtrack();
+    Map<Integer,CellContent> getRoundtrack();
 
     /**
      * this method queries the server for a list of the users that are playing the match that the user making the request is playing

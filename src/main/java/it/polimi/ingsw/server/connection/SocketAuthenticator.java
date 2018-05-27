@@ -65,7 +65,7 @@ public class SocketAuthenticator extends Thread {
                     outSocket.println("LOGIN ko");
                 }
             }
-        } catch (NullPointerException | SocketException e) {
+        } catch ( Exception e) {
             try {
                 socket.close();
             } catch (IOException e1) {

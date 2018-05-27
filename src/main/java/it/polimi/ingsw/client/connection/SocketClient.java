@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is the implementation of the SOCKET client-side connection methods
@@ -210,13 +211,13 @@ public class SocketClient implements ClientConn {
     }
 
     @Override
-    public List<IndexedCellContent> getDraftPool() {
+    public Map<Integer,CellContent> getDraftPool() {
 
         return null;
     }
 
     @Override
-    public List<IndexedCellContent> getRoundtrack() {
+    public Map<Integer,CellContent> getRoundtrack() {
 
         return null;
     }

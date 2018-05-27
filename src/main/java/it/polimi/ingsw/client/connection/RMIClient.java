@@ -7,6 +7,7 @@ import it.polimi.ingsw.server.connection.RMIServerInt;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class RMIClient implements ClientConn,RMIClientInt {
     private RMIServerInt RMIconn;
@@ -76,12 +77,12 @@ public class RMIClient implements ClientConn,RMIClientInt {
     }
 
     @Override
-    public List<IndexedCellContent> getDraftPool() {
+    public Map<Integer,CellContent> getDraftPool() {
         return null;
     }
 
     @Override
-    public List<IndexedCellContent> getRoundtrack() {
+    public Map<Integer,CellContent> getRoundtrack() {
         return null;
     }
 
