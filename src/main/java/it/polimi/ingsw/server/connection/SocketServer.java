@@ -149,6 +149,43 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
+     * Sends the match ending message and the relative ranking  to the user
+     * @param players the player's list containing the data
+     */
+    @Override
+    public void notifyGameEnd(List<Player> players){
+        outSocket.print("GAME end");
+        for(Player p : players){
+            outSocket.print(" "+p.getGameId()+","+p.getScore()+","+p.getFinalPosition());
+        }
+        outSocket.println("");
+        outSocket.flush();
+    }
+
+    /**
+     * Sends the round starting/ending message to the user
+     * @param event the round's event string: "start" or "end"
+     * @param roundNumber the round's number
+     */
+    @Override
+    public void notifyRoundEvent(String event,int roundNumber){
+        outSocket.println("GAME round_"+event+" "+roundNumber);
+        outSocket.flush();
+    }
+
+    /**
+     * Sends the turn starting/ending message to the user
+     * @param event the turns's event string: "start" or "end"
+     * @param playerId the involved player's ID
+     * @param turnNumber the turn number
+     */
+    @Override
+    public void notifyTurnEvent(String event,int playerId,int turnNumber){
+        outSocket.println("GAME turn_"+event+" "+event+" "+playerId+" "+turnNumber);
+        outSocket.flush();
+    }
+
+    /**
      * Notifies the client of a user's status change
      * @param event the event happened
      * @param id the id of the interested user

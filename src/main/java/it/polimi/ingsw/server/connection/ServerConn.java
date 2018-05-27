@@ -16,6 +16,12 @@ public interface ServerConn {
 
     void notifyStatusUpdate (String event,int id);
 
+    void notifyGameEnd(List<Player> players);
+
+    void notifyRoundEvent(String event,int roundNumber);
+
+    void notifyTurnEvent(String event,int playerId,int turnNumber);
+
     void notifySchema(SchemaCard schemaCard);
 
     void notifyToolCard(ToolCard toolCard);
