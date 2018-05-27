@@ -1,6 +1,9 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.immutables.LightCard;
+import it.polimi.ingsw.common.immutables.LightPlayer;
+import it.polimi.ingsw.common.immutables.LightTool;
 import it.polimi.ingsw.server.model.*;
 
 import java.io.IOException;
@@ -47,10 +50,9 @@ public class SocketServer extends Thread implements ServerConn  {
                     user.disconnect();
                 }
 
-                if(Validator.checkAckParams(inSocket.readln(),result)&& result.get(1).equals("status")){
-                    inSocket.pop();
+                if(!inSocket.isEmpty()){
+                    playing=execute(inSocket.getln());
                 }
-
             } catch (IllegalArgumentException e) {
                 user.disconnect();
                 playing=false;
@@ -70,19 +72,56 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private boolean execute(String command) {
         ArrayList<String> parsedResult = new ArrayList<>();
+        Game game= user.getGame();
 
-        if (Validator.isValid(command, parsedResult)) {
-            switch (parsedResult.get(0)) {
-                case "QUIT":
-                    user.quit();
-                    return false;
-                case "CHOOSE":
-                    if("schema".equals(parsedResult.get(1))){
-                        user.getGame().chooseSchemaCard(user,Integer.parseInt(parsedResult.get(2)));
-                    }
-                    return true;
-                default:
-                    return true;
+        if(Validator.isValid(command, parsedResult)) {
+            if(Validator.checkQuitParams(command,parsedResult)) {
+                user.quit();
+                return false;
+            }
+            if(Validator.checkChooseParams(command,parsedResult)){
+                if("schema".equals(parsedResult.get(1))){
+                    game.chooseSchemaCard(user,Integer.parseInt(parsedResult.get(2)));
+                }
+            }
+            if(Validator.checkGetParams(command,parsedResult)){
+                switch (parsedResult.get(1)){
+                    case "schema":
+                        if(parsedResult.get(2).equals("draft")){
+                           game.sendSchemaCards(user);
+                        }else{
+                           game.sendUserSchemaCard(user,Integer.parseInt(parsedResult.get(2)));
+                        }
+                        break;
+                    case "favor_tokens":
+                        game.sendFavorTokens(user);
+                        break;
+                    case "priv":
+                        game.sendPrivCard(user);
+                        break;
+                    case "pub":
+                        game.sendPubCards(user);
+                        break;
+                    case "tool":
+                        game.sendToolCards(user);
+                        break;
+                    case "draftpool":
+                        //to implement
+                        break;
+                    case "roundtrack":
+                        //to implement
+                        break;
+                    case "players":
+                        game.sendPlayers(user);
+                        break;
+                }
+                return true;
+            }
+            if(Validator.checkAckParams(command,parsedResult)){
+                switch(parsedResult.get(1)){
+                    case "status":
+                        return true;
+                }
             }
         }
         return true;
@@ -121,7 +160,7 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the user a text description of the schema card passed as a parameter
+     * Sends the client a text description of the schema card passed as a parameter
      * @param schemaCard the schema card to send
      */
     @Override
@@ -144,36 +183,63 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
+    public void notifyDraftPool(DraftPool pool){
+        //
+    }
+
     /**
-     * Sends the user a text description of the tool card passed as a parameter
+     * Sends the client a text description of the tool card passed as a parameter
      * @param toolCard the tool card to send
      */
     @Override
-    public void notifyToolCard(ToolCard toolCard){
+    public void notifyToolCard(LightTool toolCard){
             outSocket.println("SEND tool "+toolCard.getId()+" "+toolCard.getName().replaceAll(" ", "_")+" "+toolCard.getDescription().replaceAll(" ", "_"));
             outSocket.flush();
     }
 
     /**
-     * Sends the user a text description of the public objective card passed as a parameter
+     * Sends the client a text description of the public objective card passed as a parameter
      * @param pubObjectiveCard the public objective card to send
      */
     @Override
-    public void notifyPublicObjective(PubObjectiveCard pubObjectiveCard){
+    public void notifyPublicObjective(LightCard pubObjectiveCard){
         outSocket.println("SEND pub "+pubObjectiveCard.getId()+" "+pubObjectiveCard.getName().replaceAll(" ", "_")+" "+pubObjectiveCard.getDescription().replaceAll(" ", "_"));
         outSocket.flush();
     }
 
     /**
-     * Sends the user a text description of the private objective card passed as a parameter
+     * Sends the client a text description of the private objective card passed as a parameter
      * @param privObjectiveCard the private objective card to send
      */
     @Override
-    public void notifyPrivateObjective(PrivObjectiveCard privObjectiveCard){
+    public void notifyPrivateObjective(LightCard privObjectiveCard){
         outSocket.println("SEND priv "+privObjectiveCard.getId()+" "+privObjectiveCard.getName().replaceAll(" ", "_")+" "+privObjectiveCard.getDescription().replaceAll(" ", "_"));
         outSocket.flush();
     }
 
+    /**
+     * Sends the client a text description of the users that are currently playing in the match
+     * @param players the player's list to send
+     */
+    @Override
+    public void notifyPlayers(ArrayList<LightPlayer> players) {
+        outSocket.print("SEND players");
+        for (LightPlayer p:players){
+            outSocket.print(" "+p.getPlayerId()+","+p.getUsername());
+        }
+        outSocket.println("");
+        outSocket.flush();
+    }
+
+    /**
+     * Sends the client a text containing the number of favor tokens passed as parameter
+     * @param favorTokens the user's actual favor tokens
+     */
+    @Override
+    public void notifyFavorTokens(int favorTokens) {
+        //Da aggiungere al protocollo!!!!!
+        outSocket.println("SEND favor_tokens "+favorTokens);
+    }
 
 
     @Override

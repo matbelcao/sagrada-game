@@ -1,5 +1,8 @@
 package it.polimi.ingsw.server.model;
 
+import it.polimi.ingsw.common.immutables.LightCard;
+import it.polimi.ingsw.common.immutables.LightPlayer;
+import it.polimi.ingsw.common.immutables.LightTool;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.common.enums.UserStatus;
@@ -13,6 +16,7 @@ import java.util.*;
  */
 public class Game extends Thread implements Iterable  {
     public static final int NUM_ROUND=10;
+    private DraftPool draftPool;
     private Board board;
     private boolean additionalSchemas; //to be used for additional schemas FA
     private ArrayList<User> users;
@@ -29,14 +33,13 @@ public class Game extends Thread implements Iterable  {
      * @param additionalSchemas true if additional are wanted by the user
      */
     public Game(List<User> users,boolean additionalSchemas){
-
-
         this.users= (ArrayList<User>) users;
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
             u.setGame(this);
             u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
         }
+        this.draftPool=new DraftPool();
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         this.draftedSchemas = board.draftSchemas();
@@ -52,6 +55,7 @@ public class Game extends Thread implements Iterable  {
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
         }
+        this.draftPool=new DraftPool();
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         draftedSchemas = board.draftSchemas();
@@ -118,6 +122,7 @@ public class Game extends Thread implements Iterable  {
         waitAction();
 
         while (round.hasNextRound()){
+            //estrazione casuale dadi draftpool
             while(round.hasNext()){
                 userPlaying = round.next();
 
@@ -132,35 +137,81 @@ public class Game extends Thread implements Iterable  {
 
     /**
      * Responds to the request by sending one private objective card to the user of the match
+     * @param user the user who made the request
      */
-    private void sendPrivCards(User user){
-        user.getServerConn().notifyPrivateObjective(board.getPlayer(user).getPrivObjective());
+    public void sendPrivCard(User user){
+        PrivObjectiveCard privCard = board.getPlayer(user).getPrivObjective();
+        LightCard lightCard =new LightCard(privCard.getName(),privCard.getDescription(),privCard.getImgSrc(),privCard.getId());
+        user.getServerConn().notifyPrivateObjective(lightCard);
     }
 
     /**
      * Responds to the request by sending three public objective cards to the user of the match
+     * @param user the user who made the request
      */
-    private void sendPubCards(User user){
+    public void sendPubCards(User user){
         for (int i=0 ; i < Board.NUM_OBJECTIVES ; i++ ) {
-            user.getServerConn().notifyPublicObjective(board.getPublicObjective(i));
+            PubObjectiveCard pubCard = board.getPublicObjective(i);
+            LightCard lightCard =new LightCard(pubCard.getName(),pubCard.getDescription(),pubCard.getImgSrc(),pubCard.getId());
+            user.getServerConn().notifyPublicObjective(lightCard);
         }
     }
 
     /**
      * Responds to the request by sending three tool cards to the user of the match
+     * @param user the user who made the request
      */
-    private void sendToolCards(User user){
+    public void sendToolCards(User user){
+        LightTool lightTool;
+
         for (int i = 0; i < Board.NUM_TOOLS; i++) {
-            user.getServerConn().notifyToolCard(board.getToolCard(i));
+            ToolCard toolCard=board.getToolCard(i);
+            lightTool=new LightTool(toolCard.getName(),toolCard.getDescription(),toolCard.getImgSrc(),toolCard.getId(),toolCard.hasAlreadyUsed());
+            user.getServerConn().notifyToolCard(lightTool);
         }
     }
 
     /**
-     * Responds to the request by sending four schema cards for each user of the match
+     * Responds to the request by sending four schema cards to the user of the match
+     * @param user the user who made the request
      */
-    private void sendSchemaCards(User user){
+    public void sendSchemaCards(User user){
         for (int i=0 ; i < Board.NUM_PLAYER_SCHEMAS ; i++ ){
                 user.getServerConn().notifySchema(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]);
+        }
+    }
+
+    /**
+     * Responds to the request by sending four schema cards to the user of the match
+     * @param user the user who made the request
+     * @param playerId the id of the player's desired schema card
+     */
+    public void sendUserSchemaCard(User user,int playerId){
+        if(playerId>=0 && playerId<users.size()){
+            user.getServerConn().notifySchema(board.getPlayer(users.get(playerId)).getSchema());
+        }
+    }
+
+    /**
+     * Responds to the request by sending the draftpool to the user of the match
+     * @param user the user who made the request
+     */
+    public void sendDraftPool(User user){
+        //user.getServerConn().notifyDraftPool(draftPool);
+    }
+
+    public void sendPlayers(User user){
+        ArrayList<LightPlayer> players= new ArrayList<>();
+        for (User u:users){
+            players.add(new LightPlayer(u.getUsername(),board.getPlayer(u).getGameId()));
+        }
+        user.getServerConn().notifyPlayers(players);
+    }
+
+    public void sendFavorTokens(User user){
+        Player player=board.getPlayer(user);
+        if(player.getSchema()!=null){
+            user.getServerConn().notifyFavorTokens(player.getFavorTokens());
         }
     }
 
