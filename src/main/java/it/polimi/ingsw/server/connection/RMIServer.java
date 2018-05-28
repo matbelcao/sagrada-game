@@ -74,29 +74,6 @@ public class RMIServer implements ServerConn {
 
 
     /**
-     * Returns the light version of the given schema card
-     * @param schemaCard the schema card to be used as a template for the new light schema
-     * @return the newly created LightSchema
-     */
-    private LightSchemaCard toLightSchema(SchemaCard schemaCard){
-        HashMap<Integer,CellContent> contentMap = new HashMap<>(30);
-        for(int i=0;i<20;i++){
-           Cell cell = schemaCard.getCell(i);
-           if(cell.hasDie()){
-               contentMap.put(i,new LightDie(cell.getDie().getShade(),cell.getDie().getColor()));
-           }else if(cell.hasConstraint()){
-               Constraint constraint = cell.getConstraint();
-               if(constraint.isColorConstraint())
-                   contentMap.put(i,new LightConstraint(constraint.getColor()));
-               else
-                   contentMap.put(i,new LightConstraint(constraint.getShade()));
-           }
-        }
-        return new LightSchemaCard(schemaCard.getName(),contentMap,schemaCard.getFavorTokens());
-    }
-
-
-    /**
      * Pings the client invoking a remote method
      * @ truee iff the remote call doesn't throw an exception, therefore the connession between client and server is still up
      */

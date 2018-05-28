@@ -124,6 +124,14 @@ This message is sent whenever a round is about to begin or has just ended. `GAME
 
 This message is sent at every beginning/end of a turn and can trigger (end) clients to `GET` the updates derived from the turn, tipically the schema of the <player_id> and the draftpool.
 
+### Client-side
+
+##### `GAME end_turn`
+
+this message is sent to the server in casse the client wants to end his turn before the timer goes off.
+
+
+
 ### Example Session
 	
 +  `...`
@@ -173,11 +181,10 @@ The client sends this message to request the card parameters, some dice in the b
 
 ### Server-side
 ###### Notice: the following messages of this section all require an `ACK send` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
-##### `SEND schema|schema_update [{E,<row>,<column>}|{D,<row>,<column>,<color>,<shade>]|  {C,<row>,<column>,<color>|<shade>}] ...`
+##### `SEND schema <name> [{D,<row>,<column>,<color>,<shade>]|  {C,<row>,<column>,<color>|<shade>}] ...`
 
 +   `schema`: signals that the schema is being sent in its entirety
-+   `schema_update`: only the updated parts of the schema are sent to the user
-+   `E`: only used if `schema_update` is selected, signals an empty cell that had something in it before
++   `<name>`: the name of the schema
 +   `D`: the cell is occupied by a die
 +   `C`: there is a constraint in the cell
 +   `<row>`: the cell's row
@@ -187,29 +194,34 @@ The client sends this message to request the card parameters, some dice in the b
 
 The server responds with this message to give the information about the dice/constraints that are in the requested schema. The server can choose to just send an update (`schema_update`), instead of the whole schema, to the client when changes are made to the content of a schema after each turn.
 
-##### `SEND priv|pub|tool [<index>] <id> <name> <description>`
+##### `SEND priv|pub|tool <id> <name> <description> [<color>|<used>]`
 
 +   `priv`: the requested element is a private objective card
 +   `pub`: the requested element is a public objective card
 +   `pub`: the requested element is a toolcard
-+   `<index>`: the card's index in a list (only sent if there are multiple objects of the same type)
 +   `<id>`: the card's id
 +   `<name>`: the card's name
-+   `<description>`: the card's caption
++   `<description>`: the card's description
++   `<used>`: boolean value that tells if the tool has already been used
++   `<color>`: the private objective color
 
 The server responds with this message to give information about the requested card(s).
 
-##### `SEND draftpool|roundtrack|roundtrack_update [<index>,<color>,<shade>] ... `
+##### `SEND draftpool|roundtrack [<index>,<color>,<shade>] ... `
 
 +   `draftpool`: the requested elements concern the draftpool
 +   `roundtrack`: the requested elements concern the roundtrack
-+   `roundtrack_update`: only the updated parts of the roundtrack are sent to the user
 +   `pub`: the requested element is a public objective card
 +   `<index>`: the die position
 +   `<color>`: the die color property
 +   `<shade>`: the die shade property
 
 The server responds with this message to give information about the dice placed in the board's area that is shared by all players.
+
+##### `SEND favor_tokens <player_id> <num_tokens>`
++   `<player_id>`: the id of the player the tokens belong to
++   `<num_tokens>`: the number of remaining tokens
+ 
 
 ##### `SEND players {<player_id>,<username>} ...`
 

@@ -12,18 +12,15 @@ import java.util.NoSuchElementException;
  */
 public class LightSchemaCard {
     private final String name;
-    private int favorTokens;
     private HashMap<Integer,CellContent> cells=new HashMap<>(30);
 
     /**
      * This is the constructor of the class, it's the only way to set dice and constraints where they belong
      * @param name the name of the schema card
      * @param contentMap a map containing indexes and content(dice or constraints)
-     * @param favorTokens the favor tokens associated with the schema
      */
-    public LightSchemaCard(String name, Map<Integer,CellContent> contentMap, int favorTokens){
+    public LightSchemaCard(String name, Map<Integer,CellContent> contentMap){
         this.name = name;
-        this.favorTokens=favorTokens;
         if(!hasValidKeys(contentMap)){ throw new IllegalArgumentException(); }
         this.cells.putAll(contentMap);
         contentMap.clear();
@@ -49,9 +46,26 @@ public class LightSchemaCard {
                 }
             }
         }
-        return new LightSchemaCard(schemaCard.getName(),contentMap,schemaCard.getFavorTokens());
+        return new LightSchemaCard(schemaCard.getName(),contentMap);
     }
 
+
+    public static  LightSchemaCard toLightSchema(String schemaCard){
+        String [] parsed= schemaCard.trim().split("\\s+");
+        Map<Integer,CellContent> map=new HashMap<>();
+
+        for(int i=3;i<parsed.length;i++){
+            String [] cellcontent=parsed[i].trim().split(",");
+            int index= (Integer.parseInt(cellcontent[1]) * SchemaCard.NUM_COLS) + Integer.parseInt(cellcontent[2]);
+            if(cellcontent[0].equals("D")){
+                map.put(index,new LightDie(cellcontent[4],cellcontent[3]));
+            }else{
+                map.put(index,new LightConstraint(cellcontent[3]));
+            }
+        }
+
+        return new LightSchemaCard(parsed[2],map);
+    }
 
     /**
      * @return a copy of the map of the content of the schema
@@ -85,10 +99,6 @@ public class LightSchemaCard {
      */
     public String getName() { return name; }
 
-    /**
-     * @return the number of favor tokens associated with the card
-     */
-    public int getFavorTokens(){ return this.favorTokens; }
 
     /**
      * Tells whether or not the schema has a die in the position indicated by the @param

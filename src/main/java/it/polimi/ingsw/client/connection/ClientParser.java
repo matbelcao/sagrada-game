@@ -149,7 +149,7 @@ public class ClientParser {
      */
     private static boolean checkSend(List<String> parsedResult){
         if(parsedResult.size()<3){return false;}
-        if(parsedResult.get(1).equals("schema")||parsedResult.get(1).equals("schema_update")) {
+        if(parsedResult.get(1).equals("schema")) {
             return checkSendSchema(parsedResult);
         }
         if(parsedResult.get(1).equals("priv")||parsedResult.get(1).equals("pub")||parsedResult.get(1).equals("tool")){
@@ -170,11 +170,8 @@ public class ClientParser {
      * @return true iff the parameters are valid
      */
     private static boolean checkSendSchema(List<String> parsedResult) {
-        for (int i = 2; i < parsedResult.size(); i++) {
+        for (int i = 3; i < parsedResult.size(); i++) {
             String[] args = parsedResult.get(i).split(",");
-            if (args[0].equals("E") && args.length != 3) {
-                return false;
-            }
             if (args[0].equals("D") && args.length != 5) {
                 return false;
             }

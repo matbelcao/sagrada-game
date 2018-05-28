@@ -44,12 +44,11 @@ public class Validator {
         switch (keyword) {
 
             case "LOGIN":
-
                 return checkLoginParams(command, parsedResult);
 
             case "GET":
-
                 return checkGetParams(command, parsedResult);
+
             case "GET_DICE_LIST":
                 return checkGetDiceListParams(command, parsedResult);
 
@@ -67,10 +66,32 @@ public class Validator {
 
             case "ACK":
                 return checkAckParams(command, parsedResult);
+
+            case "GAME":
+                return checkGameParams(command,parsedResult);
             default:
                 return false;
 
         }
+    }
+
+
+
+    public static boolean checkGameParams(String rawCommand, List<String> parsedResult){
+        if( rawCommand==null){ return false; }
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(!command[0].equals("GAME")){ return false; }
+        if(command.length==2) {
+            switch (command[1]) {
+                case "end_turn":
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        return false;
     }
 
     /**
