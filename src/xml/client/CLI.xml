@@ -13,4 +13,5 @@
     <schema-border>–––––––––––––––––––––––––––––––––––</schema-border>
     <tokens-info>%s %s</tokens-info>
     <tool-index>%s %d</tool-index>
+    <round-turn>%s %d %s %d</round-turn>
 </cli-components>

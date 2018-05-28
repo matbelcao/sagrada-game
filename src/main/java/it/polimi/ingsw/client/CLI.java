@@ -23,7 +23,7 @@ public class CLI implements ClientUI{
         inKeyboard = new QueuedInReader(new BufferedReader(new InputStreamReader(System.in)));
         //inKeyboard=new BufferedReader(new InputStreamReader(System.in));
         outCli = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)), true);
-        this.view=new CLIView(lang,client.getPlayerId());
+        this.view=new CLIView(lang,client.getPlayerId(),client.getBoard().getNumPlayers());
     }
 
     public void loginProcedure() {

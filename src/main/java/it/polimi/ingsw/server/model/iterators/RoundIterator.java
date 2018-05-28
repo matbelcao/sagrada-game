@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
  */
 public class RoundIterator implements Iterator<User> {
     private final Integer numUsers;
-    private int i;
+    private int turnNumberInRound;
     private ArrayList<User> users;
     private User next;
     private int round;
@@ -26,7 +26,7 @@ public class RoundIterator implements Iterator<User> {
         this.users=(ArrayList<User>) users;
         this.numUsers=users.size();
         this.next=null;
-        this.i=0;
+        this.turnNumberInRound =0;
         this.round=-1;
     }
 
@@ -36,7 +36,7 @@ public class RoundIterator implements Iterator<User> {
     public void nextRound(){
         if(hasNextRound()) {
             this.next = null;
-            this.i = 0;
+            this.turnNumberInRound = 0;
             this.round++;
         }else{
             throw new NoSuchElementException("This is the last Round, there are no more rounds to go!");
@@ -59,11 +59,11 @@ public class RoundIterator implements Iterator<User> {
     @Override
     public boolean hasNext() {
         if(this.round==-1){this.nextRound();}
-        if(i<2*numUsers){
-            if(i<numUsers){
-                next=users.get((round + i)%numUsers);
+        if(turnNumberInRound <2*numUsers){
+            if(turnNumberInRound <numUsers){
+                next=users.get((round + turnNumberInRound)%numUsers);
             }else{
-                next=users.get((numUsers - 1 + round - i%numUsers)%numUsers);
+                next=users.get((numUsers - 1 + round - turnNumberInRound %numUsers)%numUsers);
             }
             return true;
         }
@@ -82,7 +82,8 @@ public class RoundIterator implements Iterator<User> {
      * Checks whether the u are playing the first or the second turn of the round
      * @return true iff there's at least one player that
      */
-    public boolean isFirstTurn(){ return i<=numUsers;}
+    public boolean isFirstTurn(){ return turnNumberInRound <=numUsers;}
+
 
     /**
      * Gets the next player in the round
@@ -91,7 +92,7 @@ public class RoundIterator implements Iterator<User> {
     @Override
     public User next(){
 
-        if(this.hasNext()){ i++; return next;}
+        if(this.hasNext()){ turnNumberInRound++; return next;}
         throw new NoSuchElementException();
     }
 }

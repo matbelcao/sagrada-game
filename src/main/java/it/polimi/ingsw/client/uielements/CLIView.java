@@ -12,33 +12,75 @@ public class CLIView {
     private static final int SCHEMA_WIDTH = 38;
     private static final int SCHEMA_HEIGHT = 16;
     private static final int OBJ_LENGTH = 34;
+
     private final ArrayList<String> topInfo= new ArrayList<>();
-    private HashMap<Integer,ArrayList<String>> schemas= new HashMap<>();
-    private ArrayList<String> objectives= new ArrayList<>();
+    private String turnRoundinfo;
+    private final HashMap<Integer,ArrayList<String>> schemas= new HashMap<>();
+    private ArrayList<String> objectives;
     private final ArrayList<String> tools= new ArrayList<>();
-    private String tracksDetails;
-    private final ArrayList<String> tracks= new ArrayList<>();
-    private String bottomDetails;
+
+    private final ArrayList<String> roundTrack= new ArrayList<>();
+    private ArrayList<String> draftPool= new ArrayList<>();
     private final ArrayList<String> bottom=new ArrayList<>();
     private static final CLIElems cliElems= new CLIElems();
     private final UIMessages uiMsg;
+    private int numPlayers;
     private final int playerId;
 
-    public CLIView(UILanguage lang, int playerId){
+    public CLIView(UILanguage lang, int playerId, int numPlayers){
+        this.numPlayers=numPlayers;
         this.uiMsg=new UIMessages(lang);
         this.playerId = playerId;
     }
 
+    public String printView(){
+        StringBuilder builder=new StringBuilder();
+        builder.append(printList(topInfo));
+        builder.append(printList(buildTopSection()));
+        builder.append(schemas.get(playerId));
+        return builder.toString();
+    }
 
+    private static String printList(List<String> toPrint){
+        if(toPrint==null){throw new IllegalArgumentException();}
+        StringBuilder builder=new StringBuilder();
+        for(String line : toPrint) {
+            builder.append(line+"%n");
+        }
+        return builder.toString();
+    }
+
+    private List<String> buildTopSection(){
+        ArrayList<String> result=new ArrayList<>();
+
+        for(Map.Entry<Integer,ArrayList<String>> entry : schemas.entrySet() ){
+            if(entry.getKey()!=playerId){
+                result= (ArrayList<String>) appendRows(result,entry.getValue());
+            }
+        }
+        result= (ArrayList<String>) appendRows(result,objectives);
+      return result;
+    }
     /**
      * creates the representation of the player's schema and puts it into the map
      * @param player the player whose schema we want to create/update
      */
     public void updateSchema(LightPlayer player){
-        schemas.put(player.getPlayerId(), (ArrayList<String>) buildSchema(player));
+        this.schemas.put(player.getPlayerId(), (ArrayList<String>) buildSchema(player));
     }
 
+    public void updateRoundTurn(int roundNumber, int turnNumber){
+        turnRoundinfo= String.format(cliElems.getElem("round-turn"),
+                uiMsg.getMessage("round"),
+                roundNumber,
+                uiMsg.getMessage("turn"),
+                turnNumber);
+    }
 
+    /**
+     * Updates the tools following a change in the used state of them
+     * @param tools the list of the match tools
+     */
     public void updateTools(List<LightTool> tools){
         for(int i=0;i < Board.NUM_TOOLS;i++){
             this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),i));
@@ -47,6 +89,22 @@ public class CLIView {
     }
 
 
+    /**
+     * This method creates the representation of the objectives
+     * @param pubObj the list of public objectives
+     * @param privObj the private objective
+     */
+    public void updateObjectives(List<LightCard> pubObj, LightCard privObj){
+        this.objectives= (ArrayList<String>) buildObjectives((ArrayList<LightCard>) pubObj,privObj);
+    }
+
+    /**
+     * updates the draftpool representation
+     * @param draftPool the new draftpool
+     */
+    public void updateDraftPool(Map<Integer,CellContent> draftPool){
+        this.draftPool= (ArrayList<String>) buildCellRow(draftPool,0,numPlayers*2+1);
+    }
 
 
 
@@ -134,10 +192,9 @@ public class CLIView {
      * This method sets the line that will be at the top of the interface and will contain generic info about the user
      * @param mode the type of connection the user is using
      * @param username the username
-     * @param playerId the player id of the user
      */
-    public void setClientInfo(ConnectionMode mode, String username, int playerId){
-        if(mode==null||username==null||(playerId<0||playerId>3)){ throw new IllegalArgumentException();}
+    public void setClientInfo(ConnectionMode mode, String username){
+        if(mode==null||username==null){ throw new IllegalArgumentException();}
 
         String info = String.format(cliElems.getElem("player-info"),
                 username,
@@ -291,9 +348,19 @@ public class CLIView {
         if(a==null || b==null || (!a.isEmpty() && a.size()<b.size())){
             throw new IllegalArgumentException();
         }
+
         ArrayList<String> result= new ArrayList<>();
-        for(int row=0; row<a.size();row++){
-            result.add(row,a.get(row)+b.get(row));
+        if(a.isEmpty()){
+            result.addAll(b);
+        }else{
+            assert(a.size()>=b.size());
+            for(int row=0; row<a.size();row++){
+                if(row<b.size()) {
+                    result.add(row,a.get(row)+b.get(row));
+                }else{
+                    result.add(row,a.get(row));
+                }
+            }
         }
         return result;
     }
