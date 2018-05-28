@@ -91,6 +91,12 @@ public class FullCellIterator implements Iterator <Cell>{
     }
 
     /**
+     * @return the index (0 to 19) of the cell next is pointing to
+     */
+    public int getIndex(){
+        return index-1;
+    }
+    /**
      * not implemented
      */
     @Override

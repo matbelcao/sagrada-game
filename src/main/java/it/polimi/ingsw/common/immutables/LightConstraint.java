@@ -2,6 +2,7 @@ package it.polimi.ingsw.common.immutables;
 
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.server.model.Constraint;
 
 public class LightConstraint implements CellContent {
     private Color color;
@@ -33,6 +34,15 @@ public class LightConstraint implements CellContent {
     public LightConstraint(Color color) {
         this.color = color;
         isColorConstraint = true;
+    }
+
+    /**
+     * builds a LightConstraint from a constraint
+     * @param constr the constraint to be copied
+     * @return the LightConstraint
+     */
+    public static LightConstraint toLightConstraint(Constraint constr){
+        return new LightConstraint((constr.isColorConstraint() ? constr.getColor().toString() : constr.getShade().toString()));
     }
     /**
      * Returns a string containing the constraint name regardless of the type of constraint

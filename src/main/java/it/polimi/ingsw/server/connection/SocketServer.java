@@ -79,9 +79,17 @@ public class SocketServer extends Thread implements ServerConn  {
                 return false;
             }
             if(Validator.checkChooseParams(command,parsedResult)){
-                if("schema".equals(parsedResult.get(1))){
-                    chooseSchema(Integer.parseInt(parsedResult.get(2)));
+                switch(parsedResult.get(1)){
+                    case "schema":
+                        chooseSchema(Integer.parseInt(parsedResult.get(2)));
+                        break;
+                    case "die_placement":
+                        putDie(Integer.parseInt(parsedResult.get(2)));
+                        break;
+                    case"tool":
+                        break;
                 }
+                return true;
             }
             if(Validator.checkGetParams(command,parsedResult)){
                 switch (parsedResult.get(1)){
@@ -123,28 +131,29 @@ public class SocketServer extends Thread implements ServerConn  {
                         break;
                     case "roundtrack":
                         sendRoundTrackDiceList();
+                        break;
                     case "draftpool":
                         sendDraftPoolDiceList();
                         break;
                 }
                 return true;
             }
-            /**if(Validator.checkSelectParams(command,parsedResult)){
+            if(Validator.checkSelectParams(command,parsedResult)){
                 switch(parsedResult.get(1)){
                     case "die":
-                        game.selectDie(User user, int index);
+                        selectDie(Integer.parseInt(parsedResult.get(2)));
                         break;
                     case "modified_die":
-                        game.select
+                        //game.select
                         break;
                     case "tool":
                         //to implement
                         break;
                 }
                 return true;
-            }*/
+            }
             if(Validator.checkDiscardParams(command,parsedResult)){
-                //to implement
+                discardAction();
                 return true;
             }
             if(Validator.checkAckParams(command,parsedResult)){
@@ -214,7 +223,7 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     @Override
     public void notifyTurnEvent(String event,int playerId,int turnNumber){
-        outSocket.println("GAME turn_"+event+" "+event+" "+playerId+" "+turnNumber);
+        outSocket.println("GAME turn_"+event+" "+playerId+" "+turnNumber);
         outSocket.flush();
     }
 
@@ -400,7 +409,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text list of the dice contained in the schema card parameter (with an unique INDEX)
      * @param schema the schema card to get the Dice
      */
-    public void sendSchemaDiceList() {
+    private void sendSchemaDiceList() {
         int index=0;
         Die die;
         SchemaCard schema=user.getGame().getUserSchemaCard(user);
@@ -421,19 +430,19 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text list of the dice contained in the RoundTrack (with an unique INDEX)
      * @param trackList the RoundTrack's dice list (index,die)
      */
-    public void sendRoundTrackDiceList() {
+    private void sendRoundTrackDiceList() {
         int index=0;
-        int roundNumber;
+        int numberInRound;
         List<List<Die>> trackList = user.getGame().getRoundTrackDice();
         ArrayList<Die> dieList;
 
         outSocket.print("LIST roundtrack");
-        for(int i=0;i<trackList.size();i++){
-            roundNumber=0;
-            dieList= (ArrayList<Die>) trackList.get(i);
+        for(int round=0;round<trackList.size();round++){
+            numberInRound=0;
+            dieList= (ArrayList<Die>) trackList.get(round);
             for(Die d:dieList){
-                outSocket.print(" "+index+","+i+","+roundNumber+","+d.getColor().toString()+","+d.getShade().toString());
-                roundNumber++;
+                outSocket.print(" "+index+","+round+","+numberInRound+","+d.getColor().toString()+","+d.getShade().toString());
+                numberInRound++;
                 index++;
             }
         }
@@ -446,7 +455,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text list of the dice contained in the DraftPool (with an unique INDEX)
      * @param draftedDice the DraftPool's dice list
      */
-    public void sendDraftPoolDiceList() {
+    private void sendDraftPoolDiceList() {
         Die die;
         ArrayList<Die> draftedDice= (ArrayList<Die>) user.getGame().getDraftedDice();
 
@@ -461,35 +470,49 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Internal method that waits foa the selection of the object
-     * @return the selected object index
+     * Allows the user to select the die of the previous list received, then sends the relative list of allowed positions
+     * @param index
      */
-    private int waitForSelect(){
-        ArrayList<String> parsedResult=new ArrayList<>();
-
-        try {
-            inSocket.add();
-        } catch (Exception e) {
-            //this.quit();
-            //uscita dal game
+    private void selectDie(int index){
+        int placementIndex=0;
+        Die die;
+        die = user.getGame().selectDie(user,index);
+        if(die!=null){
+                ArrayList<Integer> placements= (ArrayList<Integer>) user.getGame().getUserSchemaCard(user).listPossiblePlacements(die);
+                outSocket.print("LIST placements");
+                for (Integer p:placements){
+                    outSocket.print(" "+index+","+p);
+                }
+                outSocket.println("");
+                outSocket.flush();
         }
 
-        if (Validator.checkSelectParams(inSocket.readln(),parsedResult)) {
-            inSocket.pop();
-            if(parsedResult.get(1).equals("die")||parsedResult.get(1).equals("tool")){
-                return Integer.parseInt(parsedResult.get(2));
-            }
-            else if(parsedResult.get(1).equals("modified_die")){
-                return 1; //ok
-            }
-        }
-        if(Validator.checkDiscardParams(inSocket.readln(),parsedResult)){
-            //the command was a discar....pop out from the insocket buffer
-            inSocket.pop();
-        }
-        //wrong message in insocket --> ABORT procedure
-        return -1;
     }
+
+    /**
+     * Allows the user to put the die contained in the previous list received, then sends an answer about the action
+     * @param index
+     */
+    private void putDie(int index){
+        Boolean placed;
+        placed=user.getGame().putDie(user,index);
+        if(placed){
+            outSocket.println("CHOICE ok");
+        }else{
+            outSocket.println("CHOICE ko");
+        }
+        outSocket.flush();
+    }
+
+    /**
+     * Allows the Game model to discard a multiple-message command (for complex actions like putDie(), ToolCard usages)
+     */
+    private void discardAction(){
+        user.getGame().discard();
+        outSocket.println("DISCARD ack");
+        outSocket.flush();
+    }
+
 
     @Override
     public boolean ping() {
