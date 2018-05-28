@@ -286,7 +286,7 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void sendUserSchemaCard(int playerId){
         Cell cell;
-        SchemaCard schemaCard = user.getGame().getUserSchemaCard(playerId);
+        SchemaCard schemaCard = user.getGame().getUserSchemaCard(playerId,false);
 
         outSocket.print("SEND schema");
         for (int row=0; row < SchemaCard.NUM_ROWS ; row++) {
@@ -358,12 +358,12 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void sendDraftPoolDice(){
         Die die;
-        ArrayList<Die> dice= (ArrayList<Die>) user.getGame().getDraftedDice();
+        ArrayList<Die> dice= (ArrayList<Die>) user.getGame().getDraftedDice(false);
 
         outSocket.print("SEND draftpool");
         for (int i=0;i<dice.size();i++){
             die=dice.get(i);
-            System.out.print(" "+i+","+die.getColor().toString()+","+die.getShade().toString());
+            outSocket.print(" "+i+","+die.getColor().toString()+","+die.getShade().toString());
         }
         outSocket.println("");
         outSocket.flush();
@@ -375,7 +375,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param trackList the RoundTrack's dice list (index,die)
      */
     private void sendRoundTrackDice(){
-        List<List<Die>> trackList = user.getGame().getRoundTrackDice();
+        List<List<Die>> trackList = user.getGame().getRoundTrackDice(false);
         ArrayList<Die> dieList;
 
         outSocket.print("SEND roundtrack");
@@ -412,7 +412,7 @@ public class SocketServer extends Thread implements ServerConn  {
     private void sendSchemaDiceList() {
         int index=0;
         Die die;
-        SchemaCard schema=user.getGame().getUserSchemaCard(user);
+        SchemaCard schema=user.getGame().getUserSchemaCard(user,false);
         FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
 
         outSocket.print("LIST schema");
@@ -433,7 +433,7 @@ public class SocketServer extends Thread implements ServerConn  {
     private void sendRoundTrackDiceList() {
         int index=0;
         int numberInRound;
-        List<List<Die>> trackList = user.getGame().getRoundTrackDice();
+        List<List<Die>> trackList = user.getGame().getRoundTrackDice(false);
         ArrayList<Die> dieList;
 
         outSocket.print("LIST roundtrack");
@@ -457,12 +457,12 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void sendDraftPoolDiceList() {
         Die die;
-        ArrayList<Die> draftedDice= (ArrayList<Die>) user.getGame().getDraftedDice();
+        ArrayList<Die> draftedDice= (ArrayList<Die>) user.getGame().getDraftedDice(false);
 
         outSocket.print("LIST draftpool");
         for (int i=0;i<draftedDice.size();i++){
             die=draftedDice.get(i);
-            System.out.print(" "+i+","+die.getColor().toString()+","+die.getShade().toString());
+            outSocket.print(" "+i+","+die.getColor().toString()+","+die.getShade().toString());
         }
         outSocket.println("");
         outSocket.flush();
@@ -478,10 +478,11 @@ public class SocketServer extends Thread implements ServerConn  {
         Die die;
         die = user.getGame().selectDie(user,index);
         if(die!=null){
-                ArrayList<Integer> placements= (ArrayList<Integer>) user.getGame().getUserSchemaCard(user).listPossiblePlacements(die);
+                ArrayList<Integer> placements= (ArrayList<Integer>) user.getGame().getUserSchemaCard(user,true).listPossiblePlacements(die);
                 outSocket.print("LIST placements");
                 for (Integer p:placements){
-                    outSocket.print(" "+index+","+p);
+                    outSocket.print(" "+placementIndex+","+p);
+                    placementIndex++;
                 }
                 outSocket.println("");
                 outSocket.flush();
