@@ -49,6 +49,10 @@ public class LightBoard {
         this.tools.add(tool);
     }
 
+    public int getNumPlayers() {
+        return numPlayers;
+    }
+
     public Map<Integer, LightDie> getDraftPool() {
         return draftPool;
     }

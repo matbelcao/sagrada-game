@@ -44,4 +44,12 @@
         <eng>Tool number:</eng>
         <ita>Utensile numero:</ita>
     </tool-number>
+    <round>
+        <eng>Round number:</eng>
+        <ita>Round numero:</ita>
+    </round>
+    <turn>
+        <eng>Turn of the round:</eng>
+        <ita>Turno del round:</ita>
+    </turn>
 </messages>
