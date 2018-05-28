@@ -4,6 +4,8 @@ package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.common.enums.UserStatus;
+import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
+import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +25,7 @@ public class Game extends Thread implements Iterable  {
     private final Object lockRun;
     private User userPlaying;
     private Timer timer;
+    RoundStatus roundStatus;
 
     /**
      * Constructs the class and sets the players list
@@ -39,6 +42,7 @@ public class Game extends Thread implements Iterable  {
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         this.draftedSchemas = board.draftSchemas();
+        this.roundStatus=new RoundStatus();
     }
 
     /**
@@ -125,7 +129,7 @@ public class Game extends Thread implements Iterable  {
             }
 
             while(round.hasNext()){
-
+                roundStatus=new RoundStatus();
                 endLock=false;
                 userPlaying = round.next();
 
@@ -204,6 +208,7 @@ public class Game extends Thread implements Iterable  {
      * @param playerId the id of the player's desired schema card
      */
     public SchemaCard getUserSchemaCard(int playerId){
+        roundStatus.setRequestedSchemaList();
         if(playerId>=0 && playerId<users.size()){
             return board.getPlayer(users.get(playerId)).getSchema();
         }
@@ -216,6 +221,7 @@ public class Game extends Thread implements Iterable  {
      * @param playerId the id of the player's desired schema card
      */
     public SchemaCard getUserSchemaCard(User user){
+        roundStatus.setRequestedSchemaList();
         return board.getPlayer(user).getSchema();
     }
 
@@ -224,6 +230,7 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      */
     public List<Die> getDraftedDice(){
+        roundStatus.setRequestedDraftPoolList();
         return board.getDraftPool().getDraftedDice();
     }
 
@@ -232,6 +239,7 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      */
     public List<List<Die>> getRoundTrackDice(){
+        roundStatus.setRequestedRoundTrackList();
         return board.getDraftPool().getRoundTrack().getTrack();
     }
 
@@ -281,6 +289,84 @@ public class Game extends Thread implements Iterable  {
         timer.cancel();
         return response;
     }
+
+    public Die selectDie(User user,int index){
+        Die die;
+        int tempIndex=0;
+        if(roundStatus.isRequestedSchemaList()){
+            FullCellIterator diceIterator=(FullCellIterator)board.getPlayer(user).getSchema().iterator();
+            while(diceIterator.hasNext()){
+                die=diceIterator.next().getDie();
+                if(tempIndex==index){
+                    return die;
+                }
+                tempIndex++;
+            }
+
+            die=board.getPlayer(user).getSchema().getCell(index).getDie();
+            roundStatus.setSelectedDie(die);
+            return die;
+        }
+        if(roundStatus.isRequestedDraftPoolList()){
+            die=board.getDraftPool().getDraftedDice().get(index);
+            roundStatus.setSelectedDie(die);
+            return die;
+        }
+        if(roundStatus.isRequestedRoundTrackList()) {
+            List<List<Die>> trackList = getRoundTrackDice();
+            ArrayList<Die> dieList;
+            int round = 0;
+
+            while (tempIndex <= index) {
+                dieList = (ArrayList<Die>) trackList.get(round);
+                for (Die d : dieList) {
+                    if (tempIndex == index) {
+                        roundStatus.setSelectedDie(d);
+                        return d;
+                    }
+                    tempIndex++;
+                }
+                round++;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Puts in the user's schemacard the die if possible
+     * @param index
+     * @return
+     */
+    public boolean putDie(User user,int index){
+        int tempIndex=0;
+        if(roundStatus.isSelectedDie()){
+            if(roundStatus.isRequestedSchemaList()){
+                FullCellIterator diceIterator=(FullCellIterator)board.getPlayer(user).getSchema().iterator();
+                while(diceIterator.hasNext()){
+                    diceIterator.next();
+                    if(tempIndex==index){
+                        try {
+                            board.getPlayer(user).getSchema().putDie(diceIterator.getIndex(),roundStatus.getSelectedDie());
+                            return true;
+                        } catch (IllegalDieException e) {
+                            return false;
+                        }
+                    }
+                    tempIndex++;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Allows the Game model to discard a multiple-message command (for complex actions like putDie(), ToolCard usages)
+     */
+    public void discard(){
+        roundStatus=new RoundStatus();
+    }
+
+
 
 
     /**
