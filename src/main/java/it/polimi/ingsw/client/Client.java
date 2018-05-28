@@ -10,6 +10,7 @@ import it.polimi.ingsw.common.enums.UIMode;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
+import it.polimi.ingsw.server.connection.RMIServerObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -233,14 +234,12 @@ public class Client {
         AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
         if(authenticator.authenticate(username,password)){
             //get the stub of the remote object
-            RMIServerInt rmiConnStub = (RMIServerInt) Naming.lookup("rmi://"+serverIP+"/"+username+password);
-            //create RMIClient with the reference of the remote obj and assign it to the Client
-            RMIClientInt rmiClient  = new RMIClient(rmiConnStub,this);
-            clientConn = (RMIClient)rmiClient;
-            //create a remote reference of the obj rmiClient and pass it to the server.
-            //a remote reference is passed so there's no need to add rmiClient to a Registry
-            RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiClient, 0);
-            rmiConnStub.setClientReference(remoteRef);
+            RMIClientInt rmiConnStub = (RMIClientInt) Naming.lookup("rmi://"+serverIP+"/"+username+password);
+            clientConn = new RMIClient(rmiConnStub);
+            RMIServerInt rmiServerObject = new RMIServerObject(this);
+            //check if the method is necessary or just exend unicast remote obj in RMIServerObject
+            RMIServerInt remoteRef = (RMIServerInt) UnicastRemoteObject.exportObject(rmiServerObject, 0);
+            authenticator.setRemoteReference(remoteRef,username);
             clientUI.updateConnectionOk();
             clientUI.updateLogin(true);
             authenticator.updateConnected(username);
