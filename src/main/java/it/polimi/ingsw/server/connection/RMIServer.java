@@ -1,16 +1,8 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.common.immutables.CellContent;
-import it.polimi.ingsw.common.immutables.LightConstraint;
-import it.polimi.ingsw.common.immutables.LightDie;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
-import it.polimi.ingsw.server.model.Cell;
-import it.polimi.ingsw.server.model.Constraint;
 import it.polimi.ingsw.server.model.Player;
-import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.rmi.RemoteException;
-import java.util.HashMap;
 import java.util.List;
 
 public class RMIServer implements ServerConn {
