@@ -72,7 +72,6 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private boolean execute(String command) {
         ArrayList<String> parsedResult = new ArrayList<>();
-        Game game= user.getGame();
 
         if(Validator.isValid(command, parsedResult)) {
             if(Validator.checkQuitParams(command,parsedResult)) {
@@ -81,44 +80,53 @@ public class SocketServer extends Thread implements ServerConn  {
             }
             if(Validator.checkChooseParams(command,parsedResult)){
                 if("schema".equals(parsedResult.get(1))){
-                    game.chooseSchemaCard(user,Integer.parseInt(parsedResult.get(2)));
+                    chooseSchema(Integer.parseInt(parsedResult.get(2)));
                 }
             }
             if(Validator.checkGetParams(command,parsedResult)){
                 switch (parsedResult.get(1)){
                     case "schema":
                         if(parsedResult.get(2).equals("draft")){
-                           game.sendSchemaCards(user);
+                           draftSchemaCards();
                         }else{
-                           game.sendUserSchemaCard(user,Integer.parseInt(parsedResult.get(2)));
+                           sendUserSchemaCard(Integer.parseInt(parsedResult.get(2)));
                         }
                         break;
                     case "favor_tokens":
-                        game.sendFavorTokens(user);
+                        sendFavorTokens();
                         break;
                     case "priv":
-                        game.sendPrivCard(user);
+                        sendPrivateObjectiveCard();
                         break;
                     case "pub":
-                        game.sendPubCards(user);
+                        sendPublicObjectiveCards();
                         break;
                     case "tool":
-                        game.sendToolCards(user);
+                        sendToolCards();
                         break;
                     case "draftpool":
-                        game.sendDraftPool(user);
+                        sendDraftPoolDice();
                         break;
                     case "roundtrack":
-                        game.sendRoundTrack(user);
+                        sendRoundTrackDice();
                         break;
                     case "players":
-                        game.sendPlayers(user);
+                        sendPlayers();
                         break;
                 }
                 return true;
             }
             if(Validator.checkGetDiceListParams(command,parsedResult)){
-                game.sendDiceList(user,parsedResult.get(1));
+                switch(parsedResult.get(1)){
+                    case "schema":
+                        sendSchemaDiceList();
+                        break;
+                    case "roundtrack":
+                        sendRoundTrackDiceList();
+                    case "draftpool":
+                        sendDraftPoolDiceList();
+                        break;
+                }
                 return true;
             }
             /**if(Validator.checkSelectParams(command,parsedResult)){
@@ -135,10 +143,6 @@ public class SocketServer extends Thread implements ServerConn  {
                 }
                 return true;
             }*/
-            if(Validator.checkChooseParams(command,parsedResult)){
-                //to implement
-                return true;
-            }
             if(Validator.checkDiscardParams(command,parsedResult)){
                 //to implement
                 return true;
@@ -226,12 +230,54 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the client a text description of the schema card passed as a parameter
-     * @param schemaCard the schema card to send
+     * Sets the schema card during the match if it's possible
+     * @param schemaId the schema's id
      */
-    @Override
-    public void notifySchema(SchemaCard schemaCard){
+    private void chooseSchema(int schemaId){
+        Game game= user.getGame();
+        boolean result;
+        result=game.chooseSchemaCard(user,schemaId);
+        if(result){
+            outSocket.println("CHOICE ok");
+        }else{
+            outSocket.println("CHOICE ko");
+        }
+        outSocket.flush();
+    }
+
+    /**
+     * Sends the client a text description of the four drafted schema card passed as a parameter
+     */
+    private void draftSchemaCards(){
         Cell cell;
+        Game game= user.getGame();
+        ArrayList<SchemaCard> schemas=(ArrayList<SchemaCard>) game.getSchemaCards(user);
+
+        for(SchemaCard s: schemas){
+            outSocket.print("SEND schema");
+            for (int row=0; row < SchemaCard.NUM_ROWS ; row++) {
+                for (int column=0; column < SchemaCard.NUM_COLS ;column++){
+                    cell=s.getCell(row,column);
+                    if(cell.hasConstraint()) {
+                        outSocket.print(" C,"+row+","+column+","+cell.getConstraint().toString());
+                    }
+                    if(cell.hasDie()){
+                        outSocket.print(" D,"+row+","+column+","+cell.getDie().getColor().toString()+","+cell.getDie().getShade().toString());
+                    }
+                }
+            }
+            outSocket.println("");
+            outSocket.flush();
+        }
+    }
+
+    /**
+     * Sends the client a text description of the specific user schema card passed as a parameter
+     * @param playerId the Id of the requested player's schema card
+     */
+    private void sendUserSchemaCard(int playerId){
+        Cell cell;
+        SchemaCard schemaCard = user.getGame().getUserSchemaCard(playerId);
 
         outSocket.print("SEND schema");
         for (int row=0; row < SchemaCard.NUM_ROWS ; row++) {
@@ -249,60 +295,78 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
+    /**
+     * Sends the client a text containing the number of favor tokens passed as parameter
+     * @param favorTokens the user's actual favor tokens
+     */
+    public void sendFavorTokens() {
+        //Da aggiungere al protocollo!!!!!
+        outSocket.println("SEND favor_tokens "+user.getGame().getFavorTokens(user));
+        outSocket.flush();
+    }
+
 
     /**
-     * Sends the client a text description of the tool card passed as a parameter
-     * @param toolCard the tool card to send
+     * Sends the client a text description of the private objective card passed as a parameter
+     * @param privObjectiveCard the private objective card to send
      */
-    @Override
-    public void notifyToolCard(ToolCard toolCard){
-            outSocket.println("SEND tool "+toolCard.getId()+" "+toolCard.getName().replaceAll(" ", "_")+" "+toolCard.getDescription().replaceAll(" ", "_"));
-            outSocket.flush();
+    private void sendPrivateObjectiveCard(){
+        PrivObjectiveCard privObjectiveCard=user.getGame().getPrivCard(user);
+
+        outSocket.println("SEND priv "+privObjectiveCard.getId()+" "+privObjectiveCard.getName().replaceAll(" ", "_")+" "+privObjectiveCard.getDescription().replaceAll(" ", "_"));
+        outSocket.flush();
     }
 
     /**
      * Sends the client a text description of the public objective card passed as a parameter
      * @param pubObjectiveCard the public objective card to send
      */
-    @Override
-    public void notifyPublicObjective(PubObjectiveCard pubObjectiveCard){
-        outSocket.println("SEND pub "+pubObjectiveCard.getId()+" "+pubObjectiveCard.getName().replaceAll(" ", "_")+" "+pubObjectiveCard.getDescription().replaceAll(" ", "_"));
-        outSocket.flush();
+    private void sendPublicObjectiveCards(){
+        ArrayList<PubObjectiveCard> pubObjectiveCards= (ArrayList<PubObjectiveCard>) user.getGame().getPubCards();
+
+        for(PubObjectiveCard p:pubObjectiveCards){
+            outSocket.println("SEND pub "+p.getId()+" "+p.getName().replaceAll(" ", "_")+" "+p.getDescription().replaceAll(" ", "_"));
+            outSocket.flush();
+        }
     }
 
     /**
-     * Sends the client a text description of the private objective card passed as a parameter
-     * @param privObjectiveCard the private objective card to send
+     * Sends the client a text description of the tool card passed as a parameter
+     * @param toolCard the tool card to send
      */
-    @Override
-    public void notifyPrivateObjective(PrivObjectiveCard privObjectiveCard){
-        outSocket.println("SEND priv "+privObjectiveCard.getId()+" "+privObjectiveCard.getName().replaceAll(" ", "_")+" "+privObjectiveCard.getDescription().replaceAll(" ", "_"));
-        outSocket.flush();
+    private void sendToolCards(){
+        ArrayList<ToolCard> toolCards= (ArrayList<ToolCard>) user.getGame().getToolCards();
+
+        for (ToolCard t:toolCards){
+            outSocket.println("SEND tool "+t.getId()+" "+t.getName().replaceAll(" ", "_")+" "+t.getDescription().replaceAll(" ", "_"));
+            outSocket.flush();
+        }
     }
 
     /**
      * Sends the client a textual list of the dice in the DraftPool
      * @param draftedDice the DraftPool's dice list
      */
-    @Override
-    public void notifyDraftPool(List<Die> draftedDice){
+    private void sendDraftPoolDice(){
         Die die;
+        ArrayList<Die> dice= (ArrayList<Die>) user.getGame().getDraftedDice();
 
         outSocket.print("SEND draftpool");
-        for (int i=0;i<draftedDice.size();i++){
-            die=draftedDice.get(i);
+        for (int i=0;i<dice.size();i++){
+            die=dice.get(i);
             System.out.print(" "+i+","+die.getColor().toString()+","+die.getShade().toString());
         }
         outSocket.println("");
         outSocket.flush();
+
     }
 
     /**
      * Sends the client a textual list of the dice in the RoundTrack (can be multiple die at the same index)
      * @param trackList the RoundTrack's dice list (index,die)
      */
-    @Override
-    public void notifyRoundTrack(List<List<Die>> trackList){
+    private void sendRoundTrackDice(){
+        List<List<Die>> trackList = user.getGame().getRoundTrackDice();
         ArrayList<Die> dieList;
 
         outSocket.print("SEND roundtrack");
@@ -321,8 +385,9 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text description of the users that are currently playing in the match
      * @param players the player's list to send
      */
-    @Override
-    public void notifyPlayers(List<Player> players) {
+    private void sendPlayers(){
+        ArrayList<Player> players= (ArrayList<Player>) user.getGame().getPlayers();
+
         outSocket.print("SEND players");
         for (Player p:players){
             outSocket.print(" "+p.getGameId()+","+p.getUsername());
@@ -332,25 +397,13 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the client a text containing the number of favor tokens passed as parameter
-     * @param favorTokens the user's actual favor tokens
-     */
-    @Override
-    public void notifyFavorTokens(int favorTokens) {
-        //Da aggiungere al protocollo!!!!!
-        outSocket.println("SEND favor_tokens "+favorTokens);
-        outSocket.flush();
-    }
-
-    /**
      * Sends the client a text list of the dice contained in the schema card parameter (with an unique INDEX)
      * @param schema the schema card to get the Dice
      */
-    @Override
-    public void procSchemaDiceSelect(SchemaCard schema) {
+    public void sendSchemaDiceList() {
         int index=0;
-        int choice;
         Die die;
+        SchemaCard schema=user.getGame().getUserSchemaCard(user);
         FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
 
         outSocket.print("LIST schema");
@@ -362,19 +415,16 @@ public class SocketServer extends Thread implements ServerConn  {
         }
         outSocket.println("");
         outSocket.flush();
-
-        choice=waitForSelect();
     }
 
     /**
      * Sends the client a text list of the dice contained in the RoundTrack (with an unique INDEX)
      * @param trackList the RoundTrack's dice list (index,die)
      */
-    @Override
-    public void procRoundTrackDiceSelect(List<List<Die>> trackList) {
+    public void sendRoundTrackDiceList() {
         int index=0;
         int roundNumber;
-        int choice;
+        List<List<Die>> trackList = user.getGame().getRoundTrackDice();
         ArrayList<Die> dieList;
 
         outSocket.print("LIST roundtrack");
@@ -389,8 +439,6 @@ public class SocketServer extends Thread implements ServerConn  {
         }
         outSocket.println("");
         outSocket.flush();
-
-        choice=waitForSelect();
     }
 
 
@@ -398,10 +446,9 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text list of the dice contained in the DraftPool (with an unique INDEX)
      * @param draftedDice the DraftPool's dice list
      */
-    @Override
-    public void procDraftPoolDiceSelect(List<Die> draftedDice) {
+    public void sendDraftPoolDiceList() {
         Die die;
-        int choice;
+        ArrayList<Die> draftedDice= (ArrayList<Die>) user.getGame().getDraftedDice();
 
         outSocket.print("LIST draftpool");
         for (int i=0;i<draftedDice.size();i++){
@@ -411,7 +458,6 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.println("");
         outSocket.flush();
 
-        choice=waitForSelect();
     }
 
     /**
@@ -437,7 +483,7 @@ public class SocketServer extends Thread implements ServerConn  {
                 return 1; //ok
             }
         }
-        if(Validator.checkDiscardParams(inSocket.readln(),parsedResult){
+        if(Validator.checkDiscardParams(inSocket.readln(),parsedResult)){
             //the command was a discar....pop out from the insocket buffer
             inSocket.pop();
         }

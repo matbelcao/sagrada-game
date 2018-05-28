@@ -78,10 +78,7 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
 
     }
 
-    @Override
-    public void notifySchema(SchemaCard schemaCard){
 
-    }
 
     /**
      * Returns the light version of the given schema card
@@ -105,58 +102,6 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
         return new LightSchemaCard(schemaCard.getName(),contentMap,schemaCard.getFavorTokens());
     }
 
-    @Override
-    public void notifyToolCard(ToolCard toolCard) {
-
-    }
-
-    @Override
-    public void notifyPublicObjective(PubObjectiveCard pubObjectiveCard) {
-
-    }
-
-    @Override
-    public void notifyPrivateObjective(PrivObjectiveCard privObjectiveCard) {
-
-    }
-
-    @Override
-    public void notifyPlayers(List<Player> players) {
-
-    }
-
-    @Override
-    public void notifyDraftPool(List<Die> draftedDice) {
-        
-    }
-
-    @Override
-    public void notifyRoundTrack(List<List<Die>> trackList) {
-
-    }
-
-
-
-    @Override
-    public void notifyFavorTokens(int favorTokens) {
-
-    }
-
-    @Override
-    public void notifySchemaDiceList(SchemaCard schema) {
-
-    }
-
-    @Override
-    public void notifyRoundTrackDiceList(List<List<Die>> trackList) {
-
-    }
-
-
-    @Override
-    public void notifyDraftPoolDiceList(List<Die> draftedDice) {
-
-    }
 
     /**
      * Pings the client invoking a remote method

@@ -21,28 +21,6 @@ public interface ServerConn {
 
     void notifyTurnEvent(String event,int playerId,int turnNumber);
 
-    void notifySchema(SchemaCard schemaCard);
-
-    void notifyToolCard(ToolCard toolCard);
-
-    void notifyPublicObjective(PubObjectiveCard pubObjectiveCard);
-
-    void notifyPrivateObjective(PrivObjectiveCard privObjectiveCard);
-
-    void notifyPlayers(List<Player> players);
-
-    void notifyDraftPool(List<Die> draftedDice);
-
-    void notifyRoundTrack(List<List<Die>> trackList);
-
-    void notifyFavorTokens(int favorTokens);
-
-    void procSchemaDiceSelect(SchemaCard schema);
-
-    void procRoundTrackDiceSelect(List<List<Die>> trackList);
-
-    void procDraftPoolDiceSelect(List<Die> draftedDice);
-
     boolean ping();
 
 

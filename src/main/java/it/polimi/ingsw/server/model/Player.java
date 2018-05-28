@@ -89,12 +89,15 @@ public class Player {
     /**
      * This method assigns a schemaCard to the player
      * @param schema the Schema Card to assign
+     * @return true iff the schema will be set
      */
-     public void setSchema(SchemaCard schema){
-        assert this.schema==null;
-
+     public boolean setSchema(SchemaCard schema){
+        if(this.schema!=null){
+            return false;
+        }
         this.schema=schema;
         this.favorTokens=this.schema.getFavorTokens();
+        return true;
      }
 
     /**

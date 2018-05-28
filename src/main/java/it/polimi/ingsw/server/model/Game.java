@@ -156,38 +156,46 @@ public class Game extends Thread implements Iterable  {
      * Responds to the request by sending one private objective card to the user of the match
      * @param user the user who made the request
      */
-    public void sendPrivCard(User user){
-        user.getServerConn().notifyPrivateObjective(board.getPlayer(user).getPrivObjective());
+    public PrivObjectiveCard getPrivCard(User user){
+        return board.getPlayer(user).getPrivObjective();
     }
 
     /**
      * Responds to the request by sending three public objective cards to the user of the match
      * @param user the user who made the request
      */
-    public void sendPubCards(User user){
+    public List<PubObjectiveCard> getPubCards(){
+        ArrayList<PubObjectiveCard> cards= new ArrayList<>();
+
         for (int i=0 ; i < Board.NUM_OBJECTIVES ; i++ ) {
-            user.getServerConn().notifyPublicObjective(board.getPublicObjective(i));
+            cards.add(board.getPublicObjective(i));
         }
+        return cards;
     }
 
     /**
      * Responds to the request by sending three tool cards to the user of the match
      * @param user the user who made the request
      */
-    public void sendToolCards(User user){
+    public List<ToolCard> getToolCards(){
+        ArrayList<ToolCard> cards=new ArrayList<>();
+
         for (int i = 0; i < Board.NUM_TOOLS; i++) {
-            user.getServerConn().notifyToolCard(board.getToolCard(i));
+            cards.add(board.getToolCard(i));
         }
+        return cards;
     }
 
     /**
      * Responds to the request by sending four schema cards to the user of the match
      * @param user the user who made the request
      */
-    public void sendSchemaCards(User user){
+    public List<SchemaCard> getSchemaCards(User user){
+        ArrayList<SchemaCard> schemas=new ArrayList<SchemaCard>();
         for (int i=0 ; i < Board.NUM_PLAYER_SCHEMAS ; i++ ){
-            user.getServerConn().notifySchema(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]);
+            schemas.add(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]);
         }
+        return schemas;
     }
 
     /**
@@ -195,70 +203,60 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      * @param playerId the id of the player's desired schema card
      */
-    public void sendUserSchemaCard(User user,int playerId){
+    public SchemaCard getUserSchemaCard(int playerId){
         if(playerId>=0 && playerId<users.size()){
-            user.getServerConn().notifySchema(board.getPlayer(users.get(playerId)).getSchema());
+            return board.getPlayer(users.get(playerId)).getSchema();
         }
+        return null;
+    }
+
+    /**
+     * Responds to the request by sending four schema cards to the user of the match
+     * @param user the user who made the request
+     * @param playerId the id of the player's desired schema card
+     */
+    public SchemaCard getUserSchemaCard(User user){
+        return board.getPlayer(user).getSchema();
     }
 
     /**
      * Responds to the request by sending the draftpool to the user of the match
      * @param user the user who made the request
      */
-    public void sendDraftPool(User user){
-        user.getServerConn().notifyDraftPool(board.getDraftPool().getDraftedDice());
+    public List<Die> getDraftedDice(){
+        return board.getDraftPool().getDraftedDice();
     }
 
     /**
      * Responds to the request by sending the list of the dice that are present in the roundTrack (and their relative index)
      * @param user the user who made the request
      */
-    public void sendRoundTrack(User user){
-        user.getServerConn().notifyRoundTrack(board.getDraftPool().getRoundTrack().getTrack());
+    public List<List<Die>> getRoundTrackDice(){
+        return board.getDraftPool().getRoundTrack().getTrack();
     }
 
     /**
      * Responds to the request by sending the list of the match's players (and their id inside the Player class)
      * @param user the user who made the request
      */
-    public void sendPlayers(User user){
+    public List<Player> getPlayers(){
         ArrayList<Player> players= new ArrayList<>();
         for (User u:users){
             players.add(board.getPlayer(u));
         }
-        user.getServerConn().notifyPlayers(players);
+        return players;
     }
 
     /**
      * Responds by sending the favortokens to the user that made the request
      * @param user the user who made the request
      */
-    public void sendFavorTokens(User user){
+    public int getFavorTokens(User user){
         Player player=board.getPlayer(user);
         if(player.getSchema()!=null){
-            user.getServerConn().notifyFavorTokens(player.getFavorTokens());
+            return player.getFavorTokens();
         }
-    }
-
-    /**
-     * Responds by sending the the list of dice in the desired game area to the user
-     * @param user the the game's area string: "schema","roundtrack" or "draftpool"
-     */
-    public void sendDiceList(User user,String listType){
-        ArrayList<Die> dice;
-        if(listType.equals("schema")){
-            Player player=board.getPlayer(user);
-            if(player.getSchema()!=null){
-                user.getServerConn().notifySchemaDiceList(board.getPlayer(user).getSchema());
-            }
-            return;
-        }
-        if(listType.equals("roundtrack")){
-            user.getServerConn().notifyRoundTrackDiceList(board.getDraftPool().getRoundTrack().getTrack());
-        }
-        if(listType.equals("draftpool")){
-            user.getServerConn().notifyDraftPoolDiceList(board.getDraftPool().getDraftedDice());
-        }
+        return 0;
     }
 
     /**
@@ -267,19 +265,21 @@ public class Game extends Thread implements Iterable  {
      * @param user the user to set the card
      * @param idSchema the id of the schema card
      */
-    public void chooseSchemaCard(User user,int idSchema){
+    public boolean chooseSchemaCard(User user,int idSchema){
+        boolean response =false;
         for (SchemaCard s: draftedSchemas){
             if (s.getId()==idSchema){
-                board.getPlayer(user).setSchema(s);
+                response=board.getPlayer(user).setSchema(s);
                 break;
             }
         }
         for (User u: users){
             if(board.getPlayer(u).getSchema()==null){
-                return;
+                return response;
             }
         }
         timer.cancel();
+        return response;
     }
 
 
