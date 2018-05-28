@@ -14,6 +14,11 @@ public class LightPrivObj extends LightCard {
         return new LightPrivObj(priv.getName(),priv.getDescription(),priv.getId(),priv.getColor());
     }
 
+    public static LightPrivObj toLightPrivObj(String objective){
+        String [] param= objective.trim().split("\\s+");
+        return new LightPrivObj (param[3].replaceAll("_", " "),param[4].replaceAll("_", " "),Integer.parseInt(param[2]),Color.valueOf(param[5]));
+    }
+
     public Color getColor() {
         return color;
     }

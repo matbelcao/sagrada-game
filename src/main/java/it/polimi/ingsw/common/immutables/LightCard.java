@@ -20,10 +20,10 @@ public class LightCard {
         return new LightCard(objective.getName(),objective.getDescription(),objective.getId());
     }
 
-    //public static LightCard toLightCard(String objective){
-
-
-    //}
+    public static LightCard toLightCard(String objective){
+        String [] param= objective.trim().split("\\s+");
+        return new LightCard(param[3].replaceAll("_", " "),param[4].replaceAll("_", " "),Integer.parseInt(param[2]));
+    }
 
     public String getName() {
         return name;

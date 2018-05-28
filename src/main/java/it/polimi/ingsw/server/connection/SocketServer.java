@@ -308,7 +308,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text containing the number of favor tokens passed as parameter
      * @param favorTokens the user's actual favor tokens
      */
-    public void sendFavorTokens() {
+    public void sendFavorTokens() {//da corregere!!!!
         //Da aggiungere al protocollo!!!!!
         outSocket.println("SEND favor_tokens "+user.getGame().getFavorTokens(user));
         outSocket.flush();
