@@ -142,6 +142,21 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
 
     }
 
+    @Override
+    public void notifySchemaDiceList(SchemaCard schema) {
+
+    }
+
+    @Override
+    public void notifyRoundTrackDiceList(ArrayList<ArrayList<Die>> trackList) {
+
+    }
+
+    @Override
+    public void notifyDraftPoolDiceList(List<Die> draftedDice) {
+
+    }
+
     /**
      * Pings the client invoking a remote method
      * @ truee iff the remote call doesn't throw an exception, therefore the connession between client and server is still up

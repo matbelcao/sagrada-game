@@ -5,6 +5,7 @@ import it.polimi.ingsw.common.immutables.LightCard;
 import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.common.immutables.LightTool;
 import it.polimi.ingsw.server.model.*;
+import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,6 +20,7 @@ public class SocketServer extends Thread implements ServerConn  {
     private Socket socket;
     private QueuedInReader inSocket;
     private PrintWriter outSocket;
+    private AckQueue ack;
     private User user;
 
     /**
@@ -30,6 +32,7 @@ public class SocketServer extends Thread implements ServerConn  {
         this.outSocket=outSocket;
         this.user = user;
         this.socket = socket;
+        this.ack=new AckQueue();
 
         start();
     }
@@ -115,6 +118,32 @@ public class SocketServer extends Thread implements ServerConn  {
                         game.sendPlayers(user);
                         break;
                 }
+                return true;
+            }
+            if(Validator.checkGetDiceListParams(command,parsedResult)){
+                game.sendDiceList(user,parsedResult.get(1));
+                return true;
+            }
+            if(Validator.checkSelectParams(command,parsedResult)){
+                switch(parsedResult.get(1)){
+                    case "die":
+                        //to implement
+                        break;
+                    case "modified_die":
+                        //to implement
+                        break;
+                    case "tool":
+                        //to implement
+                        break;
+                }
+                return true;
+            }
+            if(Validator.checkChooseParams(command,parsedResult)){
+                //to implement
+                return true;
+            }
+            if(Validator.checkDiscardParams(command,parsedResult)){
+                //to implement
                 return true;
             }
             if(Validator.checkAckParams(command,parsedResult)){
@@ -253,7 +282,7 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Sends the client a textual list of the dice in the DraftPool
-     * @param draftedDice the dice list
+     * @param draftedDice the DraftPool's dice list
      */
     @Override
     public void notifyDraftPool(List<Die> draftedDice){
@@ -270,7 +299,7 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Sends the client a textual list of the dice in the RoundTrack (can be multiple die at the same index)
-     * @param trackList the dice list (index,die)
+     * @param trackList the RoundTrack's dice list (index,die)
      */
     @Override
     public void notifyRoundTrack(ArrayList<ArrayList<Die>> trackList){
@@ -310,6 +339,70 @@ public class SocketServer extends Thread implements ServerConn  {
     public void notifyFavorTokens(int favorTokens) {
         //Da aggiungere al protocollo!!!!!
         outSocket.println("SEND favor_tokens "+favorTokens);
+        outSocket.flush();
+    }
+
+    /**
+     * Sends the client a text list of the dice contained in the schema card parameter (with an unique INDEX)
+     * @param schema the schema card to get the Dice
+     */
+    @Override
+    public void notifySchemaDiceList(SchemaCard schema) {
+        int index=0;
+        Die die;
+        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+
+        outSocket.print("LIST schema");
+        while(diceIterator.hasNext()){
+            die=diceIterator.next().getDie();
+            outSocket.print(" "+index+","+diceIterator.getRow()+","+diceIterator.getColumn()+","+die.getColor().toString()
+                    +","+die.getShade().toString());
+            index++;
+        }
+        outSocket.println("");
+        outSocket.flush();
+    }
+
+    /**
+     * Sends the client a text list of the dice contained in the RoundTrack (with an unique INDEX)
+     * @param trackList the RoundTrack's dice list (index,die)
+     */
+    @Override
+    public void notifyRoundTrackDiceList(ArrayList<ArrayList<Die>> trackList) {
+        int index=0;
+        int roundNumber=0;
+        ArrayList<Die> dieList;
+
+        outSocket.print("LIST roundtrack");
+        for(int i=0;i<trackList.size();i++){
+            roundNumber=0;
+            dieList=trackList.get(i);
+            for(Die d:dieList){
+                outSocket.print(" "+index+","+i+","+roundNumber+","+d.getColor().toString()+","+d.getShade().toString());
+                roundNumber++;
+                index++;
+            }
+        }
+        outSocket.println("");
+        outSocket.flush();
+    }
+
+
+    /**
+     * Sends the client a text list of the dice contained in the DraftPool (with an unique INDEX)
+     * @param draftedDice the DraftPool's dice list
+     */
+    @Override
+    public void notifyDraftPoolDiceList(List<Die> draftedDice) {
+        Die die;
+
+        outSocket.print("LIST draftpool");
+        for (int i=0;i<draftedDice.size();i++){
+            die=draftedDice.get(i);
+            System.out.print(" "+i+","+die.getColor().toString()+","+die.getShade().toString());
+        }
+        outSocket.println("");
+        outSocket.flush();
     }
 
 

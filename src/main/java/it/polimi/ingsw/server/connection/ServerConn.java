@@ -38,6 +38,12 @@ public interface ServerConn {
 
     void notifyFavorTokens(int favorTokens);
 
+    void notifySchemaDiceList(SchemaCard schema);
+
+    void notifyRoundTrackDiceList(ArrayList<ArrayList<Die>> trackList);
+
+    void notifyDraftPoolDiceList(List<Die> draftedDice);
+
     boolean ping();
 
 
