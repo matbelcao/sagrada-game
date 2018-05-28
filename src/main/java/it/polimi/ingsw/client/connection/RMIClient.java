@@ -47,19 +47,25 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public LightCard getPublicObj() {
-        LightCard card = null;
+    public List<LightCard> getPublicObjs() {
+        List<LightCard> result = null;
         try {
-            card = remoteObj.getPublicObj();
+            result = remoteObj.getPublicObjs();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        return card;
+        return result;
     }
 
     @Override
-    public LightTool getTools() {
-        return null;
+    public List<LightCard> getTools() {
+        List<LightCard> result = null;
+        try {
+            result = remoteObj.getTools();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     @Override

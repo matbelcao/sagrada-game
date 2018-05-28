@@ -29,12 +29,12 @@ public interface ClientConn {
     /**
      * This method asks the server for the public objectives of the match, the server will send all three of them following this request
      */
-    LightCard getPublicObj();
+    List<LightCard> getPublicObjs();
 
     /**
      * This method asks the server for the tools of the match, the server will send all three of them following this request
      */
-    LightTool getTools();
+    List<LightCard> getTools();
 
     /**
      * This method asks the serverfor an updated version of the draftpool

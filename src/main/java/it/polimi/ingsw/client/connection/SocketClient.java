@@ -199,16 +199,15 @@ public class SocketClient implements ClientConn {
     }
 
     @Override
-    public LightCard getPublicObj() {
-
+    public List<LightCard> getPublicObjs() {
         return null;
     }
 
     @Override
-    public LightTool getTools() {
-
+    public List<LightCard> getTools() {
         return null;
     }
+
 
     @Override
     public Map<Integer,CellContent> getDraftPool() {

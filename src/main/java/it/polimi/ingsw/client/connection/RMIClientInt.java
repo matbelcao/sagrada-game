@@ -5,6 +5,7 @@ import it.polimi.ingsw.common.immutables.LightSchemaCard;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 public interface RMIClientInt extends Remote {
     boolean pong() throws RemoteException;
@@ -17,5 +18,7 @@ public interface RMIClientInt extends Remote {
 
     LightCard getPrivateObj() throws RemoteException;
 
-    LightCard getPublicObj() throws RemoteException;
+    List<LightCard> getPublicObjs() throws RemoteException;
+
+    List<LightCard> getTools() throws RemoteException;
 }
