@@ -122,6 +122,7 @@ public class Game extends Thread implements Iterable  {
         waitAction();
 
         while (round.hasNextRound()){
+            round.nextRound();
             board.getDraftPool().draftDice(users.size());
 
             //Notify to all the users the starting of the round
@@ -152,8 +153,7 @@ public class Game extends Thread implements Iterable  {
             for(User u:users){
                 u.getServerConn().notifyRoundEvent("end",round.getRoundNumber());
             }
-            board.getDraftPool().clearDraftPool(round.getRoundNumber());
-            round.nextRound();
+            //board.getDraftPool().clearDraftPool(round.getRoundNumber());
         }
     }
 

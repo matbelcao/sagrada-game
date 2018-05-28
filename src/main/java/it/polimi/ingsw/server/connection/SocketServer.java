@@ -223,7 +223,7 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     @Override
     public void notifyTurnEvent(String event,int playerId,int turnNumber){
-        outSocket.println("GAME turn_"+event+" "+event+" "+playerId+" "+turnNumber);
+        outSocket.println("GAME turn_"+event+" "+playerId+" "+turnNumber);
         outSocket.flush();
     }
 
