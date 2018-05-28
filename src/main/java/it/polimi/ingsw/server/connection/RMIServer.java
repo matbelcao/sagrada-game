@@ -1,35 +1,27 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.common.immutables.CellContent;
 import it.polimi.ingsw.common.immutables.LightConstraint;
 import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
-import it.polimi.ingsw.server.model.*;
+import it.polimi.ingsw.server.model.Cell;
+import it.polimi.ingsw.server.model.Constraint;
+import it.polimi.ingsw.server.model.Player;
+import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.List;
 
-public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServerInt {
-        private RMIClientInt clientReference;
-        private User user;
+public class RMIServer implements ServerConn {
+        private RMIServerInt remoteObj;
+        private  User user;
 
-    public RMIServer(User user) throws RemoteException{
+
+    public RMIServer(RMIServerInt remoteObj,User user){
+        this.remoteObj = remoteObj;
         this.user = user;
     }
-
-    @Override
-    public void setClientReference(RMIClientInt remoteRef) {
-        this.clientReference = remoteRef;
-    }
-
-    /**
-     * Quits the user
-     */
-    @Override
-    public void quit() { user.quit(); }
 
     /**
      * Notifies the client waiting in a lobby that the lobby has updated
@@ -38,10 +30,11 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
     @Override
     public void notifyLobbyUpdate(int n) {
         try {
-            clientReference.updateLobby(n);
+            remoteObj.notifyLobbyUpdate(n);
         } catch (RemoteException e) {
             user.disconnect();
         }
+
     }
 
     /**
@@ -51,8 +44,8 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
      */
     @Override
     public void notifyGameStart(int n, int id) {
-       try {
-            clientReference.updateGameStart(n,id);
+        try {
+            remoteObj.notifyGameStart( n, id);
         } catch (RemoteException e) {
             user.disconnect();
         }
@@ -108,13 +101,14 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
      * @ truee iff the remote call doesn't throw an exception, therefore the connession between client and server is still up
      */
     @Override
-    public boolean ping() {
-        try{
-            clientReference.pong();
-        } catch (Exception e) {
+    public boolean ping(){
+        boolean result;
+        try {
+            result = remoteObj.ping();
+        } catch (RemoteException e) {
             return false;
         }
-            return true;
+        return result;
     }
 
 

@@ -1,5 +1,7 @@
 package it.polimi.ingsw.server.connection;
 
+import it.polimi.ingsw.client.connection.RMIClientInt;
+import it.polimi.ingsw.client.connection.RMIClientObject;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 
 import java.net.MalformedURLException;
@@ -20,11 +22,10 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
             User user = master.getUser(username);
             user.setConnectionMode(ConnectionMode.RMI);
             try {
-                RMIServer RMIconnection = new RMIServer(user);
+                RMIClientInt RMIclientObj = new RMIClientObject(user);
                 LocateRegistry.getRegistry(master.getIpAddress(),MasterServer.getMasterServer().getRMIPort()) ;
-                Naming.rebind("rmi://"+master.getIpAddress()+"/"+username+password, RMIconnection);
+                Naming.rebind("rmi://"+master.getIpAddress()+"/"+username+password, RMIclientObj);
                 master.printMessage("RMI service for client "+username+" published"); //delete
-                user.setServerConn(RMIconnection);
             }catch (RemoteException | MalformedURLException e){
                 e.printStackTrace();
                 logged = false;
@@ -38,8 +39,14 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
     @Override
     public void updateConnected(String username){
         MasterServer master = MasterServer.getMasterServer();
-        //aggingere controllo che user non sia playing
         master.updateConnected(master.getUser(username));
+    }
+
+    @Override
+    public void setRemoteReference(RMIServerInt remoteRef, String username) throws RemoteException {
+        MasterServer master = MasterServer.getMasterServer();
+        User user = master.getUser(username);
+        user.setServerConn((new RMIServer(remoteRef, user)));
     }
 
 }

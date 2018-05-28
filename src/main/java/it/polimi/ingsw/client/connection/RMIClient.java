@@ -1,47 +1,19 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.immutables.*;
-import it.polimi.ingsw.server.connection.RMIServerInt;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class RMIClient implements ClientConn,RMIClientInt {
-    private RMIServerInt RMIconn;
-    private Client client;
+public class RMIClient implements ClientConn {
+    RMIClientInt remoteObj;
 
-    public RMIClient(RMIServerInt RMIconn, Client client) {
-        this.RMIconn = RMIconn;
-        this.client = client;
+    public RMIClient(RMIClientInt remoteObj) throws RemoteException {
+        this.remoteObj = remoteObj;
     }
 
-    public RMIServerInt getRMIconn() {
-        return RMIconn;
-    }
-
-    /**
-     * Updates the view of the lobby's current size
-     *
-     * @param lobbySize the current size of the lobby
-     */
-    @Override
-    public void updateLobby(int lobbySize) {
-        client.getClientUI().updateLobby(lobbySize);
-    }
-
-    /**
-     * Updates the view of the beginning of the match
-     *
-     * @param n  number of players of the match
-     * @param id the id of the player running the application
-     */
-    @Override
-    public void updateGameStart(int n, int id) {
-        client.updateGameStart(n, id);
-    }//
 
     @Override
     public boolean login(String username, String password) {
@@ -54,9 +26,9 @@ public class RMIClient implements ClientConn,RMIClientInt {
     @Override
     public void quit() {
         try {
-            RMIconn.quit();
-            //do nothing, client is already disconnecting
+            remoteObj.quit();
         } catch (RemoteException e) {
+            //do nothing already disconnecting
         }
     }
 
