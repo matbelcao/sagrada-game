@@ -1,4 +1,6 @@
 package it.polimi.ingsw.common.immutables;
+import it.polimi.ingsw.server.model.Cell;
+import it.polimi.ingsw.server.model.Constraint;
 import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.util.HashMap;
@@ -26,6 +28,30 @@ public class LightSchemaCard {
         this.cells.putAll(contentMap);
         contentMap.clear();
     }
+
+    /**
+     * Returns the light version of the given schema card
+     * @param schemaCard the schema card to be used as a template for the new light schema
+     * @return the newly created LightSchema
+     */
+    public static  LightSchemaCard toLightSchema(SchemaCard schemaCard){
+        HashMap<Integer,CellContent> contentMap = new HashMap<>(30);
+        for(int i=0; i<SchemaCard.NUM_COLS*SchemaCard.NUM_ROWS; i++){
+            Cell cell = schemaCard.getCell(i);
+            if(cell.hasDie()){
+                contentMap.put(i,new LightDie(cell.getDie().getShade(),cell.getDie().getColor()));
+            }else if(cell.hasConstraint()){
+                Constraint constraint = cell.getConstraint();
+                if(constraint.isColorConstraint()){
+                    contentMap.put(i,new LightConstraint(constraint.getColor()));
+                } else {
+                    contentMap.put(i, new LightConstraint(constraint.getShade()));
+                }
+            }
+        }
+        return new LightSchemaCard(schemaCard.getName(),contentMap,schemaCard.getFavorTokens());
+    }
+
 
     /**
      * @return a copy of the map of the content of the schema

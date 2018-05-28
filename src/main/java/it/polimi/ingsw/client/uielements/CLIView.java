@@ -9,8 +9,8 @@ import it.polimi.ingsw.server.model.SchemaCard;
 import java.util.*;
 
 public class CLIView {
-    private static final int SCHEMA_WIDTH = 38;
-    private static final int SCHEMA_HEIGHT = 16;
+    private static final int SCHEMA_WIDTH = 35;
+    private static final int SCHEMA_HEIGHT = 18;
     private static final int OBJ_LENGTH = 34;
 
     private final ArrayList<String> topInfo= new ArrayList<>();
@@ -25,19 +25,21 @@ public class CLIView {
     private static final CLIElems cliElems= new CLIElems();
     private final UIMessages uiMsg;
     private int numPlayers;
-    private final int playerId;
+    private int playerId;
 
-    public CLIView(UILanguage lang, int playerId, int numPlayers){
-        this.numPlayers=numPlayers;
+    public CLIView(UILanguage lang){
+
         this.uiMsg=new UIMessages(lang);
-        this.playerId = playerId;
+
     }
 
     public String printView(){
         StringBuilder builder=new StringBuilder();
         builder.append(printList(topInfo));
+        builder.append("%n");
         builder.append(printList(buildTopSection()));
-        builder.append(schemas.get(playerId));
+        builder.append("%n");
+        builder.append(printList(schemas.get(playerId)));
         return builder.toString();
     }
 
@@ -94,7 +96,7 @@ public class CLIView {
      * @param pubObj the list of public objectives
      * @param privObj the private objective
      */
-    public void updateObjectives(List<LightCard> pubObj, LightCard privObj){
+    public void updateObjectives(List<LightCard> pubObj, LightPrivObj privObj){
         this.objectives= (ArrayList<String>) buildObjectives((ArrayList<LightCard>) pubObj,privObj);
     }
 
@@ -102,21 +104,12 @@ public class CLIView {
      * updates the draftpool representation
      * @param draftPool the new draftpool
      */
-    public void updateDraftPool(Map<Integer,CellContent> draftPool){
-        this.draftPool= (ArrayList<String>) buildCellRow(draftPool,0,numPlayers*2+1);
+    public void updateDraftPool(Map<Integer,LightDie> draftPool){
+        this.draftPool= (ArrayList<String>) buildDiceRow(draftPool,0,numPlayers*2+1);
     }
 
 
-
-
-    /**
-     * creates a list of  four strings  that represent a row of cells containing or not dice or constraints
-     * @param elems a map containing the elements to be represented
-     * @param from the index of the first element to be put inside the result (if an element is not in the Map an empty cell is added)
-     * @param to the index of the last one
-     * @return the said representation
-     */
-    public static List<String> buildCellRow(Map<Integer,CellContent> elems, int from, int to){
+    private static List<String> buildDiceRow(Map<Integer,LightDie> elems, int from, int to){
         assert(from<=to && from>=0);
         ArrayList<String> result=new ArrayList<>();
         result.add("");
@@ -126,40 +119,42 @@ public class CLIView {
         String [] rows;
         rows = new String[4];
         for(int i=from;i<to;i++) {
-
             //empty cell
             if (!elems.containsKey(i)) {
                 rows = splitElem(cliElems.getBigDie("EMPTI"));
-            }
+            }else {
 
-            //not empty
-            //die
-            if (elems.containsKey(i) && elems.get(i).isDie()) {
+                //not empty
+                //die
+
                 rows = splitElem(cliElems.getBigDie(elems.get(i).getShade().toString()));
+                rows = addColor(rows, elems.get(i).getColor());
             }
-
-            //constraint
-            if (elems.containsKey(i) && !elems.get(i).isDie()) {
-                if (elems.get(i).hasColor()) {
-
-                    //color constraint
-                    rows = splitElem(cliElems.getBigDie("FILLED"));
-                } else {
-
-                    //shade constraint
-                    rows = splitElem(cliElems.getBigDie(elems.get(i).getShade().toString()));
-                }
-            }
-
-            //add color to colored things
-            if (elems.get(i).hasColor()) {
-                rows=addColor(rows,elems.get(i).getColor());
-            }
-
-            assert (result.size() == 4);
-            //append new cell/die/constraint
-            result = (ArrayList<String>) appendRows(result, Arrays.asList(rows));
         }
+        assert (result.size() == 4);
+        //append new cell/die/constraint
+        result = (ArrayList<String>) appendRows(result, Arrays.asList(rows));
+        return result;
+    }
+
+
+    /**
+     * creates a list of  four strings  that represent a row of cells containing or not dice or constraints
+     * @param elems a map containing the elements to be represented
+     * @param from the index of the first element to be put inside the result (if an element is not in the Map an empty cell is added)
+     * @param to the index of the last one
+     * @return the said representation
+     */
+    private static List<String> buildCellRow(Map<Integer,CellContent> elems, int from, int to){
+        assert(from<=to && from>=0);
+        ArrayList<String> result=new ArrayList<>();
+        for(int i=from;i<to;i++) {
+
+
+            //append new cell/die/constraint
+            result = (ArrayList<String>) appendRows(result, buildCell(elems.get(i)));
+        }
+        assert(result.size()==4);
         return result;
     }
 
@@ -203,7 +198,7 @@ public class CLIView {
                 uiMsg.getMessage("player-number"),
                 playerId);
 
-        topInfo.set(0,info);
+        topInfo.add(0,info);
     }
 
 
@@ -227,7 +222,7 @@ public class CLIView {
      * @param privObj the private objective
      * @return a list of strings with a max length defined by OBJ_LENGTH
      */
-    private List<String> buildObjectives(ArrayList<LightCard> pubObj,LightCard privObj){
+    private List<String> buildObjectives(ArrayList<LightCard> pubObj, LightPrivObj privObj){
         ArrayList<String> result=new ArrayList<>();
 
         result.add(uiMsg.getMessage("pub-obj"));
@@ -238,7 +233,49 @@ public class CLIView {
         result.add(uiMsg.getMessage("priv-obj"));
         result.addAll(buildCard( privObj));
 
+        result.addAll(buildCell(new LightConstraint(privObj.getColor())));
+
         return result;
+    }
+
+    /**
+     * this builds a list of strings that represents the cell content
+     * @param cellContent the
+     * @return
+     */
+    private static List<String> buildCell(CellContent cellContent) {
+        String[] rows=new String [4];
+
+        if(cellContent==null){
+            //empty
+            rows = splitElem(cliElems.getBigDie("EMPTI"));
+        }else {
+            //not empty
+
+            //die
+            if (cellContent.isDie()) {
+                rows = splitElem(cliElems.getBigDie(cellContent.getShade().toString()));
+            }
+
+            //constraint
+            if (!cellContent.isDie()) {
+                if (cellContent.hasColor()) {
+
+                    //color constraint
+                    rows = splitElem(cliElems.getBigDie("FILLED"));
+                } else {
+
+                    //shade constraint
+                    rows = splitElem(cliElems.getBigDie(cellContent.getShade().toString()));
+                }
+            }
+
+            //add color to colored things
+            if (cellContent.hasColor()) {
+                rows = addColor(rows, cellContent.getColor());
+            }
+        }
+        return new ArrayList<>(Arrays.asList(rows));
     }
 
     /**
@@ -280,9 +317,9 @@ public class CLIView {
                 i--;
             }
             result.add(lineToFit.substring(0,i));
-            lineToFit=lineToFit.substring(i + 1).trim();
+            lineToFit=lineToFit.substring(i).trim();
         }
-        result.add(lineToFit);
+        result.add(padUntil(lineToFit,length));
         return result;
     }
 
@@ -306,7 +343,7 @@ public class CLIView {
      * @param finalLenght the total final length of the padded string
      * @return the padded string
      */
-    private String padUntil(String toPad, int finalLenght){
+    private static String padUntil(String toPad, int finalLenght){
         if(finalLenght<0|| toPad==null||toPad.length()>finalLenght){throw new IllegalArgumentException();}
 
         return toPad+ new String(new char[finalLenght - toPad.length()]).replace("\0", " ");
@@ -374,6 +411,10 @@ public class CLIView {
         return elem.split("::");
     }
 
+    public void setMatchInfo(int playerId, int numPlayers) {
+        this.playerId=playerId;
+        this.numPlayers=numPlayers;
+    }
 }
 
 

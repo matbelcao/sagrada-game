@@ -1,5 +1,7 @@
 package it.polimi.ingsw.common.immutables;
 
+import it.polimi.ingsw.server.model.Card;
+
 public class LightCard {
     private String name;
     private String description;
@@ -11,6 +13,10 @@ public class LightCard {
         this.description = description;
         this.imgSrc = imgSrc;
         this.id = id;
+    }
+
+    public static LightCard toLightCard(Card objective){
+        return new LightCard(objective.getName(),objective.getDescription(),objective.getImgSrc(),objective.getId());
     }
 
     public String getName() {
