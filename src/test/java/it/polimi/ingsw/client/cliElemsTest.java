@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 class cliElemsTest {
     private static CLIElems cliel=new CLIElems();
@@ -28,6 +27,7 @@ class cliElemsTest {
     private static LightSchemaCard schema2;
     private static LightSchemaCard schema3;
     private static ArrayList<LightDie> draftpool;
+    private static ArrayList<IndexedCellContent> roundtrack ;
     private static ArrayList<LightCard> obj= new ArrayList<>();
 
     @BeforeAll
@@ -57,17 +57,31 @@ class cliElemsTest {
         player3.setSchema(schema3);
 
         cliview= new CLIView(UILanguage.ita);
-        cliview.setClientInfo(ConnectionMode.SOCKET,player1.getUsername());
-        cliview.setMatchInfo(1,4);
 
+        cliview.setMatchInfo(1,4);
+        cliview.setClientInfo(ConnectionMode.SOCKET,player1.getUsername());
         cliview.updateSchema(player0);
         cliview.updateSchema(player1);
         cliview.updateSchema(player2);
         cliview.updateSchema(player3);
 
-        cliview.updateRoundTurn(1,0);
+        cliview.updateRoundTurn(5,0);
 
         cliview.updateDraftPool(draftpool);
+
+        roundtrack= new ArrayList<>();
+        roundtrack.add(new IndexedCellContent(0,"ONE","YELLOW"));
+        roundtrack.add(new IndexedCellContent(1,"TWO","YELLOW"));
+        roundtrack.add(new IndexedCellContent(1,"ONE","BLUE"));
+        roundtrack.add(new IndexedCellContent(1,"FIVE","RED"));
+        roundtrack.add(new IndexedCellContent(2,"SIX","YELLOW"));
+        roundtrack.add(new IndexedCellContent(3,"THREE","PURPLE"));
+        roundtrack.add(new IndexedCellContent(3,"ONE","RED"));
+        roundtrack.add(new IndexedCellContent(4,"FOUR","GREEN"));
+        roundtrack.add(new IndexedCellContent(5,"ONE","YELLOW"));
+
+
+        cliview.updateRoundTrack(roundtrack);
 
         obj.add(LightCard.toLightCard(new PubObjectiveCard(2,MasterServer.XML_SOURCE+"PubObjectiveCard.xml")));
         obj.add(LightCard.toLightCard(new PubObjectiveCard(3,MasterServer.XML_SOURCE+"PubObjectiveCard.xml")));
@@ -98,7 +112,7 @@ class cliElemsTest {
         System.out.println("");System.out.println("");System.out.println("");
 
 
-System.out.printf(cliview.printView());
+System.out.printf(cliview.printMainView());
 
 
 

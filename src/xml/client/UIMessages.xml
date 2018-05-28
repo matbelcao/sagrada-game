@@ -56,4 +56,8 @@
         <eng>Draft pool:</eng>
         <ita>Riserva:</ita>
     </draftpool>
+    <roundtrack>
+        <eng>Round track ^</eng>
+        <ita>Tracciato dei round ^</ita>
+    </roundtrack>
 </messages>

@@ -2,22 +2,28 @@ package it.polimi.ingsw.common.immutables;
 
 import it.polimi.ingsw.server.model.Card;
 
+import java.io.File;
+
 public class LightCard {
     private String name;
     private String description;
-    private String imgSrc;
+    private static final String imgSrc="src"+ File.separator+"img"+File.separator;
     private int id;
 
-    public LightCard(String name, String description, String imgSrc, int id){
+    public LightCard(String name, String description, int id){
         this.name = name;
         this.description = description;
-        this.imgSrc = imgSrc;
         this.id = id;
     }
 
     public static LightCard toLightCard(Card objective){
-        return new LightCard(objective.getName(),objective.getDescription(),objective.getImgSrc(),objective.getId());
+        return new LightCard(objective.getName(),objective.getDescription(),objective.getId());
     }
+
+    //public static LightCard toLightCard(String objective){
+
+
+    //}
 
     public String getName() {
         return name;

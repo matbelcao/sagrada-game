@@ -5,7 +5,7 @@ import it.polimi.ingsw.server.model.ToolCard;
 public class LightTool extends LightCard {
     private boolean used;
     public LightTool(String name, String description, String imgSrc, int id, boolean used) {
-        super(name, description, imgSrc, id);
+        super(name, description, id);
         this.used=used;
     }
 

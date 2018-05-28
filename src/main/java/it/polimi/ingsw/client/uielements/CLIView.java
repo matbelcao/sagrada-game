@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.uielements;
 
+import it.polimi.ingsw.client.LightBoard;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.immutables.*;
@@ -12,17 +13,20 @@ public class CLIView {
     private static final int SCHEMA_WIDTH = 35;
     private static final int SCHEMA_HEIGHT = 18;
     private static final int CELL_HEIGHT = 4;
+    private static final int CELL_WIDTH = 7;
     private static final int OBJ_LENGTH = 34;
+    private static final int SCREEN_LENGTH = 160;
 
-    private final ArrayList<String> topInfo= new ArrayList<>();
+
+    private final List<String> bottomInfo = new ArrayList<>();
     private String turnRoundinfo;
-    private final HashMap<Integer,ArrayList<String>> schemas= new HashMap<>();
-    private ArrayList<String> objectives;
-    private final ArrayList<String> tools= new ArrayList<>();
+    private final HashMap<Integer,List<String>> schemas= new HashMap<>();
+    private List<String> objectives;
+    private final List<String> tools= new ArrayList<>();
 
-    private final ArrayList<String> roundTrack= new ArrayList<>();
-    private ArrayList<String> draftPool= new ArrayList<>();
-    private final ArrayList<String> bottom=new ArrayList<>();
+    private List<String> roundTrack= new ArrayList<>();
+    private List<String> draftPool= new ArrayList<>();
+    private final List<String> bottom=new ArrayList<>();
     private static final CLIElems cliElems= new CLIElems();
     private final UIMessages uiMsg;
     private int numPlayers;
@@ -34,13 +38,21 @@ public class CLIView {
 
     }
 
-    public String printView(){
+    public String printMainView(){
         StringBuilder builder=new StringBuilder();
-        builder.append(printList(topInfo));
+
+        builder.append(printList(roundTrack));
+        builder.append("   ").append(bold(uiMsg.getMessage("roundtrack"))).append("%n");
+        builder.append(padUntil("", SCREEN_LENGTH, '–')).append("%n");
+
+        builder.append("%n");
         builder.append("%n");
         builder.append(printList(buildTopSection()));
+
         builder.append(printList(buildDraftPool()));
+
         builder.append(printList(schemas.get(playerId)));
+        builder.append(printList(bottomInfo));
         return builder.toString();
     }
 
@@ -54,14 +66,15 @@ public class CLIView {
     }
 
     private List<String> buildTopSection(){
-        ArrayList<String> result=new ArrayList<>();
-
-        for(Map.Entry<Integer,ArrayList<String>> entry : schemas.entrySet() ){
-            if(entry.getKey()!=playerId){
-                result= (ArrayList<String>) appendRows(result,entry.getValue());
+        List<String> result=new ArrayList<>();
+        for(Map.Entry<Integer,List<String>> entry : schemas.entrySet() ){
+            if(entry.getKey() != playerId){
+                result= appendRows(result,entry.getValue());
             }
         }
-        result= (ArrayList<String>) appendRows(result,objectives);
+        result= appendRows(result,buildWall(' ',result.size(), (LightBoard.MAX_PLAYERS-numPlayers)*(SCHEMA_WIDTH+6)));
+        result= appendRows(result,buildSeparator(SCHEMA_HEIGHT));
+        result= appendRows(result,objectives);
       return result;
     }
     /**
@@ -69,7 +82,7 @@ public class CLIView {
      * @param player the player whose schema we want to create/update
      */
     public void updateSchema(LightPlayer player){
-        this.schemas.put(player.getPlayerId(), (ArrayList<String>) buildSchema(player));
+        this.schemas.put(player.getPlayerId(), buildSchema(player));
     }
 
     public void updateRoundTurn(int roundNumber, int turnNumber){
@@ -91,13 +104,14 @@ public class CLIView {
         }
     }
 
+
     /**
      * This method creates the representation of the objectives
      * @param pubObj the list of public objectives
      * @param privObj the private objective
      */
     public void updateObjectives(List<LightCard> pubObj, LightPrivObj privObj){
-        this.objectives= (ArrayList<String>) buildObjectives((ArrayList<LightCard>) pubObj,privObj);
+        this.objectives= buildObjectives(pubObj,privObj);
     }
 
 
@@ -107,15 +121,79 @@ public class CLIView {
      */
     public void updateDraftPool(List<LightDie> draftPool){
 
-        this.draftPool= (ArrayList<String>) buildDiceRow( ListToMap(draftPool),0,numPlayers*2+1);
+        this.draftPool= buildDiceRow( listToMap(draftPool),0,numPlayers*2+1);
+        this.draftPool.add(0,padUntil("",(numPlayers*2+1)*CELL_WIDTH,'_'));
+        this.draftPool.add(padUntil("",(numPlayers*2+1)*CELL_WIDTH,'–'));
     }
 
+    public void updateRoundTrack(List<IndexedCellContent> roundTrack){
+        this.roundTrack= buildRoundTrack(roundTrack);
+        this.roundTrack.add(padUntil("",(10)*CELL_WIDTH,'–'));
+        this.roundTrack= appendRows(buildSeparator(this.roundTrack.size()-1),this.roundTrack);
+
+    }
+
+    /**
+     * creates a rectangle filled with the filler of the  selected sizes
+     * @param filler the character used as a filler
+     * @param height the height of the rectangle
+     * @param width the width of the rectangle
+     * @return the wall
+     */
+    private List<String> buildWall(char filler,int height, int width){
+        if(height<0||width<0){ throw new IllegalArgumentException();}
+
+        List<String> result=new ArrayList<>();
+        for(int row=0;row<height;row++){
+            result.add(padUntil("",width,filler));
+        }
+        return result;
+    }
+
+    private List<String> buildRoundTrack(List<IndexedCellContent> roundTrack){
+        List<String> result=new ArrayList<>();
+        int maxLength=0;
+        List<List<CellContent>> matrix= new ArrayList<>();
+
+        for(int i=0;i<10;i++){
+            matrix.add(new ArrayList<>());
+        }
+        for(IndexedCellContent die: roundTrack){
+            matrix.get(die.getIndex()).add(die.getContent());
+        }
+        for(List<CellContent> round:matrix){
+            maxLength= (maxLength<round.size()?round.size():maxLength);
+        }
+        //building from the top row
+        for(int row=maxLength-1; row>0; row-- ){
+            List<String> builtRow=new ArrayList<>();
+            for(int round=0; round<10;round++){
+                try{
+                    builtRow= appendRows(builtRow,buildCell(matrix.get(round).get(row)));
+                }catch (IndexOutOfBoundsException e){
+                    builtRow= appendRows(builtRow,buildWall(' ',CELL_HEIGHT,CELL_WIDTH));
+                }
+            }
+            result.addAll(builtRow);
+        }
+
+
+        Map<Integer,CellContent> baseRow= new HashMap<>();
+        for(int round=0; round<10; round++){
+            try {
+                baseRow.put(round, matrix.get(round).get(0));
+            }catch(IndexOutOfBoundsException e){}
+        }
+
+        result.addAll(buildCellRow(baseRow,0,10));
+        return result;
+    }
 
     private List<String> buildDraftPool(){
-        ArrayList<String> result=new ArrayList<>();
+        List<String> result=new ArrayList<>();
         result.add(uiMsg.getMessage("draftpool"));
         result.addAll(draftPool);
-        result= (ArrayList<String>) appendRows(buildSeparator(CELL_HEIGHT+1),result);
+        result= appendRows(buildSeparator(draftPool.size()),result);
         return result;
     }
 
@@ -124,7 +202,7 @@ public class CLIView {
      * @param list the list to convert
      * @return the converted list as a map
      */
-    private static Map<Integer,LightDie> ListToMap(List<LightDie> list) {
+    private static Map<Integer,LightDie> listToMap(List<LightDie> list) {
         if(list==null){
             throw new IllegalArgumentException();
         }
@@ -135,13 +213,20 @@ public class CLIView {
         return map;
     }
 
+    /**
+     * builds a row of LightDie
+     * @param elems the map containing the dice
+     * @param from the index where to start from
+     * @param to the index where to end(this will not be in the result)
+     * @return the representation of the row
+     */
     private static List<String> buildDiceRow(Map<Integer,LightDie> elems, int from, int to){
         assert(from<=to && from>=0);
-        ArrayList<String> result=new ArrayList<>();
+        List<String> result=new ArrayList<>();
 
         for(int i=from;i<to;i++) {
             //empty cell
-            result = (ArrayList<String>) appendRows(result, buildCell(elems.get(i)));
+            result = appendRows(result, buildCell(elems.get(i)));
         }
         assert (result.size() == 4);
         //append new cell/die/constraint
@@ -159,10 +244,10 @@ public class CLIView {
      */
     private static List<String> buildCellRow(Map<Integer,CellContent> elems, int from, int to){
         assert(from<=to && from>=0);
-        ArrayList<String> result=new ArrayList<>();
+        List<String> result=new ArrayList<>();
         for(int i=from;i<to;i++) {
             //append new cell/die/constraint
-            result = (ArrayList<String>) appendRows(result, buildCell(elems.get(i)));
+            result = appendRows(result, buildCell(elems.get(i)));
         }
         assert(result.size()==4);
         return result;
@@ -173,7 +258,7 @@ public class CLIView {
      * @return the representation of the schema
      */
     private List<String> buildSchema(LightPlayer player){
-        ArrayList<String> schem= new ArrayList<>();
+        List<String> schem= new ArrayList<>();
 
         //add top info
         schem.addAll(fitInLength(buildSchemaInfo(player),SCHEMA_WIDTH));
@@ -189,7 +274,8 @@ public class CLIView {
         schem.add(cliElems.getElem("schema-border"));
 
         //add left/right borders
-        schem= (ArrayList<String>) appendRows(appendRows(buildSeparator(SCHEMA_HEIGHT),schem),buildSeparator(SCHEMA_HEIGHT));
+        schem= appendRows(appendRows(buildSeparator(SCHEMA_HEIGHT),schem),buildSeparator(SCHEMA_HEIGHT));
+        schem.set(schem.size()-1,padUntil("",SCHEMA_WIDTH+6,' '));
 
         return schem;
     }
@@ -208,7 +294,7 @@ public class CLIView {
                 uiMsg.getMessage("player-number"),
                 playerId);
 
-        topInfo.add(0,bold(info));
+        bottomInfo.add(0,bold(info));
     }
 
 
@@ -232,8 +318,8 @@ public class CLIView {
      * @param privObj the private objective
      * @return a list of strings with a max length defined by OBJ_LENGTH
      */
-    private List<String> buildObjectives(ArrayList<LightCard> pubObj, LightPrivObj privObj){
-        ArrayList<String> result=new ArrayList<>();
+    private List<String> buildObjectives(List<LightCard> pubObj, LightPrivObj privObj){
+        List<String> result=new ArrayList<>();
         result.add(" ");
         result.add(bold(uiMsg.getMessage("pub-obj")));
         result.add(" ");
@@ -253,13 +339,20 @@ public class CLIView {
 
     }
     private List<String> buildPrivObj(LightPrivObj privObj, int length) {
-        ArrayList<String> result=new ArrayList<>();
+        List<String> result=new ArrayList<>();
         result.add(" ");
         result.add(bold(privObj.getName()+":"));
         result.addAll(fitInLength(privObj.getDescription(), length));
         return result;
     }
 
+    private static List<String> colorWall(List<String> wall){
+        Random randomGen = new Random();
+        for(int row=0 ; row <wall.size();row++){
+            wall.set(row,addColorToLine(wall.get(row),Color.values()[randomGen.nextInt(Color.values().length -1)]));
+        }
+        return wall;
+    }
     /**
      * this builds a list of strings that represents the cell content
      * @param cellContent the
@@ -306,7 +399,7 @@ public class CLIView {
      * @return a list that is the card's representation
      */
     private List<String> buildCard( LightCard card) {
-        ArrayList<String> result=new ArrayList<>();
+        List<String> result=new ArrayList<>();
 
         result.add(bold(card.getName()+":"));
         result.addAll(fitInLength(card.getDescription(), OBJ_LENGTH));
@@ -314,8 +407,8 @@ public class CLIView {
     }
 
     private List<String> buildTool(LightTool tool){
-        ArrayList<String> result=new ArrayList<>();
-        result= (ArrayList<String>) buildCard(tool);
+        List<String> result;
+        result= buildCard(tool);
         result.add(String.format(cliElems.getElem("token-info"),
                 uiMsg.getMessage("tokens"),
                 tool.isUsed()?"2":"1"));
@@ -330,18 +423,18 @@ public class CLIView {
      */
     private static List<String> fitInLength(String line, int length ){
         if(line == null || length <= 0){throw new IllegalArgumentException();}
-        ArrayList<String> result=new ArrayList<>();
+        List<String> result=new ArrayList<>();
 
         String lineToFit= line;
         while(lineToFit.length()>length){
             int i = length - 1;
-            while(!(lineToFit.charAt(i) == ' ')){
+            while(lineToFit.charAt(i) != ' '){
                 i--;
             }
             result.add(lineToFit.substring(0,i));
             lineToFit=lineToFit.substring(i).trim();
         }
-        result.add(padUntil(lineToFit,length));
+        result.add(padUntil(lineToFit,length,' '));
         return result;
     }
 
@@ -350,7 +443,7 @@ public class CLIView {
      * @return said list
      */
     private List<String> buildSeparator(int height){
-        ArrayList<String> separator= new ArrayList<>();
+        List<String> separator= new ArrayList<>();
         separator.add("   ");
         for(int i=0;i< height;i++){
             separator.add(" | ");
@@ -365,10 +458,10 @@ public class CLIView {
      * @param finalLenght the total final length of the padded string
      * @return the padded string
      */
-    private static String padUntil(String toPad, int finalLenght){
+    private static String padUntil(String toPad, int finalLenght, char filler){
         if(finalLenght<0|| toPad==null||toPad.length()>finalLenght){throw new IllegalArgumentException();}
 
-        return toPad+ new String(new char[finalLenght - toPad.length()]).replace("\0", " ");
+        return toPad+ new String(new char[finalLenght - toPad.length()]).replace("\0", filler+"");
 
     }
 
@@ -408,7 +501,7 @@ public class CLIView {
             throw new IllegalArgumentException();
         }
 
-        ArrayList<String> result= new ArrayList<>();
+        List<String> result= new ArrayList<>();
         if(a.isEmpty()){
             result.addAll(b);
         }else{
@@ -437,4 +530,5 @@ public class CLIView {
         this.playerId=playerId;
         this.numPlayers=numPlayers;
     }
+
 }
