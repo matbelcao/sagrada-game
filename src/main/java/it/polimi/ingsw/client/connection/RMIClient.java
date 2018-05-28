@@ -25,11 +25,11 @@ public class RMIClient implements ClientConn {
      */
     @Override
     public void quit() {
-       /* try {
-            RMIconn.quit();
-            //do nothing, client is already disconnecting
+        try {
+            remoteObj.quit();
         } catch (RemoteException e) {
-        }*/
+            //do nothing already disconnecting
+        }
     }
 
     @Override

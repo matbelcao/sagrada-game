@@ -19,6 +19,6 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
 
     @Override
     public void quit() throws RemoteException {
-
+        user.quit();
     }
 }
