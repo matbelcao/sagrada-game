@@ -27,7 +27,7 @@ class cliElemsTest {
     private static LightSchemaCard schema1;
     private static LightSchemaCard schema2;
     private static LightSchemaCard schema3;
-    private static HashMap<Integer,LightDie> draftpool;
+    private static ArrayList<LightDie> draftpool;
     private static ArrayList<LightCard> obj= new ArrayList<>();
 
     @BeforeAll
@@ -38,15 +38,15 @@ class cliElemsTest {
         schema2=LightSchemaCard.toLightSchema(new SchemaCard(3,MasterServer.XML_SOURCE +"SchemaCard.xml"));
         schema3=LightSchemaCard.toLightSchema(new SchemaCard(4,MasterServer.XML_SOURCE +"SchemaCard.xml"));
 
-        draftpool=new HashMap<>();
+        draftpool=new ArrayList<>();
 
-        draftpool.put(0,new LightDie("FOUR","RED"));
-        draftpool.put(1,new LightDie("SIX","RED"));
-        draftpool.put(2,new LightDie("FOUR","GREEN"));
-        draftpool.put(3,new LightDie("TWO","RED"));
-        draftpool.put(4,new LightDie("ONE","YELLOW"));
+        draftpool.add(new LightDie("FOUR","RED"));
+        draftpool.add(new LightDie("SIX","RED"));
+        draftpool.add(new LightDie("FOUR","GREEN"));
+        draftpool.add(new LightDie("TWO","RED"));
+        draftpool.add(new LightDie("ONE","YELLOW"));
 
-        player0= new LightPlayer("ciccio",0);
+        player0= new LightPlayer("aaaaaaaaaaaaaaaa",0);
         player1= new LightPlayer("bubba",1);
         player2= new LightPlayer("boby",2);
         player3= new LightPlayer("cocco",3);
@@ -57,7 +57,7 @@ class cliElemsTest {
         player3.setSchema(schema3);
 
         cliview= new CLIView(UILanguage.ita);
-        cliview.setClientInfo(ConnectionMode.SOCKET,"ciccio");
+        cliview.setClientInfo(ConnectionMode.SOCKET,player1.getUsername());
         cliview.setMatchInfo(1,4);
 
         cliview.updateSchema(player0);

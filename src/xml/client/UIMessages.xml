@@ -25,8 +25,8 @@
         <ita>Connesso tramite:</ita>
     </connected-via>
     <player-number>
-        <eng>Player number:</eng>
-        <ita>Giocatore numero:</ita>
+        <eng>Player #</eng>
+        <ita>Giocatore #</ita>
     </player-number>
     <pub-obj>
         <eng>Public objectives:</eng>
@@ -52,4 +52,8 @@
         <eng>Turn of the round:</eng>
         <ita>Turno del round:</ita>
     </turn>
+    <draftpool>
+        <eng>Draft pool:</eng>
+        <ita>Riserva:</ita>
+    </draftpool>
 </messages>

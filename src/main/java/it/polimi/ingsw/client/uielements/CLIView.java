@@ -11,6 +11,7 @@ import java.util.*;
 public class CLIView {
     private static final int SCHEMA_WIDTH = 35;
     private static final int SCHEMA_HEIGHT = 18;
+    private static final int CELL_HEIGHT = 4;
     private static final int OBJ_LENGTH = 34;
 
     private final ArrayList<String> topInfo= new ArrayList<>();
@@ -38,7 +39,7 @@ public class CLIView {
         builder.append(printList(topInfo));
         builder.append("%n");
         builder.append(printList(buildTopSection()));
-        builder.append("%n");
+        builder.append(printList(buildDraftPool()));
         builder.append(printList(schemas.get(playerId)));
         return builder.toString();
     }
@@ -47,7 +48,7 @@ public class CLIView {
         if(toPrint==null){throw new IllegalArgumentException();}
         StringBuilder builder=new StringBuilder();
         for(String line : toPrint) {
-            builder.append(line+"%n");
+            builder.append(line).append("%n");
         }
         return builder.toString();
     }
@@ -90,7 +91,6 @@ public class CLIView {
         }
     }
 
-
     /**
      * This method creates the representation of the objectives
      * @param pubObj the list of public objectives
@@ -100,40 +100,52 @@ public class CLIView {
         this.objectives= (ArrayList<String>) buildObjectives((ArrayList<LightCard>) pubObj,privObj);
     }
 
+
     /**
      * updates the draftpool representation
      * @param draftPool the new draftpool
      */
-    public void updateDraftPool(Map<Integer,LightDie> draftPool){
-        this.draftPool= (ArrayList<String>) buildDiceRow(draftPool,0,numPlayers*2+1);
+    public void updateDraftPool(List<LightDie> draftPool){
+
+        this.draftPool= (ArrayList<String>) buildDiceRow( ListToMap(draftPool),0,numPlayers*2+1);
     }
 
+
+    private List<String> buildDraftPool(){
+        ArrayList<String> result=new ArrayList<>();
+        result.add(uiMsg.getMessage("draftpool"));
+        result.addAll(draftPool);
+        result= (ArrayList<String>) appendRows(buildSeparator(CELL_HEIGHT+1),result);
+        return result;
+    }
+
+    /**
+     * converts a list of light dice in a map of light dice preserving the order
+     * @param list the list to convert
+     * @return the converted list as a map
+     */
+    private static Map<Integer,LightDie> ListToMap(List<LightDie> list) {
+        if(list==null){
+            throw new IllegalArgumentException();
+        }
+        HashMap<Integer, LightDie> map = new HashMap<>();
+        for (int i = 0; i<list.size();i++){
+            map.put(i,list.get(i));
+        }
+        return map;
+    }
 
     private static List<String> buildDiceRow(Map<Integer,LightDie> elems, int from, int to){
         assert(from<=to && from>=0);
         ArrayList<String> result=new ArrayList<>();
-        result.add("");
-        result.add("");
-        result.add("");
-        result.add("");
-        String [] rows;
-        rows = new String[4];
+
         for(int i=from;i<to;i++) {
             //empty cell
-            if (!elems.containsKey(i)) {
-                rows = splitElem(cliElems.getBigDie("EMPTI"));
-            }else {
-
-                //not empty
-                //die
-
-                rows = splitElem(cliElems.getBigDie(elems.get(i).getShade().toString()));
-                rows = addColor(rows, elems.get(i).getColor());
-            }
+            result = (ArrayList<String>) appendRows(result, buildCell(elems.get(i)));
         }
         assert (result.size() == 4);
         //append new cell/die/constraint
-        result = (ArrayList<String>) appendRows(result, Arrays.asList(rows));
+
         return result;
     }
 
@@ -149,8 +161,6 @@ public class CLIView {
         assert(from<=to && from>=0);
         ArrayList<String> result=new ArrayList<>();
         for(int i=from;i<to;i++) {
-
-
             //append new cell/die/constraint
             result = (ArrayList<String>) appendRows(result, buildCell(elems.get(i)));
         }
@@ -179,7 +189,7 @@ public class CLIView {
         schem.add(cliElems.getElem("schema-border"));
 
         //add left/right borders
-        schem= (ArrayList<String>) appendRows(appendRows(buildSchemaSeparator(),schem),buildSchemaSeparator());
+        schem= (ArrayList<String>) appendRows(appendRows(buildSeparator(SCHEMA_HEIGHT),schem),buildSeparator(SCHEMA_HEIGHT));
 
         return schem;
     }
@@ -325,7 +335,7 @@ public class CLIView {
         String lineToFit= line;
         while(lineToFit.length()>length){
             int i = length - 1;
-            while(lineToFit.charAt(i) == ' '){
+            while(!(lineToFit.charAt(i) == ' ')){
                 i--;
             }
             result.add(lineToFit.substring(0,i));
@@ -339,10 +349,10 @@ public class CLIView {
      * Creates a list containing characters needed to visually separate schemas on the screen
      * @return said list
      */
-    private List<String> buildSchemaSeparator(){
+    private List<String> buildSeparator(int height){
         ArrayList<String> separator= new ArrayList<>();
         separator.add("   ");
-        for(int i=0;i< SCHEMA_HEIGHT;i++){
+        for(int i=0;i< height;i++){
             separator.add(" | ");
         }
         separator.add("   ");
@@ -428,5 +438,3 @@ public class CLIView {
         this.numPlayers=numPlayers;
     }
 }
-
-
