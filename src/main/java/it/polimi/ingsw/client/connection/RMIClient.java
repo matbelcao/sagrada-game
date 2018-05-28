@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.connection;
 
+import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.rmi.RemoteException;
@@ -9,9 +10,11 @@ import java.util.Map;
 
 public class RMIClient implements ClientConn {
     RMIClientInt remoteObj;
+    Client client;
 
-    public RMIClient(RMIClientInt remoteObj) throws RemoteException {
+    public RMIClient(RMIClientInt remoteObj, Client client) throws RemoteException {
         this.remoteObj = remoteObj;
+        this.client = client;
     }
 
 
@@ -34,13 +37,24 @@ public class RMIClient implements ClientConn {
 
     @Override
     public LightCard getPrivateObj() {
-        return null;
-
+        LightCard card = null;
+        try {
+            card = remoteObj.getPrivateObj();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return card;
     }
 
     @Override
     public LightCard getPublicObj() {
-        return null;
+        LightCard card = null;
+        try {
+            card = remoteObj.getPublicObj();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return card;
     }
 
     @Override
@@ -70,7 +84,14 @@ public class RMIClient implements ClientConn {
 
     @Override
     public LightSchemaCard getSchema(int playerId) {
-        return null;
+        LightSchemaCard returnedCard;
+        try {
+            returnedCard = remoteObj.getSchema(playerId);
+        } catch (RemoteException e) {
+            e.printStackTrace(); //TODO handle lost connection
+            return null;
+        }
+        return returnedCard;
     }
 
     @Override
