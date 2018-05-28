@@ -97,14 +97,15 @@ public class Game extends Thread implements Iterable  {
      * Stops the execution flow of Run() until the desired action occurs
      */
     private void waitAction(){
-        while (!endLock) {
-            synchronized (lockRun) {
+        synchronized (lockRun) {
+            while (!endLock) {
                 try {
                     lockRun.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+            lockRun.notifyAll();
         }
     }
 
@@ -315,10 +316,10 @@ public class Game extends Thread implements Iterable  {
         if(roundStatus.isRequestedRoundTrackList()) {
             List<List<Die>> trackList = getRoundTrackDice();
             ArrayList<Die> dieList;
-            int round = 0;
+            int roundN = 0;
 
             while (tempIndex <= index) {
-                dieList = (ArrayList<Die>) trackList.get(round);
+                dieList = (ArrayList<Die>) trackList.get(roundN);
                 for (Die d : dieList) {
                     if (tempIndex == index) {
                         roundStatus.setSelectedDie(d);
@@ -326,7 +327,7 @@ public class Game extends Thread implements Iterable  {
                     }
                     tempIndex++;
                 }
-                round++;
+                roundN++;
             }
         }
         return null;
