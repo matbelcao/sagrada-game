@@ -142,7 +142,7 @@ public class ClientParserTest {
         assertEquals("3,1",parsedResult.get(4));
 
         assertFalse(ClientParser.parse("SEND", parsedResult));
-        assertFalse(ClientParser.parse("SEND schema D,9,5,RED", parsedResult));
+        assertTrue(ClientParser.parse("SEND schema D,9,5,RED", parsedResult));
         assertFalse(ClientParser.parse("SEND schema", parsedResult));
         assertFalse(ClientParser.parse("SEND schema C,2,3 E,4,5,RED,THREE D,2,1,GREEN", parsedResult));
         assertFalse(ClientParser.parse("SEND priv 1 4 schemaName description xxxx", parsedResult));
