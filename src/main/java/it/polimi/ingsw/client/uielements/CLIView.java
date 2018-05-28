@@ -198,7 +198,7 @@ public class CLIView {
                 uiMsg.getMessage("player-number"),
                 playerId);
 
-        topInfo.add(0,info);
+        topInfo.add(0,bold(info));
     }
 
 
@@ -224,17 +224,29 @@ public class CLIView {
      */
     private List<String> buildObjectives(ArrayList<LightCard> pubObj, LightPrivObj privObj){
         ArrayList<String> result=new ArrayList<>();
-
-        result.add(uiMsg.getMessage("pub-obj"));
+        result.add(" ");
+        result.add(bold(uiMsg.getMessage("pub-obj")));
+        result.add(" ");
         for(LightCard card : pubObj){
             result.addAll(buildCard(card));
             result.add("     ");
         }
-        result.add(uiMsg.getMessage("priv-obj"));
-        result.addAll(buildCard( privObj));
+        result.add(bold(uiMsg.getMessage("priv-obj")));
+        result.addAll(appendRows(buildCell(new LightConstraint(privObj.getColor())),buildPrivObj(privObj,OBJ_LENGTH-7)));
 
-        result.addAll(buildCell(new LightConstraint(privObj.getColor())));
 
+        return result;
+    }
+
+    private static String bold(String line){
+        return "\u001B[1m"+line+Color.RESET;
+
+    }
+    private List<String> buildPrivObj(LightPrivObj privObj, int length) {
+        ArrayList<String> result=new ArrayList<>();
+        result.add(" ");
+        result.add(bold(privObj.getName()+":"));
+        result.addAll(fitInLength(privObj.getDescription(), length));
         return result;
     }
 
@@ -286,7 +298,7 @@ public class CLIView {
     private List<String> buildCard( LightCard card) {
         ArrayList<String> result=new ArrayList<>();
 
-        result.add(card.getName());
+        result.add(bold(card.getName()+":"));
         result.addAll(fitInLength(card.getDescription(), OBJ_LENGTH));
         return result;
     }

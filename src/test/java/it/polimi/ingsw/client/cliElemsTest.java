@@ -56,8 +56,9 @@ class cliElemsTest {
         player2.setSchema(schema2);
         player3.setSchema(schema3);
 
-        cliview= new CLIView(UILanguage.ita,1,4);
+        cliview= new CLIView(UILanguage.ita);
         cliview.setClientInfo(ConnectionMode.SOCKET,"ciccio");
+        cliview.setMatchInfo(1,4);
 
         cliview.updateSchema(player0);
         cliview.updateSchema(player1);
