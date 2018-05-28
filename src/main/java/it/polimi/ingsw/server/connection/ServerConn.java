@@ -2,7 +2,6 @@ package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.server.model.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,15 +33,15 @@ public interface ServerConn {
 
     void notifyDraftPool(List<Die> draftedDice);
 
-    void notifyRoundTrack(ArrayList<ArrayList<Die>> trackList);
+    void notifyRoundTrack(List<List<Die>> trackList);
 
     void notifyFavorTokens(int favorTokens);
 
-    void notifySchemaDiceList(SchemaCard schema);
+    void procSchemaDiceSelect(SchemaCard schema);
 
-    void notifyRoundTrackDiceList(ArrayList<ArrayList<Die>> trackList);
+    void procRoundTrackDiceSelect(List<List<Die>> trackList);
 
-    void notifyDraftPoolDiceList(List<Die> draftedDice);
+    void procDraftPoolDiceSelect(List<Die> draftedDice);
 
     boolean ping();
 

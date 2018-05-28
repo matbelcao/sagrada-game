@@ -259,7 +259,6 @@ public class Game extends Thread implements Iterable  {
         if(listType.equals("draftpool")){
             user.getServerConn().notifyDraftPoolDiceList(board.getDraftPool().getDraftedDice());
         }
-
     }
 
     /**

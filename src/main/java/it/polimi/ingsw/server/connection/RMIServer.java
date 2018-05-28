@@ -9,7 +9,6 @@ import it.polimi.ingsw.server.model.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -132,9 +131,10 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
     }
 
     @Override
-    public void notifyRoundTrack(ArrayList<ArrayList<Die>> trackList) {
+    public void notifyRoundTrack(List<List<Die>> trackList) {
 
     }
+
 
 
     @Override
@@ -148,9 +148,10 @@ public class RMIServer extends UnicastRemoteObject implements ServerConn,RMIServ
     }
 
     @Override
-    public void notifyRoundTrackDiceList(ArrayList<ArrayList<Die>> trackList) {
+    public void notifyRoundTrackDiceList(List<List<Die>> trackList) {
 
     }
+
 
     @Override
     public void notifyDraftPoolDiceList(List<Die> draftedDice) {

@@ -1,9 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.connection.QueuedInReader;
-import it.polimi.ingsw.common.immutables.LightCard;
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.common.immutables.LightTool;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
@@ -124,20 +121,20 @@ public class SocketServer extends Thread implements ServerConn  {
                 game.sendDiceList(user,parsedResult.get(1));
                 return true;
             }
-            if(Validator.checkSelectParams(command,parsedResult)){
+            /**if(Validator.checkSelectParams(command,parsedResult)){
                 switch(parsedResult.get(1)){
                     case "die":
-                        //to implement
+                        game.selectDie(User user, int index);
                         break;
                     case "modified_die":
-                        //to implement
+                        game.select
                         break;
                     case "tool":
                         //to implement
                         break;
                 }
                 return true;
-            }
+            }*/
             if(Validator.checkChooseParams(command,parsedResult)){
                 //to implement
                 return true;
@@ -152,6 +149,9 @@ public class SocketServer extends Thread implements ServerConn  {
                         return true;
                 }
             }
+        }else{
+            outSocket.println("INVALID message");
+            outSocket.flush();
         }
         return true;
     }
@@ -302,12 +302,12 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param trackList the RoundTrack's dice list (index,die)
      */
     @Override
-    public void notifyRoundTrack(ArrayList<ArrayList<Die>> trackList){
+    public void notifyRoundTrack(List<List<Die>> trackList){
         ArrayList<Die> dieList;
 
         outSocket.print("SEND roundtrack");
         for(int i=0;i<trackList.size();i++){
-            dieList=trackList.get(i);
+            dieList= (ArrayList<Die>) trackList.get(i);
             for(Die d:dieList){
                 outSocket.print(" "+i+","+d.getColor().toString()+","+d.getShade().toString());
             }
@@ -347,8 +347,9 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param schema the schema card to get the Dice
      */
     @Override
-    public void notifySchemaDiceList(SchemaCard schema) {
+    public void procSchemaDiceSelect(SchemaCard schema) {
         int index=0;
+        int choice;
         Die die;
         FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
 
@@ -361,6 +362,8 @@ public class SocketServer extends Thread implements ServerConn  {
         }
         outSocket.println("");
         outSocket.flush();
+
+        choice=waitForSelect();
     }
 
     /**
@@ -368,15 +371,16 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param trackList the RoundTrack's dice list (index,die)
      */
     @Override
-    public void notifyRoundTrackDiceList(ArrayList<ArrayList<Die>> trackList) {
+    public void procRoundTrackDiceSelect(List<List<Die>> trackList) {
         int index=0;
-        int roundNumber=0;
+        int roundNumber;
+        int choice;
         ArrayList<Die> dieList;
 
         outSocket.print("LIST roundtrack");
         for(int i=0;i<trackList.size();i++){
             roundNumber=0;
-            dieList=trackList.get(i);
+            dieList= (ArrayList<Die>) trackList.get(i);
             for(Die d:dieList){
                 outSocket.print(" "+index+","+i+","+roundNumber+","+d.getColor().toString()+","+d.getShade().toString());
                 roundNumber++;
@@ -385,6 +389,8 @@ public class SocketServer extends Thread implements ServerConn  {
         }
         outSocket.println("");
         outSocket.flush();
+
+        choice=waitForSelect();
     }
 
 
@@ -393,8 +399,9 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param draftedDice the DraftPool's dice list
      */
     @Override
-    public void notifyDraftPoolDiceList(List<Die> draftedDice) {
+    public void procDraftPoolDiceSelect(List<Die> draftedDice) {
         Die die;
+        int choice;
 
         outSocket.print("LIST draftpool");
         for (int i=0;i<draftedDice.size();i++){
@@ -403,8 +410,40 @@ public class SocketServer extends Thread implements ServerConn  {
         }
         outSocket.println("");
         outSocket.flush();
+
+        choice=waitForSelect();
     }
 
+    /**
+     * Internal method that waits foa the selection of the object
+     * @return the selected object index
+     */
+    private int waitForSelect(){
+        ArrayList<String> parsedResult=new ArrayList<>();
+
+        try {
+            inSocket.add();
+        } catch (Exception e) {
+            //this.quit();
+            //uscita dal game
+        }
+
+        if (Validator.checkSelectParams(inSocket.readln(),parsedResult)) {
+            inSocket.pop();
+            if(parsedResult.get(1).equals("die")||parsedResult.get(1).equals("tool")){
+                return Integer.parseInt(parsedResult.get(2));
+            }
+            else if(parsedResult.get(1).equals("modified_die")){
+                return 1; //ok
+            }
+        }
+        if(Validator.checkDiscardParams(inSocket.readln(),parsedResult){
+            //the command was a discar....pop out from the insocket buffer
+            inSocket.pop();
+        }
+        //wrong message in insocket --> ABORT procedure
+        return -1;
+    }
 
     @Override
     public boolean ping() {
