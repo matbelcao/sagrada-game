@@ -96,7 +96,7 @@ public class Game extends Thread implements Iterable  {
     /**
      * Stops the execution flow of Run() until the desired action occurs
      */
-    private void waitAction(){
+    private void stopFlow(){
         synchronized (lockRun) {
             while (!endLock) {
                 try {
@@ -105,6 +105,17 @@ public class Game extends Thread implements Iterable  {
                     e.printStackTrace();
                 }
             }
+            lockRun.notifyAll();
+        }
+    }
+
+    /**
+     * Restart the execution flow of Run() because the desired action has occurred
+     */
+    private void startFlow(){
+        synchronized (lockRun) {
+            endLock = true;
+            timer.cancel();//DA SOSTITUIRE
             lockRun.notifyAll();
         }
     }
@@ -119,7 +130,7 @@ public class Game extends Thread implements Iterable  {
         round = (RoundIterator) this.iterator();
 
         timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * 1000);
-        waitAction();
+        stopFlow();
 
         while (round.hasNextRound()){
             round.nextRound();
@@ -141,7 +152,7 @@ public class Game extends Thread implements Iterable  {
                 }
 
                 timer.schedule(new PlayerTurn(), MasterServer.getMasterServer().getTurnTime() * 1000);
-                waitAction();
+                stopFlow();
 
                 //Notify to all the users the ending of the turn
                 for(User u:users){
@@ -272,22 +283,18 @@ public class Game extends Thread implements Iterable  {
      * Sets the chosen schema card to the user's relative player instance, if all the player have choose a schema card
      * the timer will be stopped
      * @param user the user to set the card
-     * @param idSchema the id of the schema card
+     * @param schemaIndex the index of the schema card (for each player (0 to 3)
      */
-    public boolean chooseSchemaCard(User user,int idSchema){
+    public boolean chooseSchemaCard(User user,int schemaIndex){
         boolean response =false;
-        for (SchemaCard s: draftedSchemas){
-            if (s.getId()==idSchema){
-                response=board.getPlayer(user).setSchema(s);
-                break;
-            }
-        }
+        if(schemaIndex<0||schemaIndex>=4){return response;}
+        response=board.getPlayer(user).setSchema(draftedSchemas[(users.indexOf(user)*Board.NUM_PLAYER_SCHEMAS)+schemaIndex]);
         for (User u: users){
             if(board.getPlayer(u).getSchema()==null){
                 return response;
             }
         }
-        timer.cancel();
+        startFlow();
         return response;
     }
 
