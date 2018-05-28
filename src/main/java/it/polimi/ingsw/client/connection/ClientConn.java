@@ -2,6 +2,7 @@ package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.common.immutables.*;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,5 +72,5 @@ public interface ClientConn {
      * This method is used to check the state of the connection of the user associated with the ClientConn
      * @return
      */
-    boolean pong();
+    boolean pong() throws RemoteException;
 }

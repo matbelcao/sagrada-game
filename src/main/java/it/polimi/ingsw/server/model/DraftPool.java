@@ -55,7 +55,7 @@ public class DraftPool {
 
     public List<Die> draftDice(int numPlayers) {
         drafted=new ArrayList<>();
-        drafted = (ArrayList<Die>) diceBag.draftDice(numPlayers);
+        drafted = (ArrayList<Die>) diceBag.draftDice((numPlayers*2)+1);
         return drafted;
     }
 
@@ -64,7 +64,7 @@ public class DraftPool {
     }
 
     public void clearDraftPool(int round){
-        roundTrack.putDice(round,drafted);
+        roundTrack.putDice(round, (ArrayList<Die>) drafted.clone());
         drafted=new ArrayList<>();
     }
     

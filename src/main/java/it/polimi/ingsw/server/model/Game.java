@@ -96,7 +96,7 @@ public class Game extends Thread implements Iterable  {
     /**
      * Stops the execution flow of Run() until the desired action occurs
      */
-    private void waitAction(){
+    private void stopFlow(){
         synchronized (lockRun) {
             while (!endLock) {
                 try {
@@ -110,18 +110,32 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
+     * Restart the execution flow of Run() because the desired action has occurred
+     */
+    private void startFlow(){
+        synchronized (lockRun) {
+            if(!endLock){
+                endLock = true;
+                timer.cancel();//DA SOSTITUIRE
+                lockRun.notifyAll();
+            }
+        }
+    }
+
+    /**
      * This method provides the execution order of the game flow
      */
     @Override
     public void run(){
         endLock=false;
-        timer = new Timer();
         round = (RoundIterator) this.iterator();
 
+        timer = new Timer();
         timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * 1000);
-        waitAction();
+        stopFlow();
 
         while (round.hasNextRound()){
+            round.nextRound();
             board.getDraftPool().draftDice(users.size());
 
             //Notify to all the users the starting of the round
@@ -139,8 +153,9 @@ public class Game extends Thread implements Iterable  {
                     u.getServerConn().notifyTurnEvent("start",board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
                 }
 
+                timer = new Timer();
                 timer.schedule(new PlayerTurn(), MasterServer.getMasterServer().getTurnTime() * 1000);
-                waitAction();
+                stopFlow();
 
                 //Notify to all the users the ending of the turn
                 for(User u:users){
@@ -153,7 +168,6 @@ public class Game extends Thread implements Iterable  {
                 u.getServerConn().notifyRoundEvent("end",round.getRoundNumber());
             }
             board.getDraftPool().clearDraftPool(round.getRoundNumber());
-            round.nextRound();
         }
     }
 
@@ -208,8 +222,10 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      * @param playerId the id of the player's desired schema card
      */
-    public SchemaCard getUserSchemaCard(int playerId){
-        roundStatus.setRequestedSchemaList();
+    public SchemaCard getUserSchemaCard(int playerId,boolean override){
+        if(!override){
+            roundStatus.setRequestedSchemaList();
+        }
         if(playerId>=0 && playerId<users.size()){
             return board.getPlayer(users.get(playerId)).getSchema();
         }
@@ -221,8 +237,10 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      * @param playerId the id of the player's desired schema card
      */
-    public SchemaCard getUserSchemaCard(User user){
-        roundStatus.setRequestedSchemaList();
+    public SchemaCard getUserSchemaCard(User user, boolean override){
+        if(!override){
+            roundStatus.setRequestedSchemaList();
+        }
         return board.getPlayer(user).getSchema();
     }
 
@@ -230,8 +248,10 @@ public class Game extends Thread implements Iterable  {
      * Responds to the request by sending the draftpool to the user of the match
      * @param user the user who made the request
      */
-    public List<Die> getDraftedDice(){
-        roundStatus.setRequestedDraftPoolList();
+    public List<Die> getDraftedDice(boolean override){
+        if(!override){
+            roundStatus.setRequestedDraftPoolList();
+        }
         return board.getDraftPool().getDraftedDice();
     }
 
@@ -239,8 +259,10 @@ public class Game extends Thread implements Iterable  {
      * Responds to the request by sending the list of the dice that are present in the roundTrack (and their relative index)
      * @param user the user who made the request
      */
-    public List<List<Die>> getRoundTrackDice(){
-        roundStatus.setRequestedRoundTrackList();
+    public List<List<Die>> getRoundTrackDice(boolean override){
+        if(!override){
+            roundStatus.setRequestedRoundTrackList();
+        }
         return board.getDraftPool().getRoundTrack().getTrack();
     }
 
@@ -272,22 +294,18 @@ public class Game extends Thread implements Iterable  {
      * Sets the chosen schema card to the user's relative player instance, if all the player have choose a schema card
      * the timer will be stopped
      * @param user the user to set the card
-     * @param idSchema the id of the schema card
+     * @param schemaIndex the index of the schema card (for each player (0 to 3)
      */
-    public boolean chooseSchemaCard(User user,int idSchema){
+    public boolean chooseSchemaCard(User user,int schemaIndex){
         boolean response =false;
-        for (SchemaCard s: draftedSchemas){
-            if (s.getId()==idSchema){
-                response=board.getPlayer(user).setSchema(s);
-                break;
-            }
-        }
+        if(schemaIndex<0||schemaIndex>=4){return response;}
+        response=board.getPlayer(user).setSchema(draftedSchemas[(users.indexOf(user)*Board.NUM_PLAYER_SCHEMAS)+schemaIndex]);
         for (User u: users){
             if(board.getPlayer(u).getSchema()==null){
                 return response;
             }
         }
-        timer.cancel();
+        startFlow();
         return response;
     }
 
@@ -311,10 +329,11 @@ public class Game extends Thread implements Iterable  {
         if(roundStatus.isRequestedDraftPoolList()){
             die=board.getDraftPool().getDraftedDice().get(index);
             roundStatus.setSelectedDie(die);
+            System.out.println(roundStatus.isSelectedDie()+"  "+roundStatus.isRequestedDraftPoolList()+"");
             return die;
         }
         if(roundStatus.isRequestedRoundTrackList()) {
-            List<List<Die>> trackList = getRoundTrackDice();
+            List<List<Die>> trackList = getRoundTrackDice(true);
             ArrayList<Die> dieList;
             int roundN = 0;
 
@@ -339,21 +358,18 @@ public class Game extends Thread implements Iterable  {
      * @return
      */
     public boolean putDie(User user,int index){
-        int tempIndex=0;
+        int realIndex=0;
         if(roundStatus.isSelectedDie()){
-            if(roundStatus.isRequestedSchemaList()){
-                FullCellIterator diceIterator=(FullCellIterator)board.getPlayer(user).getSchema().iterator();
-                while(diceIterator.hasNext()){
-                    diceIterator.next();
-                    if(tempIndex==index){
-                        try {
-                            board.getPlayer(user).getSchema().putDie(diceIterator.getIndex(),roundStatus.getSelectedDie());
-                            return true;
-                        } catch (IllegalDieException e) {
-                            return false;
-                        }
-                    }
-                    tempIndex++;
+            if(roundStatus.isRequestedDraftPoolList()){
+                SchemaCard schemaCard=board.getPlayer(user).getSchema();
+                realIndex=schemaCard.listPossiblePlacements(roundStatus.getSelectedDie()).get(index);
+                System.out.println(index+"-1-"+realIndex);
+                try {
+                    schemaCard.putDie(realIndex,roundStatus.getSelectedDie());
+                    discard();
+                    return true;
+                } catch (IllegalDieException e) {
+                    return false;
                 }
             }
         }

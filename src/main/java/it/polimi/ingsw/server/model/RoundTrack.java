@@ -14,7 +14,8 @@ public class RoundTrack{
      * constructor of the object
      */
     public RoundTrack() {
-        this.track = new ArrayList<ArrayList<Die>>(10);
+        this.track = new ArrayList<>(10);
+
     }
 
     /**
@@ -30,9 +31,9 @@ public class RoundTrack{
      * @param round the position in the Round Track where the dice are put, corresponding to the current round
      * @param toAdd a list of dice to add to the Round Track
      */
-    public void putDice(int round, ArrayList<Die> toAdd){
-        assert track.get(round).isEmpty(); //adding the dice to an empty container in the track
-        track.set(round,toAdd);
+    public void putDice(int round, List<Die> toAdd){
+        track.add(round,(ArrayList<Die>)toAdd);
+        System.out.println(track.get(0));
     }
     /**
      * swaps a die from the Board with a die of the Round Track used by tool card #5

@@ -1,14 +1,14 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.client.connection.RMIClientInt;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface RMIServerInt extends Remote {
 
 
-    void setClientReference(RMIClientInt remoteRef) throws RemoteException;
+    boolean ping() throws RemoteException;
 
-    void quit() throws RemoteException;
+    void notifyLobbyUpdate(int n) throws RemoteException;
+
+    void notifyGameStart(int n, int id) throws RemoteException;
 }

@@ -7,7 +7,7 @@ import it.polimi.ingsw.server.model.Game;
 /**
  * This class contains the data concerning the user and the connection mode used
  */
-public class User {
+public class User{
     private String username;
     private String password;
     private UserStatus status;
