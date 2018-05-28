@@ -235,7 +235,7 @@ public class Client {
         if(authenticator.authenticate(username,password)){
             //get the stub of the remote object
             RMIClientInt rmiConnStub = (RMIClientInt) Naming.lookup("rmi://"+serverIP+"/"+username+password);
-            clientConn = new RMIClient(rmiConnStub);
+            clientConn = new RMIClient(rmiConnStub, this);
             RMIServerInt rmiServerObject = new RMIServerObject(this);
             //check if the method is necessary or just exend unicast remote obj in RMIServerObject
             RMIServerInt remoteRef = (RMIServerInt) UnicastRemoteObject.exportObject(rmiServerObject, 0);
