@@ -57,7 +57,6 @@ public class Validator {
                 return checkSelectParams(command, parsedResult);
 
             case "DISCARD":
-
                 return checkDiscardParams(command, parsedResult);
 
             case "CHOOSE":

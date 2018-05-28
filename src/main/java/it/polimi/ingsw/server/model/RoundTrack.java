@@ -1,6 +1,8 @@
 package it.polimi.ingsw.server.model;
 
 import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This is the place where all dice that aren't used during a turn are put, each in a marker
  * corresponding to the turn they where drafted in
@@ -19,8 +21,8 @@ public class RoundTrack{
      * getter of the object
      * @return an Arraylist of Arraylists of dice, that is the round track
      */
-    public ArrayList<ArrayList<Die>> getTrack() {
-        return (ArrayList<ArrayList<Die>>) track.clone();
+    public List<List<Die>> getTrack() {
+        return (List<List<Die>>) track.clone();
     }
 
     /**

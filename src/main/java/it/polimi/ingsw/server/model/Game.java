@@ -90,7 +90,7 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     * Stops the execution flow of Run () until the desired action occurs
+     * Stops the execution flow of Run() until the desired action occurs
      */
     private void waitAction(){
         while (!endLock) {
@@ -118,13 +118,34 @@ public class Game extends Thread implements Iterable  {
 
         while (round.hasNextRound()){
             board.getDraftPool().draftDice(users.size());
+
+            //Notify to all the users the starting of the round
+            for(User u:users){
+                u.getServerConn().notifyRoundEvent("start",round.getRoundNumber());
+            }
+
             while(round.hasNext()){
-                userPlaying = round.next();
 
                 endLock=false;
-                timer.schedule(new PlayerTurn(), MasterServer.getMasterServer().getTurnTime() * 1000);
+                userPlaying = round.next();
 
+                //Notify to all the users the starting of the turn
+                for(User u:users){
+                    u.getServerConn().notifyTurnEvent("start",board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
+                }
+
+                timer.schedule(new PlayerTurn(), MasterServer.getMasterServer().getTurnTime() * 1000);
                 waitAction();
+
+                //Notify to all the users the ending of the turn
+                for(User u:users){
+                    u.getServerConn().notifyTurnEvent("end",board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
+                }
+            }
+
+            //Notify to all the users the ending of the round
+            for(User u:users){
+                u.getServerConn().notifyRoundEvent("end",round.getRoundNumber());
             }
             board.getDraftPool().clearDraftPool(round.getRoundNumber());
             round.nextRound();
@@ -216,6 +237,27 @@ public class Game extends Thread implements Iterable  {
         Player player=board.getPlayer(user);
         if(player.getSchema()!=null){
             user.getServerConn().notifyFavorTokens(player.getFavorTokens());
+        }
+    }
+
+    /**
+     * Responds by sending the the list of dice in the desired game area to the user
+     * @param user the the game's area string: "schema","roundtrack" or "draftpool"
+     */
+    public void sendDiceList(User user,String listType){
+        ArrayList<Die> dice;
+        if(listType.equals("schema")){
+            Player player=board.getPlayer(user);
+            if(player.getSchema()!=null){
+                user.getServerConn().notifySchemaDiceList(board.getPlayer(user).getSchema());
+            }
+            return;
+        }
+        if(listType.equals("roundtrack")){
+            user.getServerConn().notifyRoundTrackDiceList(board.getDraftPool().getRoundTrack().getTrack());
+        }
+        if(listType.equals("draftpool")){
+            user.getServerConn().notifyDraftPoolDiceList(board.getDraftPool().getDraftedDice());
         }
     }
 
