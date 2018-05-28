@@ -7,7 +7,7 @@ import java.io.File;
 public class LightCard {
     private String name;
     private String description;
-    private static final String imgSrc="src"+ File.separator+"img"+File.separator;
+    private static final String imgSrc="src"+ File.separator+"img"+File.separator+"PubObjectiveCard"+File.separator;
     private int id;
 
     public LightCard(String name, String description, int id){
@@ -34,7 +34,7 @@ public class LightCard {
     }
 
     public String getImgSrc() {
-        return imgSrc;
+        return imgSrc+id;
     }
 
     public int getId() {

@@ -2,11 +2,18 @@ package it.polimi.ingsw.common.immutables;
 
 import it.polimi.ingsw.server.model.ToolCard;
 
+import java.io.File;
+
 public class LightTool extends LightCard {
+    private static  String imgSrc="src"+ File.separator+"img"+File.separator+"ToolCard"+File.separator;
     private boolean used;
     public LightTool(String name, String description, int id, boolean used) {
         super(name, description, id);
         this.used=used;
+    }
+
+    public String getImgSrc() {
+        return imgSrc+getId();
     }
 
     public boolean isUsed() {
