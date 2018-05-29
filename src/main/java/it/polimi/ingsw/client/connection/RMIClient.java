@@ -70,7 +70,13 @@ public class RMIClient implements ClientConn {
 
     @Override
     public List<CellContent> getDraftPool() {
-        return null;
+        List<CellContent> draftPool = null;
+        try {
+            draftPool = remoteObj.getDraftPool();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return draftPool;
     }
 
     @Override

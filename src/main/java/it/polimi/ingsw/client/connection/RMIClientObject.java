@@ -1,13 +1,8 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.common.immutables.LightCard;
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.connection.User;
-import it.polimi.ingsw.server.model.Player;
-import it.polimi.ingsw.server.model.PubObjectiveCard;
-import it.polimi.ingsw.server.model.SchemaCard;
-import it.polimi.ingsw.server.model.ToolCard;
+import it.polimi.ingsw.server.model.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -31,7 +26,7 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
 
     @Override
     public LightSchemaCard getSchema(int playerId) throws RemoteException {
-        return LightSchemaCard.toLightSchema(user.getGame().getUserSchemaCard(playerId,true)); //TODO check if the params have changed
+        return LightSchemaCard.toLightSchema(user.getGame().getUserSchemaCard(playerId,false)); //TODO check if the params have changed
     }
 
     @Override
@@ -82,5 +77,15 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     @Override
     public int getFavorTokens(int playerId) throws RemoteException {
         return user.getGame().getPlayers().get(playerId).getFavorTokens();
+    }
+
+    @Override
+    public List<CellContent> getDraftPool() throws RemoteException {
+         List<Die> draftPool = user.getGame().getDraftedDice(false);
+         List<CellContent> lightDraftPool = new ArrayList<>();
+         for(Die d : draftPool){
+             lightDraftPool.add(new LightDie(d.getShade(),d.getColor()));
+         }
+         return lightDraftPool;
     }
 }

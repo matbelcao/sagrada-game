@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.connection;
 
+import it.polimi.ingsw.common.immutables.CellContent;
 import it.polimi.ingsw.common.immutables.LightCard;
 import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
@@ -28,4 +29,6 @@ public interface RMIClientInt extends Remote {
     List<LightPlayer> getPlayers() throws RemoteException;
 
     int getFavorTokens(int playerId) throws RemoteException;
+
+    List<CellContent> getDraftPool() throws RemoteException;
 }
