@@ -26,6 +26,9 @@ public class ValidatorTest {
         //invalid username
 
         assertTrue(!Validator.isValid("   LOGIN    ,,,MR   RM  ",parsedResult));
+        assertTrue(!Validator.isValid("",parsedResult));
+        assertTrue(!Validator.isValid("  ",parsedResult));
+        assertTrue(!Validator.isValid("\n\r",parsedResult));
 
         //testing invalid login
         assertTrue(!Validator.isValid("   LOGIN    MR     ",parsedResult));

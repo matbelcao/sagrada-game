@@ -53,32 +53,32 @@ public class CLI implements ClientUI{
 
     public void updateLogin(boolean logged) {
         if (logged) {
-            outCli.printf(String.format("%n%s", uimsg.getMessage("login-ok")), client.getUsername());
+            outCli.printf(String.format("%s%n", uimsg.getMessage("login-ok")), client.getUsername());
         } else {
-            outCli.printf(String.format("%n%s", uimsg.getMessage("login-ko")));
+            outCli.printf(String.format("%s%n", uimsg.getMessage("login-ko")));
         }
     }
 
     public void updateConnectionOk() { outCli.printf(String.format("%n%s", uimsg.getMessage("connection-ok"))); }
 
     public void updateLobby(int numUsers){
-        outCli.printf(String.format("%n%s", uimsg.getMessage("lobby-update")),numUsers);
+        outCli.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
     }
 
     public void updateGameStart(int numUsers, int playerId){
-        outCli.printf(String.format("%n%s", uimsg.getMessage("game-start")),numUsers,playerId);
+        outCli.printf(String.format("%s%n", uimsg.getMessage("game-start")),numUsers,playerId);
         this.view.setMatchInfo(client.getPlayerId(),client.getBoard().getNumPlayers());
     }
 
     public void updateGameRoundStart(int numRound){
-        outCli.printf(String.format("%n%s", uimsg.getMessage("round")),numRound);
+        outCli.printf(String.format("%s%n", uimsg.getMessage("round")),numRound);
     }
 
     public void updateGameTurnStart(int turnNumber,boolean isYourTurn){
-        outCli.printf(String.format("%n%s", uimsg.getMessage("turn")),turnNumber);
+        outCli.printf(String.format("%s%n", uimsg.getMessage("turn")),turnNumber);
         outCli.flush();
         if(isYourTurn){
-            outCli.printf(String.format("%n%s%n", uimsg.getMessage("yourTurn")));
+            outCli.printf(String.format("%s%n", uimsg.getMessage("yourTurn")));
             outCli.flush();
         }
         //outCli.printf(view.printMainView());
