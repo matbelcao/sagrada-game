@@ -49,9 +49,28 @@ public class Client {
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client"+ File.separator; //append class name + ".xml" to obtain complete path
 
     /**
-     * this is thee default constructor and it sets the default settings that are loaded from an xml configuration file
+     * constructs the client object and sets some parameters
+     * @param uiMode the type of ui preferred
+     * @param connMode the preferred connection mode
+     * @param serverIP the server ip
+     * @param port the port to connect to
+     * @param lang the desired language
      */
-    public Client() {
+    public Client(UIMode uiMode,ConnectionMode connMode,String serverIP,Integer port,UILanguage lang) {
+        this.uiMode = uiMode;
+        this.connMode = connMode;
+        this.serverIP = serverIP;
+        this.port = port;
+        this.lang = lang;
+    }
+
+
+    /**
+     * parses the default settings in the xml file and creates a client based on that
+     * @return the newly created client
+     */
+    private static Client parser(){
+
         File xmlFile= new File(XML_SOURCE+"ClientConf.xml");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -60,18 +79,27 @@ public class Client {
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
             Element eElement = (Element)doc.getElementsByTagName("conf").item(0);
-            this.uiMode=UIMode.valueOf(eElement.getElementsByTagName("UI").item(0).getTextContent());
-            this.serverIP=eElement.getElementsByTagName("address").item(0).getTextContent();
-            this.connMode=ConnectionMode.valueOf(eElement.getElementsByTagName("connectionMode").item(0).getTextContent());
-            this.lang=UILanguage.valueOf(eElement.getElementsByTagName("language").item(0).getTextContent());
+            UIMode uiMode=UIMode.valueOf(eElement.getElementsByTagName("UI").item(0).getTextContent());
+            String serverIP=eElement.getElementsByTagName("address").item(0).getTextContent();
+            ConnectionMode connMode=ConnectionMode.valueOf(eElement.getElementsByTagName("connectionMode").item(0).getTextContent());
+            UILanguage lang=UILanguage.valueOf(eElement.getElementsByTagName("language").item(0).getTextContent());
+            int port=0;
             if(connMode.equals(ConnectionMode.RMI)){
-                this.port=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
-            }else{ this.port=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent()); }
-            this.userStatus = UserStatus.DISCONNECTED;
+                port=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
+            }else{ port=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent()); }
+            UserStatus userStatus = UserStatus.DISCONNECTED;
+            return new Client(uiMode,connMode,serverIP,port,lang);
         }catch (SAXException | ParserConfigurationException | IOException e1) {
-            e1.printStackTrace();
+            return null;
         }
+    }
 
+    public static Client getNewClient() throws InstantiationException {
+        Client newClient = parser();
+        if(newClient==null){
+            throw new InstantiationException();
+        }
+        return newClient;
     }
 
     public int getPlayerId() {
@@ -82,27 +110,6 @@ public class Client {
         this.playerId = playerId;
     }
 
-    /**
-     * This method constructs the class and overwrites uimode and connmode according to the passed params
-     * @param uiMode the wanted UI
-     * @param connMode the wanted Connection mode
-     */
-    public Client(UIMode uiMode,ConnectionMode connMode){
-        this();
-        this.uiMode=uiMode;
-        this.connMode=connMode;
-    }
-
-    /**
-     * This method constructs the class and overwrites uimode and connmode according to the passed params
-     * @param uiMode the wanted UI
-     * @param connMode the wanted Connection mode
-     */
-    public Client(String uiMode,String connMode){
-        this();
-        this.uiMode=UIMode.valueOf(uiMode);
-        this.connMode=ConnectionMode.valueOf(connMode);
-    }
 
     public LightBoard getBoard() {
         return board;
@@ -178,7 +185,7 @@ public class Client {
     /**
      * This method instantiates the user interface
      */
-    private void setupUI(){
+    private void setupUI() throws InstantiationException {
         if (uiMode.equals(UIMode.CLI)){
             clientUI=new CLI(this,lang);
         }else{
@@ -342,7 +349,13 @@ public class Client {
 
     public static void main(String[] args){
         ArrayList<String> options=new ArrayList<>();
-        Client client = new Client();
+        Client client = null;
+        try {
+            client = Client.getNewClient();
+        } catch (InstantiationException e) {
+            System.out.println("\u001B[31m"+"ERR: couldn't start the Client"+"\u001B[0m");
+            return;
+        }
         if (args.length>0) {
             if(!ClientOptions.getOptions(args,options) || options.contains("h")){
                 ClientOptions.printHelpMessage();
@@ -352,7 +365,12 @@ public class Client {
             }
         }
 
-        client.setupUI();
+        try {
+            client.setupUI();
+        } catch (InstantiationException e) {
+            System.out.println("\u001B[31m"+"ERR: couldn't start the Client UI"+"\u001B[0m");
+            return;
+        }
         client.connectAndLogin();
         client.match();
     }

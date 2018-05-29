@@ -46,6 +46,8 @@ public class ClientParser {
                 return checkChoice(parsedResult);
             case "STATUS":
                 return checkStatus(parsedResult);
+            case "INVALID":
+                return true;
             default:
                 parsedResult.clear();
                 return false;
@@ -93,6 +95,11 @@ public class ClientParser {
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals("STATUS");
 
+    }
+
+    public static boolean isInvalid(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("INVALID");
     }
 
     /**

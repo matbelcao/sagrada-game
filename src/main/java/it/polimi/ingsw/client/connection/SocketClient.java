@@ -92,11 +92,11 @@ public class SocketClient implements ClientConn {
                             client.printDebug(inSocket.readln());
                             inSocket.pop();
                         }
-
-                        //ERR
-
-                        else {
-                            System.out.println("ERR: control error caused by:  " + inSocket.readln());
+                        else if(ClientParser.isInvalid(inSocket.readln())){
+                            inSocket.pop();
+                            client.printDebug("INVALID message");
+                        }else {
+                            client.printDebug("ERR: control error caused by:  " + inSocket.readln());
                             inSocket.pop();
                         }
                     }
@@ -106,6 +106,7 @@ public class SocketClient implements ClientConn {
             }
         }).start();
     }
+
 
 
     private void manageStatusMsg(List<String> parsed){
@@ -211,18 +212,16 @@ public class SocketClient implements ClientConn {
         return null;
     }
 
-
     @Override
-    public Map<Integer,CellContent> getDraftPool() {
-
+    public List<CellContent> getDraftPool() {
         return null;
     }
 
     @Override
-    public Map<Integer,CellContent> getRoundtrack() {
-
+    public List<List<CellContent>> getRoundtrack() {
         return null;
     }
+
 
     @Override
     public List<LightPlayer> getPlayers() {
