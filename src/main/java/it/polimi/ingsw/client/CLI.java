@@ -70,6 +70,21 @@ public class CLI implements ClientUI{
         this.view.setMatchInfo(client.getPlayerId(),client.getBoard().getNumPlayers());
     }
 
+    public void updateGameRoundStart(int numRound){
+        outCli.printf(String.format("%n%s", uimsg.getMessage("round")),numRound);
+    }
+
+    public void updateGameTurnStart(int turnNumber,boolean isYourTurn){
+        outCli.printf(String.format("%n%s", uimsg.getMessage("turn")),turnNumber);
+        outCli.flush();
+        if(isYourTurn){
+            outCli.print(String.format("%n%s", uimsg.getMessage("yourTurn")));
+            outCli.flush();
+        }
+        //outCli.printf(view.printMainView());
+    }
+
+
     @Override
     public void updateStatusMessage(String statusChange, int playerid) {
 

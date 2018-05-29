@@ -115,31 +115,6 @@ public class SocketClient implements ClientConn {
      * This method receives the server's message and calls the proper updateXxxx() method (providing the parsed command)
      * @param rawCommand the server's message
      */
-    private void update(String rawCommand){
-        ArrayList<String> parsedResult = new ArrayList<>();
-
-        if (ClientParser.parse(rawCommand,parsedResult)) {
-            switch (parsedResult.get(0)) {
-
-
-                case "GAME":
-                    updateGame(parsedResult);
-                    break;
-                /*case "SEND":
-                    getSend(parsedResult);
-                    break;
-                case "LIST":
-                    getList(parsedResult);
-                    break;
-                case "DISCARD":
-                    getDiscard(parsedResult);
-                    break;
-                case "CHOICE":
-                    getChoice(parsedResult);
-                    break;*/
-            }
-        }
-    }
 
     /**
      * This methods provides the client-side login functionality to a socket connection
@@ -271,13 +246,13 @@ public class SocketClient implements ClientConn {
                 //client.updateGameEnd(playerData);
                 break;
             case "round_start":
-                //client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)));
+                client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)));
                 break;
             case "round_end":
                 //client.updateGameRoundEnd(Integer.parseInt(outcomes.get(2)));
                 break;
             case "turn_start":
-                //client.updateGameTurnStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
+                client.updateGameTurnStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
                 break;
             case "turn_end":
                 //client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));

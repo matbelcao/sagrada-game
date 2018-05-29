@@ -40,6 +40,16 @@ public class GUI implements ClientUI {
     }
 
     @Override
+    public void updateGameRoundStart(int numRound) {
+
+    }
+
+    @Override
+    public void updateGameTurnStart(int turnNumber, boolean isYourTurn) {
+
+    }
+
+    @Override
     public void updateStatusMessage(String statusChange, int playerid) {
 
     }

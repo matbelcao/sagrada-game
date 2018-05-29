@@ -5,9 +5,11 @@ public class RoundStatus {
     private Boolean requestedRoundTrackList;
     private Boolean requestedDraftPoolList;
     private Die selectedDie;
+    private boolean placedDie;
 
     public RoundStatus(){
         discard();
+        placedDie=false;
     }
 
     private void discard(){
@@ -55,4 +57,13 @@ public class RoundStatus {
     public Boolean isSelectedDie(){
         return this.selectedDie != null;
     }
+
+    public boolean hasPlacedDie() {
+        return placedDie;
+    }
+
+    public void setPlacedDie() {
+        this.placedDie = true;
+    }
+
 }

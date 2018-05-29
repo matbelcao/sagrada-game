@@ -45,13 +45,17 @@
         <ita>Utensile numero:</ita>
     </tool-number>
     <round>
-        <eng>Round number:</eng>
-        <ita>Round numero:</ita>
+        <eng>Round number:%d</eng>
+        <ita>Round numero:%d</ita>
     </round>
     <turn>
-        <eng>Turn of the round:</eng>
-        <ita>Turno del round:</ita>
+        <eng>Turn of the player number:%d</eng>
+        <ita>Turno del giocatore numero:%d</ita>
     </turn>
+    <yourTurn>
+        <eng>It's your turn</eng>
+        <ita>E' il tuo turno</ita>
+    </yourTurn>
     <draftpool>
         <eng>Draft pool:</eng>
         <ita>Riserva:</ita>

@@ -78,6 +78,11 @@ public class SocketServer extends Thread implements ServerConn  {
                 user.quit();
                 return false;
             }
+            if(Validator.checkGameParams(command,parsedResult)){
+                if(parsedResult.get(1).equals("end_turn")){
+                    user.getGame().discard();
+                }
+            }
             if(Validator.checkChooseParams(command,parsedResult)){
                 switch(parsedResult.get(1)){
                     case "schema":
@@ -322,7 +327,8 @@ public class SocketServer extends Thread implements ServerConn  {
     private void sendPrivateObjectiveCard(){
         PrivObjectiveCard privObjectiveCard=user.getGame().getPrivCard(user);
 
-        outSocket.println("SEND priv "+privObjectiveCard.getId()+" "+privObjectiveCard.getName().replaceAll(" ", "_")+" "+privObjectiveCard.getDescription().replaceAll(" ", "_"));
+        outSocket.println("SEND priv "+privObjectiveCard.getId()+" "+privObjectiveCard.getName().replaceAll(" ", "_")
+                +" "+privObjectiveCard.getDescription().replaceAll(" ", "_")+","+privObjectiveCard.getColor().toString());
         outSocket.flush();
     }
 
@@ -347,7 +353,7 @@ public class SocketServer extends Thread implements ServerConn  {
         ArrayList<ToolCard> toolCards= (ArrayList<ToolCard>) user.getGame().getToolCards();
 
         for (ToolCard t:toolCards){
-            outSocket.println("SEND tool "+t.getId()+" "+t.getName().replaceAll(" ", "_")+" "+t.getDescription().replaceAll(" ", "_"));
+            outSocket.println("SEND tool "+t.getId()+" "+t.getName().replaceAll(" ", "_")+" "+t.getDescription().replaceAll(" ", "_") +","+t.hasAlreadyUsed());
             outSocket.flush();
         }
     }

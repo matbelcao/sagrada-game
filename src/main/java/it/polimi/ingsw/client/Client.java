@@ -265,6 +265,19 @@ public class Client {
         }
     }
 
+    public void updateGameRoundStart(int numRound){
+        clientUI.updateGameRoundStart(numRound);
+    }
+
+    public void updateGameTurnStart(int playerId, int firstOrSecond){
+        if(this.playerId==playerId){
+            clientUI.updateGameTurnStart(playerId,true);
+        }else{
+            clientUI.updateGameTurnStart(playerId,false);
+        }
+
+    }
+
 
     /**
      * this method manages the game itself in its parts

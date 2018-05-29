@@ -34,6 +34,11 @@ public interface ClientUI {
      */
     void updateGameStart(int numUsers, int playerId);
 
+    public void updateGameRoundStart(int numRound);
+
+    public void updateGameTurnStart(int turnNumber,boolean isYourTurn);
+
+
     /**
      * this method is used
      */
