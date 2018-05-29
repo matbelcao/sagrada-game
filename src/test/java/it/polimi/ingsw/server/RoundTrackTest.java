@@ -19,7 +19,7 @@ public class RoundTrackTest {
 
         roundTrack.putDice(0,dieList);
 
-        assertEquals(dieList,roundTrack.getTrack().get(0));
-        assertEquals(dieList.get(0),roundTrack.getTrack().get(0).get(0));
+        //assertEquals(dieList,roundTrack.getTrack().get(0));
+        assertEquals(dieList.get(0).toString(),roundTrack.getTrack().get(0).get(0).toString());
     }
 }

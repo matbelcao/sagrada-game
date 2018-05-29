@@ -1,10 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.common.immutables.CellContent;
-import it.polimi.ingsw.common.immutables.LightCard;
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.common.immutables.*;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -127,6 +124,16 @@ public class RMIClient implements ClientConn {
             e.printStackTrace();
         }
         return result;
+    }
+
+    @Override
+    public List<Integer> selectDie(int index) {
+        return null;
+    }
+
+    @Override
+    public boolean selectTool(LightTool lightTool, int index) {
+        return false;
     }
 
     @Override
