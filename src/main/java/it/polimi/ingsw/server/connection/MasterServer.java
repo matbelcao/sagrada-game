@@ -1,4 +1,5 @@
 package it.polimi.ingsw.server.connection;
+import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.ServerOptions;
 import it.polimi.ingsw.server.model.Game;
@@ -45,7 +46,23 @@ public class MasterServer{
      * This is the constructor of the server, it initializes the address of the port for socket and RMI connection,
      * it's made private as MasterServer is a Singleton
      */
-    private MasterServer() {
+    private MasterServer(String ipAddress, int portSocket,int portRMI, boolean additionalSchemas, int lobbyTime, int turnTime) {
+
+        this.ipAddress = ipAddress;
+        this.portSocket = portSocket;
+        this.portRMI = portRMI;
+        this.additionalSchemas = additionalSchemas;
+        this.lobbyTime = lobbyTime;
+        this.turnTime = turnTime;
+        users = new ArrayList<>();
+        lobby = new ArrayList<>();
+        games = new ArrayList<>();
+        printMessage("--> STARTING :  Master Server");
+        new LobbyHandler();
+    }
+
+    private static MasterServer parser(){
+
         File xmlFile= new File(XML_SOURCE+"ServerConf.xml");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -55,23 +72,23 @@ public class MasterServer{
             doc.getDocumentElement().normalize();
 
             Element eElement = (Element)doc.getElementsByTagName("conf").item(0);
-            this.ipAddress=eElement.getElementsByTagName("address").item(0).getTextContent();
-            this.portRMI=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
-            this.portSocket=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent());
-            this.lobbyTime=Integer.parseInt(eElement.getElementsByTagName("timeLobby").item(0).getTextContent());
-            this.turnTime=Integer.parseInt(eElement.getElementsByTagName("timeGame").item(0).getTextContent());
-            this.additionalSchemas=Boolean.parseBoolean(eElement.getElementsByTagName("additionalSchemas").item(0).getTextContent());
+            String setipAddress=eElement.getElementsByTagName("address").item(0).getTextContent();
+            int setportRMI=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
+            int setportSocket=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent());
+            int setlobbyTime=Integer.parseInt(eElement.getElementsByTagName("timeLobby").item(0).getTextContent());
+            int setturnTime=Integer.parseInt(eElement.getElementsByTagName("timeGame").item(0).getTextContent());
+            boolean setadditionalSchemas=Boolean.parseBoolean(eElement.getElementsByTagName("additionalSchemas").item(0).getTextContent());
+            return new MasterServer(setipAddress,setportSocket,setportRMI,setadditionalSchemas,setlobbyTime,setturnTime);
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
+            return null;
         }
-        users = new ArrayList<>();
-        lobby = new ArrayList<>();
-        games = new ArrayList<>();
 
-        new LobbyHandler();
-        printMessage("--> STARTING :  Master Server");
+
+
 
     }
+
     /**
      * @return the port to "connect" to the server via rmi
      */
@@ -106,8 +123,8 @@ public class MasterServer{
      * This is the getter of the MasterServer
      * @return the instance of the MasterServer
      */
-    public static MasterServer getMasterServer() {
-        if (instance == null) instance = new MasterServer();
+    public static MasterServer getMasterServer()  {
+        if (instance == null) instance = parser();
         return instance;
     }
 
@@ -163,6 +180,12 @@ public class MasterServer{
         }
     }
 
+    private static void startMasterServer() throws InstantiationException {
+        instance= parser();
+        if(instance==null){
+            throw new InstantiationException();
+        }
+    }
     /**
      * Queues the users (logged and connected) or reconnect them in a match if they have previously lost the connection
      * @param user the user to check
@@ -378,7 +401,13 @@ public class MasterServer{
     public static void main(String[] args){
 
         ArrayList<String> options=new ArrayList<>();
-        MasterServer server=MasterServer.getMasterServer();
+        try {
+            MasterServer.startMasterServer();
+        } catch (InstantiationException e) {
+            System.out.println("\u001B[31m"+"ERR: couldn't start the Master Server"+"\u001B[0m");
+            return;
+        }
+        MasterServer server= MasterServer.getMasterServer();
         if (args.length>0) {
             if(!ServerOptions.getOptions(args,options) || options.contains("h")){
                 ServerOptions.printHelpMessage();
