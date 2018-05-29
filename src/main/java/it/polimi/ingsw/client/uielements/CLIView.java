@@ -27,13 +27,13 @@ public class CLIView {
     private List<String> roundTrack= new ArrayList<>();
     private List<String> draftPool= new ArrayList<>();
     private final List<String> bottom=new ArrayList<>();
-    private static final CLIElems cliElems= new CLIElems();
+    private static CLIElems cliElems;
     private final UIMessages uiMsg;
     private int numPlayers;
     private int playerId;
 
-    public CLIView(UILanguage lang){
-
+    public CLIView(UILanguage lang) throws InstantiationException {
+        cliElems=new CLIElems();
         this.uiMsg=new UIMessages(lang);
 
     }

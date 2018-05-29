@@ -1,6 +1,9 @@
 package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.uielements.UILanguage;
+import it.polimi.ingsw.common.enums.ConnectionMode;
+import it.polimi.ingsw.common.enums.UIMode;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,15 +27,15 @@ public class RMIConnectionTest {
     @Test
     public void orderedConnection() {
         ArrayList<User> users;
-        Client c1 = new Client("CLI", "RMI");
-        Client c2 = new Client("CLI", "RMI");
-        Client c3 = new Client("CLI", "RMI");
-        Client c4 = new Client("CLI", "RMI");
-        Client c5 = new Client("CLI", "RMI");
-        Client c6 = new Client("CLI", "RMI");
-        Client c7 = new Client("CLI", "RMI");
-        Client c8 = new Client("CLI", "RMI");
-        Client c9 = new Client("CLI", "RMI");
+        Client c1 = new Client(UIMode.CLI,ConnectionMode.RMI,"127.0.0.1",1099,UILanguage.ita);
+        Client c2 = new Client(UIMode.CLI,ConnectionMode.RMI,"127.0.0.1",1099,UILanguage.ita);
+        Client c3 = new Client(UIMode.CLI,ConnectionMode.RMI,"127.0.0.1",1099,UILanguage.ita);
+        Client c4 = new Client(UIMode.CLI,ConnectionMode.RMI,"127.0.0.1",1099,UILanguage.ita);
+        Client c5 = new Client(UIMode.CLI,ConnectionMode.RMI,"127.0.0.1",1099,UILanguage.ita);
+        Client c6 = new Client(UIMode.CLI,ConnectionMode.RMI,"127.0.0.1",1099,UILanguage.ita);
+        Client c7 = new Client(UIMode.CLI,ConnectionMode.RMI,"127.0.0.1",1099,UILanguage.ita);
+        Client c8 = new Client(UIMode.CLI,ConnectionMode.RMI,"127.0.0.1",1099,UILanguage.ita);
+        Client c9 = new Client(UIMode.CLI,ConnectionMode.RMI,"127.0.0.1",1099,UILanguage.ita);
         c1.setUsername("a");
         c2.setUsername("b");
         c3.setUsername("c");
