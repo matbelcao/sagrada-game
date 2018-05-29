@@ -14,6 +14,8 @@ import java.util.Map;
  * This class is the implementation of the SOCKET client-side connection methods
  */
 public class SocketClient implements ClientConn {
+    private static final int NUM_DRAFTED_SCHEMAS=4;
+
     private Socket socket;
     private QueuedInReader inSocket;
     private PrintWriter outSocket;
@@ -225,26 +227,69 @@ public class SocketClient implements ClientConn {
 
     @Override
     public List<LightPlayer> getPlayers() {
+        ArrayList<String> result= new ArrayList<>();
+        List<LightPlayer> playerList=new ArrayList<>();
+        LightPlayer players;
 
-        return null;
+        outSocket.println("GET players");
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("players")){
+            favor_tokens=Integer.parseInt(result.get(1));
+            inSocket.pop();
+        }
+        return favor_tokens;
     }
 
     @Override
     public int getFavorTokens(int playerId) {
+        ArrayList<String> result= new ArrayList<>();
+        int favor_tokens=0;
 
-        return 0;
+        outSocket.println("GET favor_tokens "+playerId);
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("favor_tokens")){
+            favor_tokens=Integer.parseInt(result.get(1));
+            inSocket.pop();
+        }
+        return favor_tokens;
     }
 
     @Override
     public LightSchemaCard getSchema(int playerId) {
+        ArrayList<String> result= new ArrayList<>();
+        LightSchemaCard lightSchema=null;
 
-        return null;
+        outSocket.println("GET schema "+playerId);
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")){
+                lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
+                inSocket.pop();
+        }
+        return lightSchema;
     }
 
     @Override
-    public ArrayList<LightSchemaCard> draftSchema() {
+    public List<LightSchemaCard> draftSchema() {
+        ArrayList<String> result= new ArrayList<>();
+        List<LightSchemaCard> lightSchemaCards=new ArrayList<>();
+        LightSchemaCard lightSchema;
 
-        return null;
+        outSocket.println("GET schema draft");
+        outSocket.flush();
+
+        int i=0;
+        while(i<NUM_DRAFTED_SCHEMAS){
+            if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")){
+                lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
+                lightSchemaCards.add(lightSchema);
+                inSocket.pop();
+                i++;
+            }
+        }
+        return lightSchemaCards;
     }
 
     /**
