@@ -5,15 +5,18 @@ import it.polimi.ingsw.client.uielements.CLIView;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.PrivObjectiveCard;
 import it.polimi.ingsw.server.model.PubObjectiveCard;
 import it.polimi.ingsw.server.model.SchemaCard;
+import it.polimi.ingsw.server.model.ToolCard;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 class cliElemsTest {
     private static CLIElems cliel;
@@ -35,10 +38,11 @@ class cliElemsTest {
     private static LightSchemaCard schema1;
     private static LightSchemaCard schema2;
     private static LightSchemaCard schema3;
-    private static ArrayList<LightDie> draftpool;
-    private static ArrayList<IndexedCellContent> roundtrack ;
-    private static ArrayList<LightCard> obj= new ArrayList<>();
-
+    private static List<LightDie> draftpool;
+    private static List<List<CellContent>> roundtrack ;
+    private static List<LightCard> obj= new ArrayList<>();
+    private static List<LightTool> tools= new ArrayList<>();
+    private static List<Integer> list= new ArrayList<>();
     @BeforeAll
     static void setup(){
 
@@ -82,17 +86,41 @@ class cliElemsTest {
 
         cliview.updateDraftPool(draftpool);
 
-        roundtrack= new ArrayList<>();
-        roundtrack.add(new IndexedCellContent(0,"ONE","YELLOW"));
-        roundtrack.add(new IndexedCellContent(1,"TWO","YELLOW"));
-        roundtrack.add(new IndexedCellContent(1,"ONE","BLUE"));
-        roundtrack.add(new IndexedCellContent(1,"FIVE","RED"));
-        roundtrack.add(new IndexedCellContent(2,"SIX","YELLOW"));
-        roundtrack.add(new IndexedCellContent(3,"THREE","PURPLE"));
-        roundtrack.add(new IndexedCellContent(3,"ONE","RED"));
-        roundtrack.add(new IndexedCellContent(4,"FOUR","GREEN"));
-        roundtrack.add(new IndexedCellContent(5,"ONE","YELLOW"));
+        list.add(0);
+        list.add(2);
+        list.add(3);
+        list.add(4);
+        list.add(6);
+        list.add(9);
+        list.add(13);
+        list.add(15);
+        list.add(16);
+        cliview.updateMenuList(list,Place.ROUNDTRACK,new LightDie("FOUR","GREEN"));
 
+        roundtrack= new ArrayList<>();
+        roundtrack.add(new ArrayList<>());
+        roundtrack.add(new ArrayList<>());
+        roundtrack.add(new ArrayList<>());
+        roundtrack.add(new ArrayList<>());
+        roundtrack.add(new ArrayList<>());
+        roundtrack.add(new ArrayList<>());
+        roundtrack.add(new ArrayList<>());
+
+        roundtrack.get(0).add(new LightDie("ONE","YELLOW"));
+        roundtrack.get(1).add(new LightDie("TWO","YELLOW"));
+        roundtrack.get(2).add(new LightDie("ONE","BLUE"));
+        roundtrack.get(2).add(new LightDie("FIVE","RED"));
+        roundtrack.get(3).add(new LightDie("SIX","YELLOW"));
+        roundtrack.get(4).add(new LightDie("THREE","PURPLE"));
+        roundtrack.get(5).add(new LightDie("ONE","RED"));
+        roundtrack.get(6).add(new LightDie("FOUR","GREEN"));
+        roundtrack.get(6).add(new LightDie("ONE","YELLOW"));
+
+        tools.add(LightTool.toLightTool(new ToolCard(2,MasterServer.XML_SOURCE+"ToolCard.xml")));
+        tools.add(LightTool.toLightTool(new ToolCard(3,MasterServer.XML_SOURCE+"ToolCard.xml")));
+        tools.add(LightTool.toLightTool(new ToolCard(6,MasterServer.XML_SOURCE+"ToolCard.xml")));
+
+        cliview.updateTools(tools);
 
         cliview.updateRoundTrack(roundtrack);
 

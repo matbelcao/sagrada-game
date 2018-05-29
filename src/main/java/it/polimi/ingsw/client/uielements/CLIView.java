@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.uielements;
 import it.polimi.ingsw.client.LightBoard;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.SchemaCard;
@@ -26,7 +27,7 @@ public class CLIView {
 
     private List<String> roundTrack= new ArrayList<>();
     private List<String> draftPool= new ArrayList<>();
-    private final List<String> bottom=new ArrayList<>();
+    private final List<String> menuList =new ArrayList<>();
     private static CLIElems cliElems;
     private final UIMessages uiMsg;
     private int numPlayers;
@@ -51,10 +52,12 @@ public class CLIView {
 
         builder.append(printList(buildDraftPool()));
 
-        builder.append(printList(schemas.get(playerId)));
+        builder.append(printList(appendRows(schemas.get(playerId),menuList)));
         builder.append(printList(bottomInfo));
         return builder.toString();
     }
+
+
 
     private static String printList(List<String> toPrint){
         if(toPrint==null){throw new IllegalArgumentException();}
@@ -77,6 +80,53 @@ public class CLIView {
         result= appendRows(result,objectives);
       return result;
     }
+
+
+    /**
+     * Creates a list of possible placements for a die
+     * @param placements the list of placements
+     * @param destination the place the possible placements refer to
+     * @param die the die to be placed
+     */
+    public void updateMenuList(List<Integer> placements, Place destination, LightDie die){
+        List<String> msg= new ArrayList<>();
+        msg.addAll(buildWall(' ',CELL_HEIGHT-1,1));
+        msg.add(bold(uiMsg.getMessage("can-be-placed")));
+
+        menuList.addAll(appendRows(buildCell(die),msg));
+        menuList.add(" ");
+
+        if(destination.equals(Place.SCHEMA)){
+            menuList.addAll(buildCoordinatesList(placements));
+        }else{
+            menuList.addAll(buildIndexList(placements));
+        }
+
+    }
+
+    private List<String> buildIndexList(List<Integer> placements) {
+        List<String> list= new ArrayList<>();
+        for(int i=0; i<placements.size();i++){
+            list.add(String.format(cliElems.getElem("li"), i, String.format(index(placements.get(i)))));
+        }
+        return list;
+
+    }
+
+    private String index(Integer index) {
+        return String.format(cliElems.getElem("index"),uiMsg.getMessage("pos"),index);
+
+    }
+
+    private List<String> buildCoordinatesList(List<Integer> placements) {
+        List<String> list= new ArrayList<>();
+        for(int i=0; i<placements.size();i++){
+            list.add(String.format(cliElems.getElem("li"), i, String.format(rowColmumn(placements.get(i)))));
+        }
+        return list;
+    }
+
+
     /**
      * creates the representation of the player's schema and puts it into the map
      * @param player the player whose schema we want to create/update
@@ -105,6 +155,12 @@ public class CLIView {
     }
 
 
+    private  String rowColmumn(int index){
+        int row= index/SchemaCard.NUM_COLS;
+        int column= index%SchemaCard.NUM_COLS;
+        return String.format(cliElems.getElem("row-col"),uiMsg.getMessage("row"),row,uiMsg.getMessage("col"),column);
+    }
+
     /**
      * This method creates the representation of the objectives
      * @param pubObj the list of public objectives
@@ -126,7 +182,7 @@ public class CLIView {
         this.draftPool.add(padUntil("",(numPlayers*2+1)*CELL_WIDTH,'–'));
     }
 
-    public void updateRoundTrack(List<IndexedCellContent> roundTrack){
+    public void updateRoundTrack(List<List<CellContent>> roundTrack){
         this.roundTrack= buildRoundTrack(roundTrack);
         this.roundTrack.add(padUntil("",(10)*CELL_WIDTH,'–'));
         this.roundTrack= appendRows(buildSeparator(this.roundTrack.size()-1),this.roundTrack);
@@ -150,18 +206,12 @@ public class CLIView {
         return result;
     }
 
-    private List<String> buildRoundTrack(List<IndexedCellContent> roundTrack){
+    private List<String> buildRoundTrack(List<List<CellContent>> roundTrack){
         List<String> result=new ArrayList<>();
         int maxLength=0;
-        List<List<CellContent>> matrix= new ArrayList<>();
 
-        for(int i=0;i<10;i++){
-            matrix.add(new ArrayList<>());
-        }
-        for(IndexedCellContent die: roundTrack){
-            matrix.get(die.getIndex()).add(die.getContent());
-        }
-        for(List<CellContent> round:matrix){
+        //calculating max number of leftover dice in a single round
+        for(List<CellContent> round:roundTrack){
             maxLength= (maxLength<round.size()?round.size():maxLength);
         }
         //building from the top row
@@ -169,7 +219,7 @@ public class CLIView {
             List<String> builtRow=new ArrayList<>();
             for(int round=0; round<10;round++){
                 try{
-                    builtRow= appendRows(builtRow,buildCell(matrix.get(round).get(row)));
+                    builtRow= appendRows(builtRow,buildCell(roundTrack.get(round).get(row)));
                 }catch (IndexOutOfBoundsException e){
                     builtRow= appendRows(builtRow,buildWall(' ',CELL_HEIGHT,CELL_WIDTH));
                 }
@@ -177,12 +227,10 @@ public class CLIView {
             result.addAll(builtRow);
         }
 
-
         Map<Integer,CellContent> baseRow= new HashMap<>();
-        for(int round=0; round<10; round++){
-            try {
-                baseRow.put(round, matrix.get(round).get(0));
-            }catch(IndexOutOfBoundsException e){}
+
+        for(int round=0; round<roundTrack.size(); round++){
+            baseRow.put(round, roundTrack.get(round).get(0));
         }
 
         result.addAll(buildCellRow(baseRow,0,10));
@@ -409,7 +457,7 @@ public class CLIView {
     private List<String> buildTool(LightTool tool){
         List<String> result;
         result= buildCard(tool);
-        result.add(String.format(cliElems.getElem("token-info"),
+        result.add(String.format(cliElems.getElem("tokens-info"),
                 uiMsg.getMessage("tokens"),
                 tool.isUsed()?"2":"1"));
         return result;

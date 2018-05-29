@@ -64,4 +64,20 @@
         <eng>Round track ^</eng>
         <ita>Tracciato dei round ^</ita>
     </roundtrack>
+    <can-be-placed>
+        <eng>‹ This die can be placed in the following positions:</eng>
+        <ita>‹ Il dado può essere piazzato nelle seguenti posizioni:</ita>
+    </can-be-placed>
+    <row>
+        <eng>row:</eng>
+        <ita>riga:</ita>
+    </row>
+    <col>
+        <eng>column:</eng>
+        <ita>colonna:</ita>
+    </col>
+    <pos>
+        <eng>position:</eng>
+        <ita>posizione:</ita>
+    </pos>
 </messages>

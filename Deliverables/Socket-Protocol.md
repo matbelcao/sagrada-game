@@ -207,12 +207,13 @@ The server responds with this message to give the information about the dice/con
 
 The server responds with this message to give information about the requested card(s).
 
-##### `SEND draftpool|roundtrack [<index>,<color>,<shade>] ... `
+##### `SEND draftpool|roundtrack [(<index>|<round>),<color>,<shade>] ... `
 
 +   `draftpool`: the requested elements concern the draftpool
 +   `roundtrack`: the requested elements concern the roundtrack
 +   `pub`: the requested element is a public objective card
-+   `<index>`: the die position
++   `<index>`: the die position in the draftpool
++   `<round>`: the number of the round the die was left over
 +   `<color>`: the die color property
 +   `<shade>`: the die shade property
 

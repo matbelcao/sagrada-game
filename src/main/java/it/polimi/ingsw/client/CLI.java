@@ -17,7 +17,6 @@ public class CLI implements ClientUI{
 
     public CLI(Client client,UILanguage lang) throws InstantiationException {
 
-
         this.uimsg=new UIMessages(lang);
         this.client = client;
         inKeyboard = new QueuedInReader(new BufferedReader(new InputStreamReader(System.in)));
@@ -30,7 +29,6 @@ public class CLI implements ClientUI{
         String username;
         String password;
         try {
-
             outCli.printf("%n%nUSERNAME: ");
             inKeyboard.add();
             username = inKeyboard.getln();
