@@ -69,12 +69,12 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public Map<Integer,CellContent> getDraftPool() {
+    public List<CellContent> getDraftPool() {
         return null;
     }
 
     @Override
-    public Map<Integer,CellContent> getRoundtrack() {
+    public List<List<CellContent>> getRoundtrack() {
         return null;
     }
 

@@ -107,7 +107,7 @@ public class SocketClient implements ClientConn {
         }).start();
     }
 
-    
+
 
     private void manageStatusMsg(List<String> parsed){
 
@@ -212,18 +212,16 @@ public class SocketClient implements ClientConn {
         return null;
     }
 
-
     @Override
-    public Map<Integer,CellContent> getDraftPool() {
-
+    public List<CellContent> getDraftPool() {
         return null;
     }
 
     @Override
-    public Map<Integer,CellContent> getRoundtrack() {
-
+    public List<List<CellContent>> getRoundtrack() {
         return null;
     }
+
 
     @Override
     public List<LightPlayer> getPlayers() {

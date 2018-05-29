@@ -16,6 +16,7 @@ public interface ClientConn {
      */
     boolean login(String username,String password);
 
+
     /**
      * This method tells the server the end of the session
      */
@@ -39,12 +40,12 @@ public interface ClientConn {
     /**
      * This method asks the serverfor an updated version of the draftpool
      */
-    Map<Integer,CellContent> getDraftPool();
+    List<CellContent> getDraftPool();
 
     /**
      * This method asks the serverfor an updated version of the roundtrack
      */
-    Map<Integer,CellContent> getRoundtrack();
+    List<List<CellContent>> getRoundtrack();
 
     /**
      * this method queries the server for a list of the users that are playing the match that the user making the request is playing
@@ -66,7 +67,7 @@ public interface ClientConn {
     /**
      * This method asks the server to draft four schemas for the initial choice of the player's schema
      */
-    ArrayList<LightSchemaCard> draftSchema();
+    List<LightSchemaCard> draftSchema();
 
     /**
      * This method is used to check the state of the connection of the user associated with the ClientConn
