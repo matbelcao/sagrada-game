@@ -270,7 +270,8 @@ public class Client {
             }
             if(command.equals("TEST")){
                 clientUI.printmsg(clientConn.getPrivateObj().toString());
-            }else{
+            }
+            if(!command.equals("")){
                 clientConn.sendDebugMessage(command);
             }
 
