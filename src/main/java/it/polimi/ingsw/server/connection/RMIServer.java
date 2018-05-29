@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public class RMIServer implements ServerConn {
-        private RMIServerInt remoteObj;
+        private RMIServerInt remoteObj; //client
         private  User user;
 
 
