@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.common.immutables.LightCard;
+import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
 
 import java.rmi.Remote;
@@ -21,4 +22,10 @@ public interface RMIClientInt extends Remote {
     List<LightCard> getPublicObjs() throws RemoteException;
 
     List<LightCard> getTools() throws RemoteException;
+
+    List<LightSchemaCard> draftSchema() throws RemoteException;
+
+    List<LightPlayer> getPlayers() throws RemoteException;
+
+    int getFavorTokens(int playerId) throws RemoteException;
 }

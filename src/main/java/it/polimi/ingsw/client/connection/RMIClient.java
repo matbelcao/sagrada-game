@@ -1,12 +1,13 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.common.immutables.CellContent;
+import it.polimi.ingsw.common.immutables.LightCard;
+import it.polimi.ingsw.common.immutables.LightPlayer;
+import it.polimi.ingsw.common.immutables.LightSchemaCard;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class RMIClient implements ClientConn {
     RMIClientInt remoteObj; //user
@@ -16,7 +17,6 @@ public class RMIClient implements ClientConn {
         this.remoteObj = remoteObj;
         this.client = client;
     }
-
 
     @Override
     public boolean login(String username, String password) {
@@ -80,12 +80,24 @@ public class RMIClient implements ClientConn {
 
     @Override
     public List<LightPlayer> getPlayers() {
-        return null;
+        List<LightPlayer> players = null;
+        try {
+            players = remoteObj.getPlayers();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return players;
     }
 
     @Override
-    public int getFavorTokens(int playerId) {
-        return 0;
+    public int getFavorTokens(int playerId) { //TODO check if it should throw exception
+        int favorTokens = 0;
+        try{
+            favorTokens = remoteObj.getFavorTokens(playerId);
+        }catch(RemoteException e){
+            e.printStackTrace();
+        }
+        return favorTokens;
     }
 
     @Override
@@ -101,8 +113,14 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public ArrayList<LightSchemaCard> draftSchema() {
-        return null;
+    public List<LightSchemaCard> draftSchema() {
+        List <LightSchemaCard>result = null;
+        try {
+           result = remoteObj.draftSchema();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     @Override
