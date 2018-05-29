@@ -168,6 +168,8 @@ public class ClientParserTest {
         assertEquals("2,3,3,RED,TWO",parsedResult.get(2));
         assertEquals("4,5,2,GREEN,FIVE",parsedResult.get(3));
 
+        assertTrue(ClientParser.parse("LIST draftpool 1,RED,THREE", parsedResult));
+
         assertTrue(ClientParser.parse("LIST placements 2,3", parsedResult));
         assertEquals("LIST",parsedResult.get(0));
         assertEquals("placements",parsedResult.get(1));

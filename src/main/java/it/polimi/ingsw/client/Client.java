@@ -249,6 +249,35 @@ public class Client {
         return false;
     }
 
+    private void match(){
+        String command;
+        synchronized (lockStatus){
+            while(userStatus.equals(UserStatus.LOBBY)){
+                try {
+                    lockStatus.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                lockStatus.notifyAll();
+            }
+        }
+
+        while(userStatus.equals(UserStatus.PLAYING)) {
+            System.out.println("CLIENT: Ancora dentro!");
+            command=clientUI.getCommand();
+            if (command.equals("QUIT")){
+                quit();
+            }
+            if(command.equals("TEST")){
+                clientUI.printmsg(clientConn.getPrivateObj().toString());
+            }else{
+                clientConn.sendDebugMessage(command);
+            }
+            System.out.println("CLIENT: Ancora dentro!");
+        }
+        System.out.println("CLIENT: USCITO!");
+    }
+
 
     /**
      * this method signals that a new match is about to begin and
@@ -278,37 +307,15 @@ public class Client {
 
     }
 
+    //ONLY FOR DEBUG PURPOSES
+    public void printDebug(String message){
+        clientUI.printmsg(message);
+    }
+
 
     /**
      * this method manages the game itself in its parts
      */
-
-    private void match(){
-        String command;
-        synchronized (lockStatus){
-            while(userStatus.equals(UserStatus.LOBBY)){
-                try {
-                   lockStatus.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                lockStatus.notifyAll();
-            }
-        }
-
-        while(userStatus.equals(UserStatus.PLAYING)) {
-            System.out.println("CLIENT: Ancora dentro!");
-            command=clientUI.getCommand();
-            if (command.equals("QUIT")){
-                quit();
-            }
-            if(command.equals("TEST")){
-                clientUI.printmsg(clientConn.getPrivateObj().toString());
-            }
-            System.out.println("CLIENT: Ancora dentro!");
-        }
-        System.out.println("CLIENT: USCITO!");
-    }
 
 
     /**

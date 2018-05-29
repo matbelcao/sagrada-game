@@ -109,5 +109,10 @@ public class RMIClient implements ClientConn {
     public boolean pong() {
         return false;
     }
+
+    @Override
+    public void sendDebugMessage(String message) {
+
+    }
 }
 

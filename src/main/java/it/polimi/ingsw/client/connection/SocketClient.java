@@ -58,22 +58,45 @@ public class SocketClient implements ClientConn {
                             inSocket.pop();
                             manageStatusMsg(result);
 
-                        //LOBBY
+                            //LOBBY
 
-                        }else if (ClientParser.isLobby(inSocket.readln())) {
+                        } else if (ClientParser.isLobby(inSocket.readln())) {
                             updateLobby(result.get(1));
                             inSocket.pop();
 
-                        //GAME
+                            //GAME
 
-                        }else if(ClientParser.isGame(inSocket.readln())) {
+                        } else if (ClientParser.isGame(inSocket.readln())) {
                             updateGame(result);
                             inSocket.pop();
 
+                        } else if (ClientParser.isList(inSocket.readln())) {
+                            switch (result.get(1)) {
+                                case "schema":
+                                    client.printDebug(inSocket.readln());
+                                    break;
+                                case "roundtrack":
+                                    client.printDebug(inSocket.readln());
+                                    break;
+                                case "draftpool":
+                                    client.printDebug(inSocket.readln());
+                                    break;
+                                case "placements":
+                                    client.printDebug(inSocket.readln());
+                                    break;
+                                case "tool_details":
+                                    break;
+                            }
+                            inSocket.pop();
+                        } else if (ClientParser.isChoice(inSocket.readln())) {
+                            client.printDebug(inSocket.readln());
+                            inSocket.pop();
+                        }
+
                         //ERR
 
-                        }else{
-                            System.out.println("ERR: control error caused by:  "+inSocket.readln());
+                        else {
+                            System.out.println("ERR: control error caused by:  " + inSocket.readln());
                             inSocket.pop();
                         }
                     }
@@ -109,6 +132,11 @@ public class SocketClient implements ClientConn {
     }
 
 
+    //ONLY FOR DEBUG PURPOSES
+    public void sendDebugMessage(String message){
+        outSocket.println(message);
+        outSocket.flush();
+    }
 
 
     /**
