@@ -15,6 +15,7 @@ import java.util.Map;
  */
 public class SocketClient implements ClientConn {
     private static final int NUM_DRAFTED_SCHEMAS=4;
+    private static final int GET_PARAMS_START=2;
 
     private Socket socket;
     private QueuedInReader inSocket;
@@ -211,12 +212,31 @@ public class SocketClient implements ClientConn {
 
     @Override
     public List<LightCard> getTools() {
+
+
         return null;
     }
 
     @Override
     public List<CellContent> getDraftPool() {
-        return null;
+       /* ArrayList<String> result= new ArrayList<>();
+        List<CellContent> draftPool=new ArrayList<>();
+        CellContent lightCell;
+        String args[];
+
+        outSocket.println("GET draftpool");
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool"){
+            inSocket.pop();
+            for(int i=GET_PARAMS_START;i<result.size();i++) {
+                args= result.get(i).split(",");
+                lightCell=new LightDie(args[1],args[0]);
+                draftPool.add(lightCell);
+            }
+        }
+        return draftPool;*/
+       return null;
     }
 
     @Override
@@ -230,20 +250,17 @@ public class SocketClient implements ClientConn {
         ArrayList<String> result= new ArrayList<>();
         List<LightPlayer> playerList=new ArrayList<>();
         LightPlayer player;
-        int playerId=0;
+        String args[];
 
         outSocket.println("GET players");
         outSocket.flush();
 
         while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("players")){
             inSocket.pop();
-            for(int i=2;i<result.size();i++) {
-                if (i % 2 == 0) { //username
-                    playerId=Integer.parseInt(result.get(i));
-                }else{
-                    player=new LightPlayer(result.get(i),playerId);
-                    playerList.add(player);
-                }
+            for(int i=GET_PARAMS_START;i<result.size();i++) {
+                args= result.get(i).split(",");
+                player=new LightPlayer(args[1],Integer.parseInt(args[0]));
+                playerList.add(player);
             }
         }
         return playerList;
