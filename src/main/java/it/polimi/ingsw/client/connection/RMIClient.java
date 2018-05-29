@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RMIClient implements ClientConn {
-    RMIClientInt remoteObj;
+    RMIClientInt remoteObj; //user
     Client client;
 
     public RMIClient(RMIClientInt remoteObj, Client client) throws RemoteException {
@@ -69,12 +69,12 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public Map<Integer,CellContent> getDraftPool() {
+    public List<CellContent> getDraftPool() {
         return null;
     }
 
     @Override
-    public Map<Integer,CellContent> getRoundtrack() {
+    public List<List<CellContent>> getRoundtrack() {
         return null;
     }
 
