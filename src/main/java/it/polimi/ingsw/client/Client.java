@@ -263,7 +263,7 @@ public class Client {
         }
 
         while(userStatus.equals(UserStatus.PLAYING)) {
-            System.out.println("CLIENT: Ancora dentro!");
+
             command=clientUI.getCommand();
             if (command.equals("QUIT")){
                 quit();
@@ -273,9 +273,9 @@ public class Client {
             }else{
                 clientConn.sendDebugMessage(command);
             }
-            System.out.println("CLIENT: Ancora dentro!");
+
         }
-        System.out.println("CLIENT: USCITO!");
+
     }
 
 

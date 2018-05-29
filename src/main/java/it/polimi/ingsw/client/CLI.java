@@ -78,7 +78,7 @@ public class CLI implements ClientUI{
         outCli.printf(String.format("%n%s", uimsg.getMessage("turn")),turnNumber);
         outCli.flush();
         if(isYourTurn){
-            outCli.print(String.format("%n%s", uimsg.getMessage("yourTurn")));
+            outCli.printf(String.format("%n%s%n", uimsg.getMessage("yourTurn")));
             outCli.flush();
         }
         //outCli.printf(view.printMainView());
