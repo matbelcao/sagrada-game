@@ -8,7 +8,7 @@ import java.util.List;
  * corresponding to the turn they where drafted in
  */
 public class RoundTrack{
-    private ArrayList<ArrayList<Die>> track;
+    private List<List<Die>> track;
 
     /**
      * constructor of the object
@@ -23,7 +23,18 @@ public class RoundTrack{
      * @return an Arraylist of Arraylists of dice, that is the round track
      */
     public List<List<Die>> getTrack() {
-        return (List<List<Die>>) track.clone();
+        return  this.copy();
+    }
+
+    private List<List<Die>> copy(){
+        List<List<Die>> clone= new ArrayList<>();
+        for (int round=0; round <track.size();round++ ){
+            clone.add(new ArrayList<>());
+            for(int i=0; i<track.get(round).size();i++){
+                clone.get(round).add(new Die(track.get(round).get(i).getShade(),track.get(round).get(i).getColor()));
+            }
+        }
+        return clone;
     }
 
     /**
@@ -32,8 +43,7 @@ public class RoundTrack{
      * @param toAdd a list of dice to add to the Round Track
      */
     public void putDice(int round, List<Die> toAdd){
-        track.add(round,(ArrayList<Die>)toAdd);
-        System.out.println(track.get(0));
+        track.add(round, toAdd);
     }
     /**
      * swaps a die from the Board with a die of the Round Track used by tool card #5

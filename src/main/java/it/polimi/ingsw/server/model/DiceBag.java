@@ -12,7 +12,7 @@ import java.util.Random;
  * it provides methods for randomly drafting dice
  */
 public class DiceBag {
-    private ArrayList<Die> toDraft;
+    private List<Die> toDraft;
 
     /**
      * Constructs the object adding all 90 dice at once setting their shade randomly
@@ -40,10 +40,10 @@ public class DiceBag {
     }
     /**
      * @param quantity the quantity of dice to be drafted at once
-     * @return an ArrayList containing the drafted dice
+     * @return a List containing the drafted dice
      */
     public List<Die> draftDice(int quantity) {
-        ArrayList<Die> drafted = new ArrayList<>();
+        List<Die> drafted = new ArrayList<>();
         try {
             while(quantity > 0) {
 

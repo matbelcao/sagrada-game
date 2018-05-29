@@ -6,7 +6,7 @@ import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
 import java.util.NoSuchElementException;
 
-public class Player {
+public class  Player {
     private final String username;
     private final int gameId;
     private final Board board;

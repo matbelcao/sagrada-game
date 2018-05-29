@@ -130,7 +130,7 @@ public class SchemaCard implements Iterable<Cell> {
      * @return the list of valid positions for the die
      */
     public List<Integer> listPossiblePlacements(Die die) {
-        ArrayList <Integer> list= new ArrayList<>();
+        List <Integer> list= new ArrayList<>();
         FullCellIterator diceIterator;
         diceIterator=new FullCellIterator(this.cell);
 
@@ -153,7 +153,7 @@ public class SchemaCard implements Iterable<Cell> {
      * @return the list of valid positions for the die
      */
     public List<Integer> listPossiblePlacements(Die die, IgnoredConstraint ignoreConstraint) {
-        ArrayList <Integer> list= new ArrayList<>();
+        List <Integer> list= new ArrayList<>();
         FullCellIterator diceIterator;
         diceIterator=new FullCellIterator(this.cell);
         if(ignoreConstraint.equals(IgnoredConstraint.ADJACENCY)){
@@ -184,7 +184,7 @@ public class SchemaCard implements Iterable<Cell> {
      * @param diceIterator iterates on full cells
      * @param list the list of possible positions for the die
      */
-    private void checkCloseCells(Die die, FullCellIterator diceIterator, ArrayList<Integer> list) {
+    private void checkCloseCells(Die die, FullCellIterator diceIterator, List<Integer> list) {
         int row;
         int column;
         Integer index;
@@ -211,7 +211,7 @@ public class SchemaCard implements Iterable<Cell> {
      * @param list the list of possible positions for the die
      * @param ignoreConstraint string that tells which constraint(s) can be ignored
      */
-    private void checkCloseCells(Die die, FullCellIterator diceIterator, ArrayList<Integer> list, IgnoredConstraint ignoreConstraint) {
+    private void checkCloseCells(Die die, FullCellIterator diceIterator, List<Integer> list, IgnoredConstraint ignoreConstraint) {
         int row;
         int column;
         Integer index;
@@ -237,7 +237,7 @@ public class SchemaCard implements Iterable<Cell> {
      * @param die die to be put in place
      * @param list list of possible placements
      */
-    private void checkBorder(Die die, ArrayList<Integer> list) {
+    private void checkBorder(Die die, List<Integer> list) {
         int row;
         int column;
         //first and last rows
@@ -266,7 +266,7 @@ public class SchemaCard implements Iterable<Cell> {
      * @param list list of possible placements
      * @param ignoreConstraint string that tells which constraint(s) can be ignored
      */
-    private void checkBorder(Die die, ArrayList<Integer> list,IgnoredConstraint ignoreConstraint) {
+    private void checkBorder(Die die, List<Integer> list,IgnoredConstraint ignoreConstraint) {
         int row;
         int column;
         //first and last rows

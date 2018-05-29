@@ -18,7 +18,7 @@ public class Game extends Thread implements Iterable  {
     public static final int NUM_ROUND=10;
     private Board board;
     private boolean additionalSchemas; //to be used for additional schemas FA
-    private ArrayList<User> users;
+    private List<User> users;
     private SchemaCard [] draftedSchemas;
     private RoundIterator round;
     private Boolean endLock;
@@ -33,7 +33,7 @@ public class Game extends Thread implements Iterable  {
      * @param additionalSchemas true if additional are wanted by the user
      */
     public Game(List<User> users,boolean additionalSchemas){
-        this.users= (ArrayList<User>) users;
+        this.users= users;
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
             u.setGame(this);
@@ -51,7 +51,7 @@ public class Game extends Thread implements Iterable  {
      */
     public Game(List<User> users){
         this.additionalSchemas=false;
-        this.users= (ArrayList<User>) users;
+        this.users= users;
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
         }
@@ -184,7 +184,7 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      */
     public List<PubObjectiveCard> getPubCards(){
-        ArrayList<PubObjectiveCard> cards= new ArrayList<>();
+        List<PubObjectiveCard> cards= new ArrayList<>();
 
         for (int i=0 ; i < Board.NUM_OBJECTIVES ; i++ ) {
             cards.add(board.getPublicObjective(i));
@@ -197,7 +197,7 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      */
     public List<ToolCard> getToolCards(){
-        ArrayList<ToolCard> cards=new ArrayList<>();
+        List<ToolCard> cards=new ArrayList<>();
 
         for (int i = 0; i < Board.NUM_TOOLS; i++) {
             cards.add(board.getToolCard(i));
@@ -210,7 +210,7 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      */
     public List<SchemaCard> getSchemaCards(User user){
-        ArrayList<SchemaCard> schemas=new ArrayList<SchemaCard>();
+        List<SchemaCard> schemas=new ArrayList<>();
         for (int i=0 ; i < Board.NUM_PLAYER_SCHEMAS ; i++ ){
             schemas.add(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]);
         }
@@ -271,7 +271,7 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      */
     public List<Player> getPlayers(){
-        ArrayList<Player> players= new ArrayList<>();
+        List<Player> players= new ArrayList<>();
         for (User u:users){
             players.add(board.getPlayer(u));
         }
@@ -329,16 +329,15 @@ public class Game extends Thread implements Iterable  {
         if(roundStatus.isRequestedDraftPoolList()){
             die=board.getDraftPool().getDraftedDice().get(index);
             roundStatus.setSelectedDie(die);
-            System.out.println(roundStatus.isSelectedDie()+"  "+roundStatus.isRequestedDraftPoolList()+"");
             return die;
         }
         if(roundStatus.isRequestedRoundTrackList()) {
             List<List<Die>> trackList = getRoundTrackDice(true);
-            ArrayList<Die> dieList;
+            List<Die> dieList;
             int roundN = 0;
 
             while (tempIndex <= index) {
-                dieList = (ArrayList<Die>) trackList.get(roundN);
+                dieList = trackList.get(roundN);
                 for (Die d : dieList) {
                     if (tempIndex == index) {
                         roundStatus.setSelectedDie(d);
@@ -363,7 +362,6 @@ public class Game extends Thread implements Iterable  {
             if(roundStatus.isRequestedDraftPoolList()){
                 SchemaCard schemaCard=board.getPlayer(user).getSchema();
                 realIndex=schemaCard.listPossiblePlacements(roundStatus.getSelectedDie()).get(index);
-                System.out.println(index+"-1-"+realIndex);
                 try {
                     schemaCard.putDie(realIndex,roundStatus.getSelectedDie());
                     discard();

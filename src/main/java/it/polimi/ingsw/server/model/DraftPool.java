@@ -8,7 +8,7 @@ import java.util.List;
  * This class represents the area where drafted dice are put
  */
 public class DraftPool {
-    private ArrayList<Die> drafted;
+    private List<Die> drafted;
     private DiceBag diceBag;
     private RoundTrack roundTrack;
 
@@ -31,7 +31,7 @@ public class DraftPool {
      * from the dice bag, when the draft area is empty
      * @param dice the dice to be added
      */
-    public void addDice(ArrayList<Die> dice){
+    public void addDice(List<Die> dice){
         assert(this.drafted.isEmpty());
         this.drafted.addAll(dice);
     }
@@ -55,7 +55,7 @@ public class DraftPool {
 
     public List<Die> draftDice(int numPlayers) {
         drafted=new ArrayList<>();
-        drafted = (ArrayList<Die>) diceBag.draftDice((numPlayers*2)+1);
+        drafted = diceBag.draftDice((numPlayers*2)+1);
         return drafted;
     }
 
@@ -64,7 +64,7 @@ public class DraftPool {
     }
 
     public void clearDraftPool(int round){
-        roundTrack.putDice(round, (ArrayList<Die>) drafted.clone());
+        roundTrack.putDice(round, drafted);
         drafted=new ArrayList<>();
     }
     

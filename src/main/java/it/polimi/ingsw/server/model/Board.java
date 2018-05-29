@@ -10,7 +10,7 @@ import java.util.Random;
 
 public class Board {
     private DraftPool draftPool;
-    private ArrayList<Player> players;
+    private List<Player> players;
     private PubObjectiveCard[] publicObjectives;
     private ToolCard[] toolCards;
     boolean additionalSchemas;
@@ -43,7 +43,7 @@ public class Board {
     private ToolCard[] draftToolCards() {
         toolCards= new ToolCard[Board.NUM_TOOLS];
         Random randomGen = new Random();
-        ArrayList<Integer> draftedTools= new ArrayList<>();
+        List<Integer> draftedTools= new ArrayList<>();
         Integer id;
         for(int i =0; i<Board.NUM_TOOLS;i++){
             do{
@@ -63,7 +63,7 @@ public class Board {
         PubObjectiveCard[] pubObjectiveCards= new PubObjectiveCard[Board.NUM_OBJECTIVES];
         Random randomGen = new Random();
         Integer id;
-        ArrayList<Integer> draftedPubs = new ArrayList<>();
+        List<Integer> draftedPubs = new ArrayList<>();
 
         for(int i =0; i<Board.NUM_OBJECTIVES;i++){
             do{
@@ -84,7 +84,7 @@ public class Board {
         PrivObjectiveCard[] privObjectiveCards= new PrivObjectiveCard[numPlayers];
         Random randomGen = new Random();
         Integer id;
-        ArrayList<Integer> draftedPrivs=new ArrayList<>();
+        List<Integer> draftedPrivs=new ArrayList<>();
 
         for(int i =0; i<numPlayers;i++){
             do{
@@ -105,7 +105,7 @@ public class Board {
         SchemaCard[]  schemaChoices= new SchemaCard[NUM_PLAYER_SCHEMAS*players.size()];
         Random randomGen = new Random();
         Integer id;
-        ArrayList<Integer> draftedSchemas= new ArrayList<>();
+        List<Integer> draftedSchemas= new ArrayList<>();
 
         for(int i =0; i < NUM_PLAYER_SCHEMAS*players.size();i++){
             do{
