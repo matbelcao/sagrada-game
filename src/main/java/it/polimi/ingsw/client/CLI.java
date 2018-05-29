@@ -15,7 +15,7 @@ public class CLI implements ClientUI{
     private Client client;
     private UIMessages uimsg;
 
-    public CLI(Client client,UILanguage lang) {
+    public CLI(Client client,UILanguage lang) throws InstantiationException {
 
 
         this.uimsg=new UIMessages(lang);

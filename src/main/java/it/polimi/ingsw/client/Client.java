@@ -185,7 +185,7 @@ public class Client {
     /**
      * This method instantiates the user interface
      */
-    private void setupUI(){
+    private void setupUI() throws InstantiationException {
         if (uiMode.equals(UIMode.CLI)){
             clientUI=new CLI(this,lang);
         }else{
@@ -353,6 +353,7 @@ public class Client {
             client = Client.getNewClient();
         } catch (InstantiationException e) {
             System.out.println("\u001B[31m"+"ERR: couldn't start the Client"+"\u001B[0m");
+            return;
         }
         if (args.length>0) {
             if(!ClientOptions.getOptions(args,options) || options.contains("h")){
@@ -363,7 +364,12 @@ public class Client {
             }
         }
 
-        client.setupUI();
+        try {
+            client.setupUI();
+        } catch (InstantiationException e) {
+            System.out.println("\u001B[31m"+"ERR: couldn't start the Client UI"+"\u001B[0m");
+            return;
+        }
         client.connectAndLogin();
         client.match();
     }

@@ -17,8 +17,14 @@ public class CLIElems {
     private static final String CLI_COMP= "cli-components";
     private static final String BIG_EL="[A-Z]+";
 
-    public CLIElems() {
+    public CLIElems() throws InstantiationException {
+        this.elemFile=parser();
+        if(this.elemFile==null){
+            throw new InstantiationException();
+        }
+    }
 
+    private Element parser(){
         File xmlFile = new File(ELEM_FILE);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = null;
@@ -27,14 +33,13 @@ public class CLIElems {
             dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
-            elemFile = (Element)doc.getElementsByTagName(CLI_COMP).item(0);
+            return (Element)doc.getElementsByTagName(CLI_COMP).item(0);
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
-
+            return null;
         }
     }
-
     public String getBigDie(String face){
         if(face.matches(BIG_EL)) {
             return getElem(face);
