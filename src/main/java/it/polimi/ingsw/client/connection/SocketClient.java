@@ -107,6 +107,7 @@ public class SocketClient implements ClientConn {
         }).start();
     }
 
+    
 
     private void manageStatusMsg(List<String> parsed){
 

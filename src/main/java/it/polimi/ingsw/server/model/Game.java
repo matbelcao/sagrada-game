@@ -369,13 +369,16 @@ public class Game extends Thread implements Iterable  {
      * @return true iff the operation was successful
      */
     public boolean putDie(User user,int index){
+        Die die;
         int realIndex=0;
+
         if(roundStatus.isSelectedDie() && !roundStatus.hasPlacedDie()){
             if(roundStatus.isRequestedDraftPoolList()){
                 SchemaCard schemaCard=board.getPlayer(user).getSchema();
                 realIndex=schemaCard.listPossiblePlacements(roundStatus.getSelectedDie()).get(index);
                 try {
                     schemaCard.putDie(realIndex,roundStatus.getSelectedDie());
+                    board.getDraftPool().chooseDie(index);
                     discard();
                     roundStatus.setPlacedDie();
                     return true;

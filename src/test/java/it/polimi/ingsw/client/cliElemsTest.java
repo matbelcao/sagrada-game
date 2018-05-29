@@ -16,7 +16,16 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 
 class cliElemsTest {
-    private static CLIElems cliel=new CLIElems();
+    private static CLIElems cliel;
+
+    static {
+        try {
+            cliel = new CLIElems();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static CLIView cliview;
     private static LightPlayer player0;
     private static LightPlayer player1;
@@ -56,7 +65,11 @@ class cliElemsTest {
         player2.setSchema(schema2);
         player3.setSchema(schema3);
 
-        cliview= new CLIView(UILanguage.ita);
+        try {
+            cliview= new CLIView(UILanguage.ita);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
 
         cliview.setMatchInfo(1,4);
         cliview.setClientInfo(ConnectionMode.SOCKET,player1.getUsername());
