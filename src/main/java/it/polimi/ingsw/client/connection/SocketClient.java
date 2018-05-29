@@ -92,11 +92,11 @@ public class SocketClient implements ClientConn {
                             client.printDebug(inSocket.readln());
                             inSocket.pop();
                         }
-
-                        //ERR
-
-                        else {
-                            System.out.println("ERR: control error caused by:  " + inSocket.readln());
+                        else if(ClientParser.isInvalid(inSocket.readln())){
+                            inSocket.pop();
+                            client.printDebug("INVALID message");
+                        }else {
+                            client.printDebug("ERR: control error caused by:  " + inSocket.readln());
                             inSocket.pop();
                         }
                     }

@@ -174,6 +174,7 @@ public class Game extends Thread implements Iterable  {
     /**
      * Responds to the request by sending one private objective card to the user of the match
      * @param user the user who made the request
+     * @return the card requested
      */
     public PrivObjectiveCard getPrivCard(User user){
         return board.getPlayer(user).getPrivObjective();
@@ -181,7 +182,7 @@ public class Game extends Thread implements Iterable  {
 
     /**
      * Responds to the request by sending three public objective cards to the user of the match
-     * @param user the user who made the request
+     * @return the list of cards requested
      */
     public List<PubObjectiveCard> getPubCards(){
         List<PubObjectiveCard> cards= new ArrayList<>();
@@ -194,7 +195,7 @@ public class Game extends Thread implements Iterable  {
 
     /**
      * Responds to the request by sending three tool cards to the user of the match
-     * @param user the user who made the request
+     * @return the list of cards requested
      */
     public List<ToolCard> getToolCards(){
         List<ToolCard> cards=new ArrayList<>();
@@ -208,6 +209,7 @@ public class Game extends Thread implements Iterable  {
     /**
      * Responds to the request by sending four schema cards to the user of the match
      * @param user the user who made the request
+     * @return the list of cards requested
      */
     public List<SchemaCard> getSchemaCards(User user){
         List<SchemaCard> schemas=new ArrayList<>();
@@ -218,9 +220,10 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     * Responds to the request by sending four schema cards to the user of the match
-     * @param user the user who made the request
+     * Responds to the request by sending the player-specific schema card
      * @param playerId the id of the player's desired schema card
+     * @param override true to not DISCARD the complex action (and reset the RoundStatus class)
+     * @return the card requested
      */
     public SchemaCard getUserSchemaCard(int playerId,boolean override){
         if(!override){
@@ -233,9 +236,10 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     * Responds to the request by sending four schema cards to the user of the match
+     * Responds to the request by sending the user's schema card
      * @param user the user who made the request
-     * @param playerId the id of the player's desired schema card
+     * @param override true to not DISCARD the complex action (and reset the RoundStatus class)
+     * @return the card requested
      */
     public SchemaCard getUserSchemaCard(User user, boolean override){
         if(!override){
@@ -245,8 +249,9 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     * Responds to the request by sending the draftpool to the user of the match
-     * @param user the user who made the request
+     * Responds to the request by sending the draftpool's content to the user of the match
+     * @param override true to not DISCARD the complex action (and reset the RoundStatus class)
+     * @return the list of die in the draftpool
      */
     public List<Die> getDraftedDice(boolean override){
         if(!override){
@@ -256,8 +261,9 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     * Responds to the request by sending the list of the dice that are present in the roundTrack (and their relative index)
-     * @param user the user who made the request
+     * Responds to the request by sending the roundracks's content to the user of the match
+     * @param override true to not DISCARD the complex action (and reset the RoundStatus class)
+     * @return the list of die in the roundtrack
      */
     public List<List<Die>> getRoundTrackDice(boolean override){
         if(!override){
@@ -268,7 +274,7 @@ public class Game extends Thread implements Iterable  {
 
     /**
      * Responds to the request by sending the list of the match's players (and their id inside the Player class)
-     * @param user the user who made the request
+     * @return the list of players in the current match
      */
     public List<Player> getPlayers(){
         List<Player> players= new ArrayList<>();
@@ -279,8 +285,8 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     * Responds by sending the favortokens to the user that made the request
-     * @param user the user who made the request
+     * Responds by sending the number of favor tokens owned by the user
+     * @param user the user to get the favor tokens
      */
     public int getFavorTokens(User user){
         Player player=board.getPlayer(user);
@@ -291,24 +297,30 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     * Sets the chosen schema card to the user's relative player instance, if all the player have choose a schema card
-     * the timer will be stopped
+     * Sets the chosen schema card to the user's relative player instance, if all the player have choose a schema card the timer will be stopped
      * @param user the user to set the card
      * @param schemaIndex the index of the schema card (for each player (0 to 3)
+     * @return true iff the operation was successful
      */
     public boolean chooseSchemaCard(User user,int schemaIndex){
-        boolean response =false;
-        if(schemaIndex<0||schemaIndex>=4){return response;}
+        boolean response;
         response=board.getPlayer(user).setSchema(draftedSchemas[(users.indexOf(user)*Board.NUM_PLAYER_SCHEMAS)+schemaIndex]);
+        if(!response){return false;}
         for (User u: users){
             if(board.getPlayer(u).getSchema()==null){
-                return response;
+                return true;
             }
         }
         startFlow();
-        return response;
+        return true;
     }
 
+    /**
+     * Selects and returns the die from a draftpool/user's schema card/roundtrack
+     * @param user the user who made the request
+     * @param index the index of the die to select
+     * @return the die selected
+     */
     public Die selectDie(User user,int index){
         Die die;
         int tempIndex=0;
@@ -352,9 +364,9 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     * Puts in the user's schemacard the die if possible
-     * @param index
-     * @return
+     * Puts in the user's schemacard/draftpool/roundtrack the die if possible
+     * @param index the index of the die to be placed
+     * @return true iff the operation was successful
      */
     public boolean putDie(User user,int index){
         int realIndex=0;
@@ -376,13 +388,11 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     * Allows the Game model to discard a multiple-message command (for complex actions like putDie(), ToolCard usages)
+     * Allows the User to discard a multiple-message command (for COMPLEX ACTIONS like putDie(), ToolCard usages, ecc)
      */
     public void discard(){
         roundStatus=new RoundStatus();
     }
-
-
 
 
     /**

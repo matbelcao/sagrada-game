@@ -310,19 +310,16 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the client a text containing the number of favor tokens passed as parameter
-     * @param favorTokens the user's actual favor tokens
+     * Sends the client a text containing his amount of favor tokens
      */
-    public void sendFavorTokens() {//da corregere!!!!
-        //Da aggiungere al protocollo!!!!!
+    public void sendFavorTokens() {
         outSocket.println("SEND favor_tokens "+user.getGame().getFavorTokens(user));
         outSocket.flush();
     }
 
 
     /**
-     * Sends the client a text description of the private objective card passed as a parameter
-     * @param privObjectiveCard the private objective card to send
+     * Sends the client a text description of the private objective card
      */
     private void sendPrivateObjectiveCard(){
         PrivObjectiveCard privObjectiveCard=user.getGame().getPrivCard(user);
@@ -333,8 +330,7 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the client a text description of the public objective card passed as a parameter
-     * @param pubObjectiveCard the public objective card to send
+     * Sends the client a text description of the public objective card
      */
     private void sendPublicObjectiveCards(){
         ArrayList<PubObjectiveCard> pubObjectiveCards= (ArrayList<PubObjectiveCard>) user.getGame().getPubCards();
@@ -347,7 +343,6 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Sends the client a text description of the tool card passed as a parameter
-     * @param toolCard the tool card to send
      */
     private void sendToolCards(){
         ArrayList<ToolCard> toolCards= (ArrayList<ToolCard>) user.getGame().getToolCards();
@@ -360,7 +355,6 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Sends the client a textual list of the dice in the DraftPool
-     * @param draftedDice the DraftPool's dice list
      */
     private void sendDraftPoolDice(){
         Die die;
@@ -377,8 +371,7 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the client a textual list of the dice in the RoundTrack (can be multiple die at the same index)
-     * @param trackList the RoundTrack's dice list (index,die)
+     * Sends the client a textual list of the dice in the RoundTrack (can be placed multiple die at the same index)
      */
     private void sendRoundTrackDice(){
         List<List<Die>> trackList = user.getGame().getRoundTrackDice(false);
@@ -395,10 +388,9 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
-    /**{
+    /**
      *
      * Sends the client a text description of the users that are currently playing in the match
-     * @param players the player's list to send
      */
     private void sendPlayers(){
         ArrayList<Player> players= (ArrayList<Player>) user.getGame().getPlayers();
@@ -413,7 +405,6 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Sends the client a text list of the dice contained in the schema card parameter (with an unique INDEX)
-     * @param schema the schema card to get the Dice
      */
     private void sendSchemaDiceList() {
         int index=0;
@@ -434,7 +425,6 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Sends the client a text list of the dice contained in the RoundTrack (with an unique INDEX)
-     * @param trackList the RoundTrack's dice list (index,die)
      */
     private void sendRoundTrackDiceList() {
         int index=0;
@@ -459,7 +449,6 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Sends the client a text list of the dice contained in the DraftPool (with an unique INDEX)
-     * @param draftedDice the DraftPool's dice list
      */
     private void sendDraftPoolDiceList() {
         Die die;
@@ -477,7 +466,7 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Allows the user to select the die of the previous list received, then sends the relative list of allowed positions
-     * @param index
+     * @param index the index of the die previously received by the client
      */
     private void selectDie(int index){
         int placementIndex=0;
@@ -498,7 +487,7 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Allows the user to put the die contained in the previous list received, then sends an answer about the action
-     * @param index
+     * @param index the index of the die previously selected
      */
     private void putDie(int index){
         Boolean placed;
