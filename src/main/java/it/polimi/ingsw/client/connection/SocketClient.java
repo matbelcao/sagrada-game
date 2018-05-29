@@ -229,16 +229,24 @@ public class SocketClient implements ClientConn {
     public List<LightPlayer> getPlayers() {
         ArrayList<String> result= new ArrayList<>();
         List<LightPlayer> playerList=new ArrayList<>();
-        LightPlayer players;
+        LightPlayer player;
+        int playerId=0;
 
         outSocket.println("GET players");
         outSocket.flush();
 
         while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("players")){
-            favor_tokens=Integer.parseInt(result.get(1));
             inSocket.pop();
+            for(int i=2;i<result.size();i++) {
+                if (i % 2 == 0) { //username
+                    playerId=Integer.parseInt(result.get(i));
+                }else{
+                    player=new LightPlayer(result.get(i),playerId);
+                    playerList.add(player);
+                }
+            }
         }
-        return favor_tokens;
+        return playerList;
     }
 
     @Override
@@ -265,8 +273,8 @@ public class SocketClient implements ClientConn {
         outSocket.flush();
 
         while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")){
-                lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
-                inSocket.pop();
+            lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
+            inSocket.pop();
         }
         return lightSchema;
     }
