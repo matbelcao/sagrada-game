@@ -4,9 +4,12 @@ import it.polimi.ingsw.client.uielements.CLIView;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.common.immutables.LightTool;
 
 import java.io.*;
+import java.util.List;
 import java.util.Map;
 
 public class CLI implements ClientUI{
@@ -76,21 +79,52 @@ public class CLI implements ClientUI{
     }
 
     @Override
-    public void showDraftedSchemas(LightBoard board) {
+    public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas) {
+        
+    }
+
+    @Override
+    public void updateBoard(LightBoard board) {
 
     }
 
     @Override
-    public void updateChosenSchemas(Map<Integer, LightSchemaCard> schemas) {
+    public void updateDraftPool(Map<Integer, LightDie> draftpool) {
 
     }
 
-    public void updateRoundStart(int numRound){
+    @Override
+    public void updateSchema(LightSchemaCard schema, int playerId) {
+
+    }
+
+    @Override
+    public void updateRoundTrack(List<List<LightDie>> roundtrack) {
+
+    }
+
+    @Override
+    public void showRoundTrackWithCoordinates(List<List<LightDie>> roundtrack) {
+
+    }
+
+    
+    public void updateRoundStart(int numRound,List<List<LightDie>> roundtrack){
         outCli.printf(String.format("%s%n", uimsg.getMessage("round")),numRound);
     }
 
+    @Override
+    public void updateTurnStart(int playerId, boolean isFirstTurn, Map<Integer,LightDie> draftpool) {
 
-    public void updateTurnStart(int playerId, boolean isFirstTurn){
+    }
+
+    @Override
+    public void updateToolUsage(List<LightTool> tools) {
+
+    }
+
+    // TODO: 31/05/2018
+    /*public void updateTurnStart(int playerId, boolean isFirstTurn){
         outCli.printf(String.format("%s%n", uimsg.getMessage("turn")),playerId);
         outCli.flush();
         if(this.client.getPlayerId()==playerId){
@@ -100,7 +134,7 @@ public class CLI implements ClientUI{
         //outCli.printf(view.printMainView());
     }
 
-
+*/
     @Override
     public void updateStatusMessage(String statusChange, int playerId) {
 

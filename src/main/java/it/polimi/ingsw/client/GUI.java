@@ -2,8 +2,12 @@ package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
+import it.polimi.ingsw.common.immutables.CellContent;
+import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.common.immutables.LightTool;
 
+import java.util.List;
 import java.util.Map;
 
 public class GUI implements ClientUI {
@@ -48,22 +52,48 @@ public class GUI implements ClientUI {
     }
 
     @Override
-    public void showDraftedSchemas(LightBoard board) {
+    public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas) {
 
     }
 
     @Override
-    public void updateChosenSchemas(Map<Integer, LightSchemaCard> schemas) {
+    public void updateBoard(LightBoard board) {
 
     }
 
     @Override
-    public void updateRoundStart(int numRound) {
+    public void updateDraftPool(Map<Integer, LightDie> draftpool) {
 
     }
 
     @Override
-    public void updateTurnStart(int playerId, boolean isFirstTurn) {
+    public void updateSchema(LightSchemaCard schema, int playerId) {
+
+    }
+
+    @Override
+    public void updateRoundTrack(List<List<LightDie>> roundtrack) {
+
+    }
+
+    @Override
+    public void showRoundTrackWithCoordinates(List<List<LightDie>> roundtrack) {
+
+    }
+
+
+    @Override
+    public void updateRoundStart(int numRound, List<List<LightDie>> roundtrack) {
+
+    }
+
+    @Override
+    public void updateTurnStart(int playerId, boolean isFirstTurn, Map<Integer,LightDie> draftpool) {
+
+    }
+
+    @Override
+    public void updateToolUsage(List<LightTool> tools) {
 
     }
 

@@ -87,8 +87,9 @@ public interface ClientUI {
     /**
      * this method tells the user that a new round has started / is about to start
      * @param numRound the number of the round that is about to begin
+     * @param roundtrack the updated roundtrack
      */
-    void updateRoundStart(int numRound);
+    void updateRoundStart(int numRound,List<List<LightDie>> roundtrack);
 
     /**
      * this method tells the users that a new turn is starting, if the player id is the same of the player receiving
@@ -98,7 +99,7 @@ public interface ClientUI {
      * @param isFirstTurn tells if the the turn is the first or the second in the round (usefool for a particular toolcard)
      * @param draftpool the updated draftpool
      */
-    void updateTurnStart(int playerId, boolean isFirstTurn, List<List<CellContent>> draftpool);
+    void updateTurnStart(int playerId, boolean isFirstTurn, Map<Integer,LightDie> draftpool);
 
     /**
      * this method updates the view of the user (broadcast) following the usage of a toolcard

@@ -325,7 +325,7 @@ public class Client {
     }
 
     public void updateGameRoundStart(int numRound){
-        clientUI.updateRoundStart(numRound);
+        clientUI.updateRoundStart(numRound, board.getRoundTrack());
     }
 
     public void updateGameRoundEnd(int numRound){
@@ -334,7 +334,7 @@ public class Client {
 
     public void updateGameTurnStart(int playerId, boolean isFirstTurn){
         this.turnOfPlayer = playerId;
-            clientUI.updateTurnStart(playerId,isFirstTurn);
+            clientUI.updateTurnStart(playerId,isFirstTurn,board.getDraftPool());
 
     }
 
