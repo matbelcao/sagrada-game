@@ -8,6 +8,7 @@ import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UIMode;
 import it.polimi.ingsw.common.enums.UserStatus;
+import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 import it.polimi.ingsw.server.connection.RMIServerObject;
@@ -26,6 +27,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents a client that can connect to the server and participate to a match of the game.
@@ -37,7 +39,11 @@ public class Client {
     private ConnectionMode connMode;
     private String username;
     private String password;
-    private int playerId;
+    private int playerId,playerTurnId;
+    //-----old stuff------
+    List<LightPlayer> players;
+
+
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
     private ClientConn clientConn;
@@ -106,8 +112,13 @@ public class Client {
         return playerId;
     }
 
+    //to remove
     public void setPlayerId(int playerId) {
         this.playerId = playerId;
+    }
+
+    public int getPlayerTurnId(){
+        return playerTurnId;
     }
 
 
@@ -171,6 +182,10 @@ public class Client {
      * @return the set password
      */
     public String getPassword(){ return password; }
+
+    public List<LightPlayer> getPlayers(){
+        return players;
+    }
 
     /**
      * @return the object that is the connection of the client towards the server
@@ -256,6 +271,9 @@ public class Client {
         return false;
     }
 
+    /**
+     * this method manages the game itself in its parts
+     */
     private void match(){
         String command;
         synchronized (lockStatus){
@@ -302,29 +320,42 @@ public class Client {
         }
     }
 
+    public void updateGameEnd(){
+        //lettura lista di player e classifica
+    }
+
     public void updateGameRoundStart(int numRound){
         clientUI.updateGameRoundStart(numRound);
     }
 
-    public void updateGameTurnStart(int playerId, int firstOrSecond){
-        if(this.playerId==playerId){
-            clientUI.updateGameTurnStart(playerId,true);
+    public void updateGameRoundEnd(int numRound){
+        //clientUI.updateGameRoundEnd(numRound);
+    }
+
+    public void updateGameTurnStart(int playerTurnId, int firstOrSecond){
+        this.playerTurnId=playerTurnId;
+        if(this.playerId==playerTurnId){
+            clientUI.updateGameTurnStart(playerTurnId,true);
         }else{
-            clientUI.updateGameTurnStart(playerId,false);
+            clientUI.updateGameTurnStart(playerTurnId,false);
         }
 
     }
+
+    public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
+        //clientUI.updateGameRoundEnd(playerTurnId);
+    }
+
+    public void updatePlayerStatus(int playerId, UserStatus status){
+        //clientUI.updatePlayerStatus(playerId,status);
+    }
+
+
 
     //ONLY FOR DEBUG PURPOSES
     public void printDebug(String message){
         clientUI.printmsg(message);
     }
-
-
-    /**
-     * this method manages the game itself in its parts
-     */
-
 
     /**
      * this method quits the player from the game, he/she will not be able to resume the game
@@ -345,7 +376,6 @@ public class Client {
         }
         clientUI.updateConnectionBroken();
     }
-
 
     public static void main(String[] args){
         ArrayList<String> options=new ArrayList<>();

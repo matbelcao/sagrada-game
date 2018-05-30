@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class SocketClient implements ClientConn {
     private static final int NUM_DRAFTED_SCHEMAS=4;
-    private static final int GET_PARAMS_START=2;
+    private static final int COMMA_PARAMS_START=2;
     private static final int NUM_CARDS=3;
 
     private Socket socket;
@@ -72,7 +72,7 @@ public class SocketClient implements ClientConn {
                             //GAME
 
                         } else if (ClientParser.isGame(inSocket.readln())) {
-                            updateGame(result);
+                            updateMessages(result);
                             inSocket.pop();
 
                         } else if (ClientParser.isList(inSocket.readln())) {
@@ -269,7 +269,7 @@ public class SocketClient implements ClientConn {
 
         while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")){
             inSocket.pop();
-            for(int i=GET_PARAMS_START;i<result.size();i++) {
+            for(int i=COMMA_PARAMS_START;i<result.size();i++) {
                 args= result.get(i).split(",");
                 lightCell=new LightDie(args[2],args[1]);
                 draftPool.add(lightCell);
@@ -294,7 +294,7 @@ public class SocketClient implements ClientConn {
             inSocket.pop();
             roundTrack = new ArrayList<>();
             container = new ArrayList<>();
-            for (int i = GET_PARAMS_START; i < result.size(); i++) {
+            for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
                 args = result.get(i).split(",");
                 lightCell = new LightDie(args[2], args[1]);
                 if (index != Integer.parseInt(args[0])) {
@@ -321,7 +321,7 @@ public class SocketClient implements ClientConn {
 
         while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("players")){
             inSocket.pop();
-            for(int i=GET_PARAMS_START;i<result.size();i++) {
+            for(int i=COMMA_PARAMS_START;i<result.size();i++) {
                 args= result.get(i).split(",");
                 player=new LightPlayer(args[1],Integer.parseInt(args[0]));
                 playerList.add(player);
@@ -396,7 +396,7 @@ public class SocketClient implements ClientConn {
 
         while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("placements")){
             inSocket.pop();
-            for(int i=GET_PARAMS_START;i<result.size();i++) {
+            for(int i=COMMA_PARAMS_START;i<result.size();i++) {
                 args= result.get(i).split(",");
                 positions.add(Integer.parseInt(args[1]));
             }
@@ -433,30 +433,37 @@ public class SocketClient implements ClientConn {
      * This method notifies to the client that there has been a change in the status of the match
      * @param outcomes the server's parsed message
      */
-    private void updateGame(List<String> outcomes){
+    private void updateMessages(List<String> outcomes){
+        String param[];
         int i;
         switch(outcomes.get(1)){
             case "start":
                 client.updateGameStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
                 break;
             case "end":
-                ArrayList<String> playerData = new ArrayList<>();
-                for(i=2;i<outcomes.size();i++){
-                    playerData.add(outcomes.get(i));
+                List<LightPlayer> playerData = client.getPlayers();
+                for(i=COMMA_PARAMS_START; i<outcomes.size();i++){
+                    param=outcomes.get(i).split(",");
+                    LightPlayer player=playerData.get(Integer.parseInt(param[0]));
+                    if (player.getPlayerId()==Integer.parseInt(param[0])){
+                        player.setPoints(Integer.parseInt(param[1]));
+                        player.setFinalPosition(Integer.parseInt(param[2]));
+                    }
+
                 }
-                //client.updateGameEnd(playerData);
+                client.updateGameEnd();
                 break;
             case "round_start":
                 client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)));
                 break;
             case "round_end":
-                //client.updateGameRoundEnd(Integer.parseInt(outcomes.get(2)));
+                client.updateGameRoundEnd(Integer.parseInt(outcomes.get(2)));
                 break;
             case "turn_start":
                 client.updateGameTurnStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
                 break;
             case "turn_end":
-                //client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
+                client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
                 break;
         }
     }
