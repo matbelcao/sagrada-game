@@ -73,36 +73,36 @@ public class SocketServer extends Thread implements ServerConn  {
     private boolean execute(String command) {
         ArrayList<String> parsedResult = new ArrayList<>();
 
-        if(Validator.isValid(command, parsedResult)) {
-            if(Validator.checkQuitParams(command,parsedResult)) {
+        if (Validator.isValid(command, parsedResult)) {
+            if (Validator.checkQuitParams(command, parsedResult)) {
                 user.quit();
                 return false;
             }
-            if(Validator.checkGameParams(command,parsedResult)){
-                if(parsedResult.get(1).equals("end_turn")){
-                    user.getGame().discard();
+            if (Validator.checkGameParams(command, parsedResult)) {
+                if (parsedResult.get(1).equals("end_turn") && user.getGame().gameStarted()) {
+                    user.getGame().startFlow();
                 }
             }
-            if(Validator.checkChooseParams(command,parsedResult)){
-                switch(parsedResult.get(1)){
+            if (Validator.checkChooseParams(command, parsedResult)) {
+                switch (parsedResult.get(1)) {
                     case "schema":
                         chooseSchema(Integer.parseInt(parsedResult.get(2)));
                         break;
                     case "die_placement":
                         putDie(Integer.parseInt(parsedResult.get(2)));
                         break;
-                    case"tool":
+                    case "tool":
                         break;
                 }
                 return true;
             }
-            if(Validator.checkGetParams(command,parsedResult)){
-                switch (parsedResult.get(1)){
+            if (Validator.checkGetParams(command, parsedResult)) {
+                switch (parsedResult.get(1)) {
                     case "schema":
-                        if(parsedResult.get(2).equals("draft")){
-                           draftSchemaCards();
-                        }else{
-                           sendUserSchemaCard(Integer.parseInt(parsedResult.get(2)));
+                        if (parsedResult.get(2).equals("draft")) {
+                            draftSchemaCards();
+                        } else if (user.getGame().gameStarted()) {
+                            sendUserSchemaCard(Integer.parseInt(parsedResult.get(2)));
                         }
                         break;
                     case "favor_tokens":
@@ -129,8 +129,8 @@ public class SocketServer extends Thread implements ServerConn  {
                 }
                 return true;
             }
-            if(Validator.checkGetDiceListParams(command,parsedResult)){
-                switch(parsedResult.get(1)){
+            if (Validator.checkGetDiceListParams(command, parsedResult) && user.getGame().gameStarted()) {
+                switch (parsedResult.get(1)) {
                     case "schema":
                         sendSchemaDiceList();
                         break;
@@ -143,8 +143,8 @@ public class SocketServer extends Thread implements ServerConn  {
                 }
                 return true;
             }
-            if(Validator.checkSelectParams(command,parsedResult)){
-                switch(parsedResult.get(1)){
+            if (Validator.checkSelectParams(command, parsedResult) && user.getGame().gameStarted()) {
+                switch (parsedResult.get(1)) {
                     case "die":
                         selectDie(Integer.parseInt(parsedResult.get(2)));
                         break;
@@ -157,20 +157,19 @@ public class SocketServer extends Thread implements ServerConn  {
                 }
                 return true;
             }
-            if(Validator.checkDiscardParams(command,parsedResult)){
+            if (Validator.checkDiscardParams(command, parsedResult) && user.getGame().gameStarted()) {
                 discardAction();
                 return true;
             }
-            if(Validator.checkAckParams(command,parsedResult)){
-                switch(parsedResult.get(1)){
+            if (Validator.checkAckParams(command, parsedResult)) {
+                switch (parsedResult.get(1)) {
                     case "status":
                         return true;
                 }
             }
-        }else{
-            outSocket.println("INVALID message");
-            outSocket.flush();
         }
+        outSocket.println("INVALID message");
+        outSocket.flush();
         return true;
     }
 

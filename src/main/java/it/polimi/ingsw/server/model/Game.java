@@ -120,7 +120,7 @@ public class Game extends Thread implements Iterable  {
     /**
      * Restart the execution flow of Run() because the desired action has occurred
      */
-    private void startFlow(){
+    public void startFlow(){
         synchronized (lockRun) {
             if(!endLock){
                 endLock = true;
@@ -445,6 +445,10 @@ public class Game extends Thread implements Iterable  {
             }
         }
         users.remove(user);
+    }
+
+    public boolean gameStarted() {
+        return gameStatus!=GameStatus.INITIALIZING;
     }
 
     /**
