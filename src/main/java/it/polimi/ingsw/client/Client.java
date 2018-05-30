@@ -39,7 +39,7 @@ public class Client {
     private ConnectionMode connMode;
     private String username;
     private String password;
-    private int playerId,playerTurnId;
+    private int playerId, turnOfPlayer;
     //-----old stuff------
     List<LightPlayer> players;
 
@@ -118,7 +118,7 @@ public class Client {
     }
 
     public int getPlayerTurnId(){
-        return playerTurnId;
+        return turnOfPlayer;
     }
 
 
@@ -227,7 +227,7 @@ public class Client {
 
                 }
             do {
-                clientUI.loginProcedure();
+                clientUI.showLoginScreen();
                 if (connMode.equals(ConnectionMode.RMI)) {
                     logged = loginRMI();
                 } else {
@@ -332,13 +332,9 @@ public class Client {
         //clientUI.updateGameRoundEnd(numRound);
     }
 
-    public void updateGameTurnStart(int playerTurnId, int firstOrSecond){
-        this.playerTurnId=playerTurnId;
-        if(this.playerId==playerTurnId){
-            clientUI.updateGameTurnStart(playerTurnId,true);
-        }else{
-            clientUI.updateGameTurnStart(playerTurnId,false);
-        }
+    public void updateGameTurnStart(int playerId, boolean isFirstTurn){
+        this.turnOfPlayer = playerId;
+            clientUI.updateGameTurnStart(playerId,isFirstTurn);
 
     }
 

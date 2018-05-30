@@ -128,7 +128,7 @@ This message is sent at every beginning/end of a turn and can trigger (end) clie
 
 ##### `GAME end_turn`
 
-this message is sent to the server in casse the client wants to end his turn before the timer goes off.
+this message is sent to the server in case the client wants to end his turn before the timer goes off.
 
 
 

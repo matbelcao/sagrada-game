@@ -2,6 +2,9 @@ package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
+import it.polimi.ingsw.common.immutables.LightSchemaCard;
+
+import java.util.Map;
 
 public class GUI implements ClientUI {
     private Client client;
@@ -14,13 +17,18 @@ public class GUI implements ClientUI {
     }
 
     @Override
-    public void loginProcedure() {
+    public void showLoginScreen() {
 
     }
 
 
     @Override
     public void updateLogin(boolean logged) {
+
+    }
+
+    @Override
+    public void showLobby() {
 
     }
 
@@ -40,17 +48,28 @@ public class GUI implements ClientUI {
     }
 
     @Override
+    public void showDraftedSchemas(LightBoard board) {
+
+    }
+
+    @Override
+    public void updateChosenSchemas(Map<Integer, LightSchemaCard> schemas) {
+
+    }
+
+    @Override
     public void updateGameRoundStart(int numRound) {
 
     }
 
     @Override
-    public void updateGameTurnStart(int turnNumber, boolean isYourTurn) {
+    public void updateGameTurnStart(int playerId, boolean isFirstTurn) {
 
     }
 
+
     @Override
-    public void updateStatusMessage(String statusChange, int playerid) {
+    public void updateStatusMessage(String statusChange, int playerId) {
 
     }
 

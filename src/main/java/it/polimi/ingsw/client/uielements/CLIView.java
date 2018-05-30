@@ -347,9 +347,9 @@ public class CLIView {
 
 
         //add top info
-        schem.addAll(0,fitInLength(buildSchemaInfo(player), width));
+        schem.addAll(0,fitInLength(buildSchemaInfo(player,width), width));
         //add top border
-        schem.add(fitInLength(buildSchemaInfo(player), width).size(),padUntil("",width,'–'));
+        schem.add(fitInLength(buildSchemaInfo(player,width), width).size(),padUntil("",width,'–'));
 
         if(player.getPlayerId()==playerId){
                 schem.add(cliElems.getElem("schema-cols"));
@@ -371,7 +371,7 @@ public class CLIView {
         //add bottom border
         schem.add(height,padUntil("",width,'–'));
         //add left/right borders
-        schem= appendRows(
+        schem = appendRows(
                 buildSeparator(height+1)
                 ,schem);
         schem= appendRows(schem,buildSeparator(height+1));
@@ -411,14 +411,12 @@ public class CLIView {
      * this creates the info section of a schema card
      * @param player one of the participants
      */
-    private String buildSchemaInfo(LightPlayer player) {
+    private String buildSchemaInfo(LightPlayer player,int width) {
         if(player==null){throw new IllegalArgumentException();}
 
-        String info=String.format(cliElems.getElem("username-id"),
+        return String.format(cliElems.getElem("username-id"),
                 player.getUsername(),alignRight(uiMsg.getMessage("player-number") +
-                        player.getPlayerId(),SCHEMA_WIDTH-player.getUsername().length()));
-
-        return info;
+                        player.getPlayerId(),width - player.getUsername().length()));
 
     }
 

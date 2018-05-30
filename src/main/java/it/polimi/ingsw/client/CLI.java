@@ -4,8 +4,10 @@ import it.polimi.ingsw.client.uielements.CLIView;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.immutables.LightSchemaCard;
 
 import java.io.*;
+import java.util.Map;
 
 public class CLI implements ClientUI{
     private final CLIView view;
@@ -25,7 +27,7 @@ public class CLI implements ClientUI{
         this.view=new CLIView(lang);
     }
 
-    public void loginProcedure() {
+    public void showLoginScreen() {
         String username;
         String password;
         try {
@@ -57,6 +59,11 @@ public class CLI implements ClientUI{
         }
     }
 
+    @Override
+    public void showLobby() {
+
+    }
+
     public void updateConnectionOk() { outCli.printf(String.format("%n%s", uimsg.getMessage("connection-ok"))); }
 
     public void updateLobby(int numUsers){
@@ -68,14 +75,25 @@ public class CLI implements ClientUI{
         this.view.setMatchInfo(client.getPlayerId(),client.getBoard().getNumPlayers());
     }
 
+    @Override
+    public void showDraftedSchemas(LightBoard board) {
+
+    }
+
+    @Override
+    public void updateChosenSchemas(Map<Integer, LightSchemaCard> schemas) {
+
+    }
+
     public void updateGameRoundStart(int numRound){
         outCli.printf(String.format("%s%n", uimsg.getMessage("round")),numRound);
     }
 
-    public void updateGameTurnStart(int turnNumber,boolean isYourTurn){
-        outCli.printf(String.format("%s%n", uimsg.getMessage("turn")),turnNumber);
+
+    public void updateGameTurnStart(int playerId,boolean isFirstTurn){
+        outCli.printf(String.format("%s%n", uimsg.getMessage("turn")),playerId);
         outCli.flush();
-        if(isYourTurn){
+        if(this.client.getPlayerId()==playerId){
             outCli.printf(String.format("%s%n", uimsg.getMessage("yourTurn")));
             outCli.flush();
         }
@@ -84,7 +102,7 @@ public class CLI implements ClientUI{
 
 
     @Override
-    public void updateStatusMessage(String statusChange, int playerid) {
+    public void updateStatusMessage(String statusChange, int playerId) {
 
     }
 
