@@ -85,12 +85,12 @@ public class CLI implements ClientUI{
 
     }
 
-    public void updateGameRoundStart(int numRound){
+    public void updateRoundStart(int numRound){
         outCli.printf(String.format("%s%n", uimsg.getMessage("round")),numRound);
     }
 
 
-    public void updateGameTurnStart(int playerId,boolean isFirstTurn){
+    public void updateTurnStart(int playerId, boolean isFirstTurn){
         outCli.printf(String.format("%s%n", uimsg.getMessage("turn")),playerId);
         outCli.flush();
         if(this.client.getPlayerId()==playerId){

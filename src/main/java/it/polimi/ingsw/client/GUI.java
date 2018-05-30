@@ -58,12 +58,12 @@ public class GUI implements ClientUI {
     }
 
     @Override
-    public void updateGameRoundStart(int numRound) {
+    public void updateRoundStart(int numRound) {
 
     }
 
     @Override
-    public void updateGameTurnStart(int playerId, boolean isFirstTurn) {
+    public void updateTurnStart(int playerId, boolean isFirstTurn) {
 
     }
 

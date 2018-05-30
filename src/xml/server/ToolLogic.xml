@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<tools>
+    <ToolCard id="1">
+        <from>draftpool</from>
+        <to>draftpool</to>
+        <modify>increase</modify>
+        <modify>decrease</modify>
+        <quantity>one</quantity>
+    </ToolCard>
+    <ToolCard id="2">
+        <from>schema</from>
+        <to>schema</to>
+        <ignored-constaint>color</ignored-constaint>
+        <quantity>one</quantity>
+    </ToolCard>
+    <ToolCard id="3">
+        <from>schema</from>
+        <to>schema</to>
+        <ignored-constaint>shade</ignored-constaint>
+        <quantity>one</quantity>
+    </ToolCard>
+    <ToolCard id="4">
+        <from>schema</from>
+        <to>schema</to>
+        <ignored-constaint>none</ignored-constaint>
+        <quantity>two</quantity>
+    </ToolCard>
+    <ToolCard id="5">
+        <from>draft</from>
+        <to>roundtrack</to>
+        <modify>swap</modify>
+        <quantity>one</quantity>
+    </ToolCard>
+    <ToolCard id="6">
+        <from>draftpool</from>
+        <to>draftpool</to>
+        <modify>reroll</modify>
+        <quantity>one</quantity>
+    </ToolCard>
+    <ToolCard id="7">
+        <from>draftpool</from>
+        <to>draftpool</to>
+        <modify>reroll</modify>
+        <quantity>all</quantity>
+        <when>
+            <turn>second</turn>
+        </when>
+    </ToolCard>
+    <ToolCard id="8">
+        <from>draftpool</from>
+        <to>schema</to>
+        <quantity>2</quantity>
+        <when>
+            <turn>first</turn>
+        </when>
+    </ToolCard>
+    <ToolCard id="9">
+        <from>draftpool</from>
+        <to>schema</to>
+        <ignored-constaint>adjacency</ignored-constaint>
+        <quantity>1</quantity>
+    </ToolCard>
+    <ToolCard id="10">
+        <from>draftpool</from>
+        <to>draftpool</to>
+        <modify>flip</modify>
+        <quantity>one</quantity>
+    </ToolCard>
+    <ToolCard id="11">
+        <from>draftpool</from>
+        <to>dicebag</to>
+        <to>schema</to>
+        <ignored-constaint>none</ignored-constaint>
+        <modify>setshade</modify>
+        <quantity>one</quantity>
+    </ToolCard>
+    <ToolCard id="12">
+        <from>schema</from>
+        <to>schema</to>
+        <ignored-constaint>none</ignored-constaint>
+        <quantity>one</quantity>
+        <quantity>two</quantity>
+        <when>
+            <matches>
+                <attribute>
+                    color
+                </attribute>
+                <where>
+                    roundtrack
+                </where>
+            </matches>
+        </when>
+    </ToolCard>
+</tools>

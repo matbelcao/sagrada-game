@@ -1,12 +1,10 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.common.immutables.LightCard;
-import it.polimi.ingsw.common.immutables.LightDie;
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.common.immutables.LightTool;
+import it.polimi.ingsw.common.immutables.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LightBoard {
@@ -14,13 +12,13 @@ public class LightBoard {
     public static final int NUM_PUB_OBJ=3;
     public static final int MAX_PLAYERS=4;
 
-    private ArrayList<LightTool> tools;
-    private ArrayList<LightCard> pubObj;
+    private List<LightTool> tools;
+    private List<LightCard> pubObj;
     private int numPlayers;
-    private LightCard privObj;
+    private LightPrivObj privObj;
     private HashMap<Integer,LightPlayer> players;
     private HashMap<Integer,LightDie> draftPool;
-    private HashMap<Integer,LightDie> roundTrack;
+    private List<List<LightDie>> roundTrack;
 
     public LightBoard(int numPlayers) {
         this.numPlayers=numPlayers;
@@ -28,7 +26,7 @@ public class LightBoard {
         pubObj= new ArrayList<>();
         players=new HashMap<>();
         draftPool=new HashMap<>();
-        roundTrack= new HashMap<>();
+        roundTrack= new ArrayList<>();
     }
 
     public void addPlayer(LightPlayer player){
@@ -40,7 +38,7 @@ public class LightBoard {
         return privObj;
     }
 
-    public void setPrivObj(LightCard privObj) {
+    public void setPrivObj(LightPrivObj privObj) {
         this.privObj = privObj;
     }
 
@@ -61,12 +59,12 @@ public class LightBoard {
         this.draftPool = (HashMap<Integer, LightDie>) draftPool;
     }
 
-    public Map<Integer, LightDie> getRoundTrack() {
+    public List<List<LightDie>> getRoundTrack() {
         return roundTrack;
     }
 
-    public void setRoundTrack(Map<Integer, LightDie> roundTrack) {
-        this.roundTrack = (HashMap<Integer, LightDie>) roundTrack;
+    public void setRoundTrack(List<List<LightDie>> roundTrack) {
+        this.roundTrack = roundTrack;
     }
 
     public void addPubObj(LightTool tool){
