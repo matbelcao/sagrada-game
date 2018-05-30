@@ -162,6 +162,11 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
+    public void discard() {
+
+    }
+
+    @Override
     public boolean pong() {
         return false;
     }

@@ -9,10 +9,11 @@ import java.util.Map;
 
 public interface ClientConn {
     /**
-     * This method tries to login by "sending" the user's credentials to the server who's then going to check whether the user can or can not login and will reply accordingly
+     * The client invokes this method and then waits for a response from the server. This is typically the first communication
+     * exchanged between client and server. The server will reply accordingly the authentication procedure
      * @param username the username of the user trying to login
      * @param password the password of the user
-     * @return true iff the login was successful
+     * @return true iff the user has been logged into the server
      */
     boolean login(String username,String password);
 
@@ -23,69 +24,124 @@ public interface ClientConn {
     void quit();
 
     /**
-     * This method asks the server for the private objective of the user
+     * This function can be invoked to notify the server in case the client wants to end his turn before the timer goes off.
+     */
+    void endTurn();
+
+    /**
+     * This function can be invoked to request the updated schema card or the complete schema card (in case of reconnection
+     * or if it’s the beginning of the first round).The draft option makes the server send the four schema cards the user
+     * has to choose from.
+     * @return the list of four schema cards immutable objects
+     */
+    List<LightSchemaCard> getSchemaDraft();
+
+    /**
+     * This function can be invoked to request the updated schema card or the complete schema card (in case of reconnection
+     * or if it’s the beginning of the first round) of a scecific user.
+     * @param playerId the id of the player's desired schema card
+     * @return one schema card immutable object
+     */
+    LightSchemaCard getSchema(int playerId);
+
+    /**
+     * This function can be invoked to request the private objective card parameters
+     * @return one private objective card immutable object
      */
     LightCard getPrivateObject();
 
     /**
-     * This method asks the server for the public objectives of the match, the server will send all three of them following this request
+     * This function can be invoked to request the three public objective cards parameters
+     * @return a list of three public objective cards immutable objects
      */
     List<LightCard> getPublicObjects();
 
     /**
-     * This method asks the server for the tools of the match, the server will send all three of them following this request
+     * This function can be invoked to request the three toolcards parameters
+     * @return a list of three toolcards immutable objects
      */
     List<LightCard> getTools();
 
     /**
-     * This method asks the serverfor an updated version of the draftpool
+     * This function can be invoked to request the dice in the draftpool
+     * @return a list of immutable dice contained in the draftpool
      */
     List<CellContent> getDraftPool();
 
     /**
-     * This method asks the serverfor an updated version of the roundtrack
+     * This function can be invoked to request the dice in the roundtrack
+     * @return a list of immutable dice contained in the roundtrack
      */
     List<List<CellContent>> getRoundtrack();
 
     /**
-     * this method queries the server for a list of the users that are playing the match that the user making the request is playing
+     * The client invokes this function to request the list of players of the match
+     * @return a list of immutable players that are playing the match
      */
     List<LightPlayer> getPlayers();
 
     /**
-     * this method asks the server for the remaining favor tokens of a player given his id
+     * This function can be invoked to get the number of tokens remaining to the specified player.
      * @param playerId the id of the player (0 to 3)
+     * @return the number of favor tokens of the specific player
      */
     int getFavorTokens(int playerId);
 
     /**
-     * this method gets an updated version of the schema of a player given his playerId
-     * @param playerId the id of the player
+     * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
+     * in the schema card
+     * @return and immutable and indexed list containing the dice
      */
-    LightSchemaCard getSchema(int playerId);
-
-    void endTurn();
-
-    /**
-     * This method asks the server to draft four schemas for the initial choice of the player's schema
-     */
-    List<LightSchemaCard> getSchemaDraft();
-
     public List<IndexedCellContent> getSchemaDiceList();
 
+    /**
+     * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
+     * in the roundtrack
+     * @return an immutable and indexed list containing the dice
+     */
     List<List<IndexedCellContent>> getRoundTrackDiceList();
 
+    /**
+     * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
+     * in the draft pool
+     * @return an immutable and indexed list containing the dice
+     */
     List<IndexedCellContent> getDraftpoolDiceList();
 
+    /**
+     * This function can be invoked to the server to specify the possible placements in the user’s schema of a die that is
+     * temporarily selected by the user.
+     * @param index the index (starting from 0) of the die in a given list
+     * @return an immutable and indexed list of possible placements
+     */
     List<Integer> selectDie(int index);
 
+    /**
+     * This function can be invoked to signal the intention of a player to use a specific toolcard
+     * @param lightTool the toolcard the player wants to use
+     * @param index the index (0 to 3) of the die in a previously given list
+     * @return true if the card has been selected correctly
+     */
     boolean selectTool(LightTool lightTool, int index);
 
+    /**
+     *  This function can be invoked to notify the server in order to make a possibly definitive choice. The server is
+     *  still going to do his checks and will reply.
+     * @param type the subject of the choice (die_placement,schema or tool)
+     * @param index the index of the object in the list previously sent by the server
+     * @return true if the procedure is successful
+     */
     boolean choose(String type, int index);
 
     /**
-     * This method is used to check the state of the connection of the user associated with the ClientConn
-     * @return
+     * This message is sent to the server when the client that received a list of possible placement for a die chooses
+     * not to place that die
+     */
+    void discard();
+
+    /**
+     * This method provides the ping functionality for the client-side hearthBreath thread
+     * @return false iff the connection has broken
      */
     boolean pong() throws RemoteException;
 

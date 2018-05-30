@@ -124,15 +124,9 @@ public class SocketClient implements ClientConn {
         }).start();
     }
 
-    //ONLY FOR DEBUG PURPOSES
-    public void sendDebugMessage(String message){
-        outSocket.println(message);
-        outSocket.flush();
-    }
-
     /**
-     * The client sends this message then waits for a response from the server. This is typically the first message
-     * exchanged between client and server.
+     * The client invokes this method and then waits for a response from the server. This is typically the first communication
+     * exchanged between client and server. The server will reply accordingly the authentication procedure
      * @param username the username of the user trying to login
      * @param password the password of the user
      * @return true iff the user has been logged into the server
@@ -179,6 +173,14 @@ public class SocketClient implements ClientConn {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * This method notifies to the view that the number of player in the lobby has changed
+     * @param lobbySize the new number of players
+     */
+    private void updateLobby(String lobbySize){
+        client.getClientUI().updateLobby(Integer.parseInt(lobbySize));
     }
 
     /**
@@ -614,17 +616,10 @@ public class SocketClient implements ClientConn {
      * This message is sent to the server when the client that received a list of possible placement for a die chooses
      * not to place that die
      */
+    @Override
     public void discard(){
         outSocket.println("DISCARD");
         outSocket.flush();
-    }
-
-    /**
-     * This method notifies to the view that the number of player in the lobby has changed
-     * @param lobbySize the new number of players
-     */
-    private void updateLobby(String lobbySize){
-        client.getClientUI().updateLobby(Integer.parseInt(lobbySize));
     }
 
     /**
@@ -640,5 +635,11 @@ public class SocketClient implements ClientConn {
             return false;
         }
         return true;
+    }
+
+    //ONLY FOR DEBUG PURPOSES
+    public void sendDebugMessage(String message){
+        outSocket.println(message);
+        outSocket.flush();
     }
 }
