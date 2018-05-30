@@ -69,6 +69,10 @@ public interface ClientConn {
      */
     List<LightSchemaCard> draftSchema();
 
+    List<Integer> selectDie(int index);
+
+    boolean selectTool(LightTool lightTool, int index);
+
     /**
      * This method is used to check the state of the connection of the user associated with the ClientConn
      * @return

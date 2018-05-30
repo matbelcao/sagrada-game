@@ -155,7 +155,7 @@ public class ClientParser {
      * @return true iff the parameters are valid
      */
     private static boolean checkSend(List<String> parsedResult){
-        if(parsedResult.size()<3){return false;}
+        if(parsedResult.size()<2){return false;}
         if(parsedResult.get(1).equals("schema")) {
             return checkSendSchema(parsedResult);
         }
@@ -208,7 +208,7 @@ public class ClientParser {
      * @return true iff the parameters are valid
      */
     private static boolean checkList(List<String> parsedResult){
-        if(parsedResult.size()<3){return false;}
+        if(parsedResult.size()<2){return false;}
         if(parsedResult.get(1).equals("schema")||parsedResult.get(1).equals("roundtrack")||parsedResult.get(1).equals("draftpool")) {
             for (int i = 2; i < parsedResult.size(); i++) {
                 if (parsedResult.get(i).split(",").length != 5 && parsedResult.get(i).split(",").length != 3) {

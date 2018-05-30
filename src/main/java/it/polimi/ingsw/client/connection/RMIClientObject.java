@@ -1,10 +1,8 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.common.immutables.LightCard;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.connection.User;
-import it.polimi.ingsw.server.model.PubObjectiveCard;
-import it.polimi.ingsw.server.model.ToolCard;
+import it.polimi.ingsw.server.model.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -24,14 +22,11 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     }
 
     @Override
-    public void quit() throws RemoteException {
-        user.quit();
-    }
+    public void quit() throws RemoteException { user.quit(); }
 
     @Override
     public LightSchemaCard getSchema(int playerId) throws RemoteException {
-        //return LightSchemaCard.toLightSchema(user.getGame().getUserSchemaCard(playerId,true));
-        return null;
+        return LightSchemaCard.toLightSchema(user.getGame().getUserSchemaCard(playerId,false)); //TODO check if the params have changed
     }
 
     @Override
@@ -57,5 +52,40 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
             lightCards.add(LightCard.toLightCard(c));
         }
         return lightCards;
+    }
+
+    @Override
+    public List<LightSchemaCard> draftSchema() throws RemoteException {
+        List<SchemaCard>  schemas = user.getGame().getSchemaCards(user);
+        List<LightSchemaCard> lightSchema = new ArrayList<>();
+        for (SchemaCard s : schemas) {
+            lightSchema.add(LightSchemaCard.toLightSchema(s));
+        }
+        return lightSchema;
+    }
+
+    @Override
+    public List<LightPlayer> getPlayers() throws RemoteException {
+        List<Player> players = user.getGame().getPlayers();
+        List<LightPlayer> lightPlayers = new ArrayList<>();
+        for (Player p : players) {
+            lightPlayers.add(LightPlayer.toLightPlayer(p));
+        }
+        return lightPlayers;
+    }
+
+    @Override
+    public int getFavorTokens(int playerId) throws RemoteException {
+        return user.getGame().getPlayers().get(playerId).getFavorTokens();
+    }
+
+    @Override
+    public List<CellContent> getDraftPool() throws RemoteException {
+         List<Die> draftPool = user.getGame().getDraftedDice(false);
+         List<CellContent> lightDraftPool = new ArrayList<>();
+         for(Die d : draftPool){
+             lightDraftPool.add(new LightDie(d.getShade(),d.getColor()));
+         }
+         return lightDraftPool;
     }
 }

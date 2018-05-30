@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.connection;
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.server.model.Board;
 
 import java.io.*;
 import java.net.Socket;
@@ -16,6 +17,7 @@ import java.util.Map;
 public class SocketClient implements ClientConn {
     private static final int NUM_DRAFTED_SCHEMAS=4;
     private static final int GET_PARAMS_START=2;
+    private static final int NUM_CARDS=3;
 
     private Socket socket;
     private QueuedInReader inSocket;
@@ -200,26 +202,64 @@ public class SocketClient implements ClientConn {
 
     @Override
     public LightCard getPrivateObj() {
+        ArrayList<String> result= new ArrayList<>();
+        LightPrivObj lightObjCard=null;
 
+        outSocket.println("GET priv");
+        outSocket.flush();
 
-        return null;
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("priv")) {
+            lightObjCard = LightPrivObj.toLightPrivObj(inSocket.readln());
+            inSocket.pop();
+        }
+        return lightObjCard;
     }
 
     @Override
     public List<LightCard> getPublicObjs() {
-        return null;
+            ArrayList<String> result= new ArrayList<>();
+            List<LightCard> pubObjCards=new ArrayList<>();
+            LightCard lightObjCard;
+
+            outSocket.println("GET pub");
+            outSocket.flush();
+
+            int i=0;
+            while(i<NUM_CARDS){
+                if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("pub")){
+                    lightObjCard=LightCard.toLightCard(inSocket.readln());
+                    pubObjCards.add(lightObjCard);
+                    inSocket.pop();
+                    i++;
+                }
+            }
+            return pubObjCards;
     }
 
     @Override
     public List<LightCard> getTools() {
+        ArrayList<String> result= new ArrayList<>();
+        List<LightCard> toolCards=new ArrayList<>();
+        LightTool lightTool;
 
+        outSocket.println("GET tool");
+        outSocket.flush();
 
-        return null;
+        int i=0;
+        while(i<NUM_CARDS){
+            if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("tool")){
+                lightTool=LightTool.toLightTool(inSocket.readln());
+                toolCards.add(lightTool);
+                inSocket.pop();
+                i++;
+            }
+        }
+        return toolCards;
     }
 
     @Override
     public List<CellContent> getDraftPool() {
-       /* ArrayList<String> result= new ArrayList<>();
+        ArrayList<String> result= new ArrayList<>();
         List<CellContent> draftPool=new ArrayList<>();
         CellContent lightCell;
         String args[];
@@ -227,21 +267,51 @@ public class SocketClient implements ClientConn {
         outSocket.println("GET draftpool");
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool"){
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")){
             inSocket.pop();
             for(int i=GET_PARAMS_START;i<result.size();i++) {
                 args= result.get(i).split(",");
-                lightCell=new LightDie(args[1],args[0]);
+                lightCell=new LightDie(args[2],args[1]);
                 draftPool.add(lightCell);
             }
         }
-        return draftPool;*/
-       return null;
+        return draftPool;
     }
 
     @Override
     public List<List<CellContent>> getRoundtrack() {
-        return null;
+        ArrayList<String> result= new ArrayList<>();
+        List<List<CellContent>> roundTrack=new ArrayList<>();
+        List<CellContent> container=new ArrayList<>();
+        CellContent lightCell;
+        int index=0;
+        String args[];
+
+        outSocket.println("GET roundtrack");
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("roundtrack")) {
+            inSocket.pop();
+            roundTrack = new ArrayList<>();
+            container = new ArrayList<>();
+            for (int i = GET_PARAMS_START; i < result.size(); i++) {
+                args = result.get(i).split(",");
+                lightCell = new LightDie(args[2], args[1]);
+                if (index == Integer.parseInt(args[0])) {
+                    container.add(lightCell);
+                } else {
+                    roundTrack.add(Integer.parseInt(args[0]), container);
+                    container = new ArrayList<>();
+                    container.add(lightCell);
+                    index = Integer.parseInt(args[0]);
+                }
+            }
+            if (!container.isEmpty()) {
+                roundTrack.add(index, container);
+            }
+
+        }
+        return roundTrack;
     }
 
 
@@ -315,6 +385,46 @@ public class SocketClient implements ClientConn {
             }
         }
         return lightSchemaCards;
+    }
+
+    public void getDiceList(){
+
+    }
+
+    @Override
+    public List<Integer> selectDie(int index){
+        ArrayList<String> result= new ArrayList<>();
+        ArrayList<Integer> positions=new ArrayList<>();
+        String [] args;
+
+        outSocket.println("SELECT die "+index);
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("placements")){
+            inSocket.pop();
+            for(int i=GET_PARAMS_START;i<result.size();i++) {
+                args= result.get(i).split(",");
+                positions.add(Integer.parseInt(args[1]));
+            }
+        }
+        return positions;
+    }
+
+    @Override
+    public boolean selectTool(LightTool lightTool, int index){
+        ArrayList<String> result= new ArrayList<>();
+
+        outSocket.println("SELECT tool "+index);
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("tool")){
+            inSocket.pop();
+            if(Integer.parseInt(result.get(2))==index){
+                lightTool.setUsed(Boolean.parseBoolean(result.get(4)));
+                return result.get(5).equals("ok");
+            }
+        }
+        return false;
     }
 
     /**

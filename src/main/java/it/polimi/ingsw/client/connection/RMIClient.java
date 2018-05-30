@@ -4,9 +4,7 @@ import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class RMIClient implements ClientConn {
     RMIClientInt remoteObj; //user
@@ -16,7 +14,6 @@ public class RMIClient implements ClientConn {
         this.remoteObj = remoteObj;
         this.client = client;
     }
-
 
     @Override
     public boolean login(String username, String password) {
@@ -70,7 +67,13 @@ public class RMIClient implements ClientConn {
 
     @Override
     public List<CellContent> getDraftPool() {
-        return null;
+        List<CellContent> draftPool = null;
+        try {
+            draftPool = remoteObj.getDraftPool();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return draftPool;
     }
 
     @Override
@@ -80,12 +83,24 @@ public class RMIClient implements ClientConn {
 
     @Override
     public List<LightPlayer> getPlayers() {
-        return null;
+        List<LightPlayer> players = null;
+        try {
+            players = remoteObj.getPlayers();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return players;
     }
 
     @Override
-    public int getFavorTokens(int playerId) {
-        return 0;
+    public int getFavorTokens(int playerId) { //TODO check if it should throw exception
+        int favorTokens = 0;
+        try{
+            favorTokens = remoteObj.getFavorTokens(playerId);
+        }catch(RemoteException e){
+            e.printStackTrace();
+        }
+        return favorTokens;
     }
 
     @Override
@@ -101,8 +116,24 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public ArrayList<LightSchemaCard> draftSchema() {
+    public List<LightSchemaCard> draftSchema() {
+        List <LightSchemaCard>result = null;
+        try {
+           result = remoteObj.draftSchema();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    public List<Integer> selectDie(int index) {
         return null;
+    }
+
+    @Override
+    public boolean selectTool(LightTool lightTool, int index) {
+        return false;
     }
 
     @Override

@@ -143,15 +143,15 @@ public class ClientParserTest {
 
         assertFalse(ClientParser.parse("SEND", parsedResult));
         assertTrue(ClientParser.parse("SEND schema D,9,5,RED", parsedResult));
-        assertFalse(ClientParser.parse("SEND schema", parsedResult));
+        assertTrue(ClientParser.parse("SEND schema", parsedResult));
         assertFalse(ClientParser.parse("SEND schema C,2,3 E,4,5,RED,THREE D,2,1,GREEN", parsedResult));
         assertFalse(ClientParser.parse("SEND priv 1 4 schemaName description xxxx", parsedResult));
         assertFalse(ClientParser.parse("SEND priv", parsedResult));
         assertFalse(ClientParser.parse("send priv 1 4 schemaName description", parsedResult));
         assertFalse(ClientParser.parse("SEND draftpool 3,RED,TWO 2,GREEN,SIX,ONE", parsedResult));
-        assertFalse(ClientParser.parse("SEND draftpool", parsedResult));
+        assertTrue(ClientParser.parse("SEND draftpool", parsedResult));
         assertFalse(ClientParser.parse("SEND players 1,3,4 2,4 3,1", parsedResult));
-        assertFalse(ClientParser.parse("SEND players", parsedResult));
+        assertTrue(ClientParser.parse("SEND players", parsedResult));
     }
 
     @Test
@@ -190,11 +190,11 @@ public class ClientParserTest {
         assertEquals("true",parsedResult.get(4));
         assertEquals("ok",parsedResult.get(5));
 
-        assertFalse(ClientParser.parse("LIST schema", parsedResult));
+        assertTrue(ClientParser.parse("LIST schema", parsedResult));
         assertFalse(ClientParser.parse("LIST", parsedResult));
         assertFalse(ClientParser.parse("LIST schema  2,3,3,RED,TWO 2,3,3,TWO", parsedResult));
         assertFalse(ClientParser.parse("LIST schema 2,3,3,RED,TWO 4,5,2,GREEN,FIVE,TWO", parsedResult));
-        assertFalse(ClientParser.parse("LIST placements", parsedResult));
+        assertTrue(ClientParser.parse("LIST placements", parsedResult));
         assertFalse(ClientParser.parse("LIST placements 2,3,5", parsedResult));
         assertFalse(ClientParser.parse("LIST tool_details", parsedResult));
         assertFalse(ClientParser.parse("LIST tool_details 1 3 true ok ko", parsedResult));
