@@ -57,12 +57,12 @@
         <ita>E' il tuo turno</ita>
     </yourTurn>
     <draftpool>
-        <eng>Draft pool:</eng>
-        <ita>Riserva:</ita>
+        <eng>   ‹ Draft pool</eng>
+        <ita>   ‹ Riserva</ita>
     </draftpool>
     <roundtrack>
-        <eng>Round track ^</eng>
-        <ita>Tracciato dei round ^</ita>
+        <eng>   ‹ Round track </eng>
+        <ita>   ‹ Tracciato dei round </ita>
     </roundtrack>
     <can-be-placed>
         <eng>‹ This die can be placed in the following positions:</eng>
@@ -80,4 +80,8 @@
         <eng>position:</eng>
         <ita>posizione:</ita>
     </pos>
+    <message-prompt>
+        <eng>Insert your commands here</eng>
+        <ita>Digita qui le tue mosse</ita>
+    </message-prompt>
 </messages>

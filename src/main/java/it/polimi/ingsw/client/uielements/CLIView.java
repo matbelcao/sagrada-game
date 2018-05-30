@@ -15,11 +15,11 @@ public class CLIView {
     private static final int SCHEMA_HEIGHT = 18;
     private static final int CELL_HEIGHT = 4;
     private static final int CELL_WIDTH = 7;
-    private static final int OBJ_LENGTH = 34;
-    private static final int SCREEN_LENGTH = 160;
+    private static final int OBJ_LENGTH = 38;
+    private static final int SCREEN_WIDTH = 160;
 
 
-    private final List<String> bottomInfo = new ArrayList<>();
+    private String bottomInfo ;
     private String turnRoundinfo;
     private final HashMap<Integer,List<String>> schemas= new HashMap<>();
     private List<String> objectives;
@@ -42,18 +42,18 @@ public class CLIView {
     public String printMainView(){
         StringBuilder builder=new StringBuilder();
 
-        builder.append(printList(roundTrack));
-        builder.append("   ").append(bold(uiMsg.getMessage("roundtrack"))).append("%n");
-        builder.append(padUntil("", SCREEN_LENGTH, '–')).append("%n");
+        builder.append(printList(buildRoundTrack())).append(" |%n");
 
-        builder.append("%n");
-        builder.append("%n");
-        builder.append(printList(buildTopSection()));
 
-        builder.append(printList(buildDraftPool()));
+        builder.append(printList(buildTopSection())).append(" |%n");
 
-        builder.append(printList(appendRows(schemas.get(playerId),menuList)));
-        builder.append(printList(bottomInfo));
+
+        builder.append(printList(buildDraftPool())).append(" |%n");
+
+        builder.append(printList(appendRows(schemas.get(playerId),menuList))).append("%n");
+
+        builder.append(padUntil("",SCHEMA_WIDTH+6,' ')+String.format(cliElems.getElem("prompt"),uiMsg.getMessage("message-prompt")));
+
         return builder.toString();
     }
 
@@ -107,7 +107,7 @@ public class CLIView {
     private List<String> buildIndexList(List<Integer> placements) {
         List<String> list= new ArrayList<>();
         for(int i=0; i<placements.size();i++){
-            list.add(String.format(cliElems.getElem("li"), i, String.format(index(placements.get(i)))));
+            list.add(String.format(cliElems.getElem("li"), i, index(placements.get(i))));
         }
         return list;
 
@@ -121,7 +121,7 @@ public class CLIView {
     private List<String> buildCoordinatesList(List<Integer> placements) {
         List<String> list= new ArrayList<>();
         for(int i=0; i<placements.size();i++){
-            list.add(String.format(cliElems.getElem("li"), i, String.format(rowColmumn(placements.get(i)))));
+            list.add(String.format(cliElems.getElem("li"), i, rowColmumn(placements.get(i))));
         }
         return list;
     }
@@ -178,15 +178,18 @@ public class CLIView {
     public void updateDraftPool(List<LightDie> draftPool){
 
         this.draftPool= buildDiceRow( listToMap(draftPool),0,numPlayers*2+1);
-        this.draftPool.add(0,padUntil("",(numPlayers*2+1)*CELL_WIDTH,'_'));
-        this.draftPool.add(padUntil("",(numPlayers*2+1)*CELL_WIDTH,'–'));
+
+        this.draftPool.add(padUntil("",SCREEN_WIDTH,'–'));
     }
 
-    public void updateRoundTrack(List<List<CellContent>> roundTrack){
-        this.roundTrack= buildRoundTrack(roundTrack);
-        this.roundTrack.add(padUntil("",(10)*CELL_WIDTH,'–'));
-        this.roundTrack= appendRows(buildSeparator(this.roundTrack.size()-1),this.roundTrack);
+    private List<String > buildRoundTrack(){
+        List<String> result=new ArrayList<>();
+        result.addAll(this.roundTrack);
 
+        result.add(padUntil("", SCREEN_WIDTH,'–'));
+        result= appendRows(buildSeparator(result.size()),result);
+
+        return result;
     }
 
     /**
@@ -206,7 +209,7 @@ public class CLIView {
         return result;
     }
 
-    private List<String> buildRoundTrack(List<List<CellContent>> roundTrack){
+    public void updateRoundTrack(List<List<CellContent>> roundTrack){
         List<String> result=new ArrayList<>();
         int maxLength=0;
 
@@ -234,13 +237,21 @@ public class CLIView {
         }
 
         result.addAll(buildCellRow(baseRow,0,10));
-        return result;
+        List<String> padding=buildWall(' ',result.size()-1,1);
+        padding.add(bold(uiMsg.getMessage("roundtrack")));
+        result= appendRows(result,padding);
+        this.roundTrack=result;
     }
 
     private List<String> buildDraftPool(){
         List<String> result=new ArrayList<>();
-        result.add(uiMsg.getMessage("draftpool"));
+
         result.addAll(draftPool);
+        result.set(CELL_HEIGHT-1,
+                result.get(CELL_HEIGHT-1)+
+                        bold(uiMsg.getMessage("draftpool")+
+                                alignRight(bottomInfo,
+                                        SCREEN_WIDTH  - (2*numPlayers+1)*CELL_WIDTH - uiMsg.getMessage("draftpool").length())));
         result= appendRows(buildSeparator(draftPool.size()),result);
         return result;
     }
@@ -302,10 +313,21 @@ public class CLIView {
     }
 
     /**
+     * creates a string that is the original string aligned to the right in a line of a certain size
+     * @param line the line to align
+     * @param size the size of the space
+     * @return the aligned string
+     */
+    private static String alignRight(String line, int size){
+        if(line==null||line.length()>size){ throw new IllegalArgumentException();}
+        return padUntil("",size-line.length(),' ')+line;
+    }
+
+    /**
      * builds a list containing strings that represent the schema of a player
      * @return the representation of the schema
      */
-    private List<String> buildSchema(LightPlayer player){
+    private List<String>  buildSchema(LightPlayer player){
         List<String> schem= new ArrayList<>();
 
         //add top info
@@ -322,8 +344,7 @@ public class CLIView {
         schem.add(cliElems.getElem("schema-border"));
 
         //add left/right borders
-        schem= appendRows(appendRows(buildSeparator(SCHEMA_HEIGHT),schem),buildSeparator(SCHEMA_HEIGHT));
-        schem.set(schem.size()-1,padUntil("",SCHEMA_WIDTH+6,' '));
+        schem= appendRows(appendRows(buildSeparator(SCHEMA_HEIGHT+1),schem),buildSeparator(SCHEMA_HEIGHT+1));
 
         return schem;
     }
@@ -342,7 +363,7 @@ public class CLIView {
                 uiMsg.getMessage("player-number"),
                 playerId);
 
-        bottomInfo.add(0,bold(info));
+        bottomInfo=info;
     }
 
 
@@ -376,7 +397,10 @@ public class CLIView {
             result.add("     ");
         }
         result.add(bold(uiMsg.getMessage("priv-obj")));
-        result.addAll(appendRows(buildCell(new LightConstraint(privObj.getColor())),buildPrivObj(privObj,OBJ_LENGTH-7)));
+        result.addAll(
+                appendRows(
+                        buildCell(new LightConstraint(privObj.getColor())),
+                        buildPrivObj(privObj,OBJ_LENGTH-CELL_WIDTH)));
 
 
         return result;
@@ -482,7 +506,9 @@ public class CLIView {
             result.add(lineToFit.substring(0,i));
             lineToFit=lineToFit.substring(i).trim();
         }
-        result.add(padUntil(lineToFit,length,' '));
+        if(lineToFit.trim().length()>=0){
+            result.add(padUntil(lineToFit,length,' '));
+        }
         return result;
     }
 
@@ -492,11 +518,10 @@ public class CLIView {
      */
     private List<String> buildSeparator(int height){
         List<String> separator= new ArrayList<>();
-        separator.add("   ");
         for(int i=0;i< height;i++){
             separator.add(" | ");
         }
-        separator.add("   ");
+
         return separator;
     }
 

@@ -95,7 +95,7 @@ class cliElemsTest {
         list.add(13);
         list.add(15);
         list.add(16);
-        cliview.updateMenuList(list,Place.ROUNDTRACK,new LightDie("FOUR","GREEN"));
+        cliview.updateMenuList(list,Place.SCHEMA,new LightDie("FOUR","GREEN"));
 
         roundtrack= new ArrayList<>();
         roundtrack.add(new ArrayList<>());
