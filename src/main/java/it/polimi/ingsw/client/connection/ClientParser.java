@@ -156,11 +156,11 @@ public class ClientParser {
      */
     private static boolean checkSend(List<String> parsedResult){
         if(parsedResult.size()<2){return false;}
-        if(parsedResult.get(1).equals("schema")) {
+        if(parsedResult.get(1).equals("schema") && parsedResult.size()>3) {
             return checkSendSchema(parsedResult);
         }
         if(parsedResult.get(1).equals("priv")||parsedResult.get(1).equals("pub")||parsedResult.get(1).equals("tool")){
-            return parsedResult.size() == 6 || parsedResult.size() == 5;
+            return parsedResult.size() == 6;
         }
         if(parsedResult.get(1).equals("draftpool")||parsedResult.get(1).equals("roundtrack")||parsedResult.get(1).equals("roundtrack_update")){
             return checkCommaParametersLength(3,parsedResult);
@@ -179,10 +179,10 @@ public class ClientParser {
     private static boolean checkSendSchema(List<String> parsedResult) {
         for (int i = 3; i < parsedResult.size(); i++) {
             String[] args = parsedResult.get(i).split(",");
-            if (args[0].equals("D") && args.length != 5) {
+            if (args[0].equals("D") && args.length != 4) {
                 return false;
             }
-            if (args[0].equals("C") && args.length != 4) {
+            if (args[0].equals("C") && args.length != 3) {
                 return false;
             }
         }
@@ -211,7 +211,7 @@ public class ClientParser {
         if(parsedResult.size()<2){return false;}
         if(parsedResult.get(1).equals("schema")||parsedResult.get(1).equals("roundtrack")||parsedResult.get(1).equals("draftpool")) {
             for (int i = 2; i < parsedResult.size(); i++) {
-                if (parsedResult.get(i).split(",").length != 5 && parsedResult.get(i).split(",").length != 3) {
+                if (parsedResult.get(i).split(",").length < 3 || parsedResult.get(i).split(",").length > 5) {
                     return false;
                 }
             }

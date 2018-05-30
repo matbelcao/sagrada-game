@@ -268,16 +268,14 @@ public class SocketServer extends Thread implements ServerConn  {
         ArrayList<SchemaCard> schemas=(ArrayList<SchemaCard>) game.getSchemaCards(user);
 
         for(SchemaCard s: schemas){
-            outSocket.print("SEND schema");
-            for (int row=0; row < SchemaCard.NUM_ROWS ; row++) {
-                for (int column=0; column < SchemaCard.NUM_COLS ;column++){
-                    cell=s.getCell(row,column);
-                    if(cell.hasConstraint()) {
-                        outSocket.print(" C,"+row+","+column+","+cell.getConstraint().toString());
-                    }
-                    if(cell.hasDie()){
-                        outSocket.print(" D,"+row+","+column+","+cell.getDie().getColor().toString()+","+cell.getDie().getShade().toString());
-                    }
+            outSocket.print("SEND schema "+s.getName().replaceAll(" ","_"));
+            for (int index=0; index < SchemaCard.NUM_ROWS*SchemaCard.NUM_COLS ; index++) {
+                cell = s.getCell(index);
+                if (cell.hasConstraint()) {
+                    outSocket.print(" C,"+index+"," + cell.getConstraint().toString());
+                }
+                if (cell.hasDie()) {
+                    outSocket.print(" D,"+index+"," + cell.getDie().getColor().toString() + "," + cell.getDie().getShade().toString());
                 }
             }
             outSocket.println("");
@@ -293,16 +291,13 @@ public class SocketServer extends Thread implements ServerConn  {
         Cell cell;
         SchemaCard schemaCard = user.getGame().getUserSchemaCard(playerId,false);
 
-        outSocket.print("SEND schema");
-        for (int row=0; row < SchemaCard.NUM_ROWS ; row++) {
-            for (int column=0; column < SchemaCard.NUM_COLS ;column++){
-                cell=schemaCard.getCell(row,column);
-                if(cell.hasConstraint()) {
-                    outSocket.print(" C,"+row+","+column+","+cell.getConstraint().toString());
-                }
-                if(cell.hasDie()){
-                    outSocket.print(" D,"+row+","+column+","+cell.getDie().getColor().toString()+","+cell.getDie().getShade().toString());
-                }
+        outSocket.print("SEND schema "+schemaCard.getName());
+        for (int index=0; index < SchemaCard.NUM_ROWS*SchemaCard.NUM_COLS ; index++) {
+            cell = schemaCard.getCell(index);
+            if (cell.hasDie()) {
+                outSocket.print(" D," + index + "," + cell.getDie().getColor().toString() + "," + cell.getDie().getShade().toString());
+            }else if (cell.hasConstraint()) {
+                outSocket.print(" C," + index + "," + cell.getConstraint().toString());
             }
         }
         outSocket.println("");
@@ -415,7 +410,7 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.print("LIST schema");
         while(diceIterator.hasNext()){
             die=diceIterator.next().getDie();
-            outSocket.print(" "+index+","+diceIterator.getRow()+","+diceIterator.getColumn()+","+die.getColor().toString()
+            outSocket.print(" "+index+","+diceIterator.getIndex()+","+die.getColor().toString()
                     +","+die.getShade().toString());
             index++;
         }

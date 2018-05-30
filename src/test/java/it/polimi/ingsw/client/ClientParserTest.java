@@ -91,17 +91,18 @@ public class ClientParserTest {
     @Test
     void testCheckSend(){
 
-        assertTrue(ClientParser.parse("SEND schema D,9,5,RED,THREE", parsedResult));
+        assertTrue(ClientParser.parse("SEND schema name D,2,RED,THREE", parsedResult));
         assertEquals("SEND",parsedResult.get(0));
         assertEquals("schema",parsedResult.get(1));
-        assertEquals("D,9,5,RED,THREE",parsedResult.get(2));
+        assertEquals("name",parsedResult.get(2));
+        assertEquals("D,2,RED,THREE",parsedResult.get(3));
 
-        assertTrue(ClientParser.parse("SEND schema E,2,3 D,4,5,RED,THREE C,2,1,GREEN", parsedResult));
+        assertTrue(ClientParser.parse("SEND schema name D,2,RED,THREE C,2,GREEN", parsedResult));
         assertEquals("SEND",parsedResult.get(0));
         assertEquals("schema",parsedResult.get(1));
-        assertEquals("E,2,3",parsedResult.get(2));
-        assertEquals("D,4,5,RED,THREE",parsedResult.get(3));
-        assertEquals("C,2,1,GREEN",parsedResult.get(4));
+        assertEquals("name",parsedResult.get(2));
+        assertEquals("D,2,RED,THREE",parsedResult.get(3));
+        assertEquals("C,2,GREEN",parsedResult.get(4));
 
         assertTrue(ClientParser.parse("SEND priv 1 4 schemaName description", parsedResult));
         assertEquals("SEND",parsedResult.get(0));
@@ -111,7 +112,7 @@ public class ClientParserTest {
         assertEquals("schemaName",parsedResult.get(4));
         assertEquals("description",parsedResult.get(5));
 
-        assertTrue(ClientParser.parse("SEND priv 4 schemaName description", parsedResult));
+        assertTrue(ClientParser.parse("SEND priv 4 schemaName description RED", parsedResult));
         assertEquals("SEND",parsedResult.get(0));
         assertEquals("priv",parsedResult.get(1));
         assertEquals("4",parsedResult.get(2));
@@ -129,6 +130,8 @@ public class ClientParserTest {
         assertEquals("3,RED,TWO",parsedResult.get(2));
         assertEquals("2,GREEN,SIX",parsedResult.get(3));
 
+        assertTrue(ClientParser.parse("SEND tool 1 name desc true", parsedResult));
+
         assertTrue(ClientParser.parse("SEND players 1,3", parsedResult));
         assertEquals("SEND",parsedResult.get(0));
         assertEquals("players",parsedResult.get(1));
@@ -142,9 +145,9 @@ public class ClientParserTest {
         assertEquals("3,1",parsedResult.get(4));
 
         assertFalse(ClientParser.parse("SEND", parsedResult));
-        assertTrue(ClientParser.parse("SEND schema D,9,5,RED", parsedResult));
-        assertTrue(ClientParser.parse("SEND schema", parsedResult));
-        assertFalse(ClientParser.parse("SEND schema C,2,3 E,4,5,RED,THREE D,2,1,GREEN", parsedResult));
+        assertFalse(ClientParser.parse("SEND schema name D,1,RED", parsedResult));
+        assertFalse(ClientParser.parse("SEND schema name", parsedResult));
+        assertFalse(ClientParser.parse("SEND schema C,2,THREE,FOUR D,2,GREEN", parsedResult));
         assertFalse(ClientParser.parse("SEND priv 1 4 schemaName description xxxx", parsedResult));
         assertFalse(ClientParser.parse("SEND priv", parsedResult));
         assertFalse(ClientParser.parse("send priv 1 4 schemaName description", parsedResult));
@@ -157,16 +160,18 @@ public class ClientParserTest {
     @Test
     void testCheckList(){
 
-        assertTrue(ClientParser.parse("LIST schema 2,3,3,RED,TWO", parsedResult));
+        assertTrue(ClientParser.parse("LIST schema 2,1,RED,TWO", parsedResult));
         assertEquals("LIST",parsedResult.get(0));
         assertEquals("schema",parsedResult.get(1));
-        assertEquals("2,3,3,RED,TWO",parsedResult.get(2));
+        assertEquals("2,1,RED,TWO",parsedResult.get(2));
 
-        assertTrue(ClientParser.parse("LIST schema 2,3,3,RED,TWO 4,5,2,GREEN,FIVE", parsedResult));
+        assertTrue(ClientParser.parse("LIST schema 2,4,RED,TWO 4,7,GREEN,FIVE", parsedResult));
         assertEquals("LIST",parsedResult.get(0));
         assertEquals("schema",parsedResult.get(1));
-        assertEquals("2,3,3,RED,TWO",parsedResult.get(2));
-        assertEquals("4,5,2,GREEN,FIVE",parsedResult.get(3));
+        assertEquals("2,4,RED,TWO",parsedResult.get(2));
+        assertEquals("4,7,GREEN,FIVE",parsedResult.get(3));
+
+        assertTrue(ClientParser.parse("LIST roundtrack 3,3,1,RED,THREE", parsedResult));
 
         assertTrue(ClientParser.parse("LIST draftpool 1,RED,THREE", parsedResult));
 
@@ -192,7 +197,7 @@ public class ClientParserTest {
 
         assertTrue(ClientParser.parse("LIST schema", parsedResult));
         assertFalse(ClientParser.parse("LIST", parsedResult));
-        assertFalse(ClientParser.parse("LIST schema  2,3,3,RED,TWO 2,3,3,TWO", parsedResult));
+        assertFalse(ClientParser.parse("LIST schema  2,RED", parsedResult));
         assertFalse(ClientParser.parse("LIST schema 2,3,3,RED,TWO 4,5,2,GREEN,FIVE,TWO", parsedResult));
         assertTrue(ClientParser.parse("LIST placements", parsedResult));
         assertFalse(ClientParser.parse("LIST placements 2,3,5", parsedResult));
