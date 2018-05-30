@@ -9,13 +9,14 @@
     <FILLED> _____ ::|█████|::|█████|::|█████|</FILLED>
     <EMPTI> _____ ::|     |::|     |::|_____|</EMPTI>
     <player-info>User: %s | %s %s | %s %d</player-info>
-    <username-id>%s     %s %d</username-id>
+    <username-id>%s%s</username-id>
     <schema-border>–––––––––––––––––––––––––––––––––––</schema-border>
     <tokens-info>%s %s</tokens-info>
     <tool-index>%s %d</tool-index>
     <round-turn>%s %d %s %d</round-turn>
     <row-col>‹%s %d , %s %d› </row-col>
     <index>‹%s %d›</index>
-    <li>  •%d: %s</li>
+    <li>  %d: %s</li>
     <prompt>%s ›››</prompt>
+    <schema-cols>     0      1      2      3      4   </schema-cols>
 </cli-components>

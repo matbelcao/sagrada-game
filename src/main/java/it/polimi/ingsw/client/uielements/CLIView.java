@@ -32,6 +32,7 @@ public class CLIView {
     private final UIMessages uiMsg;
     private int numPlayers;
     private int playerId;
+    private int nowPlaying;
 
     public CLIView(UILanguage lang) throws InstantiationException {
         cliElems=new CLIElems();
@@ -76,7 +77,7 @@ public class CLIView {
             }
         }
         result= appendRows(result,buildWall(' ',result.size(), (LightBoard.MAX_PLAYERS-numPlayers)*(SCHEMA_WIDTH+6)));
-        result= appendRows(result,buildSeparator(SCHEMA_HEIGHT));
+        result= appendRows(result,buildSeparator(SCHEMA_HEIGHT+1));
         result= appendRows(result,objectives);
       return result;
     }
@@ -133,14 +134,23 @@ public class CLIView {
      */
     public void updateSchema(LightPlayer player){
         this.schemas.put(player.getPlayerId(), buildSchema(player));
+        if(player.getPlayerId()==playerId) {
+            this.schemas.get(playerId).set(0, bold(schemas.get(playerId).get(0)));
+        }
     }
 
-    public void updateRoundTurn(int roundNumber, int turnNumber){
+    public void updateRoundTurn(int roundNumber, int turnNumber,int nowPlaying){
+        this.nowPlaying=nowPlaying;
         turnRoundinfo= String.format(cliElems.getElem("round-turn"),
                 uiMsg.getMessage("round"),
                 roundNumber,
                 uiMsg.getMessage("turn"),
                 turnNumber);
+        List<String> updateSchema= new ArrayList<>();
+
+        updateSchema=schemas.get(nowPlaying);
+        Random randomGen = new Random();
+        updateSchema.set(0,addColorToLine(bold(updateSchema.get(0)),Color.values()[randomGen.nextInt(Color.values().length)]));
     }
 
     /**
@@ -323,28 +333,48 @@ public class CLIView {
         return padUntil("",size-line.length(),' ')+line;
     }
 
+
+
     /**
      * builds a list containing strings that represent the schema of a player
      * @return the representation of the schema
      */
     private List<String>  buildSchema(LightPlayer player){
-        List<String> schem= new ArrayList<>();
+        int width=SCHEMA_WIDTH + (playerId==player.getPlayerId()?2:0);
 
         //add top info
-        schem.addAll(fitInLength(buildSchemaInfo(player),SCHEMA_WIDTH));
+        List<String> schem = new ArrayList<>();
 
+
+        //add top info
+        schem.addAll(0,fitInLength(buildSchemaInfo(player), width));
         //add top border
-        schem.add(cliElems.getElem("schema-border"));
+        schem.add(fitInLength(buildSchemaInfo(player), width).size(),padUntil("",width,'–'));
+
+        if(player.getPlayerId()==playerId){
+                schem.add(cliElems.getElem("schema-cols"));
+
+        }
 
         //build schema
         for(int row=0; row< SchemaCard.NUM_ROWS;row++){
-            schem.addAll(buildCellRow(player.getSchema().getCellsMap(),row*SchemaCard.NUM_COLS,(row+1)*SchemaCard.NUM_COLS ));
-        }
-        //add bottom border
-        schem.add(cliElems.getElem("schema-border"));
 
+            schem.addAll(appendRows(
+                    player.getPlayerId()==playerId?
+                            buildSchemaRowsIndex(row):
+                            new ArrayList<String>(CELL_HEIGHT)
+                    ,buildCellRow(player.getSchema().getCellsMap(),row*SchemaCard.NUM_COLS,(row+1)*SchemaCard.NUM_COLS )));
+        }
+
+
+        int height= SCHEMA_HEIGHT+ (playerId==player.getPlayerId()?1:0);
+        //add bottom border
+        schem.add(height,padUntil("",width,'–'));
         //add left/right borders
-        schem= appendRows(appendRows(buildSeparator(SCHEMA_HEIGHT+1),schem),buildSeparator(SCHEMA_HEIGHT+1));
+        schem= appendRows(
+                buildSeparator(height+1)
+                ,schem);
+        schem= appendRows(schem,buildSeparator(height+1));
 
         return schem;
     }
@@ -367,6 +397,15 @@ public class CLIView {
     }
 
 
+    private List<String> buildSchemaRowsIndex(int row){
+        List<String> index= new ArrayList<>();
+
+        for(int i=0; i<CELL_HEIGHT;i++){
+            index.add("  ");
+        }
+        index.set(CELL_HEIGHT/2,row+" ");
+        return index;
+    }
 
     /**
      * this creates the info section of a schema card
@@ -375,10 +414,12 @@ public class CLIView {
     private String buildSchemaInfo(LightPlayer player) {
         if(player==null){throw new IllegalArgumentException();}
 
-        return String.format(cliElems.getElem("username-id"),
-                player.getUsername(),
-                uiMsg.getMessage("player-number"),
-                player.getPlayerId());
+        String info=String.format(cliElems.getElem("username-id"),
+                player.getUsername(),alignRight(uiMsg.getMessage("player-number") +
+                        player.getPlayerId(),SCHEMA_WIDTH-player.getUsername().length()));
+
+        return info;
+
     }
 
     /**
@@ -421,7 +462,7 @@ public class CLIView {
     private static List<String> colorWall(List<String> wall){
         Random randomGen = new Random();
         for(int row=0 ; row <wall.size();row++){
-            wall.set(row,addColorToLine(wall.get(row),Color.values()[randomGen.nextInt(Color.values().length -1)]));
+            wall.set(row,addColorToLine(wall.get(row),Color.values()[randomGen.nextInt(Color.values().length )]));
         }
         return wall;
     }
