@@ -56,15 +56,15 @@ public class LightSchemaCard {
 
         for(int i=3;i<parsed.length;i++){
             String [] cellcontent=parsed[i].trim().split(",");
-            int index= (Integer.parseInt(cellcontent[1]) * SchemaCard.NUM_COLS) + Integer.parseInt(cellcontent[2]);
+            int index= Integer.parseInt(cellcontent[1]);
             if(cellcontent[0].equals("D")){
-                map.put(index,new LightDie(cellcontent[4],cellcontent[3]));
+                map.put(index,new LightDie(cellcontent[3],cellcontent[2]));
             }else{
-                map.put(index,new LightConstraint(cellcontent[3]));
+                map.put(index,new LightConstraint(cellcontent[2]));
             }
         }
 
-        return new LightSchemaCard(parsed[2],map);
+        return new LightSchemaCard(parsed[2].replaceAll("_"," "),map);
     }
 
     /**

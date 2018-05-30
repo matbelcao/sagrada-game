@@ -33,10 +33,10 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public LightCard getPrivateObj() {
+    public LightCard getPrivateObject() {
         LightCard card = null;
         try {
-            card = remoteObj.getPrivateObj();
+            card = remoteObj.getPrivateObject();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -44,10 +44,10 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public List<LightCard> getPublicObjs() {
+    public List<LightCard> getPublicObjects() {
         List<LightCard> result = null;
         try {
-            result = remoteObj.getPublicObjs();
+            result = remoteObj.getPublicObjects();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -116,10 +116,10 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public List<LightSchemaCard> draftSchema() {
+    public List<LightSchemaCard> getSchemaDraft() {
         List <LightSchemaCard>result = null;
         try {
-           result = remoteObj.draftSchema();
+           result = remoteObj.getSchemaDraft();
         } catch (RemoteException e) {
             e.printStackTrace();
         }

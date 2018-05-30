@@ -276,7 +276,7 @@ public class Client {
                 quit();
             }
             if(command.equals("TEST")){
-                clientUI.printmsg(clientConn.getPrivateObj().toString());
+                clientUI.printmsg(clientConn.getPrivateObject().toString());
             }
             if(!command.equals("")){
                 clientConn.sendDebugMessage(command);

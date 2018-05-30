@@ -132,6 +132,8 @@ public class ClientParserTest {
 
         assertTrue(ClientParser.parse("SEND tool 1 name desc true", parsedResult));
 
+        assertTrue(ClientParser.parse("SEND favor_tokens 2", parsedResult));
+
         assertTrue(ClientParser.parse("SEND players 1,3", parsedResult));
         assertEquals("SEND",parsedResult.get(0));
         assertEquals("players",parsedResult.get(1));

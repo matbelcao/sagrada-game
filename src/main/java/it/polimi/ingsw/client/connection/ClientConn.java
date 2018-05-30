@@ -25,12 +25,12 @@ public interface ClientConn {
     /**
      * This method asks the server for the private objective of the user
      */
-    LightCard getPrivateObj();
+    LightCard getPrivateObject();
 
     /**
      * This method asks the server for the public objectives of the match, the server will send all three of them following this request
      */
-    List<LightCard> getPublicObjs();
+    List<LightCard> getPublicObjects();
 
     /**
      * This method asks the server for the tools of the match, the server will send all three of them following this request
@@ -67,7 +67,7 @@ public interface ClientConn {
     /**
      * This method asks the server to draft four schemas for the initial choice of the player's schema
      */
-    List<LightSchemaCard> draftSchema();
+    List<LightSchemaCard> getSchemaDraft();
 
     List<Integer> selectDie(int index);
 

@@ -30,12 +30,12 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     }
 
     @Override
-    public LightCard getPrivateObj() throws RemoteException {
+    public LightCard getPrivateObject() throws RemoteException {
         return LightCard.toLightCard(user.getGame().getPrivCard(user));
     }
 
     @Override
-    public List<LightCard> getPublicObjs() throws RemoteException {
+    public List<LightCard> getPublicObjects() throws RemoteException {
         List<LightCard> lightCards = new ArrayList<>();
         List<PubObjectiveCard> cards = user.getGame().getPubCards();
         for (PubObjectiveCard c : cards) {
@@ -55,7 +55,7 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     }
 
     @Override
-    public List<LightSchemaCard> draftSchema() throws RemoteException {
+    public List<LightSchemaCard> getSchemaDraft() throws RemoteException {
         List<SchemaCard>  schemas = user.getGame().getSchemaCards(user);
         List<LightSchemaCard> lightSchema = new ArrayList<>();
         for (SchemaCard s : schemas) {

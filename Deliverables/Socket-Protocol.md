@@ -59,12 +59,12 @@ The server sends this message to all players in the lobby after a successful log
 +   __`PLAYER0`__ to __`SERVER`__  
 
 	`LOGIN PLAYER0 p455w0rd`
-	
+
 +   __`SERVER`__ to __`PLAYER0`__  
 
 	`LOGIN ok`  
 	`LOBBY 1`
-	
+
 +   __`PLAYER1`__ to __`SERVER`__  
 
 	`LOGIN PLAYER0 p455w0rd`
@@ -79,13 +79,13 @@ The server sends this message to all players in the lobby after a successful log
 +   __`SERVER`__ to __`PLAYER1`__  
 
 	`LOGIN ok`
-	
+
 +   __`SERVER`__ to __`PLAYER0`__ and __`PLAYER1`__  
 
-	`LOBBY 2` 
-	
+	`LOBBY 2`
+
 +   `...`
-	
+
 ## Round Evolution
 ### Server-side
 ###### Notice: all of the server-side messages in this section are sent in broadcast to all players. The players reply with a simple `ACK game` to each message they receive.
@@ -133,21 +133,21 @@ this message is sent to the server in casse the client wants to end his turn bef
 
 
 ### Example Session
-	
+
 +  `...`
-	
+
 +   __`SERVER`__ to __`PLAYER0`__
-	
+
 	`GAME start 2 0`
-	
+
 +   __`SERVER`__ to __`PLAYER1`__
-	
+
 	`GAME start 2 1`
-	
+
 +   __`PLAYER0`__ and __`PLAYER1`__ to __`SERVER`__
 
 	`ACK game`
-	
+
 +   `...`
 
 
@@ -160,7 +160,7 @@ this message is sent to the server in casse the client wants to end his turn bef
 +   `draft`: optional parameter to request four random schema cards at the match beginning (only one time)
 +   `<player_id>`: the player whose schema card the user wants to obtain
 
-The client sends this message to request the updated schema card or the complete schema card (in case of reconnection or if it's the beginning of the first round). The draft option makes the server send the four schema cards the user has to choose from. 
+The client sends this message to request the updated schema card or the complete schema card (in case of reconnection or if it's the beginning of the first round). The draft option makes the server send the four schema cards the user has to choose from.
 
 ##### `GET favor_tokens <player_id>`
 +   `<player_id>`: the player whose favor tokens the user wants to obtain
@@ -175,20 +175,19 @@ This message is used to get the number of tokens remaining to the specified play
 +   `draftpool`: the user requests the dice in the draftpool
 +   `roundtrack`: the user requests the dice in the roundtrack
 +   `players`: the user requests the list of players of the match
- 
+
 
 The client sends this message to request the card parameters, some dice in the board or info about other players.
 
 ### Server-side
 ###### Notice: the following messages of this section all require an `ACK send` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
-##### `SEND schema <name> [{D,<row>,<column>,<color>,<shade>]|  {C,<row>,<column>,<color>|<shade>}] ...`
+##### `SEND schema <name> [{D,<index>,<color>,<shade>]|  {C,<index>,<color>|<shade>}] ...`
 
 +   `schema`: signals that the schema is being sent in its entirety
 +   `<name>`: the name of the schema
 +   `D`: the cell is occupied by a die
 +   `C`: there is a constraint in the cell
-+   `<row>`: the cell's row
-+   `<column>`: the cell's column
++   `<index>`: the cell's index in the schema (0 to 19)
 +   `<color>`: the color property
 +   `<shade>`: the shade property
 
@@ -222,7 +221,7 @@ The server responds with this message to give information about the dice placed 
 ##### `SEND favor_tokens <player_id> <num_tokens>`
 +   `<player_id>`: the id of the player the tokens belong to
 +   `<num_tokens>`: the number of remaining tokens
- 
+
 
 ##### `SEND players {<player_id>,<username>} ...`
 
@@ -236,30 +235,30 @@ This message is used to send a list of the players of the match and their userna
 +   `...`
 
 +   __`PLAYER0`__ and __`PLAYER1`__ to __`SERVER`__
-	
+
 	`GET players`
-	
+
 +   __`SERVER`__ to __`PLAYER0`__ and __`PLAYER1`__  
 
 	`SEND players 0,PLAYER0 1,PLAYER1`  
 
 +   __`PLAYER0`__ and __`PLAYER1`__ to __`SERVER`__
-	
+
 	`ACK send`
 
 +   __`PLAYER0`__ and __`PLAYER1`__ to __`SERVER`__
-	
+
 	`GET schema draft`
 +   __`SERVER`__ to __`PLAYER0`__
-	
+
 	`SEND schema C,0,0,THREE C,1,2,GREEN ...`
-	
+
 +   __`PLAYER0`__ to __`SERVER`__
-	
+
 	`ACK send`
-	
+
 +   `...`
-	
+
 ## Game Management
 ### Client-side
 ##### `GET_DICE_LIST schema|roundtrack|draftpool`
@@ -287,13 +286,13 @@ This message is used to signal the intention of a player to use a specific toolc
 
 ### Server-side
 ###### Notice: the following messages of this section starting with `LIST` require an `ACK list` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
-##### `LIST schema|roundtrack|draftpool [<index>,[<row>,<column>|<round>,<number>],<color>,<shade>] ...`
+##### `LIST schema|roundtrack|draftpool [<index>,[<schema_index>|<round>,<number>],<color>,<shade>] ...`
 
 +   `schema`: provides an ordered list of the positions of the player's schema that have a die in place. The client can then `SELECT` a die from this list using the command above to obtain a list of possible placements (for example while using tool cards)
 +   `roundtrack`: provides an ordered list of the dice that are in the roundtrack
 +   `draftpool`: provides an ordered list of the dice of the draftpool
 +   `<index>`: (starting from 0) is the index of the item in the list that was requested, this is what will be used to later select the die
-+   `<row>,<column>`: theese fields are filled in if the list is about the dice in a schema
++   `<schema_index>`: those field is filled if the list is about the dice in a schema (0 to 19)
 +   `<round>,<number>`: theese fields are filled in if the list regards the roundtrack
 +   if the `draftpool` is the subject, only `<index>,<color>,<shade>` are specified
 +   `<color>,<shade>`: represent the characteristics of the die
@@ -302,20 +301,20 @@ This message is used to signal the intention of a player to use a specific toolc
 This message is used in order to create a list of valid options the client can later select a die from with the `SELECT` command. The die will be definitively chosen and actually placed only after a valid sequence of `GET_DICE_LIST ...`, `SELECT die <index>`, `CHOOSE die_placement <index>` [see the example below].
 
 ##### `LIST placements [<index>,<position>] ...`
-+   `placements`: signals that a list of possible placements for a  selected die is being sent 
++   `placements`: signals that a list of possible placements for a  selected die is being sent
 +   `<index>`: this is the index (starting from 0) in the list of placements, this will be used to `CHOOSE` the placement later on
 +   `<position>`: this is the actual position inside the schema where the die can be placed (from 0 to 19)
 
-   
+
 __NOTICE__: `<index>` and `<position>` might be the same in some cases but are not 	meant 	to always be, in general `<position>`≥ `<index>`.
 
 ##### `LIST tool_details <index> <id> <has_been_used> ok|ko`
-+   `<index>`: this is the index of the requested tool card (the same as in `SELECT tool <index>`) 
++   `<index>`: this is the index of the requested tool card (the same as in `SELECT tool <index>`)
 +   `<id>`: this is the id of the tool card (1 to 12)
 +   `<has_been_used>`: this is `true` if the toolcard has already been used, false otherwise
 +   `ok|ko`: ok if the tool can be used by the user, ko if not
 
-This message is used to give updated data on a toolcard and the ability of the player to use it or not. 
+This message is used to give updated data on a toolcard and the ability of the player to use it or not.
 
 ### Client-side
 
@@ -358,14 +357,14 @@ This is used in toolcard #11 to set the new face of the die that he has drafted 
 +   `ok`: this signals a valid choice
 +   `ko`: this signals an invalid choice sent to the server with `CHOOSE`
 
-This is used within the procedure of the toolcards #1,5,6,10,11 
+This is used within the procedure of the toolcards #1,5,6,10,11
 
 ##### `CHOICE ko|ok rerolled_dice`
 +   `rerolled_dice`: follows a `CHOOSE tool` where the selected tool is the #7 and reports to the user the fact that it was used (rerolling all draftpool dice)
 +   `ok`: this signals a valid choice
 +   `ko`: this signals an invalid choice sent to the server with `CHOOSE`
 
-This message if ok triggers the user to get an update of the draftpool 
+This message if ok triggers the user to get an update of the draftpool
 
 
 ### Example Session
@@ -379,7 +378,7 @@ This message if ok triggers the user to get an update of the draftpool
 +   __`SERVER`__ to __`PLAYER0`__
 
 	`CHOICE ok`
-	
+
 +   __`PLAYER1`__ to __`SERVER`__
 
 	`CHOOSE schema 3`
@@ -390,18 +389,18 @@ This message if ok triggers the user to get an update of the draftpool
 
 +   __`SERVER`__ to __`PLAYER0`__ and __`PLAYER1`__  
 
-	`GAME round_start 0` 
-	
+	`GAME round_start 0`
+
 +   __`PLAYER0`__ to __`SERVER`__
 
 	`GET schema 1`
-	
+
 +   `...`
 
 +   __`SERVER`__ to __`PLAYER0`__ and __`PLAYER1`__  
 
-	`GAME turn_start 0 0` 
-	
+	`GAME turn_start 0 0`
+
 +   __`PLAYER0`__ to __`SERVER`__
 
 	`GET draftpool`
@@ -411,7 +410,7 @@ This message if ok triggers the user to get an update of the draftpool
 +   __`PLAYER0`__ to __`SERVER`__
 
 	`GET_DICE_LIST draftpool`
-	
+
 +   __`SERVER`__ to __`PLAYER0`__
 
 	`LIST draftpool 0,RED,FOUR 1,BLUE,THREE ...`
@@ -430,8 +429,8 @@ This message if ok triggers the user to get an update of the draftpool
 
 	`CHOICE ok`
 +   `...`
-	
-	
+
+
 ## Player Status
 ### Client-side
 ##### `QUIT`
@@ -453,7 +452,7 @@ This message is sent to all connected users and also serves the purpose of notif
 +   __`SERVER`__ to __`PLAYER0`__ and __`PLAYER1`__
 
 	`GAME round_start 6`
-	
+
 +   __`PLAYER1`__ to __`SERVER`__
 
 	`ACK game`
@@ -461,15 +460,15 @@ This message is sent to all connected users and also serves the purpose of notif
 +   __`PLAYER0`__ to __`SERVER`__
 
 	`...`
-	
+
 +   __`SERVER`__ to __`PLAYER1`__
 
 	`STATUS disconnect 0`
-	
+
 +   __`PLAYER0`__ to __`SERVER`__
 
 	`LOGIN PLAYER0 p455w0rd`
-	
+
 +   __`SERVER`__ to __`PLAYER0`__ and __`PLAYER1`__
 
 	`STATUS reconnect 0`
@@ -477,9 +476,9 @@ This message is sent to all connected users and also serves the purpose of notif
 +   __`PLAYER0`__ to __`SERVER`__
 
 	`GET ...`
-	
+
 	`...`
-	
+
 
 ## Acknowledgement Messages
 ### Client-side
@@ -487,14 +486,14 @@ This message is sent to all connected users and also serves the purpose of notif
 ##### `ACK game|send|list|status`
 
 +   `game`: in reply to a message regarding __Round Evolution__
-+   `send`: if replying to a `SEND` 
++   `send`: if replying to a `SEND`
 +   `list`: if replying to a `LIST` message from __Game management__
 +   `status`: the information received concerned the change of a player's status
 
 The receiver reports to the sender that he has received the information correctly. An `ACK` is always sent to the server in reply to every `SEND`,`GAME` or `STATUS` message.
 
 ## Dice and Constraints Syntax
-###### In this section is reported the dice coding used in the client-server communication. 
+###### In this section is reported the dice coding used in the client-server communication.
 |   color   |    shade    |
 |:-----------:|:-----------:|
 |   RED     |     ONE     |

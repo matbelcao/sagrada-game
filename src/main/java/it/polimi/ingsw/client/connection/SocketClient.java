@@ -201,7 +201,7 @@ public class SocketClient implements ClientConn {
     }
 
     @Override
-    public LightCard getPrivateObj() {
+    public LightCard getPrivateObject() {
         ArrayList<String> result= new ArrayList<>();
         LightPrivObj lightObjCard=null;
 
@@ -216,7 +216,7 @@ public class SocketClient implements ClientConn {
     }
 
     @Override
-    public List<LightCard> getPublicObjs() {
+    public List<LightCard> getPublicObjects() {
             ArrayList<String> result= new ArrayList<>();
             List<LightCard> pubObjCards=new ArrayList<>();
             LightCard lightObjCard;
@@ -284,7 +284,7 @@ public class SocketClient implements ClientConn {
         List<List<CellContent>> roundTrack=new ArrayList<>();
         List<CellContent> container=new ArrayList<>();
         CellContent lightCell;
-        int index=0;
+        int index=-1;
         String args[];
 
         outSocket.println("GET roundtrack");
@@ -297,19 +297,13 @@ public class SocketClient implements ClientConn {
             for (int i = GET_PARAMS_START; i < result.size(); i++) {
                 args = result.get(i).split(",");
                 lightCell = new LightDie(args[2], args[1]);
-                if (index == Integer.parseInt(args[0])) {
-                    container.add(lightCell);
-                } else {
-                    roundTrack.add(Integer.parseInt(args[0]), container);
+                if (index != Integer.parseInt(args[0])) {
                     container = new ArrayList<>();
-                    container.add(lightCell);
                     index = Integer.parseInt(args[0]);
+                    roundTrack.add(index,container);
                 }
+                (roundTrack.get(index)).add(lightCell);
             }
-            if (!container.isEmpty()) {
-                roundTrack.add(index, container);
-            }
-
         }
         return roundTrack;
     }
@@ -367,7 +361,7 @@ public class SocketClient implements ClientConn {
     }
 
     @Override
-    public List<LightSchemaCard> draftSchema() {
+    public List<LightSchemaCard> getSchemaDraft() {
         ArrayList<String> result= new ArrayList<>();
         List<LightSchemaCard> lightSchemaCards=new ArrayList<>();
         LightSchemaCard lightSchema;
@@ -417,7 +411,7 @@ public class SocketClient implements ClientConn {
         outSocket.println("SELECT tool "+index);
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("tool")){
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("tool_details")){
             inSocket.pop();
             if(Integer.parseInt(result.get(2))==index){
                 lightTool.setUsed(Boolean.parseBoolean(result.get(4)));
