@@ -116,6 +116,11 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
+    public void endTurn() {
+
+    }
+
+    @Override
     public List<LightSchemaCard> getSchemaDraft() {
         List <LightSchemaCard>result = null;
         try {
@@ -127,12 +132,32 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
+    public List<IndexedCellContent> getSchemaDiceList() {
+        return null;
+    }
+
+    @Override
+    public List<List<IndexedCellContent>> getRoundTrackDiceList() {
+        return null;
+    }
+
+    @Override
+    public List<IndexedCellContent> getDraftpoolDiceList() {
+        return null;
+    }
+
+    @Override
     public List<Integer> selectDie(int index) {
         return null;
     }
 
     @Override
     public boolean selectTool(LightTool lightTool, int index) {
+        return false;
+    }
+
+    @Override
+    public boolean choose(String type, int index) {
         return false;
     }
 

@@ -184,6 +184,9 @@ public class ValidatorTest {
     @Test
     public void testCheckChoose() {
 
+        assertTrue(Validator.isValid("GET_DICE_LIST schema", parsedResult));
+        assertTrue(Validator.checkGetDiceListParams("GET_DICE_LIST schema", parsedResult));
+
         //valid
         command = "CHOOSE die_placement 6";
 

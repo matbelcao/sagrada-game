@@ -56,26 +56,38 @@ public class SocketClient implements ClientConn {
                     inSocket.add();
 
                     if(ClientParser.parse(inSocket.readln(),result)) {
-
-                        //STATUS
-
-                        if (ClientParser.isStatus(inSocket.readln())) {
+                        if(ClientParser.isAck(inSocket.readln())){
                             inSocket.pop();
-                            manageStatusMsg(result);
-
-                            //LOBBY
-
-                        } else if (ClientParser.isLobby(inSocket.readln())) {
-                            updateLobby(result.get(1));
+                        }else if(ClientParser.isStatus(inSocket.readln())) {
+                            switch (result.get(1)) {
+                                case "check":
+                                    pong();
+                                    break;
+                                case "reconnect":
+                                    break;
+                                case "disconnect":
+                                    break;
+                                case "quit":
+                                    break;
+                            }
                             inSocket.pop();
-
-                            //GAME
+                        }  else if (ClientParser.isLobby(inSocket.readln())) {
+                                updateLobby(result.get(1));
+                                inSocket.pop();
 
                         } else if (ClientParser.isGame(inSocket.readln())) {
                             updateMessages(result);
                             inSocket.pop();
 
-                        } else if (ClientParser.isList(inSocket.readln())) {
+                        }
+
+
+
+
+
+                        //------now for testing(to remove and use connection's methods)-----
+
+                        else if (ClientParser.isList(inSocket.readln())) {
                             switch (result.get(1)) {
                                 case "schema":
                                     client.printDebug(inSocket.readln());
@@ -112,46 +124,15 @@ public class SocketClient implements ClientConn {
         }).start();
     }
 
-
-
-    private void manageStatusMsg(List<String> parsed){
-
-        //STATUS check
-        if (parsed.get(1).equals("check")) {
-            this.pong();
-        }
-
-        //STATUS reconnect
-        if (parsed.get(1).equals("reconnect")) {
-
-        }
-
-        //STATUS disconnect
-        if (parsed.get(1).equals("disconnect")) {
-            this.pong();
-        }
-
-        //STATUS quit
-        if (parsed.get(1).equals("quit")) {
-            this.pong();
-        }
-    }
-
-
     //ONLY FOR DEBUG PURPOSES
     public void sendDebugMessage(String message){
         outSocket.println(message);
         outSocket.flush();
     }
 
-
     /**
-     * This method receives the server's message and calls the proper updateXxxx() method (providing the parsed command)
-     * @param rawCommand the server's message
-     */
-
-    /**
-     * This methods provides the client-side login functionality to a socket connection
+     * The client sends this message then waits for a response from the server. This is typically the first message
+     * exchanged between client and server.
      * @param username the username of the user trying to login
      * @param password the password of the user
      * @return true iff the user has been logged into the server
@@ -185,7 +166,7 @@ public class SocketClient implements ClientConn {
     }
 
     /**
-     * This method notifies the server of the closure of the communication and closes the socket.
+     * This function can be invoked to notify the server of the closure of the communication and closes the socket.
      */
     @Override
     public void quit(){
@@ -198,235 +179,6 @@ public class SocketClient implements ClientConn {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public LightCard getPrivateObject() {
-        ArrayList<String> result= new ArrayList<>();
-        LightPrivObj lightObjCard=null;
-
-        outSocket.println("GET priv");
-        outSocket.flush();
-
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("priv")) {
-            lightObjCard = LightPrivObj.toLightPrivObj(inSocket.readln());
-            inSocket.pop();
-        }
-        return lightObjCard;
-    }
-
-    @Override
-    public List<LightCard> getPublicObjects() {
-            ArrayList<String> result= new ArrayList<>();
-            List<LightCard> pubObjCards=new ArrayList<>();
-            LightCard lightObjCard;
-
-            outSocket.println("GET pub");
-            outSocket.flush();
-
-            int i=0;
-            while(i<NUM_CARDS){
-                if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("pub")){
-                    lightObjCard=LightCard.toLightCard(inSocket.readln());
-                    pubObjCards.add(lightObjCard);
-                    inSocket.pop();
-                    i++;
-                }
-            }
-            return pubObjCards;
-    }
-
-    @Override
-    public List<LightCard> getTools() {
-        ArrayList<String> result= new ArrayList<>();
-        List<LightCard> toolCards=new ArrayList<>();
-        LightTool lightTool;
-
-        outSocket.println("GET tool");
-        outSocket.flush();
-
-        int i=0;
-        while(i<NUM_CARDS){
-            if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("tool")){
-                lightTool=LightTool.toLightTool(inSocket.readln());
-                toolCards.add(lightTool);
-                inSocket.pop();
-                i++;
-            }
-        }
-        return toolCards;
-    }
-
-    @Override
-    public List<CellContent> getDraftPool() {
-        ArrayList<String> result= new ArrayList<>();
-        List<CellContent> draftPool=new ArrayList<>();
-        CellContent lightCell;
-        String args[];
-
-        outSocket.println("GET draftpool");
-        outSocket.flush();
-
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")){
-            inSocket.pop();
-            for(int i=COMMA_PARAMS_START;i<result.size();i++) {
-                args= result.get(i).split(",");
-                lightCell=new LightDie(args[2],args[1]);
-                draftPool.add(lightCell);
-            }
-        }
-        return draftPool;
-    }
-
-    @Override
-    public List<List<CellContent>> getRoundtrack() {
-        ArrayList<String> result= new ArrayList<>();
-        List<List<CellContent>> roundTrack=new ArrayList<>();
-        List<CellContent> container=new ArrayList<>();
-        CellContent lightCell;
-        int index=-1;
-        String args[];
-
-        outSocket.println("GET roundtrack");
-        outSocket.flush();
-
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("roundtrack")) {
-            inSocket.pop();
-            roundTrack = new ArrayList<>();
-            container = new ArrayList<>();
-            for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
-                args = result.get(i).split(",");
-                lightCell = new LightDie(args[2], args[1]);
-                if (index != Integer.parseInt(args[0])) {
-                    container = new ArrayList<>();
-                    index = Integer.parseInt(args[0]);
-                    roundTrack.add(index,container);
-                }
-                (roundTrack.get(index)).add(lightCell);
-            }
-        }
-        return roundTrack;
-    }
-
-
-    @Override
-    public List<LightPlayer> getPlayers() {
-        ArrayList<String> result= new ArrayList<>();
-        List<LightPlayer> playerList=new ArrayList<>();
-        LightPlayer player;
-        String args[];
-
-        outSocket.println("GET players");
-        outSocket.flush();
-
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("players")){
-            inSocket.pop();
-            for(int i=COMMA_PARAMS_START;i<result.size();i++) {
-                args= result.get(i).split(",");
-                player=new LightPlayer(args[1],Integer.parseInt(args[0]));
-                playerList.add(player);
-            }
-        }
-        return playerList;
-    }
-
-    @Override
-    public int getFavorTokens(int playerId) {
-        ArrayList<String> result= new ArrayList<>();
-        int favor_tokens=0;
-
-        outSocket.println("GET favor_tokens "+playerId);
-        outSocket.flush();
-
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("favor_tokens")){
-            favor_tokens=Integer.parseInt(result.get(1));
-            inSocket.pop();
-        }
-        return favor_tokens;
-    }
-
-    @Override
-    public LightSchemaCard getSchema(int playerId) {
-        ArrayList<String> result= new ArrayList<>();
-        LightSchemaCard lightSchema=null;
-
-        outSocket.println("GET schema "+playerId);
-        outSocket.flush();
-
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")){
-            lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
-            inSocket.pop();
-        }
-        return lightSchema;
-    }
-
-    @Override
-    public List<LightSchemaCard> getSchemaDraft() {
-        ArrayList<String> result= new ArrayList<>();
-        List<LightSchemaCard> lightSchemaCards=new ArrayList<>();
-        LightSchemaCard lightSchema;
-
-        outSocket.println("GET schema draft");
-        outSocket.flush();
-
-        int i=0;
-        while(i<NUM_DRAFTED_SCHEMAS){
-            if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")){
-                lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
-                lightSchemaCards.add(lightSchema);
-                inSocket.pop();
-                i++;
-            }
-        }
-        return lightSchemaCards;
-    }
-
-    public void getDiceList(){
-
-    }
-
-    @Override
-    public List<Integer> selectDie(int index){
-        ArrayList<String> result= new ArrayList<>();
-        ArrayList<Integer> positions=new ArrayList<>();
-        String [] args;
-
-        outSocket.println("SELECT die "+index);
-        outSocket.flush();
-
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("placements")){
-            inSocket.pop();
-            for(int i=COMMA_PARAMS_START;i<result.size();i++) {
-                args= result.get(i).split(",");
-                positions.add(Integer.parseInt(args[1]));
-            }
-        }
-        return positions;
-    }
-
-    @Override
-    public boolean selectTool(LightTool lightTool, int index){
-        ArrayList<String> result= new ArrayList<>();
-
-        outSocket.println("SELECT tool "+index);
-        outSocket.flush();
-
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("tool_details")){
-            inSocket.pop();
-            if(Integer.parseInt(result.get(2))==index){
-                lightTool.setUsed(Boolean.parseBoolean(result.get(4)));
-                return result.get(5).equals("ok");
-            }
-        }
-        return false;
-    }
-
-    /**
-     * This method notifies to the view that the number of player in the lobby has changed
-     * @param lobbySize the new number of players
-     */
-    private void updateLobby(String lobbySize){
-        client.getClientUI().updateLobby(Integer.parseInt(lobbySize));
     }
 
     /**
@@ -469,17 +221,421 @@ public class SocketClient implements ClientConn {
     }
 
     /**
+     * This function can be invoked to notify the server in case the client wants to end his turn before the timer goes off.
+     */
+    @Override
+    public void endTurn(){
+        outSocket.println("GAME end_turn");
+        outSocket.flush();
+    }
+
+    /**
+     * This function can be invoked to request the updated schema card or the complete schema card (in case of reconnection
+     * or if it’s the beginning of the first round).The draft option makes the server send the four schema cards the user
+     * has to choose from.
+     * @return the list of four schema cards immutable objects
+     */
+    @Override
+    public List<LightSchemaCard> getSchemaDraft() {
+        ArrayList<String> result= new ArrayList<>();
+        List<LightSchemaCard> lightSchemaCards=new ArrayList<>();
+        LightSchemaCard lightSchema;
+
+        outSocket.println("GET schema draft");
+        outSocket.flush();
+
+        int i=0;
+        while(i<NUM_DRAFTED_SCHEMAS){
+            if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")){
+                lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
+                lightSchemaCards.add(lightSchema);
+                inSocket.pop();
+                i++;
+            }
+        }
+        return lightSchemaCards;
+    }
+
+    /**
+     * This function can be invoked to request the updated schema card or the complete schema card (in case of reconnection
+     * or if it’s the beginning of the first round) of a scecific user.
+     * @param playerId the id of the player's desired schema card
+     * @return one schema card immutable object
+     */
+    @Override
+    public LightSchemaCard getSchema(int playerId) {
+        ArrayList<String> result= new ArrayList<>();
+        LightSchemaCard lightSchema=null;
+
+        outSocket.println("GET schema "+playerId);
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")){
+            lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
+            inSocket.pop();
+        }
+        return lightSchema;
+    }
+
+    /**
+     * This function can be invoked to request the private objective card parameters
+     * @return one private objective card immutable object
+     */
+    @Override
+    public LightCard getPrivateObject() {
+        ArrayList<String> result= new ArrayList<>();
+        LightPrivObj lightObjCard=null;
+
+        outSocket.println("GET priv");
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("priv")) {
+            lightObjCard = LightPrivObj.toLightPrivObj(inSocket.readln());
+            inSocket.pop();
+        }
+        return lightObjCard;
+    }
+
+    /**
+     * This function can be invoked to request the three public objective cards parameters
+     * @return a list of three public objective cards immutable objects
+     */
+    @Override
+    public List<LightCard> getPublicObjects() {
+            ArrayList<String> result= new ArrayList<>();
+            List<LightCard> pubObjCards=new ArrayList<>();
+            LightCard lightObjCard;
+
+            outSocket.println("GET pub");
+            outSocket.flush();
+
+            int i=0;
+            while(i<NUM_CARDS){
+                if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("pub")){
+                    lightObjCard=LightCard.toLightCard(inSocket.readln());
+                    pubObjCards.add(lightObjCard);
+                    inSocket.pop();
+                    i++;
+                }
+            }
+            return pubObjCards;
+    }
+
+    /**
+     * This function can be invoked to request the three toolcards parameters
+     * @return a list of three toolcards immutable objects
+     */
+    @Override
+    public List<LightCard> getTools() {
+        ArrayList<String> result= new ArrayList<>();
+        List<LightCard> toolCards=new ArrayList<>();
+        LightTool lightTool;
+
+        outSocket.println("GET tool");
+        outSocket.flush();
+
+        int i=0;
+        while(i<NUM_CARDS){
+            if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("tool")){
+                lightTool=LightTool.toLightTool(inSocket.readln());
+                toolCards.add(lightTool);
+                inSocket.pop();
+                i++;
+            }
+        }
+        return toolCards;
+    }
+
+    /**
+     * This function can be invoked to request the dice in the draftpool
+     * @return a list of immutable dice contained in the draftpool
+     */
+    @Override
+    public List<CellContent> getDraftPool() {
+        ArrayList<String> result= new ArrayList<>();
+        List<CellContent> draftPool=new ArrayList<>();
+        CellContent lightCell;
+        String args[];
+
+        outSocket.println("GET draftpool");
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")){
+            inSocket.pop();
+            for(int i=COMMA_PARAMS_START;i<result.size();i++) {
+                args= result.get(i).split(",");
+                lightCell=new LightDie(args[2],args[1]);
+                draftPool.add(lightCell);
+            }
+        }
+        return draftPool;
+    }
+
+    /**
+     * This function can be invoked to request the dice in the roundtrack
+     * @return a list of immutable dice contained in the roundtrack
+     */
+    @Override
+    public List<List<CellContent>> getRoundtrack() {
+        ArrayList<String> result= new ArrayList<>();
+        List<List<CellContent>> roundTrack=new ArrayList<>();
+        List<CellContent> container=new ArrayList<>();
+        CellContent lightCell;
+        int index=-1;
+        String args[];
+
+        outSocket.println("GET roundtrack");
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("roundtrack")) {
+            inSocket.pop();
+            roundTrack = new ArrayList<>();
+            container = new ArrayList<>();
+            for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
+                args = result.get(i).split(",");
+                lightCell = new LightDie(args[2], args[1]);
+                if (index != Integer.parseInt(args[0])) {
+                    container = new ArrayList<>();
+                    index = Integer.parseInt(args[0]);
+                    roundTrack.add(index,container);
+                }
+                (roundTrack.get(index)).add(lightCell);
+            }
+        }
+        return roundTrack;
+    }
+
+    /**
+     * The client invokes this function to request the list of players of the match
+     * @return a list of immutable players that are playing the match
+     */
+    @Override
+    public List<LightPlayer> getPlayers() {
+        ArrayList<String> result= new ArrayList<>();
+        List<LightPlayer> playerList=new ArrayList<>();
+        LightPlayer player;
+        String args[];
+
+        outSocket.println("GET players");
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("players")){
+            inSocket.pop();
+            for(int i=COMMA_PARAMS_START;i<result.size();i++) {
+                args= result.get(i).split(",");
+                player=new LightPlayer(args[1],Integer.parseInt(args[0]));
+                playerList.add(player);
+            }
+        }
+        return playerList;
+    }
+
+    /**
+     * This function can be invoked to get the number of tokens remaining to the specified player.
+     * @param playerId the id of the player (0 to 3)
+     * @return the number of favor tokens of the specific player
+     */
+    @Override
+    public int getFavorTokens(int playerId) {
+        ArrayList<String> result= new ArrayList<>();
+        int favor_tokens=0;
+
+        outSocket.println("GET favor_tokens "+playerId);
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("favor_tokens")){
+            favor_tokens=Integer.parseInt(result.get(1));
+            inSocket.pop();
+        }
+        return favor_tokens;
+    }
+
+    /**
+     * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
+     * in the schema card
+     * @return and immutable and indexed list containing the dice
+     */
+    @Override
+    public List<IndexedCellContent> getSchemaDiceList(){
+        ArrayList<String> result= new ArrayList<>();
+        List<IndexedCellContent> diceList=new ArrayList<>();
+        IndexedCellContent indexedDie;
+        String [] args;
+
+        outSocket.println("GET_DICE_LIST schema");
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("schema")){
+            inSocket.pop();
+            for(int i=COMMA_PARAMS_START;i<result.size();i++) {
+                args= result.get(i).split(",");
+                indexedDie=new IndexedCellContent(Integer.parseInt(args[1]),args[3],args[2]);
+                diceList.add(indexedDie);
+            }
+        }
+        return diceList;
+    }
+
+    /**
+     * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
+     * in the roundtrack
+     * @return an immutable and indexed list containing the dice
+     */
+    @Override
+    public List<List<IndexedCellContent>> getRoundTrackDiceList(){
+        ArrayList<String> result= new ArrayList<>();
+        List<List<IndexedCellContent>> roundTrack=new ArrayList<>();
+        List<IndexedCellContent> container=new ArrayList<>();
+        IndexedCellContent indexedDie;
+        String[] args;
+        int round=-1;
+
+        outSocket.println("GET_DICE_LIST roundtrack");
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("roundtrack")) {
+            inSocket.pop();
+            roundTrack = new ArrayList<>();
+            container = new ArrayList<>();
+            for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
+                args = result.get(i).split(",");
+                indexedDie = new IndexedCellContent(Integer.parseInt(args[2]), args[4],args[3]);
+                if (round != Integer.parseInt(args[1])) {
+                    container = new ArrayList<>();
+                    round = Integer.parseInt(args[1]);
+                    roundTrack.add(round,container);
+                }
+                (roundTrack.get(round)).add(indexedDie);
+            }
+        }
+        return roundTrack;
+    }
+
+    /**
+     * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
+     * in the draft pool
+     * @return an immutable and indexed list containing the dice
+     */
+    @Override
+    public List<IndexedCellContent> getDraftpoolDiceList() {
+        ArrayList<String> result = new ArrayList<>();
+        List<IndexedCellContent> draftPool = new ArrayList<>();
+        IndexedCellContent indexedDie;
+        String args[];
+
+        outSocket.println("GET_DICE_LIST draftpool");
+        outSocket.flush();
+
+        while (ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")) {
+            inSocket.pop();
+            for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
+                args = result.get(i).split(",");
+                indexedDie = new IndexedCellContent(Integer.parseInt(args[0]),args[2], args[1]);
+                draftPool.add(indexedDie);
+            }
+        }
+        return draftPool;
+    }
+
+    /**
+     * This function can be invoked to the server to specify the possible placements in the user’s schema of a die that is
+     * temporarily selected by the user.
+     * @param index the index (starting from 0) of the die in a given list
+     * @return an immutable and indexed list of possible placements
+     */
+    @Override
+    public List<Integer> selectDie(int index){
+        ArrayList<String> result= new ArrayList<>();
+        ArrayList<Integer> positions=new ArrayList<>();
+        String [] args;
+
+        outSocket.println("SELECT die "+index);
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("placements")){
+            inSocket.pop();
+            for(int i=COMMA_PARAMS_START;i<result.size();i++) {
+                args= result.get(i).split(",");
+                positions.add(Integer.parseInt(args[1]));
+            }
+        }
+        return positions;
+    }
+
+    /**
+     * This function can be invoked to signal the intention of a player to use a specific toolcard
+     * @param lightTool the toolcard the player wants to use
+     * @param index the index (0 to 3) of the die in a previously given list
+     * @return true if the card has been selected correctly
+     */
+    @Override
+    public boolean selectTool(LightTool lightTool, int index){
+        ArrayList<String> result= new ArrayList<>();
+
+        outSocket.println("SELECT tool "+index);
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("tool_details")){
+            inSocket.pop();
+            if(Integer.parseInt(result.get(2))==index){
+                lightTool.setUsed(Boolean.parseBoolean(result.get(4)));
+                return result.get(5).equals("ok");
+            }
+        }
+        return false;
+    }
+
+    /**
+     *  This function can be invoked to notify the server in order to make a possibly definitive choice. The server is
+     *  still going to do his checks and will reply.
+     * @param type the subject of the choice (die_placement,schema or tool)
+     * @param index the index of the object in the list previously sent by the server
+     * @return true if the procedure is successful
+     */
+    @Override
+    public boolean choose(String type, int index){
+        ArrayList<String> result=new ArrayList<>();
+        if(!(type.equals("die_placement")||type.equals("schema")||type.equals("tool"))){return false;}
+
+        outSocket.println("SELECT "+type+" "+index);
+        outSocket.flush();
+
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isChoice(inSocket.readln())){
+            inSocket.pop();
+            if(result.get(1).equals("ok")){
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * This message is sent to the server when the client that received a list of possible placement for a die chooses
+     * not to place that die
+     */
+    public void discard(){
+        outSocket.println("DISCARD");
+        outSocket.flush();
+    }
+
+    /**
+     * This method notifies to the view that the number of player in the lobby has changed
+     * @param lobbySize the new number of players
+     */
+    private void updateLobby(String lobbySize){
+        client.getClientUI().updateLobby(Integer.parseInt(lobbySize));
+    }
+
+    /**
      * This method provides the ping functionality for the client-side hearthBreath thread
      * @return false iff the connection has broken
      */
     @Override
     public boolean pong() {
-        //Debug
-        //System.out.println("ping_buono!!");
         try{
             outSocket.println("ACK status");
             outSocket.flush();
-
         } catch (Exception e) {
             return false;
         }

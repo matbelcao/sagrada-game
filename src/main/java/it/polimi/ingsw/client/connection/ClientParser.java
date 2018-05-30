@@ -102,6 +102,11 @@ public class ClientParser {
         return message.trim().split("\\s+",2)[0].equals("INVALID");
     }
 
+    public static boolean isAck(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("ACK");
+    }
+
     /**
      * This method checks if the LOGIN parameters have a correct number of arguments (nothing has been lost during the communication) and format
      * @param parsedResult the parsed parameters of the command

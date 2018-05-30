@@ -64,14 +64,24 @@ public interface ClientConn {
      */
     LightSchemaCard getSchema(int playerId);
 
+    void endTurn();
+
     /**
      * This method asks the server to draft four schemas for the initial choice of the player's schema
      */
     List<LightSchemaCard> getSchemaDraft();
 
+    public List<IndexedCellContent> getSchemaDiceList();
+
+    List<List<IndexedCellContent>> getRoundTrackDiceList();
+
+    List<IndexedCellContent> getDraftpoolDiceList();
+
     List<Integer> selectDie(int index);
 
     boolean selectTool(LightTool lightTool, int index);
+
+    boolean choose(String type, int index);
 
     /**
      * This method is used to check the state of the connection of the user associated with the ClientConn
