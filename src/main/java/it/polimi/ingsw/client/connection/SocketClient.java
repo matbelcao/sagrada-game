@@ -3,13 +3,11 @@ package it.polimi.ingsw.client.connection;
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.immutables.*;
-import it.polimi.ingsw.server.model.Board;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class is the implementation of the SOCKET client-side connection methods
@@ -195,10 +193,9 @@ public class SocketClient implements ClientConn {
                 client.updateGameStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
                 break;
             case "end":
-                List<LightPlayer> playerData = client.getPlayers();
                 for(i=COMMA_PARAMS_START; i<outcomes.size();i++){
                     param=outcomes.get(i).split(",");
-                    LightPlayer player=playerData.get(Integer.parseInt(param[0]));
+                    LightPlayer player=client.getBoard().getPlayerByIndex(Integer.parseInt(param[0]));
                     if (player.getPlayerId()==Integer.parseInt(param[0])){
                         player.setPoints(Integer.parseInt(param[1]));
                         player.setFinalPosition(Integer.parseInt(param[2]));

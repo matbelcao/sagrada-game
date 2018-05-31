@@ -35,7 +35,7 @@ public class CLIView {
     private int nowPlaying;
 
     public CLIView(UILanguage lang) throws InstantiationException {
-        cliElems=new CLIElems();
+        this.cliElems=new CLIElems();
         this.uiMsg=new UIMessages(lang);
 
     }
@@ -51,13 +51,17 @@ public class CLIView {
 
         builder.append(printList(buildDraftPool())).append(" |%n");
 
-        builder.append(printList(appendRows(schemas.get(playerId),menuList))).append("%n");
+        builder.append(printList(buildBottomSection())).append("%n");
 
         builder.append(padUntil("",SCHEMA_WIDTH+6,' ')+String.format(cliElems.getElem("prompt"),uiMsg.getMessage("message-prompt")));
 
         return builder.toString();
     }
 
+    private List<String> buildBottomSection() {
+        List<String> result=appendRows(schemas.get(playerId),menuList);
+        return result;
+    }
 
 
     private static String printList(List<String> toPrint){
@@ -146,7 +150,7 @@ public class CLIView {
                 roundNumber,
                 uiMsg.getMessage("turn"),
                 turnNumber);
-        List<String> updateSchema= new ArrayList<>();
+        List<String> updateSchema;
 
         updateSchema=schemas.get(nowPlaying);
         Random randomGen = new Random();
@@ -520,9 +524,9 @@ public class CLIView {
     private List<String> buildTool(LightTool tool){
         List<String> result;
         result= buildCard(tool);
-        result.add(String.format(cliElems.getElem("tokens-info"),
-                uiMsg.getMessage("tokens"),
-                tool.isUsed()?"2":"1"));
+        if(tool.isUsed()) {
+            result.set(0, result.get(0)+ " \154");
+        }
         return result;
     }
 

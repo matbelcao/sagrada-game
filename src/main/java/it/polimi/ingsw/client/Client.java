@@ -8,7 +8,6 @@ import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UIMode;
 import it.polimi.ingsw.common.enums.UserStatus;
-import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 import it.polimi.ingsw.server.connection.RMIServerObject;
@@ -27,7 +26,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class represents a client that can connect to the server and participate to a match of the game.
@@ -38,11 +36,8 @@ public class Client {
     private UIMode uiMode;
     private ConnectionMode connMode;
     private String username;
-    private String password;
+    private char [] password;
     private int playerId, turnOfPlayer;
-    //-----old stuff------
-    List<LightPlayer> players;
-
 
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
@@ -171,21 +166,13 @@ public class Client {
      * this sets the password of the client (this will be used to try and login and may differ from the one in the server)
      * @param password the password to be set
      */
-    public void setPassword(String password) { this.password = password; }
+    public void setPassword(char[] password) { this.password = password; }
 
     /**
      * @return the set username
      */
     public String getUsername() { return username; }
 
-    /**
-     * @return the set password
-     */
-    public String getPassword(){ return password; }
-
-    public List<LightPlayer> getPlayers(){
-        return players;
-    }
 
     /**
      * @return the object that is the connection of the client towards the server
@@ -233,6 +220,7 @@ public class Client {
                 } else {
                     logged = clientConn.login(username, password);
                 }
+                this.
             } while (!logged);
             synchronized (lockStatus) {
                 userStatus = UserStatus.LOBBY;
@@ -256,10 +244,10 @@ public class Client {
         AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
         if(authenticator.authenticate(username,password)){
             //get the stub of the remote object
-            RMIClientInt rmiConnStub = (RMIClientInt) Naming.lookup("rmi://"+serverIP+"/"+username+password);
+            RMIClientInt rmiConnStub = (RMIClientInt) Naming.lookup("rmi://"+serverIP+"/"+username);
             clientConn = new RMIClient(rmiConnStub, this);
             RMIServerInt rmiServerObject = new RMIServerObject(this);
-            //check if the method is necessary or just exend unicast remote obj in RMIServerObject
+            //check if the method is necessary or just extend unicast remote obj in RMIServerObject
             RMIServerInt remoteRef = (RMIServerInt) UnicastRemoteObject.exportObject(rmiServerObject, 0);
             authenticator.setRemoteReference(remoteRef,username);
             clientUI.updateConnectionOk();

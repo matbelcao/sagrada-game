@@ -9,7 +9,7 @@ import it.polimi.ingsw.server.model.Game;
  */
 public class User{
     private String username;
-    private String password;
+    private char [] password;
     private UserStatus status;
     private ConnectionMode connectionMode;
     private ServerConn serverConn;
@@ -20,7 +20,7 @@ public class User{
      * @param username the user's username
      * @param password the user's password
      */
-    public User(String username, String password){
+    public User(String username, char[] password){
        this.username = username;
        this.password = password;
        this.status = UserStatus.CONNECTED;
@@ -36,7 +36,7 @@ public class User{
      * Returns the user's password
      * @return the user password
      */
-    public String getPassword() { return password; }
+    public char[] getPassword() { return password; }
 
     public void disconnect(){
         UserStatus previousStatus=this.getStatus();

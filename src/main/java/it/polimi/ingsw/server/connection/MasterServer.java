@@ -1,5 +1,5 @@
 package it.polimi.ingsw.server.connection;
-import it.polimi.ingsw.common.enums.Color;
+
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.ServerOptions;
 import it.polimi.ingsw.server.model.Game;
@@ -20,6 +20,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -295,17 +296,17 @@ public class MasterServer{
      * @param password the password to be coupled with the username
      * @return true iff the Client gets logged in
      */
-    public boolean login(String username, String password) {
+    public boolean login(String username, char[] password) {
         User user;
         synchronized (this.users) {
             if (this.isIn(username)) {
                 user = getUser(username);
-                if (password.equals(user.getPassword()) && (user.getStatus() == UserStatus.DISCONNECTED)) {
+                if (Arrays.equals(password, user.getPassword()) && (user.getStatus() == UserStatus.DISCONNECTED)) {
                     user.setStatus(UserStatus.CONNECTED);
                     this.printMessage("Logged : "+username);
                     return true;
                 }
-                if(!password.equals(user.getPassword())){
+                if(!Arrays.equals(password, user.getPassword())){
                     this.printMessage("Wrong password : "+username);
                 }else{
                     this.printMessage("User already logged in : "+username);

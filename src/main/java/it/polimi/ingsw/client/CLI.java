@@ -3,47 +3,57 @@ package it.polimi.ingsw.client;
 import it.polimi.ingsw.client.uielements.CLIView;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
-import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
 import it.polimi.ingsw.common.immutables.LightTool;
 
-import java.io.*;
+import java.io.Console;
+import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
 public class CLI implements ClientUI{
     private final CLIView view;
-    private QueuedInReader inKeyboard;
-    //private BufferedReader inKeyboard;
+
+    private Console console
     private PrintWriter outCli;
     private Client client;
     private UIMessages uimsg;
 
     public CLI(Client client,UILanguage lang) throws InstantiationException {
 
+        this.console=System.console();
+
+        if (console == null) {
+            System.err.println("ERR: couldn't retrieve any console!");
+            System.exit(1);
+        }
         this.uimsg=new UIMessages(lang);
         this.client = client;
-        inKeyboard = new QueuedInReader(new BufferedReader(new InputStreamReader(System.in)));
-        //inKeyboard=new BufferedReader(new InputStreamReader(System.in));
-        outCli = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)), true);
         this.view=new CLIView(lang);
     }
 
     public void showLoginScreen() {
         String username;
-        String password;
+        char [] password;
+        MessageDigest digest = null;
+
+        try {
+            digest = MessageDigest.getInstance("SHA-512");
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("ERR: couldn't load password hashing algorithm");
+            System.exit(1);
+        }
+
         try {
             outCli.printf("%n%nUSERNAME: ");
-            inKeyboard.add();
-            username = inKeyboard.getln();
-
-            //username=inKeyboard.readLine();
+            username=console.readLine();
 
             outCli.printf("%nPASSWORD: ");
-            inKeyboard.add();
-            password = inKeyboard.getln();
-            //password=inKeyboard.readLine();
+            password= digest.digest(
+                            ( username.trim().toCharArray() +"bkbdkjsada" + console.readPassword());
 
             client.setPassword(password);
             client.setUsername(username);

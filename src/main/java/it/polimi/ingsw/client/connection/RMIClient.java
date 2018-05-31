@@ -17,7 +17,7 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public boolean login(String username, String password) {
+    public boolean login(String username, char[] password) {
         return false;
     }
 

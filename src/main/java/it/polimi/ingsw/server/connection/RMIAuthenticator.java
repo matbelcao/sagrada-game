@@ -15,7 +15,7 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
     RMIAuthenticator() throws RemoteException {}
 
     @Override
-    public boolean authenticate(String username, String password) {
+    public boolean authenticate(String username, char [] password) {
         MasterServer master = MasterServer.getMasterServer();
         boolean logged = master.login(username,password);
         if(logged){
@@ -24,7 +24,7 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
             try {
                 RMIClientInt RMIclientObj = new RMIClientObject(user);
                 LocateRegistry.getRegistry(master.getIpAddress(),MasterServer.getMasterServer().getRMIPort()) ;
-                Naming.rebind("rmi://"+master.getIpAddress()+"/"+username+password, RMIclientObj);
+                Naming.rebind("rmi://"+master.getIpAddress()+"/"+username, RMIclientObj);
                 master.printMessage("RMI service for client "+username+" published"); //delete
             }catch (RemoteException | MalformedURLException e){
                 e.printStackTrace();
