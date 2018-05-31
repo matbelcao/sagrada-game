@@ -127,6 +127,15 @@ public class Board {
         throw new NoSuchElementException();
     }
 
+    public Player getPlayerById(int playerId) {
+        for(Player p : players){
+            if (p.getGameId()==playerId){
+                return p;
+            }
+        }
+        throw new NoSuchElementException();
+    }
+
     public ToolCard getToolCard(int index) {
         assert (index>=0 && index<NUM_TOOLS);
         return toolCards[index];

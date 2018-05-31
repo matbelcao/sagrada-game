@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.connection;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.model.*;
+import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -25,7 +26,7 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     public void quit() throws RemoteException { user.quit(); }
 
     @Override
-    public LightSchemaCard getSchema(int playerId) throws RemoteException {
+    public LightSchemaCard getSchema(int playerId) throws RemoteException, IllegalActionException {
         return LightSchemaCard.toLightSchema(user.getGame().getUserSchemaCard(playerId,false)); //TODO check if the params have changed
     }
 
@@ -55,8 +56,8 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     }
 
     @Override
-    public List<LightSchemaCard> getSchemaDraft() throws RemoteException {
-        List<SchemaCard>  schemas = user.getGame().getSchemaCards(user);
+    public List<LightSchemaCard> getSchemaDraft() throws RemoteException, IllegalActionException {
+        List<SchemaCard>  schemas = user.getGame().getDraftedSchemaCards(user);
         List<LightSchemaCard> lightSchema = new ArrayList<>();
         for (SchemaCard s : schemas) {
             lightSchema.add(LightSchemaCard.toLightSchema(s));
@@ -80,7 +81,7 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     }
 
     @Override
-    public List<CellContent> getDraftPool() throws RemoteException {
+    public List<CellContent> getDraftPool() throws RemoteException, IllegalActionException {
          List<Die> draftPool = user.getGame().getDraftedDice(false);
          List<CellContent> lightDraftPool = new ArrayList<>();
          for(Die d : draftPool){

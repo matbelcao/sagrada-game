@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.server.model.*;
+import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class SocketServer extends Thread implements ServerConn  {
     @Override
     public void run(){
         String command = "";
-        ArrayList<String> result= new ArrayList<>();
+        ArrayList<String> parsedResult = new ArrayList<>();
         boolean playing = true;
         while(playing){
             try {
@@ -51,7 +52,13 @@ public class SocketServer extends Thread implements ServerConn  {
                 }
 
                 if(!inSocket.isEmpty()){
-                    playing=execute(inSocket.getln());
+                    command=inSocket.getln();
+                    if (Validator.isValid(command, parsedResult)) {
+                        playing = execute(command,parsedResult);
+                    }else{
+                        outSocket.println("INVALID message");
+                        outSocket.flush();
+                    }
                 }
             } catch (IllegalArgumentException e) {
                 user.disconnect();
@@ -70,107 +77,120 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param command the socket's message received
      * @return true if the connection has to be closed
      */
-    private boolean execute(String command) {
-        ArrayList<String> parsedResult = new ArrayList<>();
-
-        if (Validator.isValid(command, parsedResult)) {
+    private boolean execute(String command,ArrayList<String> parsedResult) {
+        try {
             if (Validator.checkQuitParams(command, parsedResult)) {
                 user.quit();
                 return false;
-            }
-            if (Validator.checkGameParams(command, parsedResult)) {
-                if (parsedResult.get(1).equals("end_turn") && user.getGame().gameStarted()) {
-                    user.getGame().startFlow();
-                }
-            }
-            if (Validator.checkChooseParams(command, parsedResult)) {
-                switch (parsedResult.get(1)) {
-                    case "schema":
-                        chooseSchema(Integer.parseInt(parsedResult.get(2)));
-                        break;
-                    case "die_placement":
-                        putDie(Integer.parseInt(parsedResult.get(2)));
-                        break;
-                    case "tool":
-                        break;
-                }
-                return true;
-            }
-            if (Validator.checkGetParams(command, parsedResult)) {
-                switch (parsedResult.get(1)) {
-                    case "schema":
-                        if (parsedResult.get(2).equals("draft")) {
-                            draftSchemaCards();
-                        } else if (user.getGame().gameStarted()) {
-                            sendUserSchemaCard(Integer.parseInt(parsedResult.get(2)));
-                        }
-                        break;
-                    case "favor_tokens":
-                        sendFavorTokens();
-                        break;
-                    case "priv":
-                        sendPrivateObjectiveCard();
-                        break;
-                    case "pub":
-                        sendPublicObjectiveCards();
-                        break;
-                    case "tool":
-                        sendToolCards();
-                        break;
-                    case "draftpool":
-                        sendDraftPoolDice();
-                        break;
-                    case "roundtrack":
-                        sendRoundTrackDice();
-                        break;
-                    case "players":
-                        sendPlayers();
-                        break;
-                }
-                return true;
-            }
-            if (Validator.checkGetDiceListParams(command, parsedResult) && user.getGame().gameStarted()) {
-                switch (parsedResult.get(1)) {
-                    case "schema":
-                        sendSchemaDiceList();
-                        break;
-                    case "roundtrack":
-                        sendRoundTrackDiceList();
-                        break;
-                    case "draftpool":
-                        sendDraftPoolDiceList();
-                        break;
-                }
-                return true;
-            }
-            if (Validator.checkSelectParams(command, parsedResult) && user.getGame().gameStarted()) {
-                switch (parsedResult.get(1)) {
-                    case "die":
-                        selectDie(Integer.parseInt(parsedResult.get(2)));
-                        break;
-                    case "modified_die":
-                        //game.select
-                        break;
-                    case "tool":
-                        //to implement
-                        break;
-                }
-                return true;
-            }
-            if (Validator.checkDiscardParams(command, parsedResult) && user.getGame().gameStarted()) {
+            }else if (Validator.checkGameParams(command, parsedResult)) {
+                gameCommand(parsedResult);
+            }else if (Validator.checkChooseParams(command, parsedResult)) {
+                chooseCommand(parsedResult);
+            }else if (Validator.checkGetParams(command, parsedResult)) {
+                getCommands(parsedResult);
+            }else if (Validator.checkGetDiceListParams(command, parsedResult) ) {
+                listCommand(parsedResult);
+            }else if (Validator.checkSelectParams(command, parsedResult) ) {
+                selectCommand(parsedResult);
+            }else if (Validator.checkDiscardParams(command, parsedResult) ) {
                 discardAction();
-                return true;
-            }
-            if (Validator.checkAckParams(command, parsedResult)) {
+            }else if (Validator.checkAckParams(command, parsedResult)) {
                 switch (parsedResult.get(1)) {
                     case "status":
-                        return true;
+                        break;
                 }
             }
+        } catch (IllegalActionException e) {
+            outSocket.println("ILLEGAL ACTION!!");
+            outSocket.flush();
         }
-        outSocket.println("INVALID message");
-        outSocket.flush();
         return true;
+    }
+
+    private void gameCommand(ArrayList<String> parsedResult) throws IllegalActionException {
+        if (parsedResult.get(1).equals("end_turn")) {
+            if(!user.isMyTurn()){
+                throw new IllegalActionException();
+            }
+            user.getGame().startFlow();
+        }
+    }
+
+    private void listCommand(ArrayList<String> parsedResult) throws IllegalActionException {
+        if(!user.isMyTurn()){throw new IllegalActionException();}
+        switch (parsedResult.get(1)) {
+            case "schema":
+                sendSchemaDiceList();
+                break;
+            case "roundtrack":
+                sendRoundTrackDiceList();
+                break;
+            case "draftpool":
+                sendDraftPoolDiceList();
+                break;
+        }
+    }
+
+    private void selectCommand(ArrayList<String> parsedResult) throws IllegalActionException {
+        if(!user.isMyTurn()){throw new IllegalActionException();}
+        switch (parsedResult.get(1)) {
+            case "die":
+                selectDie(Integer.parseInt(parsedResult.get(2)));
+                break;
+            case "modified_die":
+                //game.select
+                break;
+            case "tool":
+                //to implement
+                break;
+        }
+    }
+
+    private void chooseCommand(ArrayList<String> parsedResult) throws IllegalActionException {
+        if(parsedResult.get(1).equals("schema")){
+            chooseSchema(Integer.parseInt(parsedResult.get(2)));
+            return;
+        }
+        if(!user.isMyTurn()){throw new IllegalActionException();}
+        if ("die_placement".equals(parsedResult.get(1))) {
+            putDie(Integer.parseInt(parsedResult.get(2)));
+
+        } else if ("tool".equals(parsedResult.get(1))) {
+
+        }
+    }
+
+    private void getCommands(ArrayList<String> parsedResult) throws IllegalActionException {
+        switch (parsedResult.get(1)) {
+            case "schema":
+                if (parsedResult.get(2).equals("draft")) {
+                    draftSchemaCards();
+                } else {
+                    sendUserSchemaCard(Integer.parseInt(parsedResult.get(2)));
+                }
+                break;
+            case "favor_tokens":
+                sendFavorTokens();
+                break;
+            case "priv":
+                sendPrivateObjectiveCard();
+                break;
+            case "pub":
+                sendPublicObjectiveCards();
+                break;
+            case "tool":
+                sendToolCards();
+                break;
+            case "draftpool":
+                sendDraftPoolDice();
+                break;
+            case "roundtrack":
+                sendRoundTrackDice();
+                break;
+            case "players":
+                sendPlayers();
+                break;
+        }
     }
 
     /**
@@ -261,10 +281,10 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Sends the client a text description of the four drafted schema card passed as a parameter
      */
-    private void draftSchemaCards(){
+    private void draftSchemaCards() throws IllegalActionException {
         Cell cell;
         Game game= user.getGame();
-        ArrayList<SchemaCard> schemas=(ArrayList<SchemaCard>) game.getSchemaCards(user);
+        ArrayList<SchemaCard> schemas=(ArrayList<SchemaCard>) game.getDraftedSchemaCards(user);
 
         for(SchemaCard s: schemas){
             outSocket.print("SEND schema "+s.getName().replaceAll(" ","_"));
@@ -286,7 +306,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text description of the specific user schema card passed as a parameter
      * @param playerId the Id of the requested player's schema card
      */
-    private void sendUserSchemaCard(int playerId){
+    private void sendUserSchemaCard(int playerId) throws IllegalActionException {
         Cell cell;
         SchemaCard schemaCard = user.getGame().getUserSchemaCard(playerId,false);
 
@@ -350,7 +370,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Sends the client a textual list of the dice in the DraftPool
      */
-    private void sendDraftPoolDice(){
+    private void sendDraftPoolDice() throws IllegalActionException {
         Die die;
         ArrayList<Die> dice= (ArrayList<Die>) user.getGame().getDraftedDice(false);
 
@@ -367,7 +387,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Sends the client a textual list of the dice in the RoundTrack (can be placed multiple die at the same index)
      */
-    private void sendRoundTrackDice(){
+    private void sendRoundTrackDice() throws IllegalActionException {
         List<List<Die>> trackList = user.getGame().getRoundTrackDice(false);
         ArrayList<Die> dieList;
 
@@ -400,7 +420,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Sends the client a text list of the dice contained in the schema card parameter (with an unique INDEX)
      */
-    private void sendSchemaDiceList() {
+    private void sendSchemaDiceList() throws IllegalActionException {
         int index=0;
         Die die;
         SchemaCard schema=user.getGame().getUserSchemaCard(user,false);
@@ -420,7 +440,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Sends the client a text list of the dice contained in the RoundTrack (with an unique INDEX)
      */
-    private void sendRoundTrackDiceList() {
+    private void sendRoundTrackDiceList() throws IllegalActionException {
         int index=0;
         int numberInRound;
         List<List<Die>> trackList = user.getGame().getRoundTrackDice(false);
@@ -444,7 +464,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Sends the client a text list of the dice contained in the DraftPool (with an unique INDEX)
      */
-    private void sendDraftPoolDiceList() {
+    private void sendDraftPoolDiceList() throws IllegalActionException {
         Die die;
         ArrayList<Die> draftedDice= (ArrayList<Die>) user.getGame().getDraftedDice(false);
 
@@ -462,7 +482,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * Allows the user to select the die of the previous list received, then sends the relative list of allowed positions
      * @param index the index of the die previously received by the client
      */
-    private void selectDie(int index){
+    private void selectDie(int index) throws IllegalActionException {
         int placementIndex=0;
         Die die;
         die = user.getGame().selectDie(user,index);
@@ -483,7 +503,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * Allows the user to put the die contained in the previous list received, then sends an answer about the action
      * @param index the index of the die previously selected
      */
-    private void putDie(int index){
+    private void putDie(int index) throws IllegalActionException {
         Boolean placed;
         placed=user.getGame().putDie(user,index);
         if(placed){
@@ -497,7 +517,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Allows the Game model to discard a multiple-message command (for complex actions like putDie(), ToolCard usages)
      */
-    private void discardAction(){
+    private void discardAction() throws IllegalActionException {
         user.getGame().discard();
         outSocket.println("DISCARD ack");
         outSocket.flush();

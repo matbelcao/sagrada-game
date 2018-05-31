@@ -48,6 +48,8 @@ public class ClientParser {
                 return checkStatus(parsedResult);
             case "INVALID":
                 return true;
+            case "ILLEGAL":
+                return true;
             default:
                 parsedResult.clear();
                 return false;
@@ -105,6 +107,11 @@ public class ClientParser {
     public static boolean isAck(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals("ACK");
+    }
+
+    public static boolean isIllegalAction(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("INVALID");
     }
 
     /**

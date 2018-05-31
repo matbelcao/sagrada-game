@@ -2,6 +2,7 @@ package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -72,6 +73,8 @@ public class RMIClient implements ClientConn {
             draftPool = remoteObj.getDraftPool();
         } catch (RemoteException e) {
             e.printStackTrace();
+        } catch (IllegalActionException e) {
+            e.printStackTrace();
         }
         return draftPool;
     }
@@ -105,12 +108,14 @@ public class RMIClient implements ClientConn {
 
     @Override
     public LightSchemaCard getSchema(int playerId) {
-        LightSchemaCard returnedCard;
+        LightSchemaCard returnedCard=null;
         try {
             returnedCard = remoteObj.getSchema(playerId);
         } catch (RemoteException e) {
             e.printStackTrace(); //TODO handle lost connection
             return null;
+        } catch (IllegalActionException e) {
+            e.printStackTrace();
         }
         return returnedCard;
     }
@@ -126,6 +131,8 @@ public class RMIClient implements ClientConn {
         try {
            result = remoteObj.getSchemaDraft();
         } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (IllegalActionException e) {
             e.printStackTrace();
         }
         return result;

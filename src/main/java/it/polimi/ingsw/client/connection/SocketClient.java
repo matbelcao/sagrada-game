@@ -112,7 +112,7 @@ public class SocketClient implements ClientConn {
                         else if(ClientParser.isInvalid(inSocket.readln())){
                             inSocket.pop();
                             client.printDebug("INVALID message");
-                        }else {
+                        }else{
                             client.printDebug("ERR: control error caused by:  " + inSocket.readln());
                             inSocket.pop();
                         }

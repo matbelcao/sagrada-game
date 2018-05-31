@@ -14,7 +14,6 @@ public class User{
     private ConnectionMode connectionMode;
     private ServerConn serverConn;
     private Game game;
-    private Boolean myTurn;
 
     /**
      * Instantiate the user profile and associates it's credentials
@@ -38,14 +37,6 @@ public class User{
      * @return the user password
      */
     public String getPassword() { return password; }
-
-    public Boolean isMyTurn() {
-        return myTurn;
-    }
-
-    public void setTurn(Boolean myTurn) {
-        this.myTurn = myTurn;
-    }
 
     public void disconnect(){
         UserStatus previousStatus=this.getStatus();
@@ -128,6 +119,13 @@ public class User{
      */
     public Game getGame() {
         return game;
+    }
+
+    public boolean isMyTurn(){
+        if(!game.gameStarted()){
+            return false;
+        }
+        return this.equals(game.getUserPlaying());
     }
     
 }

@@ -5,6 +5,7 @@ import it.polimi.ingsw.common.enums.GameStatus;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.common.enums.UserStatus;
+import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
@@ -181,8 +182,15 @@ public class Game extends Thread implements Iterable  {
         }
     }
 
+    public User getUserPlaying(){
+        return userPlaying;
+    }
+
+
     /**
-     * Responds to the request by sending one private objective card to the user of the match
+     * ReUser spon){
+     *     reuserPlaying;rn us
+     * }ds to the request by sending one private objective card to the user of the match
      * @param user the user who made the request
      * @return the card requested
      */
@@ -221,7 +229,8 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      * @return the list of cards requested
      */
-    public List<SchemaCard> getSchemaCards(User user){
+    public List<SchemaCard> getDraftedSchemaCards(User user) throws IllegalActionException {
+        if(board.getPlayer(user).getSchema()!=null){ throw new IllegalActionException(); }
         List<SchemaCard> schemas=new ArrayList<>();
         for (int i=0 ; i < Board.NUM_PLAYER_SCHEMAS ; i++ ){
             schemas.add(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]);
@@ -235,12 +244,13 @@ public class Game extends Thread implements Iterable  {
      * @param override true to not DISCARD the complex action (and reset the RoundStatus class)
      * @return the card requested
      */
-    public SchemaCard getUserSchemaCard(int playerId,boolean override){
+    public SchemaCard getUserSchemaCard(int playerId,boolean override) throws IllegalActionException {
+        if(board.getPlayerById(playerId).getSchema()==null){ throw new IllegalActionException(); }
         if(!override){
             gameStatus=GameStatus.REQUESTED_SCHEMA_CARD;
         }
         if(playerId>=0 && playerId<users.size()){
-            return board.getPlayer(users.get(playerId)).getSchema();
+            return board.getPlayerById(playerId).getSchema();
         }
         return null;
     }
@@ -251,7 +261,8 @@ public class Game extends Thread implements Iterable  {
      * @param override true to not DISCARD the complex action (and reset the RoundStatus class)
      * @return the card requested
      */
-    public SchemaCard getUserSchemaCard(User user, boolean override){
+    public SchemaCard getUserSchemaCard(User user, boolean override) throws IllegalActionException {
+        if(board.getPlayer(user).getSchema()==null){ throw new IllegalActionException(); }
         if(!override){
             gameStatus=GameStatus.REQUESTED_SCHEMA_CARD;
         }
@@ -263,7 +274,8 @@ public class Game extends Thread implements Iterable  {
      * @param override true to not DISCARD the complex action (and reset the RoundStatus class)
      * @return the list of die in the draftpool
      */
-    public List<Die> getDraftedDice(boolean override){
+    public List<Die> getDraftedDice(boolean override) throws IllegalActionException {
+        if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
         if(!override){
             gameStatus=GameStatus.REQUESTED_DRAFT_POOL;
         }
@@ -275,7 +287,8 @@ public class Game extends Thread implements Iterable  {
      * @param override true to not DISCARD the complex action (and reset the RoundStatus class)
      * @return the list of die in the roundtrack
      */
-    public List<List<Die>> getRoundTrackDice(boolean override){
+    public List<List<Die>> getRoundTrackDice(boolean override) throws IllegalActionException {
+        if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
         if(!override){
             gameStatus=GameStatus.REQUESTED_ROUND_TRACK;
         }
@@ -331,7 +344,8 @@ public class Game extends Thread implements Iterable  {
      * @param index the index of the die to select
      * @return the die selected
      */
-    public Die selectDie(User user,int index){
+    public Die selectDie(User user,int index) throws IllegalActionException {
+        if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
         int tempIndex=0;
         if(gameStatus.equals(GameStatus.REQUESTED_SCHEMA_CARD)){
             FullCellIterator diceIterator=(FullCellIterator)board.getPlayer(user).getSchema().iterator();
@@ -375,7 +389,7 @@ public class Game extends Thread implements Iterable  {
      * @param index the index of the die to be placed
      * @return true iff the operation was successful
      */
-    public boolean putDie(User user,int index){
+    public boolean putDie(User user,int index) throws IllegalActionException {
         Die die;
         int realIndex=0;
 
@@ -400,7 +414,8 @@ public class Game extends Thread implements Iterable  {
     /**
      * Allows the User to discard a multiple-message command (for COMPLEX ACTIONS like putDie(), ToolCard usages, ecc)
      */
-    public void discard(){
+    public void discard() throws IllegalActionException {
+        if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
         selectedDie=null;
         gameStatus=GameStatus.TURN_RUN;
     }
