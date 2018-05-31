@@ -26,9 +26,9 @@ public class RoundIteratorTest {
     static void setUp(){
 
         users=new ArrayList<>();
-        users.add(new User("giuda","santana"));
-        users.add(new User("marcello","password1"));
-        users.add(new User("luca","qwerty"));
+        users.add(new User("giuda","santana".toCharArray()));
+        users.add(new User("marcello","password1".toCharArray()));
+        users.add(new User("luca","qwerty".toCharArray()));
         controller = new Game(users);
         controller.createBoard();
     }

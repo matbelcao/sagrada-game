@@ -45,15 +45,15 @@ public class RMIConnectionTest {
         c7.setUsername("g");
         c8.setUsername("h");
         c9.setUsername("i");
-        c1.setPassword("1");
-        c2.setPassword("2");
-        c3.setPassword("3");
-        c4.setPassword("4");
-        c5.setPassword("5");
-        c6.setPassword("6");
-        c7.setPassword("7");
-        c8.setPassword("8");
-        c9.setPassword("9");
+        c1.setPassword("1".toCharArray());
+        c2.setPassword("2".toCharArray());
+        c3.setPassword("3".toCharArray());
+        c4.setPassword("4".toCharArray());
+        c5.setPassword("5".toCharArray());
+        c6.setPassword("6".toCharArray());
+        c7.setPassword("7".toCharArray());
+        c8.setPassword("8".toCharArray());
+        c9.setPassword("9".toCharArray());
 
         assertEquals(0, server.getUsersSize());
         //connection of three clients

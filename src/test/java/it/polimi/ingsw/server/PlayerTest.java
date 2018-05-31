@@ -20,8 +20,8 @@ public class PlayerTest {
 
     @BeforeAll
     static void setUp() {
-        u1 = new User("Mario", "pass1");
-        u2 = new User("Luigi", "pass2");
+        u1 = new User("Mario", "pass1".toCharArray());
+        u2 = new User("Luigi", "pass2".toCharArray());
 
         ArrayList<User> users = new ArrayList<>();
         users.add(u1);

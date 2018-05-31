@@ -130,7 +130,7 @@ public class SocketClient implements ClientConn {
      * @return true iff the user has been logged into the server
      */
     @Override
-    public boolean login(String username, String password) {
+    public boolean login(String username, char [] password) {
         ArrayList<String> parsedResult = new ArrayList<>();
 
         outSocket.println("LOGIN " + username + " " + password);

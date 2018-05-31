@@ -3,21 +3,26 @@ package it.polimi.ingsw.client;
 import it.polimi.ingsw.client.uielements.CLIView;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
+import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
 import it.polimi.ingsw.common.immutables.LightTool;
 
 import java.io.Console;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class CLI implements ClientUI{
     private final CLIView view;
 
-    private Console console
+    private Console console;
     private PrintWriter outCli;
     private Client client;
     private UIMessages uimsg;
@@ -41,19 +46,15 @@ public class CLI implements ClientUI{
         MessageDigest digest = null;
 
         try {
-            digest = MessageDigest.getInstance("SHA-512");
-        } catch (NoSuchAlgorithmException e) {
-            System.err.println("ERR: couldn't load password hashing algorithm");
-            System.exit(1);
-        }
-
-        try {
             outCli.printf("%n%nUSERNAME: ");
-            username=console.readLine();
+            username=console.readLine().trim();
+
+
 
             outCli.printf("%nPASSWORD: ");
-            password= digest.digest(
-                            ( username.trim().toCharArray() +"bkbdkjsada" + console.readPassword());
+            password= Credentials.hash(username,console.readPassword());
+
+
 
             client.setPassword(password);
             client.setUsername(username);
@@ -63,6 +64,15 @@ public class CLI implements ClientUI{
         }
     }
 
+    public static byte[] charToBytes(char[] chars) {
+        CharBuffer charBuffer = CharBuffer.wrap(chars);
+        ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
+        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
+                byteBuffer.position(), byteBuffer.limit());
+        Arrays.fill(charBuffer.array(), '\u0000');
+        Arrays.fill(byteBuffer.array(), (byte) 0);
+        return bytes;
+    }
 
     public void updateLogin(boolean logged) {
         if (logged) {
@@ -165,18 +175,7 @@ public class CLI implements ClientUI{
 
         @Override
     public String getCommand() {
-        //String s="";
-        if(inKeyboard.isEmpty()) {
-            inKeyboard.add();
-        }
-
-        return inKeyboard.getln();
-        /*try {
-            s=inKeyboard.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        //return s;
+        return console.readLine();
     }
 }
 

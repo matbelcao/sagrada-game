@@ -48,7 +48,7 @@ public class SocketAuthenticator extends Thread {
                 command = inSocket.readln();
                 inSocket.pop();
                 if (Validator.checkLoginParams(command, params)) {
-                    if (master.login(params.get(1), params.get(2))) {
+                    if (master.login(params.get(1), params.get(2).toCharArray())) {
                         outSocket.println("LOGIN ok");
                         logged = true;
                         //Setting Socket specific parameters

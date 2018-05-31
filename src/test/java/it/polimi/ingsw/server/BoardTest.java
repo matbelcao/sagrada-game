@@ -16,12 +16,12 @@ public class BoardTest {
 
     @BeforeAll
     static void setUp(){
-        User u1 = new User("Mario", "pass1");
-        User u2 = new User("Luigi", "pass2");
-        u3 = new User("Giovanni", "pass3");
-        User u4 = new User("Giacomo", "pass4");
-        User u5 = new User("Aldo", "pass5");
-        u6 = new User("Paolo", "pass6");
+        User u1 = new User("Mario", "pass1".toCharArray());
+        User u2 = new User("Luigi", "pass2".toCharArray());
+        u3 = new User("Giovanni", "pass3".toCharArray());
+        User u4 = new User("Giacomo", "pass4".toCharArray());
+        User u5 = new User("Aldo", "pass5".toCharArray());
+        u6 = new User("Paolo", "pass6".toCharArray());
 
         users1=new ArrayList<>();
         users2=new ArrayList<>();

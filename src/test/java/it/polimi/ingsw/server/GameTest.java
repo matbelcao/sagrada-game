@@ -10,10 +10,10 @@ public class GameTest {
     @Test
     void testGameConstructor(){
         ArrayList <User> users= new ArrayList<>();
-        users.add(new User("Mario", "1234"));
-        users.add(new User("Aldo", "4321"));
-        users.add(new User("Giovanni", "5678"));
-        users.add(new User("Giacomo", "8765"));
+        users.add(new User("Mario", "1234".toCharArray()));
+        users.add(new User("Aldo", "4321".toCharArray()));
+        users.add(new User("Giovanni", "5678".toCharArray()));
+        users.add(new User("Giacomo", "8765".toCharArray()));
 
         Game game= new Game(users);
         users.clear();

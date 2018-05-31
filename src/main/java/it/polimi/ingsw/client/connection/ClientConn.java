@@ -15,7 +15,7 @@ public interface ClientConn {
      * @param password the password of the user
      * @return true iff the user has been logged into the server
      */
-    boolean login(String username,String password);
+    boolean login(String username,char[] password);
 
 
     /**

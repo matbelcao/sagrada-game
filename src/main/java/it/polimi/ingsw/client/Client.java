@@ -26,6 +26,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * This class represents a client that can connect to the server and participate to a match of the game.
@@ -220,7 +221,7 @@ public class Client {
                 } else {
                     logged = clientConn.login(username, password);
                 }
-                this.
+                Arrays.fill(this.password, ' ');
             } while (!logged);
             synchronized (lockStatus) {
                 userStatus = UserStatus.LOBBY;
