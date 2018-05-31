@@ -50,7 +50,7 @@ public class SocketServer extends Thread implements ServerConn  {
         String command = "";
         ArrayList<String> parsedResult = new ArrayList<>();
         boolean playing = true;
-        while(playing){
+        while(playing && connectionOk){
             try {
                 try {
                     inSocket.add();

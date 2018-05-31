@@ -288,7 +288,6 @@ public class Client {
         }
 
         while(userStatus.equals(UserStatus.PLAYING)) {
-
             command=clientUI.getCommand();
             if (command.equals("QUIT")){
                 quit();

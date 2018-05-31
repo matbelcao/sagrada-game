@@ -3,13 +3,12 @@ package it.polimi.ingsw.client.connection;
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.server.connection.SocketServer;
 import it.polimi.ingsw.server.model.Board;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is the implementation of the SOCKET client-side connection methods
@@ -23,6 +22,9 @@ public class SocketClient implements ClientConn {
     private QueuedInReader inSocket;
     private PrintWriter outSocket;
     private Client client;
+    private Timer pingTimer;
+    private final Object pingLock;
+    private boolean connectionOk;
 
     /**
      * Thi is the class constructor, it instantiates the new socket and the input/output buffers for the communications
@@ -33,11 +35,17 @@ public class SocketClient implements ClientConn {
      */
     public SocketClient(Client client,String address, int port) throws IOException {
         this.client=client;
+        this.pingLock=new Object();
+        connectionOk=true;
         socket = new Socket(address, port);
         inSocket = new QueuedInReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
         outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
 
-        inSocket.add();
+        try {
+            inSocket.add();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         inSocket.pop();
         client.getClientUI().updateConnectionOk();
@@ -48,7 +56,8 @@ public class SocketClient implements ClientConn {
      * reception to the update method
      */
     public void startListening(){
-
+        pingTimer = new Timer();
+        pingTimer.schedule(new connectionTimeout(), 2000);
         new Thread(() -> {
             ArrayList<String> result= new ArrayList<>();
             while(!socket.isClosed()) {
@@ -62,6 +71,9 @@ public class SocketClient implements ClientConn {
                             switch (result.get(1)) {
                                 case "check":
                                     pong();
+                                    /*pingTimer.cancel();
+                                    pingTimer = new Timer();
+                                    pingTimer.schedule(new connectionTimeout(), 2000);*/
                                     break;
                                 case "reconnect":
                                     break;
@@ -621,6 +633,34 @@ public class SocketClient implements ClientConn {
     public void discard(){
         outSocket.println("DISCARD");
         outSocket.flush();
+    }
+
+    public void pingThread(){
+        new Thread(() -> {
+            while(connectionOk) {
+                outSocket.println("STATUS check");
+                outSocket.flush();
+
+
+                try {
+                    Thread.sleep(2100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            quit();
+        }).start();
+    }
+
+    private class connectionTimeout extends TimerTask {
+        @Override
+        public void run(){
+            synchronized (pingLock) {
+                connectionOk = false;
+                pingLock.notifyAll();
+                sendDebugMessage("Connection Timeout!");
+            }
+        }
     }
 
     /**
