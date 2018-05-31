@@ -10,6 +10,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * This class is the implementation of the SOCKET server-side connection methods
@@ -20,6 +22,9 @@ public class SocketServer extends Thread implements ServerConn  {
     private PrintWriter outSocket;
     private AckQueue ack;
     private User user;
+    private Timer pingTimer;
+    private final Object pingLock;
+    private boolean connectionOk;
 
     /**
      * This is the constructor of the class, it starts a thread linked to an open socket
@@ -31,8 +36,10 @@ public class SocketServer extends Thread implements ServerConn  {
         this.user = user;
         this.socket = socket;
         this.ack=new AckQueue();
-
+        this.pingLock = new Object();
+        this.connectionOk=true;
         start();
+        pingThread();
     }
 
     /**
@@ -97,6 +104,7 @@ public class SocketServer extends Thread implements ServerConn  {
             }else if (Validator.checkAckParams(command, parsedResult)) {
                 switch (parsedResult.get(1)) {
                     case "status":
+                        pong();
                         break;
                 }
             }
@@ -523,6 +531,43 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
+    public void pingThread(){
+        new Thread(() -> {
+            while(connectionOk) {
+                outSocket.println("STATUS check");
+                outSocket.flush();
+
+                pingTimer = new Timer();
+                pingTimer.schedule(new connectionTimeout(), 2000);
+                try {
+                    Thread.sleep(2100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            user.disconnect();
+        }).start();
+    }
+
+    /**
+     * Timeot connection
+     */
+    private class connectionTimeout extends TimerTask {
+        @Override
+        public void run(){
+            synchronized (pingLock) {
+                connectionOk = false;
+                pingLock.notifyAll();
+            }
+        }
+    }
+
+    private void pong(){
+        synchronized (pingLock) {
+            pingTimer.cancel();
+            pingLock.notifyAll();
+        }
+    }
 
     @Override
     public boolean ping() {
