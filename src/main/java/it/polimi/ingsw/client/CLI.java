@@ -13,8 +13,6 @@ import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +33,7 @@ public class CLI implements ClientUI{
             System.err.println("ERR: couldn't retrieve any console!");
             System.exit(1);
         }
+        this.outCli= console.writer();
         this.uimsg=new UIMessages(lang);
         this.client = client;
         this.view=new CLIView(lang);
@@ -43,10 +42,9 @@ public class CLI implements ClientUI{
     public void showLoginScreen() {
         String username;
         char [] password;
-        MessageDigest digest = null;
 
         try {
-            outCli.printf("%n%nUSERNAME: ");
+            outCli.print(view.showLoginUsername());
             username=console.readLine().trim();
 
 

@@ -133,7 +133,7 @@ class cliElemsTest {
 
     }
     @Test
-    void testGetOne(){
+    void  testGetOne(){
         System.out.printf(cliel.getBigDie("ONE"));
         System.out.println("");
         System.out.printf(cliel.getBigDie("TWO"));
@@ -158,6 +158,11 @@ class cliElemsTest {
 
 
 
+    }
+
+    public static void main(String [] args){
+        setup();
+        new cliElemsTest().testGetOne();
     }
 
 }

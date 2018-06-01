@@ -56,6 +56,7 @@ public class SocketServer extends Thread implements ServerConn  {
                     inSocket.add();
                 } catch (Exception e) {
                     user.disconnect();
+                    return;
                 }
 
                 if(!inSocket.isEmpty()){

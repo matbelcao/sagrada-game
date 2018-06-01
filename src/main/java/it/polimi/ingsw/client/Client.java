@@ -48,7 +48,7 @@ public class Client {
     private ClientUI clientUI;
     private UILanguage lang;
     private LightBoard board;
-    public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client"+ File.separator; //append class name + ".xml" to obtain complete path
+    public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
 
     /**
      * constructs the client object and sets some parameters
@@ -64,6 +64,7 @@ public class Client {
         this.serverIP = serverIP;
         this.port = port;
         this.lang = lang;
+        this.userStatus = UserStatus.DISCONNECTED;
     }
 
 
@@ -72,8 +73,8 @@ public class Client {
      * @return the newly created client
      */
     private static Client parser(){
-
         File xmlFile= new File(XML_SOURCE+"ClientConf.xml");
+        System.out.println(xmlFile.getAbsolutePath());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -85,15 +86,26 @@ public class Client {
             String serverIP=eElement.getElementsByTagName("address").item(0).getTextContent();
             ConnectionMode connMode=ConnectionMode.valueOf(eElement.getElementsByTagName("connectionMode").item(0).getTextContent());
             UILanguage lang=UILanguage.valueOf(eElement.getElementsByTagName("language").item(0).getTextContent());
-            int port=0;
+            int port;
             if(connMode.equals(ConnectionMode.RMI)){
                 port=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
             }else{ port=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent()); }
-            UserStatus userStatus = UserStatus.DISCONNECTED;
+
             return new Client(uiMode,connMode,serverIP,port,lang);
-        }catch (SAXException | ParserConfigurationException | IOException e1) {
-            return null;
+
+
+
+
+        } catch (ParserConfigurationException e) {
+
+        } catch (IOException e) {
+
+        } catch (SAXException e) {
+
         }
+
+        System.exit(22);
+        return null;
     }
 
     public static Client getNewClient() throws InstantiationException {

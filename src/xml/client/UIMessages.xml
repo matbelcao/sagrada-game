@@ -4,9 +4,17 @@
         <eng>Connection established!</eng>
         <ita>Connessione stabilita!</ita>
     </connection-ok>
+    <login-username>
+        <eng>username:</eng>
+        <ita>username:</ita>
+    </login-username>
+    <login-password>
+        <eng>password:</eng>
+        <ita>password:</ita>
+    </login-password>
     <login-ok>
-        <eng>Welcome %s!</eng>
-        <ita>Benvenuto %s!</ita>
+        <eng>Welcome to Sagrada, %s!</eng>
+        <ita>Benvenuto in Sagrada, %s!</ita>
     </login-ok>
     <login-ko>
         <eng>Could not login, please try again ...</eng>

@@ -8,6 +8,7 @@ import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.SchemaCard;
 
+import java.io.IOException;
 import java.util.*;
 
 public class CLIView {
@@ -39,6 +40,24 @@ public class CLIView {
         this.uiMsg=new UIMessages(lang);
 
     }
+
+
+
+    public String showLoginUsername() {
+        StringBuilder result= new StringBuilder();
+        try {
+
+            result.append(cliElems.getWall());
+        } catch (IOException e) {
+
+        }
+        result.append(String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-username")));
+        return result.toString();
+    }
+    public String showLoginPassword() {
+return"password:";
+    }
+
 
     public String printMainView(){
         StringBuilder builder=new StringBuilder();
@@ -646,5 +665,6 @@ public class CLIView {
         this.playerId=playerId;
         this.numPlayers=numPlayers;
     }
+
 
 }

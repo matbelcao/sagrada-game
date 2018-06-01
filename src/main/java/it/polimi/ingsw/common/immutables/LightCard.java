@@ -33,7 +33,7 @@ public class LightCard {
         return description;
     }
 
-    public String getImgSrc() {
+    public  String getImgSrc() {
         return imgSrc+id;
     }
 
