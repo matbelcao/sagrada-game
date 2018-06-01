@@ -80,10 +80,10 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
     }
 
     private void resetScreenPosition(StringBuilder builder) {
+
+
         builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","%n"));
-        builder.append("\u001b[" + SCREEN_HEIGHT + "A");
-
-
+        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","\u001b[A"));
     }
 
     private List<String> buildBottomSection() {
