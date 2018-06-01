@@ -16,7 +16,7 @@ public class QueuedInReader {
         this.inReader= inReader;
     }
 
-    public void add() {
+    public void add() throws IOException {
         try {
             synchronized (lockReader) {
                 while ((temp = inReader.readLine())==null) {
@@ -31,10 +31,6 @@ public class QueuedInReader {
             e.printStackTrace();
             //debug
             System.out.println("ERR interrupt");
-        } catch (IOException e) {
-            e.printStackTrace();
-            //debug
-            System.out.println("ERR io");
         }
         put();
     }

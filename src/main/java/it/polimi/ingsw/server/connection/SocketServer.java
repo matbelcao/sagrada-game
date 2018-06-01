@@ -39,7 +39,7 @@ public class SocketServer extends Thread implements ServerConn  {
         this.pingLock = new Object();
         this.connectionOk=true;
         start();
-        pingThread();
+        //pingThread();
     }
 
     /**
@@ -532,7 +532,7 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
-    public void pingThread(){
+    /*public void pingThread(){
         new Thread(() -> {
             while(connectionOk) {
                 outSocket.println("STATUS check");
@@ -548,12 +548,12 @@ public class SocketServer extends Thread implements ServerConn  {
             }
             user.disconnect();
         }).start();
-    }
+    }*/
 
     /**
      * Timeot connection
      */
-    private class connectionTimeout extends TimerTask {
+    /*private class connectionTimeout extends TimerTask {
         @Override
         public void run(){
             synchronized (pingLock) {
@@ -561,7 +561,7 @@ public class SocketServer extends Thread implements ServerConn  {
                 pingLock.notifyAll();
             }
         }
-    }
+    }*/
 
     private void pong(){
         synchronized (pingLock) {

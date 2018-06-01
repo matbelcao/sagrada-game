@@ -2,6 +2,7 @@ package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.io.*;
@@ -116,9 +117,16 @@ public class SocketClient implements ClientConn {
                         }
                     }
                 } catch (Exception e) {
-                    this.quit();
+                    try {
+                        socket.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                    client.setUserStatus(UserStatus.DISCONNECTED);
+
                 }
             }
+            System.out.println("QUITTED");
         }).start();
     }
 
@@ -166,8 +174,6 @@ public class SocketClient implements ClientConn {
         outSocket.flush();
         try {
             socket.close();
-            socket=null;
-            inSocket=null;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -626,12 +632,12 @@ public class SocketClient implements ClientConn {
      */
     @Override
     public boolean pong() {
-        try{
+        /*try{
             outSocket.println("ACK status");
             outSocket.flush();
         } catch (Exception e) {
             return false;
-        }
+        }*/
         return true;
     }
 

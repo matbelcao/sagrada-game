@@ -185,6 +185,10 @@ public class Client {
      */
     public String getUsername() { return username; }
 
+    public void setUserStatus(UserStatus status){
+        this.userStatus=status;
+    }
+
 
     /**
      * @return the object that is the connection of the client towards the server
