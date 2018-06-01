@@ -7,21 +7,17 @@ import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
 import it.polimi.ingsw.common.immutables.LightTool;
+import org.fusesource.jansi.AnsiConsole;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 
 import java.io.Console;
-import java.io.PrintWriter;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class CLI implements ClientUI{
     private final CLIView view;
-
     private Console console;
-    private PrintWriter outCli;
     private Client client;
     private UIMessages uimsg;
 
@@ -33,7 +29,8 @@ public class CLI implements ClientUI{
             System.err.println("ERR: couldn't retrieve any console!");
             System.exit(1);
         }
-        this.outCli= console.writer();
+        AnsiConsole.systemInstall();
+
         this.uimsg=new UIMessages(lang);
         this.client = client;
         this.view=new CLIView(lang);
@@ -44,15 +41,11 @@ public class CLI implements ClientUI{
         char [] password;
 
         try {
-            outCli.printf(view.showLoginUsername());
+            console.printf(view.showLoginUsername());
             username=console.readLine().trim();
 
-
-
-            outCli.printf(view.showLoginPassword());
+            console.printf(view.showLoginPassword());
             password= Credentials.hash(username,console.readPassword());
-
-
 
             client.setPassword(password);
             client.setUsername(username);
@@ -62,21 +55,12 @@ public class CLI implements ClientUI{
         }
     }
 
-    public static byte[] charToBytes(char[] chars) {
-        CharBuffer charBuffer = CharBuffer.wrap(chars);
-        ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
-        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
-                byteBuffer.position(), byteBuffer.limit());
-        Arrays.fill(charBuffer.array(), '\u0000');
-        Arrays.fill(byteBuffer.array(), (byte) 0);
-        return bytes;
-    }
 
     public void updateLogin(boolean logged) {
         if (logged) {
-            outCli.printf(String.format("%s%n", uimsg.getMessage("login-ok")), client.getUsername());
+            console.printf(String.format("%s%n", uimsg.getMessage("login-ok")), client.getUsername());
         } else {
-            outCli.printf(String.format("%s%n", uimsg.getMessage("login-ko")));
+            console.printf(String.format("%s%n", uimsg.getMessage("login-ko")));
         }
     }
 
@@ -85,14 +69,14 @@ public class CLI implements ClientUI{
 
     }
 
-    public void updateConnectionOk() { outCli.printf(String.format("%n%s", uimsg.getMessage("connection-ok"))); }
+    public void updateConnectionOk() { console.printf(String.format("%n%s", uimsg.getMessage("connection-ok"))); }
 
     public void updateLobby(int numUsers){
-        outCli.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
+        console.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
     }
 
     public void updateGameStart(int numUsers, int playerId){
-        outCli.printf(String.format("%s%n", uimsg.getMessage("game-start")),numUsers,playerId);
+        console.printf(String.format("%s%n", uimsg.getMessage("game-start")),numUsers,playerId);
         this.view.setMatchInfo(client.getPlayerId(),client.getBoard().getNumPlayers());
     }
 
@@ -128,7 +112,7 @@ public class CLI implements ClientUI{
 
     
     public void updateRoundStart(int numRound,List<List<LightDie>> roundtrack){
-        outCli.printf(String.format("%s%n", uimsg.getMessage("round")),numRound);
+        console.printf(String.format("%s%n", uimsg.getMessage("round")),numRound);
     }
 
     @Override
@@ -161,14 +145,14 @@ public class CLI implements ClientUI{
 
     public void updateConnectionClosed()
     {
-        outCli.println("Connection closed!");
+        console.printf("Connection closed!%n");
     }
 
-    public void updateConnectionBroken() { outCli.println("Connection broken!");
+    public void updateConnectionBroken() { console.printf("Connection broken!%n");
     }
 
     public void printmsg(String msg){
-        outCli.println(msg);
+        console.printf(msg);
     }
 
         @Override

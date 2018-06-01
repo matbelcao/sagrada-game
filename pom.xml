@@ -60,6 +60,12 @@
 
   <dependencies>
       <dependency>
+          <groupId>org.fusesource.jansi</groupId>
+          <artifactId>jansi</artifactId>
+          <version>1.17.1</version>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
           <groupId>org.junit.jupiter</groupId>
           <artifactId>junit-jupiter-api</artifactId>
           <version>5.1.0</version>
@@ -93,6 +99,12 @@
           <groupId>org.jetbrains</groupId>
           <artifactId>annotations-java5</artifactId>
           <version>RELEASE</version>
+      </dependency>
+      <dependency>
+          <groupId>org.fusesource.jansi</groupId>
+          <artifactId>jansi</artifactId>
+          <version>1.17.1</version>
+          <scope>compile</scope>
       </dependency>
   </dependencies>
 </project>

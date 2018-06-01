@@ -7,8 +7,8 @@ import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.SchemaCard;
-
 import java.io.IOException;
+import org.fusesource.jansi.*;
 import java.util.*;
 
 public class CLIView {
@@ -19,8 +19,8 @@ public class CLIView {
     private static final int OBJ_LENGTH = 38;
     private static final int SCREEN_WIDTH = 160;
     private static final int SCREEN_HEIGHT = 53;
-    private static final int MENU_WIDTH=80;
-    private static final int MENU_HEIGHT=20;
+    private static final int MENU_WIDTH = 80;
+    private static final int MENU_HEIGHT = 20;
 
     private String bottomInfo ;
     private String turnRoundinfo;
@@ -83,7 +83,7 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
 
 
         builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","%n"));
-        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","\u001b[A"));
+        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","^[[A"));
     }
 
     private List<String> buildBottomSection() {
