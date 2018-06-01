@@ -44,12 +44,12 @@ public class CLI implements ClientUI{
         char [] password;
 
         try {
-            outCli.print(view.showLoginUsername());
+            outCli.printf(view.showLoginUsername());
             username=console.readLine().trim();
 
 
 
-            outCli.printf("%nPASSWORD: ");
+            outCli.printf(view.showLoginPassword());
             password= Credentials.hash(username,console.readPassword());
 
 

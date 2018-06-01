@@ -8,11 +8,8 @@ import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.SchemaCard;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
 
 public class CLIView {
     private static final int SCHEMA_WIDTH = 35;
@@ -55,6 +52,7 @@ public class CLIView {
         } catch (IOException e) {
 
         }
+        resetScreenPosition(result);
         result.append(String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-username")));
         return result.toString();
     }
@@ -76,7 +74,7 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
 
         builder.append(printList(buildBottomSection())).append("%n");
         resetScreenPosition(builder);
-        builder.append(padUntil("",SCHEMA_WIDTH+6,' ')+String.format(cliElems.getElem("prompt"),uiMsg.getMessage("message-prompt")));
+        builder.append(padUntil("", SCHEMA_WIDTH + 6, ' ')).append(String.format(cliElems.getElem("prompt"), uiMsg.getMessage("message-prompt")));
 
         return builder.toString();
     }

@@ -74,7 +74,6 @@ public class Client {
      */
     private static Client parser(){
         File xmlFile= new File(XML_SOURCE+"ClientConf.xml");
-        System.out.println(xmlFile.getAbsolutePath());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -104,7 +103,7 @@ public class Client {
 
         }
 
-        System.exit(22);
+        System.exit(1);
         return null;
     }
 
