@@ -8,8 +8,11 @@ import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.SchemaCard;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 public class CLIView {
     private static final int SCHEMA_WIDTH = 35;
@@ -18,7 +21,8 @@ public class CLIView {
     private static final int CELL_WIDTH = 7;
     private static final int OBJ_LENGTH = 38;
     private static final int SCREEN_WIDTH = 160;
-
+    private static final int MENU_WIDTH=80;
+    private static final int MENU_HEIGHT=20;
 
     private String bottomInfo ;
     private String turnRoundinfo;
@@ -79,6 +83,10 @@ return"password:";
 
     private List<String> buildBottomSection() {
         List<String> result=appendRows(schemas.get(playerId),menuList);
+        result= appendRows(result,buildSeparator(result.size()));
+        result= appendRows(result,tools);
+
+
         return result;
     }
 
@@ -114,18 +122,27 @@ return"password:";
      */
     public void updateMenuList(List<Integer> placements, Place destination, LightDie die){
         List<String> msg= new ArrayList<>();
-        msg.addAll(buildWall(' ',CELL_HEIGHT-1,1));
-        msg.add(bold(uiMsg.getMessage("can-be-placed")));
+        msg.addAll(buildWall(' ',CELL_HEIGHT-1,MENU_WIDTH-CELL_WIDTH));
+        msg.add(bold(padUntil(uiMsg.getMessage("can-be-placed"),MENU_WIDTH-CELL_WIDTH,' ')));
 
         menuList.addAll(appendRows(buildCell(die),msg));
-        menuList.add(" ");
+        menuList.add(padUntil("",MENU_WIDTH,' '));
 
         if(destination.equals(Place.SCHEMA)){
-            menuList.addAll(buildCoordinatesList(placements));
+            menuList.addAll(padUntil(buildCoordinatesList(placements),MENU_WIDTH,' '));
         }else{
             menuList.addAll(buildIndexList(placements));
         }
+        menuList.addAll(buildWall(' ',MENU_HEIGHT-menuList.size(),MENU_WIDTH));
 
+    }
+
+    private static List<String> padUntil(List<String> toPad,int finalLenght, char filler){
+        List<String> result= new ArrayList<>();
+        for(int i=0; i<toPad.size();i++){
+            result.add(padUntil(toPad.get(i),finalLenght,' '));
+        }
+        return result;
     }
 
     private List<String> buildIndexList(List<Integer> placements) {
@@ -182,6 +199,7 @@ return"password:";
      */
     public void updateTools(List<LightTool> tools){
         for(int i=0;i < Board.NUM_TOOLS;i++){
+            this.tools.add(padUntil("",OBJ_LENGTH,' '));
             this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),i));
             this.tools.addAll(buildTool(tools.get(i)));
         }
@@ -544,7 +562,7 @@ return"password:";
         List<String> result;
         result= buildCard(tool);
         if(tool.isUsed()) {
-            result.set(0, result.get(0)+ " \154");
+            result.set(0, result.get(0)+ " \u2b24");
         }
         return result;
     }
@@ -590,13 +608,13 @@ return"password:";
     /**
      * appends spaces to a string until a defined length is reached
      * @param toPad the string to be padded
-     * @param finalLenght the total final length of the padded string
+     * @param finalLength the total final length of the padded string
      * @return the padded string
      */
-    private static String padUntil(String toPad, int finalLenght, char filler){
-        if(finalLenght<0|| toPad==null||toPad.length()>finalLenght){throw new IllegalArgumentException();}
+    private static String padUntil(String toPad, int finalLength, char filler){
+        if(finalLength<0|| toPad==null||toPad.length()>finalLength){throw new IllegalArgumentException();}
 
-        return toPad+ new String(new char[finalLenght - toPad.length()]).replace("\0", filler+"");
+        return toPad+ new String(new char[finalLength - toPad.length()]).replace("\0", filler+"");
 
     }
 
