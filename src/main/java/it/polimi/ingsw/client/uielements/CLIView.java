@@ -21,6 +21,7 @@ public class CLIView {
     private static final int CELL_WIDTH = 7;
     private static final int OBJ_LENGTH = 38;
     private static final int SCREEN_WIDTH = 160;
+    private static final int SCREEN_HEIGHT = 53;
     private static final int MENU_WIDTH=80;
     private static final int MENU_HEIGHT=20;
 
@@ -50,7 +51,6 @@ public class CLIView {
     public String showLoginUsername() {
         StringBuilder result= new StringBuilder();
         try {
-
             result.append(cliElems.getWall());
         } catch (IOException e) {
 
@@ -59,7 +59,7 @@ public class CLIView {
         return result.toString();
     }
     public String showLoginPassword() {
-return"password:";
+return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-password"));
     }
 
 
@@ -75,10 +75,15 @@ return"password:";
         builder.append(printList(buildDraftPool())).append(" |%n");
 
         builder.append(printList(buildBottomSection())).append("%n");
-
+        resetScreenPosition(builder);
         builder.append(padUntil("",SCHEMA_WIDTH+6,' ')+String.format(cliElems.getElem("prompt"),uiMsg.getMessage("message-prompt")));
 
         return builder.toString();
+    }
+
+    private void resetScreenPosition(StringBuilder builder) {
+        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","\033[F"));
+        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","%n"));
     }
 
     private List<String> buildBottomSection() {
