@@ -81,7 +81,8 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
 
     private void resetScreenPosition(StringBuilder builder) {
         builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","%n"));
-        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","\033[F"));
+        builder.append("\u001b[" + SCREEN_HEIGHT + "A");
+
 
     }
 
