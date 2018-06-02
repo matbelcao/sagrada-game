@@ -87,11 +87,10 @@ public class Die {
 
     /**
      * Rerolls a die
-     * @param die the die to be rerolled
      */
-    public static void reroll(Die die){
+    public void reroll(){
         Random randomGen = new Random();
-        die.setShade(randomGen.nextInt(6)+1);
+        this.setShade(randomGen.nextInt(6)+1);
     }
 
     /**
