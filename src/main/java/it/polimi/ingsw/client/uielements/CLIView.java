@@ -124,6 +124,7 @@ public class CLIView {
         StringBuilder builder= new StringBuilder();
         builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","%n"));
         builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","\u001b[A"));
+
         return builder.toString();
     }
 
@@ -511,6 +512,8 @@ public class CLIView {
                     appendRows(
                             buildSchemaRowsIndex(row),
                             buildCellRow(schema.getCellsMap(),row*SchemaCard.NUM_COLS,(row+1)*SchemaCard.NUM_COLS )));
+            }else{
+                result.addAll(buildCellRow(schema.getCellsMap(),row*SchemaCard.NUM_COLS,(row+1)*SchemaCard.NUM_COLS ));
             }
         }
         return result;
