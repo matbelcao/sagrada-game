@@ -1,8 +1,7 @@
 package it.polimi.ingsw.server.model;
-import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.enums.ModifyDie;
-import it.polimi.ingsw.common.enums.DieQuantity;
+import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
 import it.polimi.ingsw.server.model.toolaction.ToolAction;
 import org.w3c.dom.Document;
@@ -51,6 +50,7 @@ public class ToolCard extends Card{
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
+        toolReader(super.getId());
     }
 
     protected void toolReader(int id){
@@ -108,16 +108,26 @@ public class ToolCard extends Card{
      * @return if the card has been used successfully
      */
     public boolean useTool(Player player) throws NegativeTokensException {
-        if(!used){
-            used =true;
-            player.decreaseFavorTokens(1);
-        }else{
-            player.decreaseFavorTokens(2);
-        }
+
 
         if (this.getId()==8){ player.setSkipsNextTurn(true); }
-        return toolAction.useToolCard(player);
+        return true;
     }
+
+    public boolean enableToolCard(Player player){
+        try {
+            if (!used) {
+                used = true;
+                player.decreaseFavorTokens(1);
+            } else {
+                player.decreaseFavorTokens(2);
+            }
+        } catch (NegativeTokensException e) {
+            return false;
+        }
+        return false;
+    }
+
 
     private boolean modifyDie(Die die){
         Die newDie;
@@ -133,9 +143,40 @@ public class ToolCard extends Card{
         }
     }
 
-    private boolean modifyDie(Die die1,Die die2){
-
+    //SWAPDIE
+    public boolean swapDie(Die die1,Die die2){
+        if(modify.equals(ModifyDie.SWAP)){
+            Color tmpColor=die1.getColor();
+            Face tmpFace=die1.getShade();
+            die1.setShade(die2.getShade().toInt());
+            die1.setColor(die2.getColor().toString());
+            die2.setShade(tmpFace.toInt());
+            die2.setColor(tmpColor.toString());
+            return true;
+        }
         return false;
+    }
+
+    //INCREASE_DECREASE
+    private boolean shadeIncreaseOrDecrease(Die die, int num){
+        try {
+            if (num == +1) {
+                die.increaseShade();
+                return true;
+            } else if (num == -1) {
+                die.decreaseShade();
+                return true;
+            }
+        }catch (IllegalShadeException e) {
+            return false;
+        }
+        return false;
+    }
+
+    //SETSHADE
+    private  boolean setShade(Die die,int shade){
+        die.setShade(shade);
+        return true;
     }
 
     /**
@@ -145,4 +186,5 @@ public class ToolCard extends Card{
     public boolean hasAlreadyUsed(){
         return this.used;
     }
+
 }

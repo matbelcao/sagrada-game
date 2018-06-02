@@ -101,6 +101,8 @@ public class Die {
         this.lightDie = new LightDie(Face.valueOf(shade),this.lightDie.getColor());
     }
 
+    public void setColor(String color){this.lightDie=new LightDie(this.lightDie.getShade(),Color.valueOf(color));}
+
     /**
      * Returns a string representation of the die
      * @return said string

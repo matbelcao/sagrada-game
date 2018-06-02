@@ -411,6 +411,13 @@ public class Game extends Thread implements Iterable  {
         return false;
     }
 
+    public boolean chooseTool(int index) {
+
+
+
+        return false;
+    }
+
     /**
      * Allows the User to discard a multiple-message command (for COMPLEX ACTIONS like putDie(), ToolCard usages, ecc)
      */

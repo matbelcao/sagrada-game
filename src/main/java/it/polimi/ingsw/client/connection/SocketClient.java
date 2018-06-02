@@ -602,7 +602,7 @@ public class SocketClient implements ClientConn {
     @Override
     public boolean choose(String type, int index){
         ArrayList<String> result=new ArrayList<>();
-        if(!(type.equals("die_placement")||type.equals("schema")||type.equals("tool"))){return false;}
+        if(!(type.equals("die_placement")&&!type.equals("schema")&&!type.equals("tool"))){return false;}
 
         outSocket.println("SELECT "+type+" "+index);
         outSocket.flush();

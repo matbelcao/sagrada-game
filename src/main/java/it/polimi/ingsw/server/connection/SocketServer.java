@@ -165,7 +165,7 @@ public class SocketServer extends Thread implements ServerConn  {
             putDie(Integer.parseInt(parsedResult.get(2)));
 
         } else if ("tool".equals(parsedResult.get(1))) {
-
+            useTool(Integer.parseInt(parsedResult.get(2)));
         }
     }
 
@@ -516,6 +516,17 @@ public class SocketServer extends Thread implements ServerConn  {
         Boolean placed;
         placed=user.getGame().putDie(user,index);
         if(placed){
+            outSocket.println("CHOICE ok");
+        }else{
+            outSocket.println("CHOICE ko");
+        }
+        outSocket.flush();
+    }
+
+    private void useTool(int index){
+        Boolean used;
+        used=user.getGame().chooseTool(index);
+        if(used){
             outSocket.println("CHOICE ok");
         }else{
             outSocket.println("CHOICE ko");

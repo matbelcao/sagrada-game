@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.model.Die;
 import it.polimi.ingsw.server.model.ToolCard;
 import org.junit.jupiter.api.Test;
 
@@ -28,5 +29,16 @@ class ToolCardTest {
         assertEquals("Taglierina Manuale",tool3.getName());
         assertEquals("src"+File.separator+"img"+File.separator+"ToolCard"+File.separator+"12.png",tool3.getImgSrc());
         assertEquals("Muovi fino a due dadi dello stesso colore di un solo dado sul Tracciato dei Round (Devi rispettare tutte le restrizioni di piazzamento)",tool3.getDescription());
+    }
+
+    @Test
+    void testSwapDie(){
+        Die die1=new Die("THREE","RED");
+        Die die2=new Die("SIX","GREEN");
+        ToolCard tool5 = new ToolCard(5,MasterServer.XML_SOURCE+"ToolCard.xml");
+        tool5.swapDie(die1,die2);
+        assertEquals("RED",die2.getColor().toString());
+        assertEquals("THREE",die2.getShade().toString());
+        assertEquals("SIX",die1.getShade().toString());
     }
 }
