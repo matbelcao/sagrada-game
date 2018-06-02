@@ -22,7 +22,7 @@ public class CLIView {
     private static final int CELL_WIDTH = 7;
     private static final int OBJ_LENGTH = 38;
     private static final int SCREEN_WIDTH = 160;
-    private static final int SCREEN_HEIGHT =52;
+    private static final int SCREEN_CLEAR =100;
     private static final int MENU_WIDTH = 80;
     private static final int MENU_HEIGHT = 20;
 
@@ -53,12 +53,14 @@ public class CLIView {
 
     public String showLoginUsername() {
         StringBuilder result= new StringBuilder();
+        result.append(resetScreenPosition());
         try {
             result.append(cliElems.getWall());
         } catch (IOException e) {
 
         }
-        result.append(resetScreenPosition());
+        result.append(uiMsg.getMessage("connection-ok")).append("%n");
+
         result.append(String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-username")));
         return result.toString();
     }
@@ -133,8 +135,8 @@ public class CLIView {
             builder.append(ansi().restoreCursorPosition());
         }
         else {
-            builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0", "%n"));
-            builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0", "\u001b[A"));
+            builder.append(new String(new char[SCREEN_CLEAR]).replaceAll("\0", "%n"));
+            builder.append(new String(new char[SCREEN_CLEAR]).replaceAll("\0", "\u001b[A"));
         }
         return builder.toString();
     }

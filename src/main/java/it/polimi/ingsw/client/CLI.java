@@ -8,7 +8,7 @@ import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightPrivObj;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
 import it.polimi.ingsw.common.immutables.LightTool;
-import org.fusesource.jansi.AnsiConsole;
+
 import java.io.Console;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +68,7 @@ public class CLI implements ClientUI{
 
     @Override
     public void updateLobby(int numUsers){
-        console.printf(CLIView.resetScreenPosition());
+        CLIView.resetScreenPosition();
         console.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
     }
 
