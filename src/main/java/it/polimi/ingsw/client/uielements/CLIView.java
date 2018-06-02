@@ -45,8 +45,7 @@ public class CLIView {
     public CLIView(UILanguage lang) throws InstantiationException {
         this.cliElems=new CLIElems();
         this.uiMsg=new UIMessages(lang);
-        //AnsiConsole.systemInstall();
-
+        System.setProperty("file.encoding","UTF8");
     }
 
 
