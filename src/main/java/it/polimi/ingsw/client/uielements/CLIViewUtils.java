@@ -26,7 +26,7 @@ public class CLIViewUtils {
     static final int SCREEN_CLEAR =100;
     static final int MENU_WIDTH = 80;
     static final int MENU_HEIGHT = 21;
-    static final String FAVOR= "⬤";
+    static final String FAVOR= "";
 
     static CLIElems cliElems;
 
@@ -43,7 +43,7 @@ public class CLIViewUtils {
     }
 
     /**
-     * this method is used to clena the screen and to make sure the lines of the page are printed starting from the top of the screen
+     * this method is used to cleanx the screen and to make sure the lines of the page are printed starting from the top of the screen
      */
     public static String resetScreenPosition() {
         StringBuilder builder= new StringBuilder();
