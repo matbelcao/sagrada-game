@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 public class LightSchemaCard {
     private final String name;
     private HashMap<Integer,CellContent> cells=new HashMap<>(30);
+    private int initialFavorTokens;
 
     /**
      * This is the constructor of the class, it's the only way to set dice and constraints where they belong
@@ -25,6 +26,21 @@ public class LightSchemaCard {
         this.cells.putAll(contentMap);
         contentMap.clear();
     }
+
+    /**
+     * This is the constructor of the class, it's the only way to set dice and constraints where they belong
+     * @param name the name of the schema card
+     * @param contentMap a map containing indexes and content(dice or constraints)
+     * @param initialFavorTokens the number of favor tokens associated with the schema
+     */
+    public LightSchemaCard(String name, Map<Integer,CellContent> contentMap,int initialFavorTokens){
+        this.initialFavorTokens=initialFavorTokens;
+        this.name = name;
+        if(!hasValidKeys(contentMap)){ throw new IllegalArgumentException(); }
+        this.cells.putAll(contentMap);
+        contentMap.clear();
+    }
+
 
     /**
      * Returns the light version of the given schema card
@@ -53,8 +69,12 @@ public class LightSchemaCard {
     public static  LightSchemaCard toLightSchema(String schemaCard){
         String [] parsed= schemaCard.trim().split("\\s+");
         Map<Integer,CellContent> map=new HashMap<>();
-
-        for(int i=3;i<parsed.length;i++){
+        int favorTokens;
+        int start=3;
+        if(parsed[3].matches("[0-9]")){
+            start++;
+        }
+        for(int i=start;i<parsed.length;i++){
             String [] cellcontent=parsed[i].trim().split(",");
             int index= Integer.parseInt(cellcontent[1]);
             if(cellcontent[0].equals("D")){
@@ -63,8 +83,16 @@ public class LightSchemaCard {
                 map.put(index,new LightConstraint(cellcontent[2]));
             }
         }
+        if(parsed[3].matches("[0-9]")){
+            favorTokens=Integer.parseInt(parsed[3]);
+            return new LightSchemaCard(parsed[2].replaceAll("_"," "),map,favorTokens);
+        }
 
         return new LightSchemaCard(parsed[2].replaceAll("_"," "),map);
+    }
+
+    public int getFavorTokens() {
+        return initialFavorTokens;
     }
 
     /**

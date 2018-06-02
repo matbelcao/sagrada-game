@@ -181,9 +181,10 @@ The client sends this message to request the card parameters, some dice in the b
 
 ### Server-side
 ###### Notice: the following messages of this section all require an `ACK send` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
-##### `SEND schema <name> [{D,<index>,<color>,<shade>]|  {C,<index>,<color>|<shade>}] ...`
+##### `SEND schema <name> [<favor_tokens>] [{D,<index>,<color>,<shade>|  {C,<index>,<color>|<shade>}] ...`
 
 +   `schema`: signals that the schema is being sent in its entirety
++   `<favor_tokens>`: the number of favor tokens associated with the schema (this is used only when sending the drafted schemas at the beginning of a game)
 +   `<name>`: the name of the schema
 +   `D`: the cell is occupied by a die
 +   `C`: there is a constraint in the cell

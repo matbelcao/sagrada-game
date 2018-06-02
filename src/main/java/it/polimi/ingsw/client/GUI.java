@@ -2,10 +2,7 @@ package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
-import it.polimi.ingsw.common.immutables.CellContent;
-import it.polimi.ingsw.common.immutables.LightDie;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
-import it.polimi.ingsw.common.immutables.LightTool;
+import it.polimi.ingsw.common.immutables.*;
 
 import java.util.List;
 import java.util.Map;
@@ -31,10 +28,6 @@ public class GUI implements ClientUI {
 
     }
 
-    @Override
-    public void showLobby() {
-
-    }
 
     @Override
     public void updateConnectionOk() {
@@ -52,7 +45,7 @@ public class GUI implements ClientUI {
     }
 
     @Override
-    public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas) {
+    public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
 
     }
 

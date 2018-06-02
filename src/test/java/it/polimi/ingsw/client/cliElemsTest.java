@@ -82,7 +82,7 @@ class cliElemsTest {
         cliview.updateSchema(player2);
         cliview.updateSchema(player3);
 
-        cliview.updateRoundTurn(5,0,0);
+        cliview.updateRoundTurn(5,0);
 
         cliview.updateDraftPool(draftpool);
 

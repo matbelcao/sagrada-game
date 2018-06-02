@@ -7,8 +7,8 @@ import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.SchemaCard;
+
 import java.io.IOException;
-import org.fusesource.jansi.*;
 import java.util.*;
 
 public class CLIView {
@@ -22,12 +22,13 @@ public class CLIView {
     private static final int MENU_WIDTH = 80;
     private static final int MENU_HEIGHT = 20;
 
-    private String bottomInfo ;
+    private String bottomInfo;
+    private String lobby;
     private String turnRoundinfo;
     private final HashMap<Integer,List<String>> schemas= new HashMap<>();
     private List<String> objectives;
     private final List<String> tools= new ArrayList<>();
-
+    private List<String> privObj;
     private List<String> roundTrack= new ArrayList<>();
     private List<String> draftPool= new ArrayList<>();
     private final List<String> menuList =new ArrayList<>();
@@ -52,14 +53,32 @@ public class CLIView {
         } catch (IOException e) {
 
         }
-        resetScreenPosition(result);
+        result.append(resetScreenPosition());
         result.append(String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-username")));
         return result.toString();
     }
+
     public String showLoginPassword() {
-return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-password"));
+        return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-password"));
     }
 
+
+    public void updateDraftedSchemas(List<LightSchemaCard> schemaCards){
+        for(int i=0; i<schemaCards.size();i++){
+            List<String> schema=new ArrayList<>();
+
+            schema.add(buildDraftedSchemaInfo(schemaCards.get(i)));
+            schema.addAll(buildSchema(schemaCards.get(i),false));
+        }
+    }
+
+    private String buildDraftedSchemaInfo(LightSchemaCard schemaCard) {
+        return schemaCard.getName()+alignRight(printFavorTokens(schemaCard.getFavorTokens()),SCHEMA_WIDTH);
+    }
+
+    private static String printFavorTokens(int tokens){
+        return new String (new char[tokens]).replaceAll("\0"," \u2b24"  );
+    }
 
     public String printMainView(){
         StringBuilder builder=new StringBuilder();
@@ -73,29 +92,60 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
         builder.append(printList(buildDraftPool())).append(" |%n");
 
         builder.append(printList(buildBottomSection())).append("%n");
-        resetScreenPosition(builder);
+        builder.append(resetScreenPosition());
         builder.append(padUntil("", SCHEMA_WIDTH + 6, ' ')).append(String.format(cliElems.getElem("prompt"), uiMsg.getMessage("message-prompt")));
 
         return builder.toString();
     }
 
-    private void resetScreenPosition(StringBuilder builder) {
-
-
-        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","%n"));
-        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","^[[A"));
+    public String printSchemaChoiceView(){
+        StringBuilder builder=new StringBuilder();
+        builder.append(resetScreenPosition());
+        builder.append(printList(appendRows(buildDraftedSchemas(),privObj))).append("%n%n%n");
+        return builder.toString();
     }
 
+    public void updatePrivObj(LightPrivObj priv){
+        this.privObj=buildPrivObj(priv,OBJ_LENGTH);
+    }
+
+    private List<String> buildDraftedSchemas() {
+        List<String> result= new ArrayList<>(SCHEMA_HEIGHT+2);
+        for(Map.Entry<Integer,List<String>> entry: schemas.entrySet()){
+            result=appendRows(result,entry.getValue());
+        }
+        return result;
+    }
+
+    /**
+     * this method is used to clena the screen and to make sure the lines of the page are printed starting from the top of the screen
+     */
+    public static String resetScreenPosition() {
+        StringBuilder builder= new StringBuilder();
+        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","%n"));
+        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","\u001b[A"));
+        return builder.toString();
+    }
+
+    /**
+     * this method builds the bottom section of the main view by arranging side by side the schema of the user with the list of possible moves he can do
+     * and the three tools of the game
+     * @return a List of strings that represent that view
+     */
     private List<String> buildBottomSection() {
         List<String> result=appendRows(schemas.get(playerId),menuList);
+
         result= appendRows(result,buildSeparator(result.size()));
         result= appendRows(result,tools);
-
 
         return result;
     }
 
-
+    /**
+     * this method is used to create a string that represents a list of strings by appending them one to another separated by a newline
+     * @param toPrint the list to be put in the string
+     * @return said string
+     */
     private static String printList(List<String> toPrint){
         if(toPrint==null){throw new IllegalArgumentException();}
         StringBuilder builder=new StringBuilder();
@@ -105,6 +155,10 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
         return builder.toString();
     }
 
+    /**
+     * this builds the top section by arranging the rivals' schema in a row, and appending pieces of information about the private and public objectives
+     * @return a list of strings that represent that
+     */
     private List<String> buildTopSection(){
         List<String> result=new ArrayList<>();
         for(Map.Entry<Integer,List<String>> entry : schemas.entrySet() ){
@@ -142,6 +196,13 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
 
     }
 
+    /**
+     * this method is used to fill up the space following a certain string until a defined total length is reached
+     * @param toPad the string to be padded
+     * @param finalLenght the final desired length
+     * @param filler the character uset to fill the remaining space
+     * @return a list of strings that represent that
+     */
     private static List<String> padUntil(List<String> toPad,int finalLenght, char filler){
         List<String> result= new ArrayList<>();
         for(int i=0; i<toPad.size();i++){
@@ -150,24 +211,39 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
         return result;
     }
 
-    private List<String> buildIndexList(List<Integer> placements) {
+    /**
+     * this method builds a list of indexes for the menu, those indexes represents possible placements or dice from which to choose
+     * @param indexes the list of possible choices
+     * @return the list of string containing the possible entries
+     */
+    private List<String> buildIndexList(List<Integer> indexes) {
         List<String> list= new ArrayList<>();
-        for(int i=0; i<placements.size();i++){
-            list.add(String.format(cliElems.getElem("li"), i, index(placements.get(i))));
+        for(int i=0; i<indexes.size();i++){
+            list.add(String.format(cliElems.getElem("li"), i, index(indexes.get(i))));
         }
         return list;
 
     }
 
+    /**
+     * this method returns a string that is a formatted version of the index passed to it
+     * @param index the index to be represented
+     * @return the string containing the index
+     */
     private String index(Integer index) {
         return String.format(cliElems.getElem("index"),uiMsg.getMessage("pos"),index);
 
     }
 
-    private List<String> buildCoordinatesList(List<Integer> placements) {
+    /**
+     * this method builds a list of the coordinates (row, column) in a schema in which we can place a some selected die
+     * @param indexes the indexes (0-19) that point to a cell in the schema
+     * @return a list of the coordinates
+     */
+    private List<String> buildCoordinatesList(List<Integer> indexes) {
         List<String> list= new ArrayList<>();
-        for(int i=0; i<placements.size();i++){
-            list.add(String.format(cliElems.getElem("li"), i, rowColmumn(placements.get(i))));
+        for(int i=0; i<indexes.size();i++){
+            list.add(String.format(cliElems.getElem("li"), i, rowColmumn(indexes.get(i))));
         }
         return list;
     }
@@ -178,19 +254,24 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
      * @param player the player whose schema we want to create/update
      */
     public void updateSchema(LightPlayer player){
-        this.schemas.put(player.getPlayerId(), buildSchema(player));
+        this.schemas.put(player.getPlayerId(), buildPlayerSchema(player));
         if(player.getPlayerId()==playerId) {
             this.schemas.get(playerId).set(0, bold(schemas.get(playerId).get(0)));
         }
     }
 
-    public void updateRoundTurn(int roundNumber, int turnNumber,int nowPlaying){
+    /**
+     * updates the information abuot the round, turn and who's playing this turn
+     * @param roundNumber the number of the round
+     * @param nowPlaying the user playing the turn
+     */
+    public void updateRoundTurn(int roundNumber,int nowPlaying){
         this.nowPlaying=nowPlaying;
         turnRoundinfo= String.format(cliElems.getElem("round-turn"),
                 uiMsg.getMessage("round"),
                 roundNumber,
                 uiMsg.getMessage("turn"),
-                turnNumber);
+                nowPlaying);
         List<String> updateSchema;
 
         updateSchema=schemas.get(nowPlaying);
@@ -211,6 +292,11 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
     }
 
 
+    /**
+     * this method calculates and builds a string containing the row and column corresponding to an index in a schema card
+     * @param index the index (0-19) of a cell in the schema
+     * @return a string containing the coordinates
+     */
     private  String rowColmumn(int index){
         int row= index/SchemaCard.NUM_COLS;
         int column= index%SchemaCard.NUM_COLS;
@@ -385,7 +471,7 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
      * builds a list containing strings that represent the schema of a player
      * @return the representation of the schema
      */
-    private List<String>  buildSchema(LightPlayer player){
+    private List<String> buildPlayerSchema(LightPlayer player){
         int width=SCHEMA_WIDTH + (playerId==player.getPlayerId()?2:0);
 
         //add top info
@@ -402,15 +488,7 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
 
         }
 
-        //build schema
-        for(int row=0; row< SchemaCard.NUM_ROWS;row++){
-
-            schem.addAll(appendRows(
-                    player.getPlayerId()==playerId?
-                            buildSchemaRowsIndex(row):
-                            new ArrayList<String>(CELL_HEIGHT)
-                    ,buildCellRow(player.getSchema().getCellsMap(),row*SchemaCard.NUM_COLS,(row+1)*SchemaCard.NUM_COLS )));
-        }
+        schem.addAll(buildSchema(player.getSchema(),player.getPlayerId()==playerId));
 
 
         int height= SCHEMA_HEIGHT+ (playerId==player.getPlayerId()?1:0);
@@ -424,6 +502,20 @@ return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-pass
 
         return schem;
     }
+
+    private List<String> buildSchema(LightSchemaCard schema,boolean setIndexes) {
+        List<String> result= new ArrayList<>();
+        for(int row = 0; row< SchemaCard.NUM_ROWS; row++){
+            if(setIndexes){
+            result.addAll(
+                    appendRows(
+                            buildSchemaRowsIndex(row),
+                            buildCellRow(schema.getCellsMap(),row*SchemaCard.NUM_COLS,(row+1)*SchemaCard.NUM_COLS )));
+            }
+        }
+        return result;
+    }
+
     /**
      * This method sets the line that will be at the top of the interface and will contain generic info about the user
      * @param mode the type of connection the user is using
