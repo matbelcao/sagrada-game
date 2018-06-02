@@ -149,9 +149,6 @@ public class SocketServer extends Thread implements ServerConn  {
             case "modified_die":
                 //game.select
                 break;
-            case "tool":
-                //to implement
-                break;
         }
     }
 
@@ -505,7 +502,6 @@ public class SocketServer extends Thread implements ServerConn  {
                 outSocket.println("");
                 outSocket.flush();
         }
-
     }
 
     /**
@@ -523,9 +519,9 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
-    private void useTool(int index){
+    private void useTool(int index) throws IllegalActionException {
         Boolean used;
-        used=user.getGame().chooseTool(index);
+        used=user.getGame().chooseTool(user,index);
         if(used){
             outSocket.println("CHOICE ok");
         }else{

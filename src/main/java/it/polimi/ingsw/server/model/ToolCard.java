@@ -114,7 +114,7 @@ public class ToolCard extends Card{
         return true;
     }
 
-    public boolean enableToolCard(Player player){
+    public boolean enableToolCard(Player player,int turnFirstOrSecond){
         try {
             if (!used) {
                 used = true;
@@ -122,10 +122,15 @@ public class ToolCard extends Card{
             } else {
                 player.decreaseFavorTokens(2);
             }
+            if (this.getId()==8){
+                if(turnFirstOrSecond==1){return false;}
+                player.setSkipsNextTurn(true);
+            }
+            if(turnFirstOrSecond==0 && this.getId()==7){return false;}
+            return true;
         } catch (NegativeTokensException e) {
             return false;
         }
-        return false;
     }
 
 

@@ -144,12 +144,12 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public List<List<IndexedCellContent>> getRoundTrackDiceList() {
+    public List<List<CellContent>> getRoundTrackDiceList() {
         return null;
     }
 
     @Override
-    public List<IndexedCellContent> getDraftpoolDiceList() {
+    public List<CellContent> getDraftpoolDiceList() {
         return null;
     }
 
@@ -158,10 +158,6 @@ public class RMIClient implements ClientConn {
         return null;
     }
 
-    @Override
-    public boolean selectTool(LightTool lightTool, int index) {
-        return false;
-    }
 
     @Override
     public boolean choose(String type, int index) {

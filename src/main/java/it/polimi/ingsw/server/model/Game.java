@@ -269,6 +269,7 @@ public class Game extends Thread implements Iterable  {
         return board.getPlayer(user).getSchema();
     }
 
+
     /**
      * Responds to the request by sending the draftpool's content to the user of the match
      * @param override true to not DISCARD the complex action (and reset the RoundStatus class)
@@ -411,11 +412,17 @@ public class Game extends Thread implements Iterable  {
         return false;
     }
 
-    public boolean chooseTool(int index) {
-
-
-
-        return false;
+    public boolean chooseTool(User user,int index) throws IllegalActionException {
+        Boolean toolEnabled;
+        if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
+        if(index<0||index>2){return false;}
+        toolEnabled=board.getToolCard(index).enableToolCard(board.getPlayer(user),round.isFirstTurn()?0:1);
+        if(toolEnabled){
+            gameStatus=GameStatus.REQUESTED_TOOL_CARD;
+        }else{
+            discard();
+        }
+        return toolEnabled;
     }
 
     /**
