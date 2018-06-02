@@ -18,7 +18,7 @@ public class CLIView {
     private static final int CELL_WIDTH = 7;
     private static final int OBJ_LENGTH = 38;
     private static final int SCREEN_WIDTH = 160;
-    private static final int SCREEN_HEIGHT = 53;
+    private static final int SCREEN_HEIGHT =54;
     private static final int MENU_WIDTH = 80;
     private static final int MENU_HEIGHT = 20;
 

@@ -209,6 +209,7 @@ public class Client {
      */
     private void setupUI() throws InstantiationException {
         if (uiMode.equals(UIMode.CLI)){
+            AnsiConsole.systemInstall();
             clientUI=new CLI(this,lang);
         }else{
             System.out.println("Launching GUI (still not implemented....");
@@ -381,9 +382,7 @@ public class Client {
     }
 
     public static void main(String[] args){
-        AnsiConsole.systemInstall();
-        System.out.println( ansi().eraseScreen().fg(RED).a("Hello").fg(GREEN).a(" World").reset() );
-        System.out.println("\u001B[31m"+" Hello number 2");
+
         ArrayList<String> options=new ArrayList<>();
         Client client = null;
         try {
