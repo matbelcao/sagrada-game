@@ -11,6 +11,7 @@ import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 import it.polimi.ingsw.server.connection.RMIServerObject;
+import org.fusesource.jansi.AnsiConsole;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -27,6 +28,9 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 
 /**
  * This class represents a client that can connect to the server and participate to a match of the game.
@@ -377,6 +381,9 @@ public class Client {
     }
 
     public static void main(String[] args){
+        AnsiConsole.systemInstall();
+        System.out.println( ansi().eraseScreen().fg(RED).a("Hello").fg(GREEN).a(" World").reset() );
+        System.out.println("\u001B[31m"+" Hello number 2");
         ArrayList<String> options=new ArrayList<>();
         Client client = null;
         try {
