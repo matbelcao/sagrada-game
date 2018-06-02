@@ -33,7 +33,7 @@ public class UIMessages {
 
         }
    }
-   public String getMessage(String msgName){
+   public  String getMessage(String msgName){
         Element msg= (Element) msgFile.getElementsByTagName(msgName).item(0);
         return msg.getElementsByTagName(lang.toString()).item(0).getTextContent();
    }
