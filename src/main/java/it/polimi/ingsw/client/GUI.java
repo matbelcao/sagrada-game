@@ -34,14 +34,14 @@ public class GUI extends Application implements ClientUI {
         Application.launch(GUI.class);
     }
 
+    public GUI(){ instance = this; }
+
     public static GUI getGUI(){
-        //add check if instance is null
         return instance;
     }
 
     @Override
     public void start(Stage primaryStage) {
-        instance = this; //Assign the newly created object to static parameter
         client.setUsername("mario");
 
         primaryStage.setTitle("Drawing Operations Test");
