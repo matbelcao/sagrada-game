@@ -232,23 +232,9 @@ public class Client {
         }else{
             System.out.println("Launching GUI (still not implemented....");
             //Application.launch(GUI.class);//the control passes to the Application, the client is blocked until the window is closed
-            new Thread(() -> GUI.launch(this,lang)).start(); //main continues to run
-            while(GUI.getGUI()==null){
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            clientUI = GUI.getGUI();
-            System.out.println("Reference ottenuta!!");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            clientUI.printmsg("ciao");
+            clientUI=new GUI(this,lang);
+            new Thread(() -> clientUI.showLoginScreen()).start(); //main continues to run
+            clientUI.printmsg("prova di riferimento");
         }
     }
 
@@ -267,10 +253,19 @@ public class Client {
 
             if (connMode.equals(ConnectionMode.SOCKET)) {
                 clientConn = new SocketClient(this, serverIP, port);
-
-                }
+            }
             do {
-                clientUI.showLoginScreen();
+                if(uiMode==UIMode.CLI){
+                    clientUI.showLoginScreen();
+                }else{
+                    while(username==null || password==null){
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
                 if (connMode.equals(ConnectionMode.RMI)) {
                     logged = loginRMI();
                 } else {
