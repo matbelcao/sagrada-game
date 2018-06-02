@@ -397,7 +397,6 @@ public class Client {
     }
 
     public static void main(String[] args){
-
         ArrayList<String> options=new ArrayList<>();
         Client client = null;
         try {

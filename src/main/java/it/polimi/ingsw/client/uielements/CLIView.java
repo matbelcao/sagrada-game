@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.uielements;
 
+import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.client.LightBoard;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
@@ -7,6 +8,9 @@ import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.SchemaCard;
+import org.fusesource.jansi.AnsiConsole;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -41,6 +45,7 @@ public class CLIView {
     public CLIView(UILanguage lang) throws InstantiationException {
         this.cliElems=new CLIElems();
         this.uiMsg=new UIMessages(lang);
+        //AnsiConsole.systemInstall();
 
     }
 
@@ -122,9 +127,15 @@ public class CLIView {
      */
     public static String resetScreenPosition() {
         StringBuilder builder= new StringBuilder();
-        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","%n"));
-        builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0","\u001b[A"));
-
+        Client.getOsName();
+        if(Client.isWindows()){
+            builder.append(ansi().eraseScreen());
+            builder.append(ansi().restoreCursorPosition());
+        }
+        else {
+            builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0", "%n"));
+            builder.append(new String(new char[SCREEN_HEIGHT]).replaceAll("\0", "\u001b[A"));
+        }
         return builder.toString();
     }
 
