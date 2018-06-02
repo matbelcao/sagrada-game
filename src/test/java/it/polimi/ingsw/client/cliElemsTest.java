@@ -86,11 +86,9 @@ class cliElemsTest {
         player2.setSchema(schema2);
         player3.setSchema(schema3);
 
-        try {
+
             cliview= new CLIView(UILanguage.ita);
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        }
+
 
         cliview.setMatchInfo(1,4);
         cliview.setClientInfo(ConnectionMode.SOCKET,player1.getUsername());

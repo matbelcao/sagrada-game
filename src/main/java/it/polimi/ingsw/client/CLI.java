@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.uielements.CLIView;
+import it.polimi.ingsw.client.uielements.CLIViewUtils;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
@@ -65,7 +66,7 @@ public class CLI implements ClientUI{
 
     @Override
     public void updateLobby(int numUsers){
-        CLIView.resetScreenPosition();
+        CLIViewUtils.resetScreenPosition();
         view.setClientInfo(client.getConnMode(),client.getUsername());
         console.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
     }
