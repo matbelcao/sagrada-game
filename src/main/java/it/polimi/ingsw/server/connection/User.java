@@ -1,8 +1,10 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.enums.ConnectionMode;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.model.Game;
+import it.polimi.ingsw.server.model.Player;
 
 /**
  * This class contains the data concerning the user and the connection mode used
@@ -120,6 +122,7 @@ public class User{
     public Game getGame() {
         return game;
     }
+
 
     public boolean isMyTurn(){
         if(!game.gameStarted()){

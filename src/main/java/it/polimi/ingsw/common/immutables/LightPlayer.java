@@ -8,6 +8,8 @@ public class LightPlayer {
     int points;
     int finalPosition;
     LightSchemaCard schema;
+    int favorTokens;
+
 
     public LightPlayer(String username, int playerId) {
         this.username = username;
@@ -27,7 +29,13 @@ public class LightPlayer {
         return lightPlayer;
     }
 
+    public int getFavorTokens() {
+        return favorTokens;
+    }
 
+    public void setFavorTokens(int favorTokens) {
+        this.favorTokens = favorTokens;
+    }
 
     public String getUsername() {
         return username;

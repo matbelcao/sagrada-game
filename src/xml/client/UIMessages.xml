@@ -21,12 +21,12 @@
         <ita>Impossibile effettuare il login, per favore riprova ...</ita>
     </login-ko>
     <lobby-update>
-        <eng>Waiting for other players to connect ... %n%d players are waiting for the start of the game ...</eng>
-        <ita>In attesa della connessione di altri giocatori ... %n%d giocatori stanno aspettando di iniziare la partita ...</ita>
+        <eng>%n%n          Waiting for other players to connect ... %n          %d players are waiting for the start of the game ...</eng>
+        <ita>%n%n          In attesa della connessione di altri giocatori ... %n          %d giocatori stanno aspettando di iniziare la partita ...</ita>
     </lobby-update>
     <game-start>
-        <eng>A new match is starting right now with %d players %nYou are player number %d %n%nGood luck!</eng>
-        <ita>Una nuova partita sta per iniziare con %d giocatori %nSei il giocatore numero %d %n%nBuona fortuna!</ita>
+        <eng>          A new match is starting right now with %d players %n          You are player number %d %n%n          Good luck!</eng>
+        <ita>          Una nuova partita sta per iniziare con %d giocatori %n          Sei il giocatore numero %d %n%n          Buona fortuna!</ita>
     </game-start>
     <connected-via>
         <eng>Connected via:</eng>
@@ -45,8 +45,8 @@
         <ita>Obiettivo privato:</ita>
     </priv-obj>
     <tokens>
-        <eng>Favor tokens:</eng>
-        <ita>Gettoni favore:</ita>
+        <eng>Remaining tokens:</eng>
+        <ita>Gettoni rimanenti:</ita>
     </tokens>
     <tool-number>
         <eng>Tool number:</eng>
@@ -92,4 +92,12 @@
         <eng>Insert your commands here</eng>
         <ita>Digita qui le tue mosse</ita>
     </message-prompt>
+    <quit-option>
+        <eng>to abandon the match type q</eng>
+        <ita>per abbandonare la partita scrivi q</ita>
+    </quit-option>
+    <discard-option>
+        <eng>to discard the selection type d</eng>
+        <ita>per ignorare la selezione type d</ita>
+    </discard-option>
 </messages>

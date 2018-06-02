@@ -12,6 +12,7 @@ import it.polimi.ingsw.server.model.PrivObjectiveCard;
 import it.polimi.ingsw.server.model.PubObjectiveCard;
 import it.polimi.ingsw.server.model.SchemaCard;
 import it.polimi.ingsw.server.model.ToolCard;
+import org.fusesource.jansi.AnsiConsole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +21,17 @@ import java.util.List;
 
 class cliElemsTest {
     private static CLIElems cliel;
+    private static String OS = null;
+    public static String getOsName()
+    {
+        if(OS == null) { OS = System.getProperty("os.name"); }
+        return OS;
+    }
+    public static boolean isWindows()
+    {
+        return getOsName().startsWith("Windows");
+    }
+
 
     static {
         try {
@@ -39,12 +51,17 @@ class cliElemsTest {
     private static LightSchemaCard schema2;
     private static LightSchemaCard schema3;
     private static List<LightDie> draftpool;
-    private static List<List<CellContent>> roundtrack ;
+    private static List<List<LightDie>> roundtrack ;
     private static List<LightCard> obj= new ArrayList<>();
     private static List<LightTool> tools= new ArrayList<>();
     private static List<Integer> list= new ArrayList<>();
     @BeforeAll
     static void setup(){
+
+        getOsName();
+        if(isWindows()){
+            AnsiConsole.systemInstall();
+        }
 
         schema0=LightSchemaCard.toLightSchema(new SchemaCard(1,MasterServer.XML_SOURCE +"SchemaCard.xml"));
         schema1=LightSchemaCard.toLightSchema(new SchemaCard(2,MasterServer.XML_SOURCE +"SchemaCard.xml"));
@@ -82,7 +99,7 @@ class cliElemsTest {
         cliview.updateSchema(player2);
         cliview.updateSchema(player3);
 
-        cliview.updateRoundTurn(5,0,0);
+        cliview.updateRoundTurn(5,0);
 
         cliview.updateDraftPool(draftpool);
 

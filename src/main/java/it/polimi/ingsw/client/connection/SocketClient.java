@@ -357,21 +357,22 @@ public class SocketClient implements ClientConn {
      * @return a list of immutable dice contained in the draftpool
      */
     @Override
-    public List<CellContent> getDraftPool() {
+    public List<LightDie> getDraftPool() {
         ArrayList<String> result= new ArrayList<>();
-        List<CellContent> draftPool=new ArrayList<>();
-        CellContent lightCell;
+        List<LightDie> draftPool=new ArrayList<>();
+        LightDie die;
         String args[];
 
         outSocket.println("GET draftpool");
         outSocket.flush();
 
+
         while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")){
             inSocket.pop();
             for(int i=COMMA_PARAMS_START;i<result.size();i++) {
                 args= result.get(i).split(",");
-                lightCell=new LightDie(args[2],args[1]);
-                draftPool.add(lightCell);
+                die=new LightDie(args[2],args[1]);
+                draftPool.add(die);
             }
         }
         return draftPool;
@@ -382,11 +383,11 @@ public class SocketClient implements ClientConn {
      * @return a list of immutable dice contained in the roundtrack
      */
     @Override
-    public List<List<CellContent>> getRoundtrack() {
+    public List<List<LightDie>> getRoundtrack() {
         ArrayList<String> result= new ArrayList<>();
-        List<List<CellContent>> roundTrack=new ArrayList<>();
-        List<CellContent> container=new ArrayList<>();
-        CellContent lightCell;
+        List<List<LightDie>> roundTrack=new ArrayList<>();
+        List<LightDie> container;
+        LightDie die;
         int index=-1;
         String args[];
 
@@ -399,13 +400,13 @@ public class SocketClient implements ClientConn {
             container = new ArrayList<>();
             for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
                 args = result.get(i).split(",");
-                lightCell = new LightDie(args[2], args[1]);
+                die = new LightDie(args[2], args[1]);
                 if (index != Integer.parseInt(args[0])) {
                     container = new ArrayList<>();
                     index = Integer.parseInt(args[0]);
                     roundTrack.add(index,container);
                 }
-                (roundTrack.get(index)).add(lightCell);
+                (roundTrack.get(index)).add(die);
             }
         }
         return roundTrack;
@@ -488,11 +489,11 @@ public class SocketClient implements ClientConn {
      * @return an immutable and indexed list containing the dice
      */
     @Override
-    public List<List<IndexedCellContent>> getRoundTrackDiceList(){
+    public List<List<CellContent>> getRoundTrackDiceList(){
         ArrayList<String> result= new ArrayList<>();
-        List<List<IndexedCellContent>> roundTrack=new ArrayList<>();
-        List<IndexedCellContent> container=new ArrayList<>();
-        IndexedCellContent indexedDie;
+        List<List<CellContent>> roundTrack=new ArrayList<>();
+        List<CellContent> container=new ArrayList<>();
+        CellContent die;
         String[] args;
         int round=-1;
 
@@ -505,13 +506,13 @@ public class SocketClient implements ClientConn {
             container = new ArrayList<>();
             for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
                 args = result.get(i).split(",");
-                indexedDie = new IndexedCellContent(Integer.parseInt(args[2]), args[4],args[3]);
+                die = new LightDie(args[4],args[3]);
                 if (round != Integer.parseInt(args[1])) {
                     container = new ArrayList<>();
                     round = Integer.parseInt(args[1]);
                     roundTrack.add(round,container);
                 }
-                (roundTrack.get(round)).add(indexedDie);
+                (roundTrack.get(round)).add(die);
             }
         }
         return roundTrack;
@@ -523,10 +524,10 @@ public class SocketClient implements ClientConn {
      * @return an immutable and indexed list containing the dice
      */
     @Override
-    public List<IndexedCellContent> getDraftpoolDiceList() {
+    public List<CellContent> getDraftpoolDiceList() {
         ArrayList<String> result = new ArrayList<>();
-        List<IndexedCellContent> draftPool = new ArrayList<>();
-        IndexedCellContent indexedDie;
+        List<CellContent> draftPool = new ArrayList<>();
+        CellContent die;
         String args[];
 
         outSocket.println("GET_DICE_LIST draftpool");
@@ -536,8 +537,8 @@ public class SocketClient implements ClientConn {
             inSocket.pop();
             for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
                 args = result.get(i).split(",");
-                indexedDie = new IndexedCellContent(Integer.parseInt(args[0]),args[2], args[1]);
-                draftPool.add(indexedDie);
+                die = new LightDie(args[2], args[1]);
+                draftPool.add(die);
             }
         }
         return draftPool;
@@ -566,29 +567,6 @@ public class SocketClient implements ClientConn {
             }
         }
         return positions;
-    }
-
-    /**
-     * This function can be invoked to signal the intention of a player to use a specific toolcard
-     * @param lightTool the toolcard the player wants to use
-     * @param index the index (0 to 3) of the die in a previously given list
-     * @return true if the card has been selected correctly
-     */
-    @Override
-    public boolean selectTool(LightTool lightTool, int index){
-        ArrayList<String> result= new ArrayList<>();
-
-        outSocket.println("SELECT tool "+index);
-        outSocket.flush();
-
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("tool_details")){
-            inSocket.pop();
-            if(Integer.parseInt(result.get(2))==index){
-                lightTool.setUsed(Boolean.parseBoolean(result.get(4)));
-                return result.get(5).equals("ok");
-            }
-        }
-        return false;
     }
 
     /**

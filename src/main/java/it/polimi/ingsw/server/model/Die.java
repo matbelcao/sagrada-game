@@ -87,11 +87,10 @@ public class Die {
 
     /**
      * Rerolls a die
-     * @param die the die to be rerolled
      */
-    public static void reroll(Die die){
+    public void reroll(){
         Random randomGen = new Random();
-        die.setShade(randomGen.nextInt(6)+1);
+        this.setShade(randomGen.nextInt(6)+1);
     }
 
     /**
@@ -101,6 +100,8 @@ public class Die {
     public void setShade(int shade){
         this.lightDie = new LightDie(Face.valueOf(shade),this.lightDie.getColor());
     }
+
+    public void setColor(String color){this.lightDie=new LightDie(this.lightDie.getShade(),Color.valueOf(color));}
 
     /**
      * Returns a string representation of the die

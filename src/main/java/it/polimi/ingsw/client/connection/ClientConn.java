@@ -66,13 +66,13 @@ public interface ClientConn {
      * This function can be invoked to request the dice in the draftpool
      * @return a list of immutable dice contained in the draftpool
      */
-    List<CellContent> getDraftPool();
+    List<LightDie> getDraftPool();
 
     /**
      * This function can be invoked to request the dice in the roundtrack
      * @return a list of immutable dice contained in the roundtrack
      */
-    List<List<CellContent>> getRoundtrack();
+    List<List<LightDie>> getRoundtrack();
 
     /**
      * The client invokes this function to request the list of players of the match
@@ -99,14 +99,14 @@ public interface ClientConn {
      * in the roundtrack
      * @return an immutable and indexed list containing the dice
      */
-    List<List<IndexedCellContent>> getRoundTrackDiceList();
+    List<List<CellContent>> getRoundTrackDiceList();
 
     /**
      * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
      * in the draft pool
      * @return an immutable and indexed list containing the dice
      */
-    List<IndexedCellContent> getDraftpoolDiceList();
+    List<CellContent> getDraftpoolDiceList();
 
     /**
      * This function can be invoked to the server to specify the possible placements in the user’s schema of a die that is
@@ -115,14 +115,6 @@ public interface ClientConn {
      * @return an immutable and indexed list of possible placements
      */
     List<Integer> selectDie(int index);
-
-    /**
-     * This function can be invoked to signal the intention of a player to use a specific toolcard
-     * @param lightTool the toolcard the player wants to use
-     * @param index the index (0 to 3) of the die in a previously given list
-     * @return true if the card has been selected correctly
-     */
-    boolean selectTool(LightTool lightTool, int index);
 
     /**
      *  This function can be invoked to notify the server in order to make a possibly definitive choice. The server is

@@ -17,6 +17,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
+import it.polimi.ingsw.common.immutables.*;
 
 import java.util.List;
 import java.util.Map;
@@ -119,10 +120,6 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-    @Override
-    public void showLobby() {
-
-    }
 
     @Override
     public void updateConnectionOk() {
@@ -140,7 +137,7 @@ public class GUI extends Application implements ClientUI {
     }
 
     @Override
-    public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas) {
+    public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
 
     }
 
@@ -150,14 +147,15 @@ public class GUI extends Application implements ClientUI {
     }
 
     @Override
-    public void updateDraftPool(Map<Integer, LightDie> draftpool) {
+    public void updateDraftPool(List<LightDie> draftpool) {
 
     }
 
     @Override
-    public void updateSchema(LightSchemaCard schema, int playerId) {
+    public void updateSchema(LightPlayer player) {
 
     }
+
 
     @Override
     public void updateRoundTrack(List<List<LightDie>> roundtrack) {

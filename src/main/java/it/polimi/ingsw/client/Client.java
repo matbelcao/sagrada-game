@@ -11,6 +11,7 @@ import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 import it.polimi.ingsw.server.connection.RMIServerObject;
+import org.fusesource.jansi.AnsiConsole;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -27,6 +28,9 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 
 /**
  * This class represents a client that can connect to the server and participate to a match of the game.
@@ -49,6 +53,18 @@ public class Client {
     private UILanguage lang;
     private LightBoard board;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
+
+    private static String OS = null;
+    public static String getOsName()
+    {
+        if(OS == null) { OS = System.getProperty("os.name"); }
+        return OS;
+    }
+    public static boolean isWindows()
+    {
+        return getOsName().startsWith("Windows");
+    }
+
 
     /**
      * constructs the client object and sets some parameters
@@ -189,6 +205,9 @@ public class Client {
         this.userStatus=status;
     }
 
+    public ConnectionMode getConnMode() {
+        return connMode;
+    }
 
     /**
      * @return the object that is the connection of the client towards the server
@@ -205,6 +224,10 @@ public class Client {
      */
     private void setupUI() throws InstantiationException {
         if (uiMode.equals(UIMode.CLI)){
+            getOsName();
+            if(isWindows()){
+                AnsiConsole.systemInstall();
+            }
             clientUI=new CLI(this,lang);
         }else{
             System.out.println("Launching GUI (still not implemented....");

@@ -40,4 +40,10 @@ public class LightCard {
     public int getId() {
         return id;
     }
+
+
+
+    public LightCard clone(){
+        return new LightCard(this.getName(),this.getDescription(),this.getId());
+    }
 }

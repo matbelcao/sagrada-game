@@ -181,9 +181,10 @@ The client sends this message to request the card parameters, some dice in the b
 
 ### Server-side
 ###### Notice: the following messages of this section all require an `ACK send` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
-##### `SEND schema <name> [{D,<index>,<color>,<shade>]|  {C,<index>,<color>|<shade>}] ...`
+##### `SEND schema <name> [<favor_tokens>] [{D,<index>,<color>,<shade>|  {C,<index>,<color>|<shade>}] ...`
 
 +   `schema`: signals that the schema is being sent in its entirety
++   `<favor_tokens>`: the number of favor tokens associated with the schema (this is used only when sending the drafted schemas at the beginning of a game)
 +   `<name>`: the name of the schema
 +   `D`: the cell is occupied by a die
 +   `C`: there is a constraint in the cell
@@ -278,11 +279,6 @@ This message is a request to the server to specify the possible placements in th
 
 This asks the server a list of possible placements for the die that has been rerolled, swapped, flipped... following a `CHOOSE`. It will trigger a `LIST placements` from the server towards the client. If the client receives an empty list or simply chooses to `DISCARD`, the toolcard will be marked as used (if it wasn't already) and the used favor tokens will be gone.
 
-##### `SELECT tool <index>`
-+   `<index>`: the index of the toolcard in the list of toolcards that the client received with a sequence of `SEND tool` (tipically at the beginning of the match)
-
-This message is used to signal the intention of a player to use a specific toolcard. the server will reply with details on the toolcard with a `LIST tool_details`
-
 
 ### Server-side
 ###### Notice: the following messages of this section starting with `LIST` require an `ACK list` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
@@ -308,13 +304,6 @@ This message is used in order to create a list of valid options the client can l
 
 __NOTICE__: `<index>` and `<position>` might be the same in some cases but are not 	meant 	to always be, in general `<position>`≥ `<index>`.
 
-##### `LIST tool_details <index> <id> <has_been_used> ok|ko`
-+   `<index>`: this is the index of the requested tool card (the same as in `SELECT tool <index>`)
-+   `<id>`: this is the id of the tool card (1 to 12)
-+   `<has_been_used>`: this is `true` if the toolcard has already been used, false otherwise
-+   `ok|ko`: ok if the tool can be used by the user, ko if not
-
-This message is used to give updated data on a toolcard and the ability of the player to use it or not.
 
 ### Client-side
 

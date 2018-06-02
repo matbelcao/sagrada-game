@@ -60,9 +60,9 @@ public class DiceBag {
      * Puts a die in the DiceBag, to be used by tool card #11
      * @param die to be rerolled
      */
-    public void putDie(Die die){
+    /*public void putDie(Die die){
         Die.reroll(die);
         toDraft.add(die);
-    }
+    }*/
 
 }

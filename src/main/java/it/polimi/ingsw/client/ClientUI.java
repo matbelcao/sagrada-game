@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.server.model.Player;
 
 import java.io.File;
 import java.util.List;
@@ -25,10 +26,6 @@ public interface ClientUI {
      */
     void updateLogin(boolean logged);
 
-    /**
-     * this method is called after a successful login to show information about the lobby
-     */
-    void showLobby();
 
     /**
      * this method sends to the client an update regarding the number of players connected and waiting to begin a match
@@ -47,8 +44,9 @@ public interface ClientUI {
      * this method is called right after the message that signals the start of a game and shows to the user elements
      * of the board and the drafted schemas to be able to make a choice of the schema based on them
      * @param draftedSchemas the schemas that have been drafted for this player
+     * @param privObj the private objective of the player
      */
-    void showDraftedSchemas(List<LightSchemaCard> draftedSchemas);
+    void showDraftedSchemas(List<LightSchemaCard> draftedSchemas,LightPrivObj privObj);
 
     /**
      * this method updates the player's view with all other components of the board
@@ -60,14 +58,13 @@ public interface ClientUI {
      * this updates the sole draftpool
      * @param draftpool the new draftpool
      */
-    void updateDraftPool(Map<Integer,LightDie> draftpool );
+    void updateDraftPool(List<LightDie> draftpool );
 
     /**
      * this updates the schema of a certain player identified by its id
-     * @param schema the updated schema
-     * @param playerId the player whose schema is being updated
+     * @param player the player with its data and updated schema
      */
-    void updateSchema(LightSchemaCard schema, int playerId);
+    void updateSchema(LightPlayer player);
 
     /**
      * this updates the roundtrack
