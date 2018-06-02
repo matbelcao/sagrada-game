@@ -18,7 +18,7 @@ public class CLIView {
     private static final int CELL_WIDTH = 7;
     private static final int OBJ_LENGTH = 38;
     private static final int SCREEN_WIDTH = 160;
-    private static final int SCREEN_HEIGHT =54;
+    private static final int SCREEN_HEIGHT =52;
     private static final int MENU_WIDTH = 80;
     private static final int MENU_HEIGHT = 20;
 
@@ -82,7 +82,7 @@ public class CLIView {
 
     public String printMainView(){
         StringBuilder builder=new StringBuilder();
-
+        builder.append(resetScreenPosition());
         builder.append(printList(buildRoundTrack())).append(" |%n");
 
 
@@ -92,7 +92,7 @@ public class CLIView {
         builder.append(printList(buildDraftPool())).append(" |%n");
 
         builder.append(printList(buildBottomSection())).append("%n");
-        builder.append(resetScreenPosition());
+
         builder.append(padUntil("", SCHEMA_WIDTH + 6, ' ')).append(String.format(cliElems.getElem("prompt"), uiMsg.getMessage("message-prompt")));
 
         return builder.toString();

@@ -27,7 +27,6 @@ public class CLI implements ClientUI{
             System.err.println("ERR: couldn't retrieve any console!");
             System.exit(1);
         }
-        AnsiConsole.systemInstall();
 
         this.uimsg=new UIMessages(lang);
         this.client = client;
