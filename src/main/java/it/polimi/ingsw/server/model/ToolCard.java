@@ -119,6 +119,25 @@ public class ToolCard extends Card{
         return toolAction.useToolCard(player);
     }
 
+    private boolean modifyDie(Die die){
+        Die newDie;
+        switch (modify){
+            case FLIP:
+                die.flipShade();
+                return true;
+            case REROLL:
+                die.reroll();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean modifyDie(Die die1,Die die2){
+
+        return false;
+    }
+
     /**
      * This method provide the information about if the card has been yet used
      * @return true iff has been used yet
