@@ -67,8 +67,8 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public List<CellContent> getDraftPool() {
-        List<CellContent> draftPool = null;
+    public List<LightDie> getDraftPool() {
+        List<LightDie> draftPool = null;
         try {
             draftPool = remoteObj.getDraftPool();
         } catch (RemoteException e) {
@@ -80,7 +80,7 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public List<List<CellContent>> getRoundtrack() {
+    public List<List<LightDie>> getRoundtrack() {
         return null;
     }
 

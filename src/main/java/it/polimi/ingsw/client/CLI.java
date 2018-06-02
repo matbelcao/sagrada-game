@@ -4,10 +4,7 @@ import it.polimi.ingsw.client.uielements.CLIView;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
-import it.polimi.ingsw.common.immutables.LightDie;
-import it.polimi.ingsw.common.immutables.LightPrivObj;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
-import it.polimi.ingsw.common.immutables.LightTool;
+import it.polimi.ingsw.common.immutables.*;
 
 import java.io.Console;
 import java.util.List;
@@ -69,6 +66,7 @@ public class CLI implements ClientUI{
     @Override
     public void updateLobby(int numUsers){
         CLIView.resetScreenPosition();
+        view.setClientInfo(client.getConnMode(),client.getUsername());
         console.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
     }
 
@@ -87,22 +85,33 @@ public class CLI implements ClientUI{
 
     @Override
     public void updateBoard(LightBoard board) {
+        view.updateTools(board.getTools());
+        view.updatePrivObj(board.getPrivObj());
+        view.updateObjectives(board.getPubObjs(),board.getPrivObj());
+        view.updateMenuListDefault();
 
+        for(int i=0;i<board.getNumPlayers();i++){
+            view.updateSchema(board.getPlayerByIndex(i));
+        }
+        console.printf(view.printMainView());
     }
 
     @Override
-    public void updateDraftPool(Map<Integer, LightDie> draftpool) {
-
+    public void updateDraftPool(List<LightDie> draftpool) {
+        view.updateDraftPool(draftpool);
+        console.printf(view.printMainView());
     }
 
     @Override
-    public void updateSchema(LightSchemaCard schema, int playerId) {
-
+    public void updateSchema(LightPlayer player) {
+        view.updateSchema(player);
+        console.printf(view.printMainView());
     }
 
     @Override
     public void updateRoundTrack(List<List<LightDie>> roundtrack) {
-
+        view.updateRoundTrack(roundtrack);
+        console.printf(view.printMainView());
     }
 
     @Override
@@ -112,7 +121,8 @@ public class CLI implements ClientUI{
 
     @Override
     public void updateRoundStart(int numRound,List<List<LightDie>> roundtrack){
-        console.printf(String.format("%s%n", uimsg.getMessage("round")),numRound);
+        view.updateNewRound(numRound);
+        this.updateRoundTrack(roundtrack);
     }
 
     @Override

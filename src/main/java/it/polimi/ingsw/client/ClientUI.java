@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.server.model.Player;
 
 import java.io.File;
 import java.util.List;
@@ -57,14 +58,13 @@ public interface ClientUI {
      * this updates the sole draftpool
      * @param draftpool the new draftpool
      */
-    void updateDraftPool(Map<Integer,LightDie> draftpool );
+    void updateDraftPool(List<LightDie> draftpool );
 
     /**
      * this updates the schema of a certain player identified by its id
-     * @param schema the updated schema
-     * @param playerId the player whose schema is being updated
+     * @param player the player with its data and updated schema
      */
-    void updateSchema(LightSchemaCard schema, int playerId);
+    void updateSchema(LightPlayer player);
 
     /**
      * this updates the roundtrack

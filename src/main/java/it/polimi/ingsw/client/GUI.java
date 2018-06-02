@@ -55,14 +55,15 @@ public class GUI implements ClientUI {
     }
 
     @Override
-    public void updateDraftPool(Map<Integer, LightDie> draftpool) {
+    public void updateDraftPool(List<LightDie> draftpool) {
 
     }
 
     @Override
-    public void updateSchema(LightSchemaCard schema, int playerId) {
+    public void updateSchema(LightPlayer player) {
 
     }
+
 
     @Override
     public void updateRoundTrack(List<List<LightDie>> roundtrack) {

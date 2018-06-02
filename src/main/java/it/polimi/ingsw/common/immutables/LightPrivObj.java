@@ -29,4 +29,5 @@ public class LightPrivObj extends LightCard {
     public Color getColor() {
         return color;
     }
+
 }

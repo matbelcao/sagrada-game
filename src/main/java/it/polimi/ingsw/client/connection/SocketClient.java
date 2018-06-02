@@ -357,21 +357,22 @@ public class SocketClient implements ClientConn {
      * @return a list of immutable dice contained in the draftpool
      */
     @Override
-    public List<CellContent> getDraftPool() {
+    public List<LightDie> getDraftPool() {
         ArrayList<String> result= new ArrayList<>();
-        List<CellContent> draftPool=new ArrayList<>();
-        CellContent lightCell;
+        List<LightDie> draftPool=new ArrayList<>();
+        LightDie die;
         String args[];
 
         outSocket.println("GET draftpool");
         outSocket.flush();
 
+
         while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")){
             inSocket.pop();
             for(int i=COMMA_PARAMS_START;i<result.size();i++) {
                 args= result.get(i).split(",");
-                lightCell=new LightDie(args[2],args[1]);
-                draftPool.add(lightCell);
+                die=new LightDie(args[2],args[1]);
+                draftPool.add(die);
             }
         }
         return draftPool;
@@ -382,11 +383,11 @@ public class SocketClient implements ClientConn {
      * @return a list of immutable dice contained in the roundtrack
      */
     @Override
-    public List<List<CellContent>> getRoundtrack() {
+    public List<List<LightDie>> getRoundtrack() {
         ArrayList<String> result= new ArrayList<>();
-        List<List<CellContent>> roundTrack=new ArrayList<>();
-        List<CellContent> container=new ArrayList<>();
-        CellContent lightCell;
+        List<List<LightDie>> roundTrack=new ArrayList<>();
+        List<LightDie> container;
+        LightDie die;
         int index=-1;
         String args[];
 
@@ -399,13 +400,13 @@ public class SocketClient implements ClientConn {
             container = new ArrayList<>();
             for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
                 args = result.get(i).split(",");
-                lightCell = new LightDie(args[2], args[1]);
+                die = new LightDie(args[2], args[1]);
                 if (index != Integer.parseInt(args[0])) {
                     container = new ArrayList<>();
                     index = Integer.parseInt(args[0]);
                     roundTrack.add(index,container);
                 }
-                (roundTrack.get(index)).add(lightCell);
+                (roundTrack.get(index)).add(die);
             }
         }
         return roundTrack;

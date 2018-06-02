@@ -205,6 +205,9 @@ public class Client {
         this.userStatus=status;
     }
 
+    public ConnectionMode getConnMode() {
+        return connMode;
+    }
 
     /**
      * @return the object that is the connection of the client towards the server

@@ -66,13 +66,13 @@ public interface ClientConn {
      * This function can be invoked to request the dice in the draftpool
      * @return a list of immutable dice contained in the draftpool
      */
-    List<CellContent> getDraftPool();
+    List<LightDie> getDraftPool();
 
     /**
      * This function can be invoked to request the dice in the roundtrack
      * @return a list of immutable dice contained in the roundtrack
      */
-    List<List<CellContent>> getRoundtrack();
+    List<List<LightDie>> getRoundtrack();
 
     /**
      * The client invokes this function to request the list of players of the match

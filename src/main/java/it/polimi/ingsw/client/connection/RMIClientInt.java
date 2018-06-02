@@ -1,9 +1,6 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.common.immutables.CellContent;
-import it.polimi.ingsw.common.immutables.LightCard;
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 
 import java.rmi.Remote;
@@ -31,5 +28,5 @@ public interface RMIClientInt extends Remote {
 
     int getFavorTokens(int playerId) throws RemoteException;
 
-    List<CellContent> getDraftPool() throws RemoteException, IllegalActionException;
+    List<LightDie> getDraftPool() throws RemoteException, IllegalActionException;
 }

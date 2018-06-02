@@ -33,4 +33,9 @@ public class LightTool extends LightCard {
         return new LightTool (param[3].replaceAll("_", " "),param[4].replaceAll("_", " "),Integer.parseInt(param[2]),Boolean.parseBoolean(param[5]));
     }
 
+    @Override
+    public LightTool clone(){
+        return new LightTool(this.getName(),this.getDescription(),this.getId(),this.isUsed());
+
+    }
 }

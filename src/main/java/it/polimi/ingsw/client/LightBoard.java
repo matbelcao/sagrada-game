@@ -34,7 +34,7 @@ public class LightBoard {
         players.put(player.getPlayerId(),player);
     }
 
-    public LightCard getPrivObj() {
+    public LightPrivObj getPrivObj() {
         return privObj;
     }
 
@@ -45,6 +45,19 @@ public class LightBoard {
     public void addTool(LightTool tool){
         assert(tools.size()<NUM_TOOLS );
         this.tools.add(tool);
+    }
+
+    public List<LightCard> getPubObjs() {
+        List<LightCard> clone = new ArrayList<>(pubObj.size());
+        for (LightCard item : pubObj) clone.add(item.clone());
+        return clone;
+    }
+
+
+    public List<LightTool> getTools() {
+        List<LightTool> clone = new ArrayList<>(tools.size());
+        for (LightTool item : tools) clone.add(item.clone());
+        return clone;
     }
 
     public int getNumPlayers() {

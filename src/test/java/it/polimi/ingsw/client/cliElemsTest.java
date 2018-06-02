@@ -51,7 +51,7 @@ class cliElemsTest {
     private static LightSchemaCard schema2;
     private static LightSchemaCard schema3;
     private static List<LightDie> draftpool;
-    private static List<List<CellContent>> roundtrack ;
+    private static List<List<LightDie>> roundtrack ;
     private static List<LightCard> obj= new ArrayList<>();
     private static List<LightTool> tools= new ArrayList<>();
     private static List<Integer> list= new ArrayList<>();

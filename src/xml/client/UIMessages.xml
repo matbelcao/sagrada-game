@@ -92,4 +92,12 @@
         <eng>Insert your commands here</eng>
         <ita>Digita qui le tue mosse</ita>
     </message-prompt>
+    <quit-option>
+        <eng>to abandon the match type q</eng>
+        <ita>per abbandonare la partita scrivi q</ita>
+    </quit-option>
+    <discard-option>
+        <eng>to discard the selection type d</eng>
+        <ita>per ignorare la selezione type d</ita>
+    </discard-option>
 </messages>

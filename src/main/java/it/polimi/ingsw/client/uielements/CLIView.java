@@ -8,12 +8,11 @@ import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.SchemaCard;
-import org.fusesource.jansi.AnsiConsole;
-import static org.fusesource.jansi.Ansi.*;
-import static org.fusesource.jansi.Ansi.Color.*;
 
 import java.io.IOException;
 import java.util.*;
+
+import static org.fusesource.jansi.Ansi.ansi;
 
 public class CLIView {
     private static final int SCHEMA_WIDTH = 35;
@@ -27,7 +26,6 @@ public class CLIView {
     private static final int MENU_HEIGHT = 20;
 
     private String bottomInfo;
-    private String lobby;
     private String turnRoundinfo;
     private final HashMap<Integer,List<String>> schemas= new HashMap<>();
     private List<String> objectives;
@@ -35,11 +33,12 @@ public class CLIView {
     private List<String> privObj;
     private List<String> roundTrack= new ArrayList<>();
     private List<String> draftPool= new ArrayList<>();
-    private final List<String> menuList =new ArrayList<>();
+    private List<String> menuList =new ArrayList<>();
     private static CLIElems cliElems;
     private final UIMessages uiMsg;
     private int numPlayers;
     private int playerId;
+    private int turnNumber;
     private int nowPlaying;
 
     public CLIView(UILanguage lang) throws InstantiationException {
@@ -184,6 +183,18 @@ public class CLIView {
       return result;
     }
 
+    public void updateMenuListDefault() {
+        menuList=buildDefaultMenu();
+    }
+
+    private List<String> buildDefaultMenu() {
+        List<String> defaultMenu= new ArrayList<>();
+        if(nowPlaying==playerId){
+            defaultMenu.add(uiMsg.getMessage("discard-option"));
+        }
+        defaultMenu.add(uiMsg.getMessage("quit-option"));
+        return defaultMenu;
+    }
 
     /**
      * Creates a list of possible placements for a die
@@ -205,6 +216,7 @@ public class CLIView {
             menuList.addAll(buildIndexList(placements));
         }
         menuList.addAll(buildWall(' ',MENU_HEIGHT-menuList.size(),MENU_WIDTH));
+        menuList.addAll(buildDefaultMenu());
 
     }
 
@@ -270,6 +282,11 @@ public class CLIView {
         if(player.getPlayerId()==playerId) {
             this.schemas.get(playerId).set(0, bold(schemas.get(playerId).get(0)));
         }
+    }
+
+    public void updateNewRound(int numRound) {
+        menuList.clear();
+
     }
 
     /**
@@ -363,12 +380,12 @@ public class CLIView {
         return result;
     }
 
-    public void updateRoundTrack(List<List<CellContent>> roundTrack){
+    public void updateRoundTrack(List<List<LightDie>> roundTrack){
         List<String> result=new ArrayList<>();
         int maxLength=0;
 
         //calculating max number of leftover dice in a single round
-        for(List<CellContent> round:roundTrack){
+        for(List<LightDie> round:roundTrack){
             maxLength= (maxLength<round.size()?round.size():maxLength);
         }
         //building from the top row
@@ -794,6 +811,7 @@ public class CLIView {
         this.playerId=playerId;
         this.numPlayers=numPlayers;
     }
+
 
 
 }
