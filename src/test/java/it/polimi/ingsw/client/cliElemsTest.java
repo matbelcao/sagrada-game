@@ -12,6 +12,7 @@ import it.polimi.ingsw.server.model.PrivObjectiveCard;
 import it.polimi.ingsw.server.model.PubObjectiveCard;
 import it.polimi.ingsw.server.model.SchemaCard;
 import it.polimi.ingsw.server.model.ToolCard;
+import org.fusesource.jansi.AnsiConsole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +21,17 @@ import java.util.List;
 
 class cliElemsTest {
     private static CLIElems cliel;
+    private static String OS = null;
+    public static String getOsName()
+    {
+        if(OS == null) { OS = System.getProperty("os.name"); }
+        return OS;
+    }
+    public static boolean isWindows()
+    {
+        return getOsName().startsWith("Windows");
+    }
+
 
     static {
         try {
@@ -45,6 +57,11 @@ class cliElemsTest {
     private static List<Integer> list= new ArrayList<>();
     @BeforeAll
     static void setup(){
+
+        getOsName();
+        if(isWindows()){
+            AnsiConsole.systemInstall();
+        }
 
         schema0=LightSchemaCard.toLightSchema(new SchemaCard(1,MasterServer.XML_SOURCE +"SchemaCard.xml"));
         schema1=LightSchemaCard.toLightSchema(new SchemaCard(2,MasterServer.XML_SOURCE +"SchemaCard.xml"));

@@ -54,6 +54,18 @@ public class Client {
     private LightBoard board;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
 
+    private static String OS = null;
+    public static String getOsName()
+    {
+        if(OS == null) { OS = System.getProperty("os.name"); }
+        return OS;
+    }
+    public static boolean isWindows()
+    {
+        return getOsName().startsWith("Windows");
+    }
+
+
     /**
      * constructs the client object and sets some parameters
      * @param uiMode the type of ui preferred
@@ -209,7 +221,10 @@ public class Client {
      */
     private void setupUI() throws InstantiationException {
         if (uiMode.equals(UIMode.CLI)){
-            AnsiConsole.systemInstall();
+            getOsName();
+            if(isWindows()){
+                AnsiConsole.systemInstall();
+            }
             clientUI=new CLI(this,lang);
         }else{
             System.out.println("Launching GUI (still not implemented....");
