@@ -191,6 +191,9 @@ public class ClientParser {
      */
     private static boolean checkSendSchema(List<String> parsedResult) {
         for (int i = 3; i < parsedResult.size(); i++) {
+            if(parsedResult.get(i).matches("[0-9]")){
+                i++;
+            }
             String[] args = parsedResult.get(i).split(",");
             if (args[0].equals("D") && args.length != 4) {
                 return false;

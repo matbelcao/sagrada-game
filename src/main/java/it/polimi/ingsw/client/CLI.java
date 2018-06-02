@@ -5,12 +5,10 @@ import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.immutables.LightDie;
+import it.polimi.ingsw.common.immutables.LightPrivObj;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
 import it.polimi.ingsw.common.immutables.LightTool;
 import org.fusesource.jansi.AnsiConsole;
-import static org.fusesource.jansi.Ansi.*;
-import static org.fusesource.jansi.Ansi.Color.*;
-
 import java.io.Console;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +34,7 @@ public class CLI implements ClientUI{
         this.view=new CLIView(lang);
     }
 
+    @Override
     public void showLoginScreen() {
         String username;
         char [] password;
@@ -50,12 +49,12 @@ public class CLI implements ClientUI{
             client.setPassword(password);
             client.setUsername(username);
         } catch (Exception e) {
-            e.printStackTrace();
             client.disconnect();
         }
     }
 
 
+    @Override
     public void updateLogin(boolean logged) {
         if (logged) {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ok")), client.getUsername());
@@ -64,25 +63,27 @@ public class CLI implements ClientUI{
         }
     }
 
+
     @Override
-    public void showLobby() {
-
-    }
-
     public void updateConnectionOk() { console.printf(String.format("%n%s", uimsg.getMessage("connection-ok"))); }
 
+    @Override
     public void updateLobby(int numUsers){
+        console.printf(CLIView.resetScreenPosition());
         console.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
     }
 
+    @Override
     public void updateGameStart(int numUsers, int playerId){
         console.printf(String.format("%s%n", uimsg.getMessage("game-start")),numUsers,playerId);
         this.view.setMatchInfo(client.getPlayerId(),client.getBoard().getNumPlayers());
     }
 
     @Override
-    public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas) {
-        
+    public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
+        view.updateDraftedSchemas(draftedSchemas);
+        view.updatePrivObj(privObj);
+        console.printf(view.printSchemaChoiceView());
     }
 
     @Override
@@ -110,7 +111,7 @@ public class CLI implements ClientUI{
 
     }
 
-    
+    @Override
     public void updateRoundStart(int numRound,List<List<LightDie>> roundtrack){
         console.printf(String.format("%s%n", uimsg.getMessage("round")),numRound);
     }
@@ -125,37 +126,28 @@ public class CLI implements ClientUI{
 
     }
 
-    // TODO: 31/05/2018
-    /*public void updateTurnStart(int playerId, boolean isFirstTurn){
-        outCli.printf(String.format("%s%n", uimsg.getMessage("turn")),playerId);
-        outCli.flush();
-        if(this.client.getPlayerId()==playerId){
-            outCli.printf(String.format("%s%n", uimsg.getMessage("yourTurn")));
-            outCli.flush();
-        }
-        //outCli.printf(view.printMainView());
-    }
-
-*/
     @Override
     public void updateStatusMessage(String statusChange, int playerId) {
 
     }
 
 
+    @Override
     public void updateConnectionClosed()
     {
         console.printf("Connection closed!%n");
     }
 
+    @Override
     public void updateConnectionBroken() { console.printf("Connection broken!%n");
     }
 
+    @Override
     public void printmsg(String msg){
         console.printf(msg);
     }
 
-        @Override
+    @Override
     public String getCommand() {
         return console.readLine();
     }
