@@ -1,4 +1,5 @@
 package it.polimi.ingsw.common.connection;
+import java.util.Base64;
 
 public class Credentials {
     private static final int HASH_SIZE=32;
@@ -11,7 +12,8 @@ public class Credentials {
                 hash[j]= (char)Math.abs(j%2==0?hash[j]-credentials[i]:((hash[j]+credentials[i]))%0xff);
             }
         }
-        return hash;
+
+        return Base64.getEncoder().encodeToString(new String (hash).getBytes()).toCharArray();
     }
     private static char[] concat(char[]a,char[] b){
         char[] concat = new char[a.length+b.length];
