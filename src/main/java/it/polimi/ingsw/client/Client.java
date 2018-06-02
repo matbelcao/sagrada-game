@@ -231,7 +231,24 @@ public class Client {
             clientUI=new CLI(this,lang);
         }else{
             System.out.println("Launching GUI (still not implemented....");
-            clientUI=new GUI(this,lang);
+            //Application.launch(GUI.class);//the control passes to the Application, the client is blocked until the window is closed
+            new Thread(() -> GUI.launch(this,lang)).start(); //main continues to run
+            while(GUI.getGUI()==null){
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            clientUI = GUI.getGUI();
+            System.out.println("Reference ottenuta!!");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            clientUI.printmsg("ciao");
         }
     }
 
