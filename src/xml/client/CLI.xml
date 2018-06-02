@@ -10,7 +10,7 @@
     <EMPTI> _____ ::|     |::|     |::|_____|</EMPTI>
     <player-info>User: %s | %s %s | %s %d</player-info>
     <username-id>%s%s</username-id>
-    <tokens-info>%s %s</tokens-info>
+    <tokens-info> %s %s</tokens-info>
     <tool-index>%s %d</tool-index>
     <round-turn>%s %d %s %d</round-turn>
     <row-col>‹%s %d %s %d› </row-col>

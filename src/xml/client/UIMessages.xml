@@ -45,8 +45,8 @@
         <ita>Obiettivo privato:</ita>
     </priv-obj>
     <tokens>
-        <eng>Favor tokens:</eng>
-        <ita>Gettoni favore:</ita>
+        <eng>Remaining tokens:</eng>
+        <ita>Gettoni rimanenti:</ita>
     </tokens>
     <tool-number>
         <eng>Tool number:</eng>

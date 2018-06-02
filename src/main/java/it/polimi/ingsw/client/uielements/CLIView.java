@@ -23,9 +23,11 @@ public class CLIView {
     private static final int SCREEN_WIDTH = 160;
     private static final int SCREEN_CLEAR =100;
     private static final int MENU_WIDTH = 80;
-    private static final int MENU_HEIGHT = 20;
+    private static final int MENU_HEIGHT = 21;
+    private static final String FAVOR= "⬤";
 
     private String bottomInfo;
+    private String options;
     private String turnRoundinfo;
     private final HashMap<Integer,List<String>> schemas= new HashMap<>();
     private List<String> objectives;
@@ -81,7 +83,7 @@ public class CLIView {
     }
 
     private static String printFavorTokens(int tokens){
-        return new String (new char[tokens]).replaceAll("\0"," \u2b24"  );
+        return replicate(FAVOR,tokens);
     }
 
     public String printMainView(){
@@ -97,7 +99,7 @@ public class CLIView {
 
         builder.append(printList(buildBottomSection())).append("%n");
 
-        builder.append(padUntil("", SCHEMA_WIDTH + 6, ' ')).append(String.format(cliElems.getElem("prompt"), uiMsg.getMessage("message-prompt")));
+        builder.append(String.format(cliElems.getElem("prompt"), buildOptions()));
 
         return builder.toString();
     }
@@ -132,8 +134,8 @@ public class CLIView {
             builder.append(ansi().restoreCursorPosition());
         }
         else {
-            builder.append(new String(new char[SCREEN_CLEAR]).replaceAll("\0", "%n"));
-            builder.append(new String(new char[SCREEN_CLEAR]).replaceAll("\0", "\u001b[A"));
+            builder.append(replicate("%n",SCREEN_CLEAR));
+            builder.append(replicate("\u001b[A",SCREEN_CLEAR));
         }
         return builder.toString();
     }
@@ -144,6 +146,11 @@ public class CLIView {
      * @return a List of strings that represent that view
      */
     private List<String> buildBottomSection() {
+
+        if(menuList.size()>schemas.get(playerId).size() ) {
+            schemas.get(playerId).addAll(buildWall(' ', menuList.size() - schemas.get(playerId).size(), SCHEMA_WIDTH + 8));
+        }
+
         List<String> result=appendRows(schemas.get(playerId),menuList);
 
         result= appendRows(result,buildSeparator(result.size()));
@@ -184,16 +191,20 @@ public class CLIView {
     }
 
     public void updateMenuListDefault() {
-        menuList=buildDefaultMenu();
+        menuList.clear();
     }
 
-    private List<String> buildDefaultMenu() {
-        List<String> defaultMenu= new ArrayList<>();
-        if(nowPlaying==playerId){
-            defaultMenu.add(uiMsg.getMessage("discard-option"));
-        }
-        defaultMenu.add(uiMsg.getMessage("quit-option"));
-        return defaultMenu;
+    private String buildOptions() {
+        StringBuilder defaultMenu= new StringBuilder();
+
+            defaultMenu.append(
+                            (nowPlaying==playerId?
+                                    (uiMsg.getMessage("discard-option")+"|"):
+                                    "")
+                                    + uiMsg.getMessage("quit-option"));
+
+
+        return defaultMenu.toString();
     }
 
     /**
@@ -216,7 +227,6 @@ public class CLIView {
             menuList.addAll(buildIndexList(placements));
         }
         menuList.addAll(buildWall(' ',MENU_HEIGHT-menuList.size(),MENU_WIDTH));
-        menuList.addAll(buildDefaultMenu());
 
     }
 
@@ -302,6 +312,7 @@ public class CLIView {
                 uiMsg.getMessage("turn"),
                 nowPlaying);
         List<String> updateSchema;
+
 
         updateSchema=schemas.get(nowPlaying);
         Random randomGen = new Random();
@@ -520,7 +531,7 @@ public class CLIView {
         schem.addAll(buildSchema(player.getSchema(),player.getPlayerId()==playerId));
 
 
-        int height= SCHEMA_HEIGHT+ (playerId==player.getPlayerId()?1:0);
+        int height= SCHEMA_HEIGHT+ (playerId==player.getPlayerId()?2:1);
         //add bottom border
         schem.add(height,padUntil("",width,'–'));
         //add left/right borders
@@ -583,10 +594,15 @@ public class CLIView {
     private String buildSchemaInfo(LightPlayer player,int width) {
         if(player==null){throw new IllegalArgumentException();}
 
-        return String.format(cliElems.getElem("username-id"),
+        String info=String.format(cliElems.getElem("username-id"),
                 player.getUsername(),alignRight(uiMsg.getMessage("player-number") +
                         player.getPlayerId(),width - player.getUsername().length()));
+        return info+(String.format(cliElems.getElem("tokens-info"),uiMsg.getMessage("tokens"),replicate(FAVOR,player.getFavorTokens())));
 
+    }
+
+    private static String replicate(String toReplicate,int times){
+        return new String (new char[times]).replaceAll("\0",toReplicate);
     }
 
     /**
@@ -690,7 +706,7 @@ public class CLIView {
         List<String> result;
         result= buildCard(tool);
         if(tool.isUsed()) {
-            result.set(0, result.get(0)+ " \u2b24");
+            result.set(0, result.get(0)+" "+ FAVOR);
         }
         return result;
     }
@@ -707,7 +723,7 @@ public class CLIView {
 
         String lineToFit= line;
         while(lineToFit.length()>length){
-            int i = length - 1;
+            int i = length;
             while(lineToFit.charAt(i) != ' '){
                 i--;
             }
@@ -742,7 +758,7 @@ public class CLIView {
     private static String padUntil(String toPad, int finalLength, char filler){
         if(finalLength<0|| toPad==null||toPad.length()>finalLength){throw new IllegalArgumentException();}
 
-        return toPad+ new String(new char[finalLength - toPad.length()]).replace("\0", filler+"");
+        return toPad+ replicate(filler+"",finalLength - toPad.length());
 
     }
 
