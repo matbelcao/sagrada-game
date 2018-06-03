@@ -26,16 +26,9 @@ public class CLIViewUtils {
     static final int SCREEN_CLEAR =100;
     static final int MENU_WIDTH = 80;
     static final int MENU_HEIGHT = 21;
-<<<<<<< HEAD
     static final String FAVOR= "●";
 
 
-
-
-
-=======
-    static final String FAVOR= "⬤";
->>>>>>> 6e4dd7a713ba91dc434450c728f68447001b654c
 
     static CLIElems cliElems;
 
