@@ -14,9 +14,9 @@ import static org.fusesource.jansi.Ansi.ansi;
  * and can be used to execute different tasks for the CLIView.
  */
 public class CLIViewUtils {
-    private CLIViewUtils(){}
 
 
+    static final String BOLD = "\u001B[1m";
     static final int SCHEMA_WIDTH = 35;
     static final int SCHEMA_HEIGHT = 18;
     static final int CELL_HEIGHT = 4;
@@ -26,8 +26,11 @@ public class CLIViewUtils {
     static final int SCREEN_CLEAR =100;
     static final int MENU_WIDTH = 80;
     static final int MENU_HEIGHT = 21;
+    static final String FAVOR= "●";
 
-    static final String FAVOR= "";
+
+
+
 
 
     static CLIElems cliElems;
@@ -39,6 +42,8 @@ public class CLIViewUtils {
             System.exit(2);
         }
     }
+
+    private CLIViewUtils(){}
 
     static String printFavorTokens(int tokens){
         return replicate(FAVOR,tokens);
@@ -133,13 +138,10 @@ public class CLIViewUtils {
     static List<String> buildDiceRow(Map<Integer,LightDie> elems, int from, int to){
         assert(from<=to && from>=0);
         List<String> result=new ArrayList<>();
-
         for(int i=from;i<to;i++) {
-            //empty cell
             result = appendRows(result, buildCell(elems.get(i)));
         }
-        assert (result.size() == 4);
-        //append new cell/die/constraint
+        assert (result.size() == CELL_HEIGHT);
 
         return result;
     }
@@ -157,10 +159,9 @@ public class CLIViewUtils {
         assert(from<=to && from>=0);
         List<String> result=new ArrayList<>();
         for(int i=from;i<to;i++) {
-            //append new cell/die/constraint
             result = appendRows(result, buildCell(elems.get(i)));
         }
-        assert(result.size()==4);
+        assert(result.size()==CELL_HEIGHT);
         return result;
     }
 
@@ -233,8 +234,8 @@ public class CLIViewUtils {
      * @param line the line to be rendered bold
      * @return the bold string
      */
-    public static String bold(String line){
-        return "\u001B[1m"+line+Color.RESET;
+    public static String boldify(String line){
+        return BOLD +line+Color.RESET;
 
     }
 
@@ -248,7 +249,7 @@ public class CLIViewUtils {
     static List<String> buildPrivObj(LightPrivObj privObj, int width) {
         List<String> result=new ArrayList<>();
         result.add(" ");
-        result.add(bold(privObj.getName()+":"));
+        result.add(boldify(privObj.getName()+":"));
         result.addAll(fitInLength(privObj.getDescription(), width));
         return result;
     }
@@ -315,7 +316,7 @@ public class CLIViewUtils {
     static List<String> buildCard( LightCard card) {
         List<String> result=new ArrayList<>();
 
-        result.add(bold(card.getName()+":"));
+        result.add(boldify(card.getName()+":"));
         result.addAll(fitInLength(card.getDescription(), OBJ_LENGTH));
         return result;
     }
