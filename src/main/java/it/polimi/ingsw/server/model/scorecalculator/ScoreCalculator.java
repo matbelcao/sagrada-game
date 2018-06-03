@@ -10,5 +10,5 @@ public interface ScoreCalculator {
      * @param schema the schema whom score needs to be calculated
      * @return the score
      */
-    public int calculateScore(SchemaCard schema);
+    int calculateScore(SchemaCard schema);
 }

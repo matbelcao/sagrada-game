@@ -12,7 +12,7 @@ import java.util.NoSuchElementException;
  */
 public class LightSchemaCard {
     private final String name;
-    private HashMap<Integer,CellContent> cells=new HashMap<>(30);
+    private Map<Integer,CellContent> cells=new HashMap<>(30);
     private int initialFavorTokens;
 
     /**
@@ -99,7 +99,11 @@ public class LightSchemaCard {
      * @return a copy of the map of the content of the schema
      */
     public Map<Integer,CellContent> getCellsMap(){
-        return (Map<Integer, CellContent>) cells.clone();
+        Map<Integer,CellContent> copy= new HashMap<>();
+        for(Map.Entry<Integer,CellContent> entry: cells.entrySet()){
+            copy.put(entry.getKey(),entry.getValue());
+        }
+        return copy;
     }
 
 

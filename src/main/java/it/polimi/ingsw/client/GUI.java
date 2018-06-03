@@ -36,8 +36,8 @@ public class GUI extends Application implements ClientUI {
     private boolean logged;
 
     public GUI(Client client, UILanguage language){
-        this.client=client;
-        this.language=language;
+        GUI.client =client;
+        GUI.language =language;
     }
 
     public GUI(){
@@ -48,7 +48,7 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("LOGIN WINDOW");
-        this.primaryStage=primaryStage;
+        GUI.primaryStage =primaryStage;
         //---
 
         GridPane grid = new GridPane();

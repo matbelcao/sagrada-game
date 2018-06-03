@@ -92,7 +92,7 @@ public interface ClientConn {
      * in the schema card
      * @return and immutable and indexed list containing the dice
      */
-    public List<IndexedCellContent> getSchemaDiceList();
+    List<IndexedCellContent> getSchemaDiceList();
 
     /**
      * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
@@ -138,5 +138,5 @@ public interface ClientConn {
     boolean pong() throws RemoteException;
 
     //ONLY FOR DEBUG PURPOSES
-    public void sendDebugMessage(String message);
+    void sendDebugMessage(String message);
 }

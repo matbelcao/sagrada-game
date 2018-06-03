@@ -6,5 +6,5 @@ package it.polimi.ingsw.common.enums;
  */
 public enum UIMode {
     CLI,
-    GUI;
+    GUI
 }

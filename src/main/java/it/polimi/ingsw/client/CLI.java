@@ -17,7 +17,7 @@ public class CLI implements ClientUI{
     private Client client;
     private UIMessages uimsg;
 
-    public CLI(Client client,UILanguage lang) throws InstantiationException {
+    public CLI(Client client,UILanguage lang) {
 
         this.console=System.console();
 
@@ -86,6 +86,7 @@ public class CLI implements ClientUI{
 
     @Override
     public void updateBoard(LightBoard board) {
+        if(board==null){ throw new IllegalArgumentException();}
         view.updateTools(board.getTools());
         view.updatePrivObj(board.getPrivObj());
         view.updateObjectives(board.getPubObjs(),board.getPrivObj());

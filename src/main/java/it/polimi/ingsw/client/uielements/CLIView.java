@@ -63,6 +63,7 @@ public class CLIView {
 
             schema.add(buildDraftedSchemaInfo(schemaCards.get(i)));
             schema.addAll(buildSchema(schemaCards.get(i),false));
+            schemas.put(i,schema);
         }
     }
 
@@ -159,7 +160,7 @@ public class CLIView {
             defaultMenu.append(
                             (nowPlaying==playerId?
                                     (uiMsg.getMessage("discard-option")+"|"):
-                                    "")
+                                    "") // TODO: 03/06/2018 add pass turn option
                                     + uiMsg.getMessage("quit-option"));
 
 
@@ -173,8 +174,7 @@ public class CLIView {
      * @param die the die to be placed
      */
     public void updateMenuList(List<Integer> placements, Place destination, LightDie die){
-        List<String> msg= new ArrayList<>();
-        msg.addAll(buildWall(' ',CELL_HEIGHT-1,MENU_WIDTH-CELL_WIDTH));
+        List<String> msg = new ArrayList<>(buildWall(' ', CELL_HEIGHT - 1, MENU_WIDTH - CELL_WIDTH));
         msg.add(boldify(padUntil(uiMsg.getMessage("can-be-placed"),MENU_WIDTH-CELL_WIDTH,' ')));
 
         menuList.addAll(appendRows(buildCell(die),msg));
@@ -311,8 +311,7 @@ public class CLIView {
     }
 
     private List<String > buildRoundTrack(){
-        List<String> result=new ArrayList<>();
-        result.addAll(this.roundTrack);
+        List<String> result = new ArrayList<>(this.roundTrack);
 
         result.add(padUntil("", SCREEN_WIDTH,'–'));
         result= appendRows(buildSeparator(result.size()),result);
@@ -357,9 +356,8 @@ public class CLIView {
     }
 
     private List<String> buildDraftPool(){
-        List<String> result=new ArrayList<>();
 
-        result.addAll(draftPool);
+        List<String> result = new ArrayList<>(draftPool);
         result.set(CELL_HEIGHT-1,
                 result.get(CELL_HEIGHT-1)+
                         boldify(uiMsg.getMessage("draftpool")+
@@ -414,14 +412,13 @@ public class CLIView {
     public void setClientInfo(ConnectionMode mode, String username){
         if(mode==null||username==null){ throw new IllegalArgumentException();}
 
-        String info = String.format(cliElems.getElem("player-info"),
+        bottomInfo = String.format(cliElems.getElem("player-info"),
                 username,
                 uiMsg.getMessage("connected-via"),
                 mode.toString(),
                 uiMsg.getMessage("player-number"),
                 playerId);
 
-        bottomInfo=info;
     }
 
 

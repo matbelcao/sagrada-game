@@ -11,7 +11,7 @@ public class RMIClient implements ClientConn {
     RMIClientInt remoteObj; //user
     Client client;
 
-    public RMIClient(RMIClientInt remoteObj, Client client) throws RemoteException {
+    public RMIClient(RMIClientInt remoteObj, Client client) {
         this.remoteObj = remoteObj;
         this.client = client;
     }

@@ -204,7 +204,7 @@ public class CLIViewUtils {
      * @param row the row of the schema
      * @return said column
      */
-    static List<String> buildSchemaRowsIndex(int row){
+    private static List<String> buildSchemaRowsIndex(int row){
         List<String> index= new ArrayList<>();
 
         for(int i=0; i<CELL_HEIGHT;i++){
@@ -446,7 +446,7 @@ public class CLIViewUtils {
      * @param elem the string to be split
      * @return the array of strings containing the parts of the elem divided by "::"
      */
-    static String[] splitElem(String elem){
+    private static String[] splitElem(String elem){
         return elem.split("::");
     }
 

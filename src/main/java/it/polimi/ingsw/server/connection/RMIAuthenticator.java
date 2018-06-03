@@ -43,7 +43,7 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
     }
 
     @Override
-    public void setRemoteReference(RMIServerInt remoteRef, String username) throws RemoteException {
+    public void setRemoteReference(RMIServerInt remoteRef, String username) {
         MasterServer master = MasterServer.getMasterServer();
         User user = master.getUser(username);
         user.setServerConn((new RMIServer(remoteRef, user)));

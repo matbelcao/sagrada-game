@@ -586,10 +586,7 @@ public class SocketClient implements ClientConn {
 
         while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isChoice(inSocket.readln())){
             inSocket.pop();
-            if(result.get(1).equals("ok")){
-                return true;
-            }
-            return false;
+            return result.get(1).equals("ok");
         }
         return false;
     }

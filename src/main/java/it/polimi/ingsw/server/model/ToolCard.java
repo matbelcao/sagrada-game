@@ -107,7 +107,7 @@ public class ToolCard extends Card{
      * @param player the player that wants to use the card
      * @return if the card has been used successfully
      */
-    public boolean useTool(Player player) throws NegativeTokensException {
+    public boolean useTool(Player player) {
 
 
         if (this.getId()==8){ player.setSkipsNextTurn(true); }
@@ -126,8 +126,7 @@ public class ToolCard extends Card{
                 if(turnFirstOrSecond==1){return false;}
                 player.setSkipsNextTurn(true);
             }
-            if(turnFirstOrSecond==0 && this.getId()==7){return false;}
-            return true;
+            return turnFirstOrSecond != 0 || this.getId() != 7;
         } catch (NegativeTokensException e) {
             return false;
         }

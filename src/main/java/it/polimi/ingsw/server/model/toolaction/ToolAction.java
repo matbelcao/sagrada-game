@@ -11,5 +11,5 @@ public interface ToolAction{
      * @param player the player that wants to use the card
      * @return if the card has been used successfully
      */
-    public boolean useToolCard(Player player);
+    boolean useToolCard(Player player);
 }
