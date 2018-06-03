@@ -6,22 +6,22 @@ import java.rmi.RemoteException;
 
 public class RMIServerObject  implements RMIServerInt {
     Client client;
-    public RMIServerObject(Client client) throws RemoteException {
+    public RMIServerObject(Client client) {
         this.client = client;
     }
 
     @Override
-    public boolean ping() throws RemoteException {
+    public boolean ping() {
         return true;
     }
 
     @Override
-    public void notifyLobbyUpdate(int n) throws RemoteException {
+    public void notifyLobbyUpdate(int n) {
         client.getClientUI().updateLobby(n);
     }
 
     @Override
-    public void notifyGameStart(int n, int id) throws RemoteException {
+    public void notifyGameStart(int n, int id) {
         client.updateGameStart(n,id);
     }
 }

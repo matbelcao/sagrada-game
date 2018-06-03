@@ -14,19 +14,21 @@ import static org.fusesource.jansi.Ansi.ansi;
  * and can be used to execute different tasks for the CLIView.
  */
 public class CLIViewUtils {
-    private CLIViewUtils(){}
 
 
+    static final String BOLD = "\u001B[1m";
     static final int SCHEMA_WIDTH = 35;
     static final int SCHEMA_HEIGHT = 18;
     static final int CELL_HEIGHT = 4;
     static final int CELL_WIDTH = 7;
     static final int OBJ_LENGTH = 38;
     static final int SCREEN_WIDTH = 160;
-    static final int SCREEN_CLEAR =100;
+    static final String SCREEN_CLEAR ="\033[H\033[2J";
     static final int MENU_WIDTH = 80;
     static final int MENU_HEIGHT = 21;
-    static final String FAVOR= "⬤";
+    static final String FAVOR= "●";
+
+
 
     static CLIElems cliElems;
 
@@ -38,17 +40,19 @@ public class CLIViewUtils {
         }
     }
 
+    private CLIViewUtils(){}
+
     static String printFavorTokens(int tokens){
         return replicate(FAVOR,tokens);
     }
 
     /**
-     * this method is used to clena the screen and to make sure the lines of the page are printed starting from the top of the screen
+     * this method is used to cleanx the screen and to make sure the lines of the page are printed starting from the top of the screen
      */
     public static String resetScreenPosition() {
         StringBuilder builder= new StringBuilder();
         Client.getOsName();
-        if(Client.isWindows()){
+        /*if(Client.isWindows()){
             builder.append(ansi().eraseScreen());
             builder.append(ansi().restoreCursorPosition());
         }
@@ -57,6 +61,8 @@ public class CLIViewUtils {
             builder.append(replicate("\u001b[A",SCREEN_CLEAR));
         }
         return builder.toString();
+        */
+        return SCREEN_CLEAR;
     }
     /**
      * this method is used to create a string that represents a list of strings by appending them one to another separated by a newline
@@ -131,13 +137,10 @@ public class CLIViewUtils {
     static List<String> buildDiceRow(Map<Integer,LightDie> elems, int from, int to){
         assert(from<=to && from>=0);
         List<String> result=new ArrayList<>();
-
         for(int i=from;i<to;i++) {
-            //empty cell
             result = appendRows(result, buildCell(elems.get(i)));
         }
-        assert (result.size() == 4);
-        //append new cell/die/constraint
+        assert (result.size() == CELL_HEIGHT);
 
         return result;
     }
@@ -155,10 +158,9 @@ public class CLIViewUtils {
         assert(from<=to && from>=0);
         List<String> result=new ArrayList<>();
         for(int i=from;i<to;i++) {
-            //append new cell/die/constraint
             result = appendRows(result, buildCell(elems.get(i)));
         }
-        assert(result.size()==4);
+        assert(result.size()==CELL_HEIGHT);
         return result;
     }
 
@@ -204,7 +206,7 @@ public class CLIViewUtils {
      * @param row the row of the schema
      * @return said column
      */
-    static List<String> buildSchemaRowsIndex(int row){
+    private static List<String> buildSchemaRowsIndex(int row){
         List<String> index= new ArrayList<>();
 
         for(int i=0; i<CELL_HEIGHT;i++){
@@ -231,8 +233,8 @@ public class CLIViewUtils {
      * @param line the line to be rendered bold
      * @return the bold string
      */
-    public static String bold(String line){
-        return "\u001B[1m"+line+Color.RESET;
+    public static String boldify(String line){
+        return BOLD +line+Color.RESET;
 
     }
 
@@ -246,7 +248,7 @@ public class CLIViewUtils {
     static List<String> buildPrivObj(LightPrivObj privObj, int width) {
         List<String> result=new ArrayList<>();
         result.add(" ");
-        result.add(bold(privObj.getName()+":"));
+        result.add(boldify(privObj.getName()+":"));
         result.addAll(fitInLength(privObj.getDescription(), width));
         return result;
     }
@@ -313,7 +315,7 @@ public class CLIViewUtils {
     static List<String> buildCard( LightCard card) {
         List<String> result=new ArrayList<>();
 
-        result.add(bold(card.getName()+":"));
+        result.add(boldify(card.getName()+":"));
         result.addAll(fitInLength(card.getDescription(), OBJ_LENGTH));
         return result;
     }
@@ -446,7 +448,7 @@ public class CLIViewUtils {
      * @param elem the string to be split
      * @return the array of strings containing the parts of the elem divided by "::"
      */
-    static String[] splitElem(String elem){
+    private static String[] splitElem(String elem){
         return elem.split("::");
     }
 

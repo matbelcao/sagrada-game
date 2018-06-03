@@ -52,12 +52,9 @@ public class ScoreCalculator9 implements ScoreCalculator{
              && schema.getCell(row + 1,column - 1).getDie().getColor().equals(cell.getDie().getColor())) {
             return true;
         }
-        if(row < (SchemaCard.NUM_ROWS - 1) && column < (SchemaCard.NUM_COLS - 1)
-             && schema.getCell(row + 1,column + 1).hasDie()
-             && schema.getCell(row + 1,column + 1).getDie().getColor().equals(cell.getDie().getColor())) {
-            return true;
-        }
-        return false;
+        return row < (SchemaCard.NUM_ROWS - 1) && column < (SchemaCard.NUM_COLS - 1)
+                && schema.getCell(row + 1, column + 1).hasDie()
+                && schema.getCell(row + 1, column + 1).getDie().getColor().equals(cell.getDie().getColor());
 
     }
 }

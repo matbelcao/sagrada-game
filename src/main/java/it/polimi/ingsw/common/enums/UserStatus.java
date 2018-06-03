@@ -4,5 +4,5 @@ public enum UserStatus {
     LOBBY,
     PLAYING,
     DISCONNECTED,
-    CONNECTED;
+    CONNECTED
 }

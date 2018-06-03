@@ -40,14 +40,11 @@ public class CLIView {
 
     public String showLoginUsername() {
         StringBuilder result= new StringBuilder();
-        result.append(resetScreenPosition());
         try {
             result.append(cliElems.getWall());
         } catch (IOException e) {
 
         }
-        result.append(uiMsg.getMessage("connection-ok")).append("%n");
-
         result.append(String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-username")));
         return result.toString();
     }
@@ -63,6 +60,7 @@ public class CLIView {
 
             schema.add(buildDraftedSchemaInfo(schemaCards.get(i)));
             schema.addAll(buildSchema(schemaCards.get(i),false));
+            schemas.put(i,schema);
         }
     }
 
@@ -159,7 +157,7 @@ public class CLIView {
             defaultMenu.append(
                             (nowPlaying==playerId?
                                     (uiMsg.getMessage("discard-option")+"|"):
-                                    "")
+                                    "") // TODO: 03/06/2018 add pass turn option
                                     + uiMsg.getMessage("quit-option"));
 
 
@@ -173,9 +171,8 @@ public class CLIView {
      * @param die the die to be placed
      */
     public void updateMenuList(List<Integer> placements, Place destination, LightDie die){
-        List<String> msg= new ArrayList<>();
-        msg.addAll(buildWall(' ',CELL_HEIGHT-1,MENU_WIDTH-CELL_WIDTH));
-        msg.add(bold(padUntil(uiMsg.getMessage("can-be-placed"),MENU_WIDTH-CELL_WIDTH,' ')));
+        List<String> msg = new ArrayList<>(buildWall(' ', CELL_HEIGHT - 1, MENU_WIDTH - CELL_WIDTH));
+        msg.add(boldify(padUntil(uiMsg.getMessage("can-be-placed"),MENU_WIDTH-CELL_WIDTH,' ')));
 
         menuList.addAll(appendRows(buildCell(die),msg));
         menuList.add(padUntil("",MENU_WIDTH,' '));
@@ -236,7 +233,7 @@ public class CLIView {
     public void updateSchema(LightPlayer player){
         this.schemas.put(player.getPlayerId(), buildPlayerSchema(player));
         if(player.getPlayerId()==playerId) {
-            this.schemas.get(playerId).set(0, bold(schemas.get(playerId).get(0)));
+            this.schemas.get(playerId).set(0, boldify(schemas.get(playerId).get(0)));
         }
     }
 
@@ -262,7 +259,7 @@ public class CLIView {
 
         updateSchema=schemas.get(nowPlaying);
         Random randomGen = new Random();
-        updateSchema.set(0,addColorToLine(bold(updateSchema.get(0)),Color.values()[randomGen.nextInt(Color.values().length)]));
+        updateSchema.set(0,addColorToLine(boldify(updateSchema.get(0)),Color.values()[randomGen.nextInt(Color.values().length)]));
     }
 
     /**
@@ -311,8 +308,7 @@ public class CLIView {
     }
 
     private List<String > buildRoundTrack(){
-        List<String> result=new ArrayList<>();
-        result.addAll(this.roundTrack);
+        List<String> result = new ArrayList<>(this.roundTrack);
 
         result.add(padUntil("", SCREEN_WIDTH,'–'));
         result= appendRows(buildSeparator(result.size()),result);
@@ -351,18 +347,17 @@ public class CLIView {
 
         result.addAll(buildCellRow(baseRow,0,10));
         List<String> padding=buildWall(' ',result.size()-1,1);
-        padding.add(bold(uiMsg.getMessage("roundtrack")));
+        padding.add(boldify(uiMsg.getMessage("roundtrack")));
         result= appendRows(result,padding);
         this.roundTrack=result;
     }
 
     private List<String> buildDraftPool(){
-        List<String> result=new ArrayList<>();
 
-        result.addAll(draftPool);
+        List<String> result = new ArrayList<>(draftPool);
         result.set(CELL_HEIGHT-1,
                 result.get(CELL_HEIGHT-1)+
-                        bold(uiMsg.getMessage("draftpool")+
+                        boldify(uiMsg.getMessage("draftpool")+
                                 alignRight(bottomInfo,
                                         SCREEN_WIDTH  - (2*numPlayers+1)*CELL_WIDTH - uiMsg.getMessage("draftpool").length())));
         result= appendRows(buildSeparator(draftPool.size()),result);
@@ -414,14 +409,13 @@ public class CLIView {
     public void setClientInfo(ConnectionMode mode, String username){
         if(mode==null||username==null){ throw new IllegalArgumentException();}
 
-        String info = String.format(cliElems.getElem("player-info"),
+        bottomInfo = String.format(cliElems.getElem("player-info"),
                 username,
                 uiMsg.getMessage("connected-via"),
                 mode.toString(),
                 uiMsg.getMessage("player-number"),
                 playerId);
 
-        bottomInfo=info;
     }
 
 
@@ -451,13 +445,13 @@ public class CLIView {
     private List<String> buildObjectives(List<LightCard> pubObj, LightPrivObj privObj){
         List<String> result=new ArrayList<>();
         result.add(" ");
-        result.add(bold(uiMsg.getMessage("pub-obj")));
+        result.add(boldify(uiMsg.getMessage("pub-obj")));
         result.add(" ");
         for(LightCard card : pubObj){
             result.addAll(buildCard(card));
             result.add("     ");
         }
-        result.add(bold(uiMsg.getMessage("priv-obj")));
+        result.add(boldify(uiMsg.getMessage("priv-obj")));
         result.addAll(
                 appendRows(
                         buildCell(new LightConstraint(privObj.getColor())),

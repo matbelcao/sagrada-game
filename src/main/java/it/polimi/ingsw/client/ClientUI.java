@@ -29,7 +29,7 @@ public interface ClientUI {
 
     /**
      * this method sends to the client an update regarding the number of players connected and waiting to begin a match
-     * @param numUsers
+     * @param numUsers the number of connected players at the moment
      */
     void updateLobby(int numUsers);
 

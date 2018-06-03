@@ -10,9 +10,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:5.1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.2.0-RC1" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.2.0-RC1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apiguardian:apiguardian-api:1.0.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.0.0" level="project" />
@@ -29,7 +26,10 @@
     <orderEntry type="library" name="Maven: org.fusesource.jansi:jansi:1.17.1" level="project" />
   </component>
   <component name="sonarModuleSettings">
+    <option name="alternativeWorkingDirPath" value="" />
     <option name="localAnalysisScripName" value="&lt;PROJECT&gt;" />
     <option name="serverName" value="&lt;PROJECT&gt;" />
+    <option name="useAlternativeWorkingDir" value="false" />
+    <option name="workingDirSelection" value="&lt;MODULE&gt;" />
   </component>
 </module>

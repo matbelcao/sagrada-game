@@ -17,7 +17,7 @@ public class CLI implements ClientUI{
     private Client client;
     private UIMessages uimsg;
 
-    public CLI(Client client,UILanguage lang) throws InstantiationException {
+    public CLI(Client client,UILanguage lang) {
 
         this.console=System.console();
 
@@ -31,6 +31,9 @@ public class CLI implements ClientUI{
         this.view=new CLIView(lang);
     }
 
+    private void resetScreen(){
+        console.printf(CLIViewUtils.resetScreenPosition());
+    }
     @Override
     public void showLoginScreen() {
         String username;
@@ -53,26 +56,35 @@ public class CLI implements ClientUI{
 
     @Override
     public void updateLogin(boolean logged) {
+        resetScreen();
         if (logged) {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ok")), client.getUsername());
         } else {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ko")));
         }
+
     }
 
 
     @Override
-    public void updateConnectionOk() { console.printf(String.format("%n%s", uimsg.getMessage("connection-ok"))); }
+    public void updateConnectionOk() {
+        resetScreen();
+        console.printf(String.format("%n%s", uimsg.getMessage("connection-ok")));
+
+    }
 
     @Override
     public void updateLobby(int numUsers){
-        CLIViewUtils.resetScreenPosition();
+        resetScreen();
         view.setClientInfo(client.getConnMode(),client.getUsername());
+
         console.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
+
     }
 
     @Override
     public void updateGameStart(int numUsers, int playerId){
+        resetScreen();
         console.printf(String.format("%s%n", uimsg.getMessage("game-start")),numUsers,playerId);
         this.view.setMatchInfo(client.getPlayerId(),client.getBoard().getNumPlayers());
     }
@@ -86,6 +98,7 @@ public class CLI implements ClientUI{
 
     @Override
     public void updateBoard(LightBoard board) {
+        if(board==null){ throw new IllegalArgumentException();}
         view.updateTools(board.getTools());
         view.updatePrivObj(board.getPrivObj());
         view.updateObjectives(board.getPubObjs(),board.getPrivObj());
