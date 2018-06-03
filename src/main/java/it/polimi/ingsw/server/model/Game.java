@@ -30,6 +30,7 @@ public class Game extends Thread implements Iterable  {
     private Timer timer;
     private Die selectedDie;
     private boolean placedDie;
+    private int selectedTool;
     private GameStatus gameStatus;
 
 
@@ -345,9 +346,13 @@ public class Game extends Thread implements Iterable  {
      * @param index the index of the die to select
      * @return the die selected
      */
+    // To continue........deve restituire List<Die>...solo per piazzamenti nella schema (o alcune toolcard)
     public Die selectDie(User user,int index) throws IllegalActionException {
         if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
         int tempIndex=0;
+        /*if(selectedTool!=-1){
+            board.getToolCard(selectedTool).selectDie(index);//da rivedere
+        }*/
         if(gameStatus.equals(GameStatus.REQUESTED_SCHEMA_CARD)){
             FullCellIterator diceIterator=(FullCellIterator)board.getPlayer(user).getSchema().iterator();
             while(diceIterator.hasNext()){
@@ -357,12 +362,21 @@ public class Game extends Thread implements Iterable  {
                 }
                 tempIndex++;
             }
-
+            //Routine selection
             selectedDie=board.getPlayer(user).getSchema().getCell(index).getDie();
+            if(selectedTool!=-1) {
+                //Toolcard selection
+                board.getToolCard(selectedTool).selectDie(selectedDie, gameStatus);
+            }
             return selectedDie;
         }
         if(gameStatus.equals(GameStatus.REQUESTED_DRAFT_POOL)){
+            //Routine selection
             selectedDie=board.getDraftPool().getDraftedDice().get(index);
+            if(selectedTool!=-1){
+                //Toolcard selection
+                board.getToolCard(selectedTool).selectDie(selectedDie,gameStatus);
+            }
             return selectedDie;
         }
         if(gameStatus.equals(GameStatus.REQUESTED_ROUND_TRACK)) {
@@ -374,7 +388,12 @@ public class Game extends Thread implements Iterable  {
                 dieList = trackList.get(roundN);
                 for (Die d : dieList) {
                     if (tempIndex == index) {
+                        //Routine selection
                         selectedDie=d;
+                        if(selectedTool!=-1){
+                            //ToolCard selection
+                            board.getToolCard(selectedTool).selectDie(selectedDie,gameStatus);
+                        }
                         return selectedDie;
                     }
                     tempIndex++;
@@ -384,6 +403,7 @@ public class Game extends Thread implements Iterable  {
         }
         return null;
     }
+
 
     /**
      * Puts in the user's schemacard/draftpool/roundtrack the die if possible
@@ -412,13 +432,14 @@ public class Game extends Thread implements Iterable  {
         return false;
     }
 
+    //selects and enables the tool
     public boolean chooseTool(User user,int index) throws IllegalActionException {
         Boolean toolEnabled;
         if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
         if(index<0||index>2){return false;}
         toolEnabled=board.getToolCard(index).enableToolCard(board.getPlayer(user),round.isFirstTurn()?0:1);
         if(toolEnabled){
-            gameStatus=GameStatus.REQUESTED_TOOL_CARD;
+            selectedTool=index;
         }else{
             discard();
         }
@@ -431,6 +452,7 @@ public class Game extends Thread implements Iterable  {
     public void discard() throws IllegalActionException {
         if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
         selectedDie=null;
+        selectedTool=-1;
         gameStatus=GameStatus.TURN_RUN;
     }
 

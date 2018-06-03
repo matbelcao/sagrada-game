@@ -5,7 +5,8 @@ public enum ModifyDie {
     SWAP,
     REROLL,
     FLIP,
-    SETSHADE;
+    SETSHADE,
+    NONE;
 
     public static ModifyDie toModifyDie(String modify){
         switch(modify){
@@ -20,7 +21,7 @@ public enum ModifyDie {
             case "setshade":
                 return SETSHADE;
             default:
-                return null;
+                return NONE;
         }
     }
 

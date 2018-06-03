@@ -1,6 +1,8 @@
 package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
+import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
 import it.polimi.ingsw.server.model.toolaction.ToolAction;
@@ -23,10 +25,13 @@ public class ToolCard extends Card{
     private boolean used;
     private ToolAction toolAction;
     public static final int NUM_TOOL_CARDS=12;
-    Place from,to;
-    DieQuantity quantity;
-    ModifyDie modify;
-    String when,ignored_constraint;
+    private Place from,to;
+    private DieQuantity quantity;
+    private ModifyDie modify;
+    private IgnoredConstraint ignored_constraint;
+    private String when;
+
+    private Die die;
 
 
     /**
@@ -68,14 +73,18 @@ public class ToolCard extends Card{
             for (int temp = 0; temp < nodeList.getLength() && (temp-1)!=id; temp++) {
                 Element eElement = (Element)nodeList.item(temp);
                 if(Integer.parseInt(eElement.getAttribute("id"))==id){
-                    this.from=Place.toPlace(eElement.getElementsByTagName("from").item(0).getTextContent());
-                    this.to= Place.toPlace(eElement.getElementsByTagName("to").item(0).getTextContent());
-                    this.quantity=DieQuantity.toDieQuantity(eElement.getElementsByTagName("quantity").item(0).getTextContent());
+                    from=Place.toPlace(eElement.getElementsByTagName("from").item(0).getTextContent());
+                    to= Place.toPlace(eElement.getElementsByTagName("to").item(0).getTextContent());
+                    quantity=DieQuantity.toDieQuantity(eElement.getElementsByTagName("quantity").item(0).getTextContent());
                     if(id==1 || id==5 || id==6 || id==7 || id==10 || id==11){
-                        this.modify=ModifyDie.toModifyDie(eElement.getElementsByTagName("modify").item(0).getTextContent());
+                        modify=ModifyDie.toModifyDie(eElement.getElementsByTagName("modify").item(0).getTextContent());
+                    }else{
+                        modify=ModifyDie.NONE;
                     }
                     if(id==2 || id==3 || id==4 || id==9 || id==11){
-                        ignored_constraint=eElement.getElementsByTagName("ignored-constraint").item(0).getTextContent();
+                        ignored_constraint=IgnoredConstraint.toIgnoredConstraint(eElement.getElementsByTagName("ignored-constraint").item(0).getTextContent());
+                    }else{
+                        ignored_constraint=IgnoredConstraint.NONE;
                     }
                     if(id==7 || id==8 || id==12){
                         when=eElement.getElementsByTagName("when").item(0).getTextContent();
@@ -88,7 +97,6 @@ public class ToolCard extends Card{
             e1.printStackTrace();
         }
     }
-
 
     /**
      * Checks whether the player can or can not use the tool card, based on the cost in favor tokens
@@ -132,6 +140,17 @@ public class ToolCard extends Card{
             return false;
         }
     }
+
+    public void selectDie(Die die,GameStatus status) throws IllegalActionException {
+        if(from!=GameStatus.toPlaceFrom(status)){throw new IllegalActionException();}
+        this.die=die;
+        switch (to){
+            case SCHEMA:
+
+        }
+    }
+
+
 
 
     private boolean modifyDie(Die die){
@@ -184,12 +203,24 @@ public class ToolCard extends Card{
         return true;
     }
 
+    public void discard(){
+        this.die=null;
+    }
+
     /**
      * This method provide the information about if the card has been yet used
      * @return true iff has been used yet
      */
     public boolean hasAlreadyUsed(){
         return this.used;
+    }
+
+    public Place getDestination(){
+        return to;
+    }
+
+    public IgnoredConstraint getIgnoredConstraint(){
+        return ignored_constraint;
     }
 
 }

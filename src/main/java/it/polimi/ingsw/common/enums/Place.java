@@ -4,7 +4,8 @@ public enum Place {
     DRAFTPOOL,
     SCHEMA,
     ROUNDTRACK,
-    DICEBAG;
+    DICEBAG,
+    NONE;
 
 
     public static Place toPlace(String place){
@@ -18,7 +19,7 @@ public enum Place {
             case "dicebag":
                 return DICEBAG;
             default:
-                return null;
+                return NONE;
         }
     }
 }

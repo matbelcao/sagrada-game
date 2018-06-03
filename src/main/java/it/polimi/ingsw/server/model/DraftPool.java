@@ -53,6 +53,14 @@ public class DraftPool {
         return this.drafted;
     }
 
+    public List<Integer> getDicePoolList(){
+        List<Integer> positions=new ArrayList<>();
+        for(int i=0;i<drafted.size();i++){
+            positions.add(i);
+        }
+        return positions;
+    }
+
     public List<Die> draftDice(int numPlayers) {
         drafted=new ArrayList<>();
         drafted = diceBag.draftDice((numPlayers*2)+1);

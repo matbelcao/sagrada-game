@@ -1,7 +1,11 @@
 package it.polimi.ingsw.server.model;
 
+import it.polimi.ingsw.common.enums.GameStatus;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
+import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,6 +120,32 @@ public class Board {
             schemaChoices[i]=new SchemaCard(id,MasterServer.XML_SOURCE+"SchemaCard.xml");
         }
         return schemaChoices;
+    }
+
+    //To continue.....
+    public List<Integer> listPlacements(User user, Die selectedDie, int selectedTool, GameStatus status) throws IllegalActionException {
+        if(selectedTool!=-1){
+            //Tool-specific placements
+            Place destination;
+            IgnoredConstraint ignoredConstraint;
+            destination=toolCards[selectedTool].getDestination();
+            ignoredConstraint=toolCards[selectedTool].getIgnoredConstraint();
+
+            if(destination!=GameStatus.toPlaceFrom(status)){throw new IllegalActionException();}
+            switch(destination){
+                case SCHEMA:
+                    return getPlayer(user).getSchema().listPossiblePlacements(selectedDie,ignoredConstraint);
+                case DRAFTPOOL:
+                    //return draftPool.getDiceList();
+                case ROUNDTRACK:
+                    //return draftPool.getRoundTrack()
+            }
+
+        }else{
+            //Routine placements in the schema card
+            return getPlayer(user).getSchema().listPossiblePlacements(selectedDie);
+        }
+        return getPlayer(user).getSchema().listPossiblePlacements(selectedDie);//to change
     }
 
     public Player getPlayer(User user) {
