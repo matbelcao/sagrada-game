@@ -5,6 +5,7 @@ import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.SchemaCard;
 
+import java.io.IOException;
 import java.util.*;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -50,18 +51,26 @@ public class CLIViewUtils {
      * this method is used to cleanx the screen and to make sure the lines of the page are printed starting from the top of the screen
      */
     public static String resetScreenPosition() {
-        StringBuilder builder= new StringBuilder();
+        //StringBuilder builder= new StringBuilder();
         Client.getOsName();
-        /*if(Client.isWindows()){
-            builder.append(ansi().eraseScreen());
+        if(Client.isWindows()){
+            try {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            /*builder.append(ansi().eraseScreen());
             builder.append(ansi().restoreCursorPosition());
+            return builder.toString();*/
+            return "";
         }
-        else {
-            builder.append(replicate("%n",SCREEN_CLEAR));
-            builder.append(replicate("\u001b[A",SCREEN_CLEAR));
-        }
-        return builder.toString();
-        */
+        //else {
+
+            /*builder.append(replicate("%n",SCREEN_CLEAR));
+            builder.append(replicate("\u001b[A",SCREEN_CLEAR));*/
+        //}
         return SCREEN_CLEAR;
     }
     /**
