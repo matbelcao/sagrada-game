@@ -20,13 +20,13 @@ public class CLIView {
     private String turnRoundinfo;
     private final HashMap<Integer,List<String>> schemas= new HashMap<>();
     private List<String> objectives;
-    private final List<String> tools= new ArrayList<>();
+    private final List<String> tools = new ArrayList<>();
     private List<String> privObj;
-    private List<String> roundTrack= new ArrayList<>();
-    private List<String> draftPool= new ArrayList<>();
-    private List<String> menuList =new ArrayList<>();
+    private List<String> roundTrack = new ArrayList<>();
+    private List<String> draftPool = new ArrayList<>();
+    private List<String> menuList = new ArrayList<>();
 
-    private UIMessages uiMsg;
+    private static UIMessages uiMsg;
     private int numPlayers;
     private int playerId;
     private int turnNumber;
@@ -109,6 +109,29 @@ public class CLIView {
 
 
 
+    private List<String> buildDiceList(List<IndexedCellContent> dice, Place place){
+        List<String> list= new ArrayList<>();
+        for(int i=0; i<dice.size();i++){
+            list.add(String.format(cliElems.getElem("li"),i,buildDiceListEntry(dice.get(i),place)));
+        }
+        return list;
+    }
+
+
+    private String buildDiceListEntry(IndexedCellContent die, Place place){
+        StringBuilder entry= new StringBuilder();
+        entry.append(CLIViewUtils.buildSmallDie(die.getContent())).append(" ");
+        if(place.equals(Place.SCHEMA)){
+            entry.append(rowColmumn(die.getIndex()));
+        } else if(place.equals(Place.ROUNDTRACK)){
+            entry.append(String.format(cliElems.getElem("index"),uiMsg.getMessage("round-number"),die.getIndex()));
+        }else{
+            entry.append(String.format(cliElems.getElem("index"),uiMsg.getMessage("pos"),die.getIndex()));
+        }
+        return entry.toString();
+    }
+
+
     /**
      * this method builds the bottom section of the main view by arranging side by side the schema of the user with the list of possible moves he can do
      * and the three tools of the game
@@ -156,7 +179,7 @@ public class CLIView {
 
             defaultMenu.append(
                             (nowPlaying==playerId?
-                                    (uiMsg.getMessage("discard-option")+"|"):
+                                    (uiMsg.getMessage("discard-option")+"|"+uiMsg.getMessage("passturn-option")):
                                     "") // TODO: 03/06/2018 add pass turn option
                                     + uiMsg.getMessage("quit-option"));
 
@@ -170,7 +193,7 @@ public class CLIView {
      * @param destination the place the possible placements refer to
      * @param die the die to be placed
      */
-    public void updateMenuList(List<Integer> placements, Place destination, LightDie die){
+    public void updateMenuListPlacements(List<Integer> placements, Place destination, LightDie die){
         List<String> msg = new ArrayList<>(buildWall(' ', CELL_HEIGHT - 1, MENU_WIDTH - CELL_WIDTH));
         msg.add(boldify(padUntil(uiMsg.getMessage("can-be-placed"),MENU_WIDTH-CELL_WIDTH,' ')));
 
@@ -280,7 +303,7 @@ public class CLIView {
      * @param index the index (0-19) of a cell in the schema
      * @return a string containing the coordinates
      */
-    private  String rowColmumn(int index){
+    private static String rowColmumn(int index){
         int row= index/SchemaCard.NUM_COLS;
         int column= index%SchemaCard.NUM_COLS;
         return String.format(cliElems.getElem("row-col"),uiMsg.getMessage("row"),row,uiMsg.getMessage("col"),column);

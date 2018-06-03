@@ -53,8 +53,8 @@
         <ita>Utensile numero:</ita>
     </tool-number>
     <round>
-        <eng>Round number:%d</eng>
-        <ita>Round numero:%d</ita>
+        <eng>Round number:</eng>
+        <ita>Round numero:</ita>
     </round>
     <turn>
         <eng>Turn of the player number:%d</eng>
@@ -85,7 +85,7 @@
         <ita>colonna:</ita>
     </col>
     <pos>
-        <eng>position:</eng>
+        <eng>position: </eng>
         <ita>posizione:</ita>
     </pos>
     <message-prompt>
@@ -93,11 +93,15 @@
         <ita>Digita qui le tue mosse</ita>
     </message-prompt>
     <quit-option>
-        <eng>to abandon the match type q</eng>
-        <ita>per abbandonare la partita scrivi q</ita>
+        <eng>q -> abandon the match </eng>
+        <ita>q -> abbandonare partita</ita>
     </quit-option>
     <discard-option>
-        <eng>to discard the selection type d</eng>
-        <ita>per ignorare la selezione type d</ita>
+        <eng>d -> discard the selection</eng>
+        <ita>d -> ignorare la selezione</ita>
+    </discard-option>
+    <discard-option>
+        <eng>e -> end your turn</eng>
+        <ita>e -> termina il turno</ita>
     </discard-option>
 </messages>
