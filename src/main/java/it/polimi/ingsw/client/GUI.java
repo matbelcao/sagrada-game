@@ -1,81 +1,113 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.client.ClientUI;
 import it.polimi.ingsw.client.uielements.UILanguage;
-import it.polimi.ingsw.client.uielements.UIMessages;
-import it.polimi.ingsw.common.immutables.LightDie;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
-import it.polimi.ingsw.common.immutables.LightTool;
+import it.polimi.ingsw.common.immutables.*;
 import javafx.application.Application;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import it.polimi.ingsw.common.immutables.*;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.util.List;
 import java.util.Map;
 
 public class GUI extends Application implements ClientUI {
     private static Client client;
-    private static UIMessages uimsg;
-    private static GUI instance;
-    private BooleanProperty booleanProperty = new SimpleBooleanProperty(true);
+    private static UILanguage language;
+    private static Stage primaryStage;
+    private boolean logged;
 
-    public static void launch(Client client, UILanguage lang) {
-        GUI.client = client;
-        GUI.uimsg = new UIMessages(lang);
-        Application.launch(GUI.class);
+    public GUI(Client client, UILanguage language){
+        this.client=client;
+        this.language=language;
     }
 
-    public GUI(){ instance = this; }
-
-    public static GUI getGUI(){
-        return instance;
+    public GUI(){
     }
+
+
 
     @Override
     public void start(Stage primaryStage) {
-        client.setUsername("mario");
+        primaryStage.setTitle("LOGIN WINDOW");
+        this.primaryStage=primaryStage;
+        //---
 
-        primaryStage.setTitle("Drawing Operations Test");
-        Group root = new Group();
-        Canvas canvas = new Canvas(300, 250);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        drawShapes(gc);
-        root.getChildren().add(canvas);
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
-        booleanProperty.addListener(new ChangeListener<Boolean>() {
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        //----------
+        Scene scene = new Scene(grid, 300, 275);
+        primaryStage.setScene(scene);
+
+        Text scenetitle = new Text("Welcome");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        Label userName = new Label("User Name:");
+        grid.add(userName, 0, 1);
+
+        TextField userTextField = new TextField();
+        grid.add(userTextField, 1, 1);
+
+        Label pw = new Label("Password:");
+        grid.add(pw, 0, 2);
+
+        PasswordField pwBox = new PasswordField();
+        grid.add(pwBox, 1, 2);
+        //-----------------
+        Button btn = new Button("Sign in");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(btn);
+        grid.add(hbBtn, 1, 4);
+
+        //---
+        final Text actiontarget = new Text();
+        grid.add(actiontarget, 1, 6);
+
+        //----
+        btn.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                System.out.println("changed " + oldValue + "->" + newValue);
-                drawShapes2(primaryStage);
+            public void handle(ActionEvent e) {
+                System.out.println(userTextField.getText());
+                actiontarget.setFill(Color.FIREBRICK);
+                actiontarget.setText("Sign in button pressed");
+                System.out.println(userTextField.getText()+"   "+pwBox.getText().toCharArray());
+                client.setUsername(userTextField.getText());
+                client.setPassword(pwBox.toString().toCharArray());
             }
         });
-    }
-
-    private void drawShapes2(Stage primaryStage) {
-        Group root = new Group();
-        Canvas canvas = new Canvas(200, 400);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        root.getChildren().add(canvas);
-        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
     private void drawShapes(GraphicsContext gc) {
         gc.setFill(Color.GREEN);
-        gc.setStroke(Color.RED);
-        gc.setLineWidth(1);
-        gc.strokeLine(350, 100, 10, 40);
+        gc.setStroke(Color.BLUE);
+        gc.setLineWidth(5);
+        gc.strokeLine(40, 10, 10, 40);
         gc.fillOval(10, 60, 30, 30);
         gc.strokeOval(60, 60, 30, 30);
         gc.fillRoundRect(110, 60, 30, 30, 10, 10);
@@ -94,36 +126,24 @@ public class GUI extends Application implements ClientUI {
                 new double[]{210, 210, 240, 240}, 4);
     }
 
-    /*@Override
-    public void start(Stage stage) {
-        Group root = new Group();
-        Scene scene = new Scene(root, 500, 200);
-        stage.setScene(scene);
-        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-        //set Stage boundaries to visible bounds of the main screen
-        stage.setX(primaryScreenBounds.getMinX());
-        stage.setY(primaryScreenBounds.getMinY());
-        stage.setWidth(primaryScreenBounds.getWidth());
-        stage.setHeight(primaryScreenBounds.getHeight());
-        System.out.println(primaryScreenBounds);
-        stage.show();
-    }*/
-
-    @Override
-    public void showLoginScreen() {
-
-    }
-
-
-    @Override
-    public void updateLogin(boolean logged) {
-
-    }
-
-
     @Override
     public void updateConnectionOk() {
 
+    }
+
+    @Override
+    public void showLoginScreen() {
+        launch();
+    }
+
+    @Override
+    public void updateLogin(boolean logged) {
+        if(logged){
+            System.out.println("Succ logged");
+        }else{
+            System.out.println("Fail login");
+        }
+        //primaryStage.close();
     }
 
     @Override
@@ -156,7 +176,6 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-
     @Override
     public void updateRoundTrack(List<List<LightDie>> roundtrack) {
 
@@ -167,14 +186,13 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-
     @Override
     public void updateRoundStart(int numRound, List<List<LightDie>> roundtrack) {
 
     }
 
     @Override
-    public void updateTurnStart(int playerId, boolean isFirstTurn, Map<Integer,LightDie> draftpool) {
+    public void updateTurnStart(int playerId, boolean isFirstTurn, Map<Integer, LightDie> draftpool) {
 
     }
 
@@ -183,12 +201,10 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-
     @Override
     public void updateStatusMessage(String statusChange, int playerId) {
 
     }
-
 
     @Override
     public void updateConnectionClosed() {
@@ -202,7 +218,7 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void printmsg(String msg) {
-        booleanProperty.setValue(false);
+        System.out.println(msg);
     }
 
     @Override
