@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.immutables.*;
@@ -141,7 +142,7 @@ public class SocketClient implements ClientConn {
     public boolean login(String username, char [] password) {
         ArrayList<String> parsedResult = new ArrayList<>();
 
-        outSocket.println("LOGIN " + username + " " + password);
+        outSocket.println("LOGIN " + username + " " + Credentials.toString(password));
         outSocket.flush();
 
 

@@ -23,7 +23,7 @@ public class CLIViewUtils {
     static final int CELL_WIDTH = 7;
     static final int OBJ_LENGTH = 38;
     static final int SCREEN_WIDTH = 160;
-    static final int SCREEN_CLEAR =100;
+    static final String SCREEN_CLEAR ="\033[H\033[2J";
     static final int MENU_WIDTH = 80;
     static final int MENU_HEIGHT = 21;
     static final String FAVOR= "●";
@@ -52,7 +52,7 @@ public class CLIViewUtils {
     public static String resetScreenPosition() {
         StringBuilder builder= new StringBuilder();
         Client.getOsName();
-        if(Client.isWindows()){
+        /*if(Client.isWindows()){
             builder.append(ansi().eraseScreen());
             builder.append(ansi().restoreCursorPosition());
         }
@@ -61,6 +61,8 @@ public class CLIViewUtils {
             builder.append(replicate("\u001b[A",SCREEN_CLEAR));
         }
         return builder.toString();
+        */
+        return SCREEN_CLEAR;
     }
     /**
      * this method is used to create a string that represents a list of strings by appending them one to another separated by a newline

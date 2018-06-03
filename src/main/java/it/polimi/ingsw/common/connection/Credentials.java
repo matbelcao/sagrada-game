@@ -15,6 +15,16 @@ public class Credentials {
 
         return Base64.getEncoder().encodeToString(new String (hash).getBytes()).toCharArray();
     }
+
+    public static String toString(char[] charArray){
+        StringBuilder string = new StringBuilder();
+        for(char c: charArray){
+            string.append(c);
+        }
+        return string.toString();
+    }
+
+
     private static char[] concat(char[]a,char[] b){
         char[] concat = new char[a.length+b.length];
         for(int i=0; i<a.length+b.length;i++){

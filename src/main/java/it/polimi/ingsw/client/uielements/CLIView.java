@@ -40,14 +40,11 @@ public class CLIView {
 
     public String showLoginUsername() {
         StringBuilder result= new StringBuilder();
-        result.append(resetScreenPosition());
         try {
             result.append(cliElems.getWall());
         } catch (IOException e) {
 
         }
-        result.append(uiMsg.getMessage("connection-ok")).append("%n");
-
         result.append(String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-username")));
         return result.toString();
     }
