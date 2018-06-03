@@ -282,15 +282,12 @@ This asks the server a list of possible placements for the die that has been rer
 
 ### Server-side
 ###### Notice: the following messages of this section starting with `LIST` require an `ACK list` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
-##### `LIST schema|roundtrack|draftpool [<index>,[<schema_index>|<round>,<number>],<color>,<shade>] ...`
+##### `LIST schema|roundtrack|draftpool [<position>,<color>,<shade>] ...`
 
 +   `schema`: provides an ordered list of the positions of the player's schema that have a die in place. The client can then `SELECT` a die from this list using the command above to obtain a list of possible placements (for example while using tool cards)
 +   `roundtrack`: provides an ordered list of the dice that are in the roundtrack
 +   `draftpool`: provides an ordered list of the dice of the draftpool
-+   `<index>`: (starting from 0) is the index of the item in the list that was requested, this is what will be used to later select the die
-+   `<schema_index>`: those field is filled if the list is about the dice in a schema (0 to 19)
-+   `<round>,<number>`: theese fields are filled in if the list regards the roundtrack
-+   if the `draftpool` is the subject, only `<index>,<color>,<shade>` are specified
++   `<position>`: an integer value that carries the information about the position of the die in the element of the board
 +   `<color>,<shade>`: represent the characteristics of the die
 
 
@@ -332,24 +329,17 @@ This message is a simple acknowledgement to a previous `DISCARD` sent by the pla
 This is the reply of the server to a `CHOOSE` message previously received from the user.
 
 ### Toolcards Specific
---
+
 ###Client-side
 ##### `CHOOSE die <index> [increase|decrease|reroll|flip|put_in_bag] `
 This message can only be sent within the usage of tool cards that require to choose a die from the draftpool, the schema or the roundtrack. A `GET_DICE_LIST ...` is required before using it. This has to be used by toolcards with id in {1,5,6,10,11}
 In toolcard #5 the chosen die is the one in the roundtrack, while the one in the draftpool is selected.
+
 ##### `CHOOSE face <shade>`
 This is used in toolcard #11 to set the new face of the die that he has drafted from the dice bag. The die can then be selected with a `SELECT modified_die` after receiving a `CHOICE ok`.
 
 ### Server-side
-##### `CHOICE ko|ok modified_die <color>[,<shade>]`
-+   `modified_die <color>,<shade>`: follows a `CHOOSE die ...` and reports the result back to the user who can then select the die with a `SELECT modified_die`(with tool #11 the user needs to choose the face first)
-+   `ok`: this signals a valid choice
-+   `ko`: this signals an invalid choice sent to the server with `CHOOSE`
-
-This is used within the procedure of the toolcards #1,5,6,10,11
-
-##### `CHOICE ko|ok rerolled_dice`
-+   `rerolled_dice`: follows a `CHOOSE tool` where the selected tool is the #7 and reports to the user the fact that it was used (rerolling all draftpool dice)
+##### `CHOICE ko|ok`
 +   `ok`: this signals a valid choice
 +   `ko`: this signals an invalid choice sent to the server with `CHOOSE`
 
