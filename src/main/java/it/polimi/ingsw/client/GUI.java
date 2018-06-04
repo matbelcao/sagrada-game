@@ -2,8 +2,10 @@ package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.uielements.CommandQueue;
 import it.polimi.ingsw.client.uielements.UILanguage;
+import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.immutables.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -16,6 +18,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.scene.text.Font;
@@ -28,35 +31,44 @@ import java.util.Map;
 
 public class GUI extends Application implements ClientUI {
     private static Client client;
-    private static UILanguage language;
-    private static Stage primaryStage;
-    private boolean logged;
+    private static UIMessages uimsg;
+    private Stage primaryStage;
+    private static GUI instance;
 
-    public GUI(Client client, UILanguage language){
-        GUI.client =client;
-        GUI.language =language;
+
+    public GUI() {
+        instance = this;
     }
 
-    public GUI(){
+    public static GUI getGUI() {
+        return instance;
     }
 
 
+    public static void launch(Client client, UILanguage lang) {
+
+        GUI.client = client;
+        GUI.uimsg = new UIMessages(lang);
+        Application.launch(GUI.class);
+    }
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("LOGIN WINDOW");
-        GUI.primaryStage =primaryStage;
-        //---
+        this.primaryStage = primaryStage;
+        primaryStage.setScene(logInScene());
+        primaryStage.setResizable(false);
+        primaryStage.show();
 
+    }
+
+    private Scene logInScene() {
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
-
-        //----------
-        Scene scene = new Scene(grid, 325, 300);
-        primaryStage.setScene(scene);
+        Scene loginScene = new Scene(grid, 325, 300);
 
         Text scenetitle = new Text("Sagrada");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
@@ -89,16 +101,22 @@ public class GUI extends Application implements ClientUI {
 
             @Override
             public void handle(ActionEvent e) {
-                System.out.println(usernameField.getText());
+                /*System.out.println(usernameField.getText());
                 actiontarget.setFill(Color.FIREBRICK);
                 actiontarget.setText("Sign in button pressed");
                 System.out.println(usernameField.getText()+"   "+passwordField.getText().toCharArray());
                 client.setUsername(usernameField.getText());
-                client.setPassword(passwordField.toString().toCharArray());
+                client.setPassword(passwordField.toString().toCharArray());*/
+                primaryStage.setScene(getScene2());
             }
         });
-        primaryStage.setResizable(false);
-        primaryStage.show();
+        return loginScene;
+    }
+
+    private Scene getScene2() {
+        StackPane layou2 = new StackPane();
+        Scene scene2 = new Scene(layou2, 600, 400);
+        return scene2;
     }
 
     private void drawShapes(GraphicsContext gc) {
@@ -131,14 +149,13 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void showLoginScreen() {
-        launch();
     }
 
     @Override
     public void updateLogin(boolean logged) {
-        if(logged){
+        if (logged) {
             System.out.println("Succ logged");
-        }else{
+        } else {
             System.out.println("Fail login");
         }
         //primaryStage.close();
@@ -204,7 +221,6 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-
     @Override
     public void updateRoundStart(int numRound, List<List<LightDie>> roundtrack) {
 
@@ -237,7 +253,12 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void printmsg(String msg) {
-        System.out.println(msg);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                primaryStage.setScene(getScene2());
+            }
+        });
     }
 
     @Override
