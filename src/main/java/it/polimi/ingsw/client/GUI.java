@@ -35,6 +35,7 @@ public class GUI extends Application implements ClientUI {
     private static UIMessages uimsg;
     private Stage primaryStage;
     private static GUI instance;
+    private Text messageToUser = new Text();
 
 
     public GUI() {
@@ -93,17 +94,14 @@ public class GUI extends Application implements ClientUI {
         grid.add(hbBtn, 1, 4);
 
         //---
-        final Text actiontarget = new Text();
-        grid.add(actiontarget, 1, 6);
+
+        grid.add(messageToUser, 1, 6);
 
         //----
         button.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent e) {
-                System.out.println(usernameField.getText());
-                actiontarget.setFill(Color.FIREBRICK);
-                actiontarget.setText("Sign in button pressed");
                 System.out.println(usernameField.getText()+"   "+passwordField.getText().toCharArray());
                 client.setUsername(usernameField.getText());
                 client.setPassword(Credentials.hash(client.getUsername(),passwordField.getText().toCharArray()));
@@ -153,9 +151,21 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void updateLogin(boolean logged) {
         if (logged) {
-            System.out.println("Succ logged");
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    messageToUser.setFill(Color.GREEN);
+                    messageToUser.setText("Logged in successfully");
+                }
+            });
         } else {
-            System.out.println("Fail login");
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    messageToUser.setFill(Color.FIREBRICK);
+                    messageToUser.setText("Failed login, please retry");
+                }
+            });
         }
         //primaryStage.close();
     }
