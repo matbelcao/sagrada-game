@@ -248,11 +248,7 @@ public class GUI extends Application implements ClientUI {
     public String getCommand() {
         return null;
     }
-
-    @Override
-    public void setCommandQueue(CommandQueue commandQueue) {
-
-    }
+    
 
     @Override
     public void update(Observable o, Object arg) {
