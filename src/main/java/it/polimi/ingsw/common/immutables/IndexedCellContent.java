@@ -2,7 +2,11 @@ package it.polimi.ingsw.common.immutables;
 
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.common.enums.GameStatus;
+import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.model.Die;
+import it.polimi.ingsw.server.model.SchemaCard;
+import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +79,48 @@ public class IndexedCellContent {
             result.add(LightDie.toLightDie(draftpool.get(index)));
         }
         return result;
+    }
+
+    public static List<IndexedCellContent> toSchemaDiceList(SchemaCard schema){
+        List<IndexedCellContent> indexedList=new ArrayList<>();
+        IndexedCellContent indexedCell;
+        Die die;
+
+        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+
+        while(diceIterator.hasNext()) {
+            die = diceIterator.next().getDie();
+            indexedCell = new IndexedCellContent(diceIterator.getIndex(), die);
+            indexedList.add(indexedCell);
+        }
+        return indexedList;
+    }
+
+    public static List<IndexedCellContent> toDraftedDiceList(List<Die> draftedDice){
+        List<IndexedCellContent> indexedList=new ArrayList<>();
+        IndexedCellContent indexedCell;
+        Die die;
+
+        for (int index=0;index<draftedDice.size();index++){
+            die=draftedDice.get(index);
+            indexedCell=new IndexedCellContent(index,die);
+            indexedList.add(indexedCell);
+        }
+        return indexedList;
+    }
+
+    public static List<IndexedCellContent> toRoundTrackDiceList(List<List<Die>> dieTrack){
+        List<IndexedCellContent> indexedList=new ArrayList<>();
+        IndexedCellContent indexedCell;
+
+        for(int index=0;index<dieTrack.size();index++){
+            List<Die> dieList= dieTrack.get(index);
+            for(Die d:dieList){
+                indexedCell=new IndexedCellContent(index,d);
+                indexedList.add(indexedCell);
+            }
+        }
+        return indexedList;
     }
 
 }

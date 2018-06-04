@@ -457,7 +457,7 @@ public class SocketServer extends Thread implements ServerConn  {
             numberInRound=0;
             dieList= (ArrayList<Die>) trackList.get(round);
             for(Die d:dieList){
-                outSocket.print(" "+index+","+round+","+numberInRound+","+d.getColor().toString()+","+d.getShade().toString());
+                outSocket.print(" "+index+","+round+","+d.getColor().toString()+","+d.getShade().toString());
                 numberInRound++;
                 index++;
             }
@@ -477,7 +477,7 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.print("LIST draftpool");
         for (int i=0;i<draftedDice.size();i++){
             die=draftedDice.get(i);
-            outSocket.print(" "+i+","+die.getColor().toString()+","+die.getShade().toString());
+            outSocket.print(" "+i+","+i+","+die.getColor().toString()+","+die.getShade().toString());
         }
         outSocket.println("");
         outSocket.flush();

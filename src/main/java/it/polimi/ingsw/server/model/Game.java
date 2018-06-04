@@ -272,23 +272,7 @@ public class Game extends Thread implements Iterable  {
     }
 
 
-    public List<IndexedCellContent> getSchemaDiceList(User user){
-        List<IndexedCellContent> indexedList=new ArrayList<>();
-        IndexedCellContent indexedCell;
-        Die die;
 
-        gameStatus=GameStatus.REQUESTED_SCHEMA_CARD;
-
-        SchemaCard schema = board.getPlayer(user).getSchema();
-        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
-
-        while(diceIterator.hasNext()) {
-            die = diceIterator.next().getDie();
-            indexedCell = new IndexedCellContent(diceIterator.getIndex(), die);
-            indexedList.add(indexedCell);
-        }
-        return indexedList;
-    }
 
 
     /**
@@ -304,22 +288,7 @@ public class Game extends Thread implements Iterable  {
         return board.getDraftPool().getDraftedDice();
     }
 
-    public List<IndexedCellContent> getDraftedDiceList(){
-        List<IndexedCellContent> indexedList=new ArrayList<>();
-        IndexedCellContent indexedCell;
-        Die die;
 
-        gameStatus=GameStatus.REQUESTED_DRAFT_POOL;
-
-        List<Die> draftedDice= board.getDraftPool().getDraftedDice();
-
-        for (int index=0;index<draftedDice.size();index++){
-            die=draftedDice.get(index);
-            indexedCell=new IndexedCellContent(index,die);
-            indexedList.add(indexedCell);
-        }
-        return indexedList;
-    }
 
     /**
      * Responds to the request by sending the roundracks's content to the user of the match
@@ -334,24 +303,7 @@ public class Game extends Thread implements Iterable  {
         return board.getDraftPool().getRoundTrack().getTrack();
     }
 
-    public List<IndexedCellContent> getRoundTrackDiceList(){
-        List<IndexedCellContent> indexedList=new ArrayList<>();
-        IndexedCellContent indexedCell;
-        Die die;
 
-        gameStatus=GameStatus.REQUESTED_ROUND_TRACK;
-
-        List<List<Die>> dieTrack = board.getDraftPool().getRoundTrack().getTrack();
-        List<Die> dieList;
-        for(int index=0;index<dieTrack.size();index++){
-            dieList= dieTrack.get(index);
-            for(Die d:dieList){
-                indexedCell=new IndexedCellContent(index,d);
-                indexedList.add(indexedCell);
-            }
-        }
-        return indexedList;
-    }
 
     /**
      * Responds to the request by sending the list of the match's players (and their id inside the Player class)
