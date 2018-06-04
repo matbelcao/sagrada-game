@@ -3,6 +3,7 @@ package it.polimi.ingsw.client;
 import it.polimi.ingsw.client.uielements.CommandQueue;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
+import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.immutables.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -28,12 +29,14 @@ import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 
 public class GUI extends Application implements ClientUI {
     private static Client client;
     private static UIMessages uimsg;
     private Stage primaryStage;
     private static GUI instance;
+    private Text messageToUser = new Text();
 
 
     public GUI() {
@@ -46,7 +49,6 @@ public class GUI extends Application implements ClientUI {
 
 
     public static void launch(Client client, UILanguage lang) {
-
         GUI.client = client;
         GUI.uimsg = new UIMessages(lang);
         Application.launch(GUI.class);
@@ -93,21 +95,17 @@ public class GUI extends Application implements ClientUI {
         grid.add(hbBtn, 1, 4);
 
         //---
-        final Text actiontarget = new Text();
-        grid.add(actiontarget, 1, 6);
+
+        grid.add(messageToUser, 1, 6);
 
         //----
         button.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent e) {
-                /*System.out.println(usernameField.getText());
-                actiontarget.setFill(Color.FIREBRICK);
-                actiontarget.setText("Sign in button pressed");
                 System.out.println(usernameField.getText()+"   "+passwordField.getText().toCharArray());
                 client.setUsername(usernameField.getText());
-                client.setPassword(passwordField.toString().toCharArray());*/
-                primaryStage.setScene(getScene2());
+                client.setPassword(Credentials.hash(client.getUsername(),passwordField.getText().toCharArray()));
             }
         });
         return loginScene;
@@ -154,9 +152,21 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void updateLogin(boolean logged) {
         if (logged) {
-            System.out.println("Succ logged");
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    messageToUser.setFill(Color.GREEN);
+                    messageToUser.setText("Logged in successfully");
+                }
+            });
         } else {
-            System.out.println("Fail login");
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    messageToUser.setFill(Color.FIREBRICK);
+                    messageToUser.setText("Failed login, please retry");
+                }
+            });
         }
         //primaryStage.close();
     }
@@ -269,5 +279,10 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void setCommandQueue(CommandQueue commandQueue) {
 
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        
     }
 }
