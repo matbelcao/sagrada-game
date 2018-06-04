@@ -3,9 +3,7 @@ package it.polimi.ingsw.client.connection;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public interface ClientConn {
     /**

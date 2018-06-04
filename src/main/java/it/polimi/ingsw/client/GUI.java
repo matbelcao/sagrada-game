@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.ClientUI;
+import it.polimi.ingsw.client.uielements.CommandQueue;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.common.immutables.*;
 import javafx.application.Application;
@@ -8,9 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -24,7 +22,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.util.List;
 import java.util.Map;
@@ -183,9 +180,30 @@ public class GUI extends Application implements ClientUI {
     }
 
     @Override
-    public void showRoundTrackWithCoordinates(List<List<LightDie>> roundtrack) {
+    public void showRoundtrackDiceList(List<IndexedCellContent> roundtrack) {
 
     }
+
+    @Override
+    public void showDraftPoolDiceList(List<IndexedCellContent> draftpool) {
+
+    }
+
+    @Override
+    public void showSchemaDiceList(List<IndexedCellContent> schema) {
+
+    }
+
+    @Override
+    public void showTurnInitScreen() {
+
+    }
+
+    @Override
+    public void showNotYourTurnScreen() {
+
+    }
+
 
     @Override
     public void updateRoundStart(int numRound, List<List<LightDie>> roundtrack) {
@@ -225,5 +243,10 @@ public class GUI extends Application implements ClientUI {
     @Override
     public String getCommand() {
         return null;
+    }
+
+    @Override
+    public void setCommandQueue(CommandQueue commandQueue) {
+
     }
 }

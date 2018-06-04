@@ -2,7 +2,6 @@ package it.polimi.ingsw.client.uielements;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.SchemaCard;
 
@@ -27,6 +26,7 @@ public class CLIViewUtils {
     static final int MENU_WIDTH = 80;
     static final int MENU_HEIGHT = 21;
     static final String FAVOR= "●";
+    static final String ESCAPE="\\u001B\\[([0-9]|([0-9][0-9]))m";
 
 
 
@@ -42,6 +42,15 @@ public class CLIViewUtils {
 
     private CLIViewUtils(){}
 
+    public static int printableLength(String line){
+        String[] chars=line.split(ESCAPE);
+        int length=0;
+        for(String part: chars){
+            length+=part.length();
+        }
+        return length;
+    }
+
     static String printFavorTokens(int tokens){
         return replicate(FAVOR,tokens);
     }
@@ -51,7 +60,7 @@ public class CLIViewUtils {
      */
     public static String resetScreenPosition() {
 
-        Client.getOsName();
+
         if(Client.isWindows()){
             try {
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
@@ -69,7 +78,7 @@ public class CLIViewUtils {
         if(die==null || !die.isDie()){
             throw new IllegalArgumentException();
         }
-        Client.getOsName();
+
         if(Client.isWindows()){
             return boldify(addColorToLine(die.getShade().toInt()+"",die.getColor()));
         }
@@ -183,7 +192,7 @@ public class CLIViewUtils {
      */
     static String alignRight(String line, int size){
         if(line==null||line.length()>size){ throw new IllegalArgumentException();}
-        return padUntil("",size-line.length(),' ')+line;
+        return padUntil("",size-printableLength(line),' ')+line;
     }
 
 
@@ -370,9 +379,9 @@ public class CLIViewUtils {
      * @return the padded string
      */
     static String padUntil(String toPad, int finalLength, char filler){
-        if(finalLength<0|| toPad==null||toPad.length()>finalLength){throw new IllegalArgumentException();}
+        if(finalLength<0|| toPad==null||printableLength(toPad)>finalLength){throw new IllegalArgumentException();}
 
-        return toPad+ replicate(filler+"",finalLength - toPad.length());
+        return toPad+ replicate(filler+"",finalLength - printableLength(toPad));
 
     }
 
@@ -387,7 +396,7 @@ public class CLIViewUtils {
         List<String> result=new ArrayList<>();
 
         String lineToFit= line;
-        while(lineToFit.length()>length){
+        while(printableLength(lineToFit)>length){
             int i = length;
             while(lineToFit.charAt(i) != ' '){
                 i--;
@@ -395,7 +404,7 @@ public class CLIViewUtils {
             result.add(lineToFit.substring(0,i));
             lineToFit=lineToFit.substring(i).trim();
         }
-        if(lineToFit.trim().length()>=0){
+        if(printableLength(lineToFit.trim())>=0){
             result.add(padUntil(lineToFit,length,' '));
         }
         return result;
@@ -423,7 +432,7 @@ public class CLIViewUtils {
      * @param color the color to apply
      * @return the colored string
      */
-    static String addColorToLine(String line, Color color){
+    public static String addColorToLine(String line, Color color){
         return color.getUtf()+line+Color.RESET;
     }
 

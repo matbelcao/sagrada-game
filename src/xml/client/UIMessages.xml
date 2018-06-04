@@ -65,13 +65,17 @@
         <ita>E' il tuo turno</ita>
     </yourTurn>
     <draftpool>
-        <eng>   ‹ Draft pool</eng>
-        <ita>   ‹ Riserva</ita>
+        <eng>Draft pool</eng>
+        <ita>Riserva</ita>
     </draftpool>
     <roundtrack>
-        <eng>   ‹ Round track </eng>
-        <ita>   ‹ Tracciato dei round </ita>
+        <eng>Round track</eng>
+        <ita>Tracciato dei round</ita>
     </roundtrack>
+    <schema>
+        <eng>Window</eng>
+        <ita>Vetrata</ita>
+    </schema>
     <can-be-placed>
         <eng>‹ This die can be placed in the following positions:</eng>
         <ita>‹ Il dado può essere piazzato nelle seguenti posizioni:</ita>
@@ -104,4 +108,16 @@
         <eng>e -> end your turn</eng>
         <ita>e -> termina il turno</ita>
     </discard-option>
+    <dice-list>
+        <eng>Choose one of the following dice from the %s by entering the index of the row:</eng>
+        <ita>Scegli uno dei seguenti dadi da %s attreverso il numero di riga:</ita>
+    </dice-list>
+    <place-die>
+        <eng>Place a die in your window</eng>
+        <ita>Piazza un dado nella tua vetrata</ita>
+    </place-die>
+    <use-tool>
+        <eng>Use a Tool</eng>
+        <ita>Usa un Utensile</ita>
+    </use-tool>
 </messages>
