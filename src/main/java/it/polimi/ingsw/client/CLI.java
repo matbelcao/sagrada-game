@@ -6,12 +6,13 @@ import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.io.Console;
+import java.io.Reader;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 
 public class CLI implements ClientUI {
     private final CLIView view;
+    private final Reader reader;
     private Console console;
     private Client client;
     private UIMessages uimsg;
@@ -25,7 +26,7 @@ public class CLI implements ClientUI {
             System.err.println("ERR: couldn't retrieve any console!");
             System.exit(1);
         }
-
+        this.reader= console.reader();
         this.uimsg=new UIMessages(lang);
         this.client = client;
         this.view=new CLIView(lang);
@@ -35,7 +36,7 @@ public class CLI implements ClientUI {
     private void commandListener(){
         new Thread(() -> {
             while(client.isLogged()){
-                commandQueue.add(console.readLine());
+                commandQueue.add(reader.toString());
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {

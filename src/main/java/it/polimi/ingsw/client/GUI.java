@@ -231,15 +231,7 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-    @Override
-    public void updateRoundStart(int numRound, List<List<LightDie>> roundtrack) {
 
-    }
-
-    @Override
-    public void updateTurnStart(int playerId, boolean isFirstTurn, Map<Integer, LightDie> draftpool) {
-
-    }
 
     @Override
     public void updateToolUsage(List<LightTool> tools) {

@@ -318,7 +318,7 @@ public class Client {
 
         while(userStatus.equals(UserStatus.PLAYING)) {
 
-            if (commandQueue.read().equals("q")){
+            if(commandQueue.read().equals("q")){
                 commandQueue.pop();
                 quit();
             }
@@ -356,7 +356,8 @@ public class Client {
             userStatus=UserStatus.PLAYING;
             lockStatus.notifyAll();
         }
-        clientUI.showDraftedSchemas(clientConn.getSchemaDraft(),clientConn.getPrivateObject());
+        board.setPrivObj(clientConn.getPrivateObject());
+        clientUI.showDraftedSchemas(clientConn.getSchemaDraft(),board.getPrivObj());
 
     }
 
@@ -390,6 +391,8 @@ public class Client {
         board.setDraftPool(clientConn.getDraftPool());
         board.setNowPlaying(playerId);
         board.setIsFirstTurn(isFirstTurn);
+
+
 
     }
 
