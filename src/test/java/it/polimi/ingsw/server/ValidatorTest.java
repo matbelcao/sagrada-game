@@ -70,6 +70,11 @@ public class ValidatorTest {
             assertEquals("3", parsedResult.get(2));
         }
 
+        command= "   GET   favor_tokens ";
+
+        assertTrue(Validator.isValid(command,parsedResult));
+        assertTrue(Validator.checkGetParams(command,parsedResult));
+
         //invalid playerid
         command= "   GET   schema  4  ";
 

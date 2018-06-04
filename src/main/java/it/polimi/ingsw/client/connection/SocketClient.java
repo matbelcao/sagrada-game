@@ -78,43 +78,13 @@ public class SocketClient implements ClientConn {
                         } else if (ClientParser.isGame(inSocket.readln())) {
                             updateMessages(result);
                             inSocket.pop();
-
-                        }
-
-
-
-
-
-                        //------now for testing(to remove and use connection's methods)-----
-
-                        else if (ClientParser.isList(inSocket.readln())) {
-                            switch (result.get(1)) {
-                                case "schema":
-                                    client.printDebug(inSocket.readln());
-                                    break;
-                                case "roundtrack":
-                                    client.printDebug(inSocket.readln());
-                                    break;
-                                case "draftpool":
-                                    client.printDebug(inSocket.readln());
-                                    break;
-                                case "placements":
-                                    client.printDebug(inSocket.readln());
-                                    break;
-                                case "tool_details":
-                                    break;
-                            }
-                            inSocket.pop();
-                        } else if (ClientParser.isChoice(inSocket.readln())) {
-                            client.printDebug(inSocket.readln());
-                            inSocket.pop();
                         }
                         else if(ClientParser.isInvalid(inSocket.readln())){
                             inSocket.pop();
-                            client.printDebug("INVALID message");
+                            System.out.println("INVALID message");
                         }else{
-                            client.printDebug("ERR: control error caused by:  " + inSocket.readln());
-                            inSocket.pop();
+                            System.out.println("ERR: control error caused by:  " + inSocket.readln());
+                            //inSocket.pop();
                         }
                     }
                 } catch (Exception e) {
