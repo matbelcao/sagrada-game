@@ -45,6 +45,7 @@ public class ClientParserTest {
         assertEquals("start",parsedResult.get(1));
         assertEquals("2",parsedResult.get(2));
         assertEquals("3",parsedResult.get(3));
+        assertTrue(ClientParser.isGame("GAME start 2 3"));
 
         assertTrue(ClientParser.parse("GAME end 1,45,1", parsedResult));
         assertTrue(ClientParser.parse("GAME end 1,45,1 2,28,2", parsedResult));

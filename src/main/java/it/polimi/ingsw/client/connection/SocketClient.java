@@ -56,9 +56,10 @@ public class SocketClient implements ClientConn {
                     inSocket.add();
 
                     if(ClientParser.parse(inSocket.readln(),result)) {
-                        if(ClientParser.isAck(inSocket.readln())){
+                        /*if(ClientParser.isAck(inSocket.readln())){
+                            inSocket.pop();fdfd
+                        }else */if(ClientParser.isStatus(inSocket.readln())) {
                             inSocket.pop();
-                        }else if(ClientParser.isStatus(inSocket.readln())) {
                             switch (result.get(1)) {
                                 case "check":
                                     pong();
@@ -70,14 +71,13 @@ public class SocketClient implements ClientConn {
                                 case "quit":
                                     break;
                             }
-                            inSocket.pop();
                         }  else if (ClientParser.isLobby(inSocket.readln())) {
-                                updateLobby(result.get(1));
-                                inSocket.pop();
-
-                        } else if (ClientParser.isGame(inSocket.readln())) {
-                            updateMessages(result);
                             inSocket.pop();
+                            updateLobby(result.get(1));
+                        } else if (ClientParser.isGame(inSocket.readln())) {
+                            inSocket.pop();
+                            updateMessages(result);
+
                         }
                         else if(ClientParser.isInvalid(inSocket.readln())){
                             inSocket.pop();
@@ -88,6 +88,7 @@ public class SocketClient implements ClientConn {
                         }
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     try {
                         socket.close();
                     } catch (IOException e1) {
@@ -223,6 +224,11 @@ public class SocketClient implements ClientConn {
 
         int i=0;
         while(i<NUM_DRAFTED_SCHEMAS){
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")){
                 lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
                 lightSchemaCards.add(lightSchema);
@@ -247,10 +253,14 @@ public class SocketClient implements ClientConn {
         outSocket.println("GET schema "+playerId);
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")){
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")));
             lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
             inSocket.pop();
-        }
         return lightSchema;
     }
 
@@ -266,9 +276,15 @@ public class SocketClient implements ClientConn {
         outSocket.println("GET priv");
         outSocket.flush();
 
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("priv")));
         lightObjCard = LightPrivObj.toLightPrivObj(inSocket.readln());
         inSocket.pop();
+        System.out.println("qui");
         return lightObjCard;
     }
 
@@ -287,6 +303,11 @@ public class SocketClient implements ClientConn {
 
             int i=0;
             while(i<NUM_CARDS){
+                try {
+                    inSocket.waitForLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("pub")){
                     lightObjCard=LightCard.toLightCard(inSocket.readln());
                     pubObjCards.add(lightObjCard);
@@ -312,6 +333,11 @@ public class SocketClient implements ClientConn {
 
         int i=0;
         while(i<NUM_CARDS){
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("tool")){
                 lightTool=LightTool.toLightTool(inSocket.readln());
                 toolCards.add(lightTool);
@@ -336,15 +362,18 @@ public class SocketClient implements ClientConn {
         outSocket.println("GET draftpool");
         outSocket.flush();
 
-
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")){
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")));
             inSocket.pop();
             for(int i=COMMA_PARAMS_START;i<result.size();i++) {
                 args= result.get(i).split(",");
                 die=new LightDie(args[2],args[1]);
                 draftPool.add(die);
             }
-        }
         return draftPool;
     }
 
@@ -364,7 +393,12 @@ public class SocketClient implements ClientConn {
         outSocket.println("GET roundtrack");
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("roundtrack")) {
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("roundtrack")));
             inSocket.pop();
             roundTrack = new ArrayList<>();
             container = new ArrayList<>();
@@ -378,7 +412,6 @@ public class SocketClient implements ClientConn {
                 }
                 (roundTrack.get(index)).add(die);
             }
-        }
         return roundTrack;
     }
 
@@ -396,14 +429,18 @@ public class SocketClient implements ClientConn {
         outSocket.println("GET players");
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("players")){
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("players")));
             inSocket.pop();
             for(int i=COMMA_PARAMS_START;i<result.size();i++) {
                 args= result.get(i).split(",");
                 player=new LightPlayer(args[1],Integer.parseInt(args[0]));
                 playerList.add(player);
             }
-        }
         return playerList;
     }
 
@@ -420,10 +457,14 @@ public class SocketClient implements ClientConn {
         outSocket.println("GET favor_tokens "+playerId);
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("favor_tokens")){
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("favor_tokens")));
             favor_tokens=Integer.parseInt(result.get(1));
             inSocket.pop();
-        }
         return favor_tokens;
     }
 
@@ -440,10 +481,15 @@ public class SocketClient implements ClientConn {
         outSocket.println("GET_DICE_LIST schema");
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("schema")){
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("schema")));
             inSocket.pop();
             schemaList=buildIndexedList(result);
-        }
+
         return schemaList;
     }
 
@@ -461,11 +507,15 @@ public class SocketClient implements ClientConn {
         outSocket.println("GET_DICE_LIST roundtrack");
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("roundtrack")){
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("roundtrack")));
             inSocket.pop();
             roundTrack=buildIndexedList(result);
 
-        }
         return roundTrack;
     }
 
@@ -482,10 +532,14 @@ public class SocketClient implements ClientConn {
         outSocket.println("GET_DICE_LIST draftpool");
         outSocket.flush();
 
-        while (ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")) {
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")) );
             inSocket.pop();
             draftPool=buildIndexedList(result);
-        }
         return draftPool;
     }
 
@@ -521,13 +575,18 @@ public class SocketClient implements ClientConn {
         outSocket.println("SELECT die "+index);
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("placements")){
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("placements")));
             inSocket.pop();
             for(int i=COMMA_PARAMS_START;i<result.size();i++) {
                 args= result.get(i).split(",");
                 positions.add(Integer.parseInt(args[1]));
             }
-        }
+
         return positions;
     }
 
@@ -546,11 +605,14 @@ public class SocketClient implements ClientConn {
         outSocket.println("SELECT "+type+" "+index);
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isChoice(inSocket.readln())){
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isChoice(inSocket.readln())));
             inSocket.pop();
             return result.get(1).equals("ok");
-        }
-        return false;
     }
 
     /**

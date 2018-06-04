@@ -104,10 +104,10 @@ public class ClientParser {
         return message.trim().split("\\s+",2)[0].equals("INVALID");
     }
 
-    public static boolean isAck(String message){
+    /*public static boolean isAck(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals("ACK");
-    }
+    }*/
 
     public static boolean isIllegalAction(String message){
         if (message == null) throw new IllegalArgumentException();

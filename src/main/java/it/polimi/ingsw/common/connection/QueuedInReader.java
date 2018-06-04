@@ -71,4 +71,9 @@ public class QueuedInReader {
             return queue.isEmpty();
         }
     }
+    public void waitForLine() throws IOException {
+        while(isEmpty()){
+            add();
+        }
+    }
 }
