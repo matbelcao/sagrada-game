@@ -5,7 +5,6 @@ import it.polimi.ingsw.client.uielements.CLIViewUtils;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
-import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.io.Console;
@@ -31,6 +30,10 @@ public class CLI implements ClientUI{
         this.client = client;
         this.view=new CLIView(lang);
     }
+
+
+
+
 
     private void resetScreen(){
         console.printf(CLIViewUtils.resetScreenPosition());

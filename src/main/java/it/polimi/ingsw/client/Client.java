@@ -39,7 +39,8 @@ public class Client {
     private ConnectionMode connMode;
     private String username;
     private char [] password;
-    private int playerId, turnOfPlayer;
+    private int playerId;
+    private int turnOfPlayer;
 
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
@@ -104,20 +105,12 @@ public class Client {
             }else{ port=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent()); }
 
             return new Client(uiMode,connMode,serverIP,port,lang);
-
-
-
-
-        } catch (ParserConfigurationException e) {
-
-        } catch (IOException e) {
-
-        } catch (SAXException e) {
-
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            System.exit(1);
+            return null;
         }
 
-        System.exit(1);
-        return null;
+
     }
 
     public static Client getNewClient() throws InstantiationException {
