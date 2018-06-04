@@ -2,13 +2,12 @@ package it.polimi.ingsw.client.uielements;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.io.IOException;
 import java.util.*;
-
-import static org.fusesource.jansi.Ansi.ansi;
 
 /**
  * This class contains all utility methods for the cliview class. All methods here are static
@@ -51,28 +50,32 @@ public class CLIViewUtils {
      * this method is used to cleanx the screen and to make sure the lines of the page are printed starting from the top of the screen
      */
     public static String resetScreenPosition() {
-        //StringBuilder builder= new StringBuilder();
+
         Client.getOsName();
         if(Client.isWindows()){
             try {
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (InterruptedException | IOException e) {
+
             }
-            /*builder.append(ansi().eraseScreen());
-            builder.append(ansi().restoreCursorPosition());
-            return builder.toString();*/
             return "";
         }
-        //else {
 
-            /*builder.append(replicate("%n",SCREEN_CLEAR));
-            builder.append(replicate("\u001b[A",SCREEN_CLEAR));*/
-        //}
         return SCREEN_CLEAR;
     }
+
+
+    public static String buildSmallDie(CellContent die){
+        if(die==null || !die.isDie()){
+            throw new IllegalArgumentException();
+        }
+        Client.getOsName();
+        if(Client.isWindows()){
+            return boldify(addColorToLine(die.getShade().toInt()+"",die.getColor()));
+        }
+            return addColorToLine(die.getShade().getUtf(),die.getColor());
+    }
+
     /**
      * this method is used to create a string that represents a list of strings by appending them one to another separated by a newline
      * @param toPrint the list to be put in the string
@@ -153,7 +156,6 @@ public class CLIViewUtils {
 
         return result;
     }
-
 
 
     /**
