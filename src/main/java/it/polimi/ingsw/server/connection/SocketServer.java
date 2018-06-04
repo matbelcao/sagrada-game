@@ -4,6 +4,7 @@ import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.IOException;
 import java.io.PrintWriter;

@@ -160,6 +160,9 @@ public class Game extends Thread implements Iterable  {
                 placedDie=false;
                 endLock=false;
                 userPlaying = round.next();
+                try {
+                    discard();
+                } catch (IllegalActionException e) { }
 
                 //Notify to all the users the starting of the turn
                 for(User u:users){
@@ -360,7 +363,7 @@ public class Game extends Thread implements Iterable  {
         Die die;
         int tempIndex=0;
 
-        if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
+        if(gameStatus==GameStatus.INITIALIZING || gameStatus==GameStatus.TURN_RUN){ throw new IllegalActionException(); }
         if(gameStatus.equals(GameStatus.REQUESTED_SCHEMA_CARD)){
             FullCellIterator diceIterator=(FullCellIterator)board.getPlayer(user).getSchema().iterator();
             while(diceIterator.hasNext()){
@@ -392,11 +395,12 @@ public class Game extends Thread implements Iterable  {
             }
         }
         if(selectedTool!=-1){
-            //particolar toolcard's contraint
-        }else{
-            placements=board.getPlayer(user).getSchema().listPossiblePlacements(selectedDie);
+            if(!board.getToolCard(selectedTool).stageFrom()){
+                if(!board.getToolCard(selectedTool).stageFrom()){throw new IllegalActionException();}
+            }
         }
-        return null;
+        placements=board.listSchemaPlacements(user,selectedTool,selectedDie);
+        return placements;
     }
 
 
@@ -415,7 +419,7 @@ public class Game extends Thread implements Iterable  {
                 realIndex=schemaCard.listPossiblePlacements(selectedDie).get(index);
                 try {
                     schemaCard.putDie(realIndex,selectedDie);
-                    board.getDraftPool().chooseDie(index);
+                    board.getDraftPool().chooseDie(realIndex);
                     discard();
                     placedDie=true;
                     return true;
