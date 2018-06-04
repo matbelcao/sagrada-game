@@ -17,13 +17,24 @@ public class CommandQueue {
         }
     }
 
+    public boolean isEmpty(){
+        synchronized (lockQueue){
+            if(queue.isEmpty()){
+                notifyAll();
+                return true;
+            }
+            notifyAll();
+            return false;
+
+        }
+    }
+
     public String read(){
         synchronized (lockQueue){
             while(queue.isEmpty()){
                 try {
                     lockQueue.wait();
-                } catch (InterruptedException e) {
-                }
+                } catch (InterruptedException e) {}
             }
             String line=queue.get(0);
             lockQueue.notifyAll();
