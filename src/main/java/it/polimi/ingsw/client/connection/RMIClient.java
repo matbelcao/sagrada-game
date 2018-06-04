@@ -1,6 +1,8 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.common.enums.ModifyDie;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 
@@ -158,11 +160,36 @@ public class RMIClient implements ClientConn {
         return null;
     }
 
-
     @Override
-    public boolean choose(String type, int index) {
+    public boolean chooseDiePlacement(int index) {
         return false;
     }
+
+    @Override
+    public boolean chooseSchema(int index) {
+        return false;
+    }
+
+    @Override
+    public boolean chooseTool(int index) {
+        return false;
+    }
+
+    @Override
+    public boolean chooseDie(int index) {
+        return false;
+    }
+
+    @Override
+    public boolean chooseDieModify(int index, ModifyDie modify) {
+        return false;
+    }
+
+    @Override
+    public boolean chooseDieFace(int index, Face shade) {
+        return false;
+    }
+    
 
     @Override
     public void discard() {

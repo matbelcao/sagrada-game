@@ -179,7 +179,7 @@ public class SocketServer extends Thread implements ServerConn  {
                 }
                 break;
             case "favor_tokens":
-                sendFavorTokens();
+                sendFavorTokens(Integer.parseInt(parsedResult.get(2)));
                 break;
             case "priv":
                 sendPrivateObjectiveCard();
@@ -335,8 +335,8 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Sends the client a text containing his amount of favor tokens
      */
-    public void sendFavorTokens() {
-        outSocket.println("SEND favor_tokens "+user.getGame().getFavorTokens(user));
+    public void sendFavorTokens(int playerId) {
+        outSocket.println("SEND favor_tokens "+user.getGame().getFavorTokens(playerId));
         outSocket.flush();
     }
 

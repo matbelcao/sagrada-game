@@ -3,6 +3,8 @@ package it.polimi.ingsw.client.connection;
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.common.enums.ModifyDie;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.immutables.*;
 
@@ -593,17 +595,60 @@ public class SocketClient implements ClientConn {
     /**
      *  This function can be invoked to notify the server in order to make a possibly definitive choice. The server is
      *  still going to do his checks and will reply.
-     * @param type the subject of the choice (die_placement,schema or tool)
      * @param index the index of the object in the list previously sent by the server
      * @return true if the procedure is successful
      */
     @Override
-    public boolean choose(String type, int index){
-        ArrayList<String> result=new ArrayList<>();
-        if(!(type.equals("die_placement")||type.equals("schema")||type.equals("tool"))){return false;}
-
-        outSocket.println("SELECT "+type+" "+index);
+    public boolean chooseDiePlacement(int index){
+        outSocket.println("CHOOSE die_placement "+index);
         outSocket.flush();
+
+        return socketChoice();
+    }
+
+    @Override
+    public boolean chooseSchema(int index){
+        outSocket.println("CHOOSE schema "+index);
+        outSocket.flush();
+
+        return socketChoice();
+    }
+
+    @Override
+    public boolean chooseTool(int index){
+        outSocket.println("CHOOSE tool "+index);
+        outSocket.flush();
+
+        return socketChoice();
+    }
+
+    @Override
+    public boolean chooseDie(int index){
+        outSocket.println("CHOOSE die "+index);
+        outSocket.flush();
+
+        return socketChoice();
+    }
+
+    //Da rivedere come fare enum
+    @Override
+    public boolean chooseDieModify(int index, ModifyDie modify){
+        outSocket.println("CHOOSE die "+index+" "+modify.toString());
+        outSocket.flush();
+
+        return socketChoice();
+    }
+
+    @Override
+    public boolean chooseDieFace(int index, Face shade){
+        outSocket.println("CHOOSE die "+index+" "+shade.toInt());
+        outSocket.flush();
+
+        return socketChoice();
+    }
+
+    private boolean socketChoice(){
+        ArrayList<String> result=new ArrayList<>();
 
         try {
             inSocket.waitForLine();
@@ -611,8 +656,8 @@ public class SocketClient implements ClientConn {
             e.printStackTrace();
         }
         while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isChoice(inSocket.readln())));
-            inSocket.pop();
-            return result.get(1).equals("ok");
+        inSocket.pop();
+        return result.get(1).equals("ok");
     }
 
     /**

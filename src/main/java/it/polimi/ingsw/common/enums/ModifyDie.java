@@ -27,5 +27,4 @@ public enum ModifyDie {
                 return NONE;
         }
     }
-
 }

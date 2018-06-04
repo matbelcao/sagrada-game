@@ -70,7 +70,7 @@ public class ValidatorTest {
             assertEquals("3", parsedResult.get(2));
         }
 
-        command= "   GET   favor_tokens ";
+        command= "   GET   favor_tokens  3";
 
         assertTrue(Validator.isValid(command,parsedResult));
         assertTrue(Validator.checkGetParams(command,parsedResult));

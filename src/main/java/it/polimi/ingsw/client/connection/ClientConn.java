@@ -1,5 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
+import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.common.enums.ModifyDie;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.rmi.RemoteException;
@@ -114,14 +116,17 @@ public interface ClientConn {
      */
     List<Integer> selectDie(int index);
 
-    /**
-     *  This function can be invoked to notify the server in order to make a possibly definitive choice. The server is
-     *  still going to do his checks and will reply.
-     * @param type the subject of the choice (die_placement,schema or tool)
-     * @param index the index of the object in the list previously sent by the server
-     * @return true if the procedure is successful
-     */
-    boolean choose(String type, int index);
+    public boolean chooseDiePlacement(int index);
+
+    public boolean chooseSchema(int index);
+
+    public boolean chooseTool(int index);
+
+    public boolean chooseDie(int index);
+
+    public boolean chooseDieModify(int index, ModifyDie modify);
+
+    public boolean chooseDieFace(int index, Face shade);
 
     /**
      * This message is sent to the server when the client that received a list of possible placement for a die chooses

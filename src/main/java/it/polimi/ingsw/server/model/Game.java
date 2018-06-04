@@ -323,10 +323,10 @@ public class Game extends Thread implements Iterable  {
 
     /**
      * Responds by sending the number of favor tokens owned by the user
-     * @param user the user to get the favor tokens
+     * @param playerId the id of the user to get the favor tokens
      */
-    public int getFavorTokens(User user){
-        Player player=board.getPlayer(user);
+    public int getFavorTokens(int playerId){
+        Player player=board.getPlayerById(playerId);
         if(player.getSchema()!=null){
             return player.getFavorTokens();
         }

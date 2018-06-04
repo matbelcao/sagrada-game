@@ -77,7 +77,7 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
 
     @Override
     public int getFavorTokens(int playerId) {
-        return user.getGame().getFavorTokens(user);
+        return user.getGame().getFavorTokens(playerId);
     }
 
     @Override
