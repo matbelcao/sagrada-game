@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.model;
 
 
 import it.polimi.ingsw.common.enums.GameStatus;
+import it.polimi.ingsw.common.enums.ModifyDie;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
@@ -42,16 +43,16 @@ public class Game extends Thread implements Iterable  {
      */
     public Game(List<User> users,boolean additionalSchemas){
         this.users= users;
-        for(User u : users){
-            u.setStatus(UserStatus.PLAYING);
-            u.setGame(this);
-            u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
-        }
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         this.draftedSchemas = board.draftSchemas();
         this.gameStatus=GameStatus.INITIALIZING;
         this.selectedDie=null;
+        for(User u : users){
+            u.setStatus(UserStatus.PLAYING);
+            u.setGame(this);
+            u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
+        }
     }
 
     /**
@@ -61,14 +62,14 @@ public class Game extends Thread implements Iterable  {
     public Game(List<User> users){
         this.additionalSchemas=false;
         this.users= users;
-        for(User u : users){
-            u.setStatus(UserStatus.PLAYING);
-        }
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         draftedSchemas = board.draftSchemas();
         this.gameStatus=GameStatus.INITIALIZING;
         this.selectedDie=null;
+        for(User u : users){
+            u.setStatus(UserStatus.PLAYING);
+        }
     }
 
     /**
@@ -443,6 +444,62 @@ public class Game extends Thread implements Iterable  {
             discard();
         }
         return toolEnabled;
+    }
+
+    public boolean chooseToolDie(int index,String action) throws IllegalActionException {
+        boolean result;
+        Die die=findChoosedDie(index);
+
+        if(gameStatus==GameStatus.INITIALIZING || gameStatus==GameStatus.TURN_RUN || selectedTool==-1){ throw new IllegalActionException(); }
+
+        result=board.getToolCard(selectedTool).modifyDie1(die,ModifyDie.toModifyDie(action));
+        if(!result){
+            result=board.getToolCard(selectedTool).swapDie(die);
+        }
+        return result;
+    }
+
+    public boolean chooseToolDie(int index) throws IllegalActionException {
+        boolean result;
+        Die die=findChoosedDie(index);
+
+        if(gameStatus==GameStatus.INITIALIZING || gameStatus==GameStatus.TURN_RUN || selectedTool==-1){ throw new IllegalActionException(); }
+
+        result=board.getToolCard(selectedTool).selectDie1(die);
+        return result;
+    }
+
+    public boolean chooseToolDieFace(int shade) throws IllegalActionException {
+        boolean result;
+        if(gameStatus==GameStatus.INITIALIZING || gameStatus==GameStatus.TURN_RUN || selectedTool==-1){ throw new IllegalActionException(); }
+        if(shade<0||shade>6){ return false;}
+
+        result=board.getToolCard(selectedTool).setShade(shade);
+        return result;
+    }
+
+    private Die findChoosedDie(int index)  {
+        int tempIndex=0;
+
+        if(gameStatus.equals(GameStatus.REQUESTED_DRAFT_POOL)){
+            return board.getDraftPool().getDraftedDice().get(index);
+        }else if(gameStatus.equals(GameStatus.REQUESTED_ROUND_TRACK)) {
+            List<List<Die>> trackList = board.getDraftPool().getRoundTrack().getTrack();
+            List<Die> dieList;
+            int roundN = 0;
+
+            while (tempIndex <= index) {
+                dieList = trackList.get(roundN);
+                for (Die d : dieList) {
+                    if (tempIndex == index) {
+                        return d;
+                    }
+                    tempIndex++;
+                }
+                roundN++;
+            }
+        }
+        return null;
     }
 
     /**

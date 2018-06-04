@@ -56,7 +56,11 @@ class ToolCardTest {
         Die die1=new Die("THREE","RED");
         Die die2=new Die("SIX","GREEN");
         ToolCard tool5 = new ToolCard(5);
-        tool5.swapDie(die1,die2);
+        tool5.initStage();
+        assertTrue(tool5.stageFrom());
+        assertTrue(tool5.selectDie1(die1));
+        assertTrue(tool5.stageTo());
+        assertTrue(tool5.swapDie(die2));
         assertEquals("RED",die2.getColor().toString());
         assertEquals("THREE",die2.getShade().toString());
         assertEquals("SIX",die1.getShade().toString());

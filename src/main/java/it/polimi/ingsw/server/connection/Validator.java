@@ -131,7 +131,7 @@ public class Validator {
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();
-        if(!command[0].equals("CHOOSE")){ return false; }
+        if(!command[0].equals("CHOOSE") || command.length <=2){ return false; }
         switch (command[1]){
             case "die_placement":
                 if((command.length == 3) && command[2].matches(CELL_INDEX)){

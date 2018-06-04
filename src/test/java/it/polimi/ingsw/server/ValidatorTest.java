@@ -253,7 +253,10 @@ public class ValidatorTest {
         assertTrue(Validator.isValid(command, parsedResult));
         assertTrue(Validator.checkChooseParams(command, parsedResult));
 
+        command = "CHOOSE die 8";
 
+        assertTrue(Validator.isValid(command, parsedResult));
+        assertTrue(Validator.checkChooseParams(command, parsedResult));
 
 
         //valid

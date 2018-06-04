@@ -55,15 +55,16 @@ public class Cell {
      * @return true iff the die respects the Cell constraint
      */
     public Boolean canAcceptDie(Die die, IgnoredConstraint ignoreConstraint){
+        if(this.constraint==null ) {
+            return true;
+        }
+
         if(die==null){return false;}
         if(ignoreConstraint.equals(IgnoredConstraint.NONE)){ return canAcceptDie(die); }
         if(ignoreConstraint.equals(IgnoredConstraint.ALL)){ return true; }
         if(ignoreConstraint.equals(IgnoredConstraint.COLOR) && this.constraint.isColorConstraint()){ return true; }
         if(ignoreConstraint.equals(IgnoredConstraint.SHADE) && !this.constraint.isColorConstraint()){ return true; }
 
-        if(this.constraint==null ) {
-            return true;
-        }
 
         if( this.constraint.isColorConstraint() && die.getColor().toString().equals(this.constraint.getColor().toString())){
             return true;

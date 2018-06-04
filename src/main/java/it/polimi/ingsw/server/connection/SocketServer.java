@@ -4,7 +4,6 @@ import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,7 +11,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * This class is the implementation of the SOCKET server-side connection methods
@@ -164,6 +162,10 @@ public class SocketServer extends Thread implements ServerConn  {
 
         } else if ("tool".equals(parsedResult.get(1))) {
             useTool(Integer.parseInt(parsedResult.get(2)));
+        }else if("die".equals(parsedResult.get(1))){
+            chooseToolDie(parsedResult);
+        }else if("face".equals(parsedResult.get(1))){
+            setShade(parsedResult.get(2));
         }
     }
 
@@ -524,6 +526,34 @@ public class SocketServer extends Thread implements ServerConn  {
             outSocket.println("CHOICE ko");
         }
         outSocket.flush();
+    }
+
+    private void chooseToolDie(List<String> parsedResult) throws IllegalActionException {
+        Boolean choosed;
+        if(parsedResult.size()==4){
+            choosed=user.getGame().chooseToolDie(Integer.parseInt(parsedResult.get(2)),parsedResult.get(3));
+        }else{
+            choosed=user.getGame().chooseToolDie(Integer.parseInt(parsedResult.get(2)));
+        }
+
+        if(choosed){
+            outSocket.println("CHOICE ok");
+        }else{
+            outSocket.println("CHOICE ko");
+        }
+        outSocket.flush();
+    }
+
+    private void setShade(String shade) throws IllegalActionException {
+        Boolean setted=user.getGame().chooseToolDieFace(Integer.parseInt(shade));
+
+        if(setted){
+            outSocket.println("CHOICE ok");
+        }else{
+            outSocket.println("CHOICE ko");
+        }
+        outSocket.flush();
+
     }
 
     /**
