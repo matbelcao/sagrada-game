@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.connection.ClientConn;
 import it.polimi.ingsw.client.connection.RMIClient;
 import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.client.connection.SocketClient;
+import it.polimi.ingsw.client.uielements.CommandQueue;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UIMode;
@@ -51,16 +52,12 @@ public class Client {
     private UILanguage lang;
     private LightBoard board;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
+    private final CommandQueue commandQueue= new CommandQueue();
 
-    private static String OS = null;
-    public static String getOsName()
-    {
-        if(OS == null) { OS = System.getProperty("os.name"); }
-        return OS;
-    }
+
     public static boolean isWindows()
     {
-        return getOsName().startsWith("Windows");
+        return System.getProperty("os.name").startsWith("Windows");
     }
 
 
@@ -212,19 +209,26 @@ public class Client {
     /**
      * This method instantiates the user interface
      */
-    private void setupUI() throws InstantiationException {
+    private void setupUI() {
         if (uiMode.equals(UIMode.CLI)){
-            getOsName();
             if(isWindows()){
                 AnsiConsole.systemInstall();
             }
             clientUI=new CLI(this,lang);
         }else{
             System.out.println("Launching GUI (still not implemented....");
-            //Application.launch(GUI.class);//the control passes to the Application, the client is blocked until the window is closed
-            clientUI=new GUI(this,lang);
-            new Thread(() -> clientUI.showLoginScreen()).start(); //main continues to run
-            clientUI.printmsg("prova di riferimento");
+            new Thread(() -> GUI.launch(this,lang)).start();
+            while(GUI.getGUI() == null){
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            clientUI = GUI.getGUI();
+            clientUI.printmsg("prova");
+
+
         }
     }
 
@@ -309,6 +313,7 @@ public class Client {
      */
     private void match(){
         String command;
+        clientUI.setCommandQueue(this.commandQueue);
         synchronized (lockStatus){
             while(userStatus.equals(UserStatus.LOBBY)){
                 try {
@@ -321,21 +326,25 @@ public class Client {
         }
 
         while(userStatus.equals(UserStatus.PLAYING)) {
-            command=clientUI.getCommand();
-            if (command.equals("QUIT")){
+
+            if (commandQueue.read().equals("q")){
+                commandQueue.pop();
                 quit();
             }
-            if(command.equals("TEST")){
-                clientUI.printmsg(clientConn.getPrivateObject().toString());
+            if(commandQueue.read().equals("init-turn")){
+
+
             }
-            if(!command.equals("")){
-                clientConn.sendDebugMessage(command);
-            }
+
 
         }
 
     }
 
+
+    public boolean isLogged(){
+        return userStatus.equals(UserStatus.LOBBY)||userStatus.equals(UserStatus.PLAYING);
+    }
 
     /**
      * this method signals that a new match is about to begin and
@@ -423,12 +432,7 @@ public class Client {
             }
         }
 
-        try {
-            client.setupUI();
-        } catch (InstantiationException e) {
-            System.out.println("\u001B[31m"+"ERR: couldn't start the Client UI"+"\u001B[0m");
-            return;
-        }
+        client.setupUI();
         client.connectAndLogin();
         client.match();
     }

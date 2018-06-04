@@ -1,14 +1,11 @@
 package it.polimi.ingsw.server.model;
+
 import it.polimi.ingsw.common.enums.*;
-import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
-import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
-import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 import it.polimi.ingsw.server.model.toolaction.ToolAction;
-import javafx.scene.control.IndexedCell;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -20,7 +17,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 

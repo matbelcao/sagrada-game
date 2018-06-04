@@ -1,7 +1,7 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.client.uielements.CommandQueue;
 import it.polimi.ingsw.common.immutables.*;
-import it.polimi.ingsw.server.model.Player;
 
 import java.io.File;
 import java.util.List;
@@ -72,12 +72,15 @@ public interface ClientUI {
      */
     void updateRoundTrack(List<List<LightDie>> roundtrack);
 
-    /**
-     * this will show the roundtrack with properly placed indexes for the purpose of letting the user
-     * be able to select a particular die from it (to be used with some toolcards)
-     * @param roundtrack the roundtrack to be shown
-     */
-    void showRoundTrackWithCoordinates(List<List<LightDie>> roundtrack);
+    void showRoundtrackDiceList(List<IndexedCellContent> roundtrack);
+
+    void showDraftPoolDiceList(List<IndexedCellContent> draftpool);
+
+    void showSchemaDiceList(List<IndexedCellContent> schema);
+
+    void showTurnInitScreen();
+
+    void showNotYourTurnScreen();
 
     //void showPossibleChangesToDie(List<ModifyDie> changes);
     // TODO: 31/05/2018  
@@ -106,6 +109,7 @@ public interface ClientUI {
 
 
 
+
     /**
      * this method is used
      */
@@ -124,4 +128,6 @@ public interface ClientUI {
     void printmsg(String msg);
 
     String getCommand();
+
+    void setCommandQueue(CommandQueue commandQueue);
 }

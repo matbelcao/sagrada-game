@@ -1,21 +1,20 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.uielements.CLIView;
-import it.polimi.ingsw.client.uielements.CLIViewUtils;
-import it.polimi.ingsw.client.uielements.UILanguage;
-import it.polimi.ingsw.client.uielements.UIMessages;
+import it.polimi.ingsw.client.uielements.*;
 import it.polimi.ingsw.common.connection.Credentials;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.io.Console;
 import java.util.List;
 import java.util.Map;
 
-public class CLI implements ClientUI{
+public class CLI implements ClientUI {
     private final CLIView view;
     private Console console;
     private Client client;
     private UIMessages uimsg;
+    private CommandQueue commandQueue;
 
     public CLI(Client client,UILanguage lang) {
 
@@ -29,6 +28,20 @@ public class CLI implements ClientUI{
         this.uimsg=new UIMessages(lang);
         this.client = client;
         this.view=new CLIView(lang);
+    }
+
+
+    private void commandListener(){
+        new Thread(() -> {
+            while(client.isLogged()){
+                commandQueue.add(console.readLine());
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+
+                }
+            }
+        }).start();
     }
 
 
@@ -63,6 +76,7 @@ public class CLI implements ClientUI{
         resetScreen();
         if (logged) {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ok")), client.getUsername());
+            commandListener();
         } else {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ko")));
         }
@@ -133,9 +147,30 @@ public class CLI implements ClientUI{
     }
 
     @Override
-    public void showRoundTrackWithCoordinates(List<List<LightDie>> roundtrack) {
+    public void showRoundtrackDiceList(List<IndexedCellContent> roundtrack) {
+        view.updateMenuDiceList(roundtrack,Place.ROUNDTRACK);
+    }
+
+    @Override
+    public void showDraftPoolDiceList(List<IndexedCellContent> draftpool) {
+        view.updateMenuDiceList(draftpool,Place.DRAFTPOOL);
+    }
+
+    @Override
+    public void showSchemaDiceList(List<IndexedCellContent> schema) {
+        view.updateMenuDiceList(schema,Place.SCHEMA);
+    }
+
+    @Override
+    public void showTurnInitScreen() {
 
     }
+
+    @Override
+    public void showNotYourTurnScreen() {
+
+    }
+
 
     @Override
     public void updateRoundStart(int numRound,List<List<LightDie>> roundtrack){
@@ -145,7 +180,7 @@ public class CLI implements ClientUI{
 
     @Override
     public void updateTurnStart(int playerId, boolean isFirstTurn, Map<Integer,LightDie> draftpool) {
-
+        commandQueue.add("init-turn");
     }
 
     @Override
@@ -177,6 +212,11 @@ public class CLI implements ClientUI{
     @Override
     public String getCommand() {
         return console.readLine();
+    }
+
+    @Override
+    public void setCommandQueue(CommandQueue commandQueue) {
+        this.commandQueue=commandQueue;
     }
 }
 

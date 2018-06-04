@@ -107,12 +107,19 @@ public class CLIView {
         return result;
     }
 
+    public void updateMenuDiceList(List<IndexedCellContent> dice,Place place){
+        menuList.clear();
+        menuList.add(String.format(uiMsg.getMessage("dice-list"),uiMsg.getMessage(place.toString().toLowerCase())));
+        menuList.addAll(buildDiceList(dice,place));
+        fillMenu();
+    }
 
 
     private List<String> buildDiceList(List<IndexedCellContent> dice, Place place){
         List<String> list= new ArrayList<>();
         for(int i=0; i<dice.size();i++){
             list.add(String.format(cliElems.getElem("li"),i,buildDiceListEntry(dice.get(i),place)));
+            list.set(i,list.get(i)+padUntil("",MENU_WIDTH-printableLength(list.get(i)),' ' ));
         }
         return list;
     }
@@ -180,7 +187,7 @@ public class CLIView {
             defaultMenu.append(
                             (nowPlaying==playerId?
                                     (uiMsg.getMessage("discard-option")+"|"+uiMsg.getMessage("passturn-option")):
-                                    "") // TODO: 03/06/2018 add pass turn option
+                                    "")
                                     + uiMsg.getMessage("quit-option"));
 
 
@@ -196,7 +203,7 @@ public class CLIView {
     public void updateMenuListPlacements(List<Integer> placements, Place destination, LightDie die){
         List<String> msg = new ArrayList<>(buildWall(' ', CELL_HEIGHT - 1, MENU_WIDTH - CELL_WIDTH));
         msg.add(boldify(padUntil(uiMsg.getMessage("can-be-placed"),MENU_WIDTH-CELL_WIDTH,' ')));
-
+        menuList.clear();
         menuList.addAll(appendRows(buildCell(die),msg));
         menuList.add(padUntil("",MENU_WIDTH,' '));
 
@@ -205,11 +212,30 @@ public class CLIView {
         }else{
             menuList.addAll(buildIndexList(placements));
         }
-        menuList.addAll(buildWall(' ',MENU_HEIGHT-menuList.size(),MENU_WIDTH));
+        fillMenu();
 
     }
 
+    private void fillMenu() {
+        menuList.addAll(buildWall(' ',MENU_HEIGHT-menuList.size(),MENU_WIDTH));
+    }
 
+
+    public void updateMenuTurnInit(){
+        menuList.clear();
+        menuList.addAll(padUntil(buildTurnInitOptions(),MENU_WIDTH,' '));
+
+
+
+        fillMenu();
+    }
+
+    private List<String> buildTurnInitOptions(){
+        List<String> options= new ArrayList<>();
+        options.add(String.format(cliElems.getElem("li"),0,uiMsg.getMessage("place-die")));
+        options.add(String.format(cliElems.getElem("li"),0,uiMsg.getMessage("use-tool")));
+        return options;
+    }
 
     /**
      * this method builds a list of indexes for the menu, those indexes represents possible placements or dice from which to choose
@@ -370,7 +396,7 @@ public class CLIView {
 
         result.addAll(buildCellRow(baseRow,0,10));
         List<String> padding=buildWall(' ',result.size()-1,1);
-        padding.add(boldify(uiMsg.getMessage("roundtrack")));
+        padding.add(boldify(String.format(cliElems.getElem("point-left"),uiMsg.getMessage("roundtrack"))));
         result= appendRows(result,padding);
         this.roundTrack=result;
     }
@@ -380,9 +406,8 @@ public class CLIView {
         List<String> result = new ArrayList<>(draftPool);
         result.set(CELL_HEIGHT-1,
                 result.get(CELL_HEIGHT-1)+
-                        boldify(uiMsg.getMessage("draftpool")+
-                                alignRight(bottomInfo,
-                                        SCREEN_WIDTH  - (2*numPlayers+1)*CELL_WIDTH - uiMsg.getMessage("draftpool").length())));
+                        boldify(String.format(cliElems.getElem("point-left"),uiMsg.getMessage("draftpool"))));
+        result.set(CELL_HEIGHT-1,result.get(CELL_HEIGHT-1)+alignRight(bottomInfo, SCREEN_WIDTH - printableLength(result.get(CELL_HEIGHT-1))));
         result= appendRows(buildSeparator(draftPool.size()),result);
         return result;
     }
