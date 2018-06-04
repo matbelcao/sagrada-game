@@ -40,9 +40,9 @@ public class LightBoard extends Observable {
         this.privObj = privObj;
     }
 
-    public void addTool(LightTool tool){
-        assert(tools.size()<NUM_TOOLS );
-        this.tools.add(tool);
+    public void addTools(List<LightTool> tool){
+        this.tools=tool;
+        notifyObservers();
     }
 
     public List<LightCard> getPubObjs() {
@@ -68,6 +68,7 @@ public class LightBoard extends Observable {
 
     public void setDraftPool(Map<Integer, LightDie> draftPool) {
         this.draftPool = (HashMap<Integer, LightDie>) draftPool;
+        notifyObservers();
     }
 
     public void setDraftPool(List<LightDie> draftPool) {
@@ -76,6 +77,7 @@ public class LightBoard extends Observable {
             this.draftPool.put(i,draftPool.get(i));
 
         }
+        notifyObservers();
     }
 
     public List<List<LightDie>> getRoundTrack() {
@@ -85,6 +87,7 @@ public class LightBoard extends Observable {
     public void setRoundTrack(List<List<LightDie>> roundTrack, int numRound) {
         this.roundTrack = roundTrack;
         this.roundNumber=numRound;
+        notifyObservers();
     }
 
     public void addPubObj(LightTool tool){
@@ -94,6 +97,7 @@ public class LightBoard extends Observable {
 
     public void updateSchema(int playerId, LightSchemaCard schema){
         players.get(playerId).setSchema(schema);
+        notifyObservers();
     }
 
     public LightTool getToolByIndex(int index){

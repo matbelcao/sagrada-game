@@ -9,9 +9,8 @@ import java.io.Console;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
-import java.util.Observer;
 
-public class CLI implements ClientUI,Observer {
+public class CLI implements ClientUI {
     private final CLIView view;
     private Console console;
     private Client client;

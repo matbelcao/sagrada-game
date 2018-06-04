@@ -56,8 +56,8 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public List<LightCard> getTools() {
-        List<LightCard> result = null;
+    public List<LightTool> getTools() {
+        List<LightTool> result = null;
         try {
             result = remoteObj.getTools();
         } catch (RemoteException e) {

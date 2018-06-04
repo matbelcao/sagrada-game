@@ -230,6 +230,8 @@ public class Client {
 
 
         }
+
+        board.addObserver(clientUI);
     }
 
 
@@ -371,12 +373,23 @@ public class Client {
     }
 
     public void updateGameRoundStart(int numRound){
-        board.setRoundTrack(clientConn.getRoundtrack(),numRound);
+        if(numRound==0){
+            //get players schema
+            for(int i=0; i < board.getNumPlayers();i++) {
+                board.updateSchema(i,clientConn.getSchema(i));
+            }
+            //get other board elements
+            for(int i=0; i< board.NUM_TOOLS;i++){
+                board.addTools(clientConn.getTools());
+            }
+
+        }
+
         
     }
 
     public void updateGameRoundEnd(int numRound){
-        //clientUI.updateGameRoundEnd(numRound);
+        board.setRoundTrack(clientConn.getRoundtrack(),numRound+1);
     }
 
     public void updateGameTurnStart(int playerId, boolean isFirstTurn){

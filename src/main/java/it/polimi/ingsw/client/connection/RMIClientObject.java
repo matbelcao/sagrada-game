@@ -46,11 +46,11 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     }
 
     @Override
-    public List<LightCard> getTools() {
+    public List<LightTool> getTools() {
         List<ToolCard> toolCards = user.getGame().getToolCards();
-        List<LightCard> lightCards = new ArrayList<>();
+        List<LightTool> lightCards = new ArrayList<>();
         for (ToolCard c : toolCards) {
-            lightCards.add(LightCard.toLightCard(c));
+            lightCards.add(LightTool.toLightTool(c));
         }
         return lightCards;
     }
