@@ -16,7 +16,7 @@ public interface RMIClientInt extends Remote {
 
     LightSchemaCard getSchema(int playerId) throws RemoteException, IllegalActionException;
 
-    LightCard getPrivateObject() throws RemoteException;
+    LightPrivObj getPrivateObject() throws RemoteException;
 
     List<LightCard> getPublicObjects() throws RemoteException;
 

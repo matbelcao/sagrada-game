@@ -85,22 +85,8 @@ public interface ClientUI extends Observer {
 
     //void showPossibleChangesToDie(List<ModifyDie> changes);
     // TODO: 31/05/2018  
-    /**
-     * this method tells the user that a new round has started / is about to start
-     * @param numRound the number of the round that is about to begin
-     * @param roundtrack the updated roundtrack
-     */
-    void updateRoundStart(int numRound,List<List<LightDie>> roundtrack);
 
-    /**
-     * this method tells the users that a new turn is starting, if the player id is the same of the player receiving
-     * the message he will be shown the default screen, where he'll be able to choose a die from the draftpool or to make
-     * a different move
-     * @param playerId the number of the player that is going to play the next turn
-     * @param isFirstTurn tells if the the turn is the first or the second in the round (usefool for a particular toolcard)
-     * @param draftpool the updated draftpool
-     */
-    void updateTurnStart(int playerId, boolean isFirstTurn, Map<Integer,LightDie> draftpool);
+
 
     /**
      * this method updates the view of the user (broadcast) following the usage of a toolcard

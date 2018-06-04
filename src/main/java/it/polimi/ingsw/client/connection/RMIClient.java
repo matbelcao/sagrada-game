@@ -34,8 +34,8 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public LightCard getPrivateObject() {
-        LightCard card = null;
+    public LightPrivObj getPrivateObject() {
+        LightPrivObj card = null;
         try {
             card = remoteObj.getPrivateObject();
         } catch (RemoteException e) {

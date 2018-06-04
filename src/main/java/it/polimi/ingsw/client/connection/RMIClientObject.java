@@ -31,8 +31,8 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     }
 
     @Override
-    public LightCard getPrivateObject() {
-        return LightCard.toLightCard(user.getGame().getPrivCard(user));
+    public LightPrivObj getPrivateObject() {
+        return LightPrivObj.toLightPrivObj(user.getGame().getPrivCard(user));
     }
 
     @Override

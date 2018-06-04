@@ -46,7 +46,7 @@ public interface ClientConn {
      * This function can be invoked to request the private objective card parameters
      * @return one private objective card immutable object
      */
-    LightCard getPrivateObject();
+    LightPrivObj getPrivateObject();
 
     /**
      * This function can be invoked to request the three public objective cards parameters
