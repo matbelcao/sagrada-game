@@ -29,9 +29,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.fusesource.jansi.Ansi.*;
-import static org.fusesource.jansi.Ansi.Color.*;
-
 /**
  * This class represents a client that can connect to the server and participate to a match of the game.
  * Every client has some preferences that can be set via command line options (-h to see them)
@@ -272,6 +269,10 @@ public class Client {
                     logged = clientConn.login(username, password);
                 }
                 Arrays.fill(this.password, ' ');
+                if(!logged){
+                    username = null;
+                    password = null;
+                }
             } while (!logged);
             synchronized (lockStatus) {
                 userStatus = UserStatus.LOBBY;
