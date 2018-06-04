@@ -2,21 +2,22 @@ package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.uielements.*;
 import it.polimi.ingsw.common.connection.Credentials;
+import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 
+import java.io.BufferedReader;
 import java.io.Console;
-import java.io.Reader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Observable;
 
 public class CLI implements ClientUI {
     private final CLIView view;
-    private final Reader reader;
     private Console console;
+    private QueuedInReader commandQueue;
     private Client client;
     private UIMessages uimsg;
-    private CommandQueue commandQueue;
 
     public CLI(Client client,UILanguage lang) {
 
@@ -26,7 +27,7 @@ public class CLI implements ClientUI {
             System.err.println("ERR: couldn't retrieve any console!");
             System.exit(1);
         }
-        this.reader= console.reader();
+        this.commandQueue = new QueuedInReader(new BufferedReader(console.reader()));
         this.uimsg=new UIMessages(lang);
         this.client = client;
         this.view=new CLIView(lang);
@@ -36,12 +37,16 @@ public class CLI implements ClientUI {
     private void commandListener(){
         new Thread(() -> {
             while(client.isLogged()){
-                commandQueue.add(reader.toString());
                 try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-
+                    commandQueue.add();
+                } catch (IOException e) {
+                    System.err.println("ERR: couldn't read from the console");
+                    System.exit(1);
                 }
+                if(commandQueue.readln().equals("q")){
+                    client.quit();
+                }
+
             }
         }).start();
     }
@@ -203,13 +208,10 @@ public class CLI implements ClientUI {
 
     @Override
     public String getCommand() {
-        return console.readLine();
+        return commandQueue.getln();
     }
 
-    @Override
-    public void setCommandQueue(CommandQueue commandQueue) {
-        this.commandQueue=commandQueue;
-    }
+
 
     @Override
     public void update(Observable o, Object arg) {
@@ -225,7 +227,9 @@ public class CLI implements ClientUI {
         console.printf(view.printMainView());
 
         if(board.getNowPlaying()==board.getMyPlayerId()){
-            commandQueue.add("init-turn");
+            showTurnInitScreen();
+        } else{
+            showNotYourTurnScreen();
         }
 
     }

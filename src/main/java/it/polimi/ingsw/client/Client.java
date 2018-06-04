@@ -52,7 +52,7 @@ public class Client {
     private UILanguage lang;
     private LightBoard board;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
-    private final CommandQueue commandQueue= new CommandQueue();
+
 
 
     public static boolean isWindows()
@@ -302,7 +302,7 @@ public class Client {
      */
     private void match(){
         String command;
-        clientUI.setCommandQueue(this.commandQueue);
+
         synchronized (lockStatus){
             while(userStatus.equals(UserStatus.LOBBY)){
                 try {
@@ -316,24 +316,12 @@ public class Client {
 
         while(userStatus.equals(UserStatus.PLAYING)) {
 
-            if(commandQueue.read().equals("q")){
-                commandQueue.pop();
-                quit();
-            }
-            if(commandQueue.read().equals("init-turn")){
-                initTurn();
-
-            }
 
 
         }
 
     }
 
-    private void initTurn() {
-
-
-    }
 
 
     public boolean isLogged(){
@@ -389,7 +377,9 @@ public class Client {
         board.setDraftPool(clientConn.getDraftPool());
         board.setNowPlaying(playerId);
         board.setIsFirstTurn(isFirstTurn);
+        if(playerId==board.getMyPlayerId()){
 
+        }
 
 
     }
