@@ -7,8 +7,6 @@ import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.immutables.*;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -28,7 +26,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 
 public class GUI extends Application implements ClientUI {
@@ -99,19 +96,14 @@ public class GUI extends Application implements ClientUI {
         grid.add(messageToUser, 1, 6);
 
         //----
-        button.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent e) {
-                System.out.println(usernameField.getText()+"   "+passwordField.getText().toCharArray());
-                client.setUsername(usernameField.getText());
-                client.setPassword(Credentials.hash(client.getUsername(),passwordField.getText().toCharArray()));
-            }
+        button.setOnAction(e -> {
+            client.setUsername(usernameField.getText());
+            client.setPassword(Credentials.hash(client.getUsername(),passwordField.getText().toCharArray()));
         });
         return loginScene;
     }
 
-    private Scene getScene2() {
+    private Scene draftedSchemaScene() {
         StackPane layou2 = new StackPane();
         Scene scene2 = new Scene(layou2, 600, 400);
         return scene2;
@@ -152,38 +144,32 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void updateLogin(boolean logged) {
         if (logged) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    messageToUser.setFill(Color.GREEN);
-                    messageToUser.setText("Logged in successfully");
-                }
+            Platform.runLater(() -> {
+                messageToUser.setFill(Color.GREEN);
+                messageToUser.setText(String.format(uimsg.getMessage("login-ok"),client.getUsername()));
             });
         } else {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    messageToUser.setFill(Color.FIREBRICK);
-                    messageToUser.setText("Failed login, please retry");
-                }
+            Platform.runLater(() -> {
+                messageToUser.setFill(Color.FIREBRICK);
+                messageToUser.setText(uimsg.getMessage("login-ko"));
             });
         }
-        //primaryStage.close();
     }
 
     @Override
     public void updateLobby(int numUsers) {
-
+        messageToUser.setFill(Color.GREEN);
+        /* TODO add other text field */
+        messageToUser.setText("lobby "+numUsers);
     }
 
     @Override
     public void updateGameStart(int numUsers, int playerId) {
-
     }
 
     @Override
     public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
-
+        Platform.runLater(() -> primaryStage.setScene(draftedSchemaScene()));
     }
 
     @Override
@@ -230,9 +216,6 @@ public class GUI extends Application implements ClientUI {
     public void showNotYourTurnScreen() {
 
     }
-
-
-
     @Override
     public void updateToolUsage(List<LightTool> tools) {
 
@@ -255,12 +238,7 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void printmsg(String msg) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                primaryStage.setScene(getScene2());
-            }
-        });
+
     }
 
     @Override
@@ -275,6 +253,6 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void update(Observable o, Object arg) {
-        
+
     }
 }
