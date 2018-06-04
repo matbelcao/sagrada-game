@@ -325,8 +325,7 @@ public class Validator {
                     return false;
 
                 case "favor_tokens":
-                    if ((command.length == 3)
-                            && (command[2].matches(PLAYER_ID))) {
+                    if ((command.length == 1)) {
 
                         parsedResult.addAll(Arrays.asList(command));
                         return true;
