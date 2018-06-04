@@ -1,11 +1,9 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.uielements.CommandQueue;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.Observer;
 
 public interface ClientUI extends Observer {

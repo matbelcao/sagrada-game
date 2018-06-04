@@ -43,10 +43,6 @@ public class CLI implements ClientUI {
                     System.err.println("ERR: couldn't read from the console");
                     System.exit(1);
                 }
-                if(commandQueue.readln().equals("q")){
-                    client.quit();
-                }
-
             }
         }).start();
     }
@@ -58,6 +54,7 @@ public class CLI implements ClientUI {
     private void resetScreen(){
         console.printf(CLIViewUtils.resetScreenPosition());
     }
+
     @Override
     public void showLoginScreen() {
         String username;
