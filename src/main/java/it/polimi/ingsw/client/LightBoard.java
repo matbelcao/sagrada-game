@@ -17,6 +17,10 @@ public class LightBoard extends Observable {
     private HashMap<Integer,LightDie> draftPool;
     private List<List<LightDie>> roundTrack;
     private int roundNumber;
+    private int nowPlaying;
+    private boolean isFirstTurn;
+    private int myPlayerId;
+
 
     public LightBoard(int numPlayers) {
         this.numPlayers=numPlayers;
@@ -25,6 +29,22 @@ public class LightBoard extends Observable {
         players=new HashMap<>();
         draftPool=new HashMap<>();
         roundTrack= new ArrayList<>();
+    }
+
+    public int getMyPlayerId() {
+        return myPlayerId;
+    }
+
+    public void setMyPlayerId(int myPlayerId) {
+        this.myPlayerId = myPlayerId;
+    }
+
+    public int getNowPlaying() {
+        return nowPlaying;
+    }
+
+    public void setNowPlaying(int nowPlaying) {
+        this.nowPlaying = nowPlaying;
     }
 
     public void addPlayer(LightPlayer player){
@@ -43,6 +63,10 @@ public class LightBoard extends Observable {
     public void addTools(List<LightTool> tool){
         this.tools=tool;
         notifyObservers();
+    }
+
+    public void setNumPlayers(int numPlayers) {
+        this.numPlayers = numPlayers;
     }
 
     public List<LightCard> getPubObjs() {
@@ -118,5 +142,13 @@ public class LightBoard extends Observable {
 
     public int getRoundNumber() {
         return roundNumber;
+    }
+
+    public void setIsFirstTurn(boolean isFirstTurn) {
+        this.isFirstTurn = isFirstTurn;
+    }
+
+    public boolean getIsFirstTurn() {
+        return isFirstTurn;
     }
 }

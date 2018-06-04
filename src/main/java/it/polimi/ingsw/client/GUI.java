@@ -28,7 +28,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 
 public class GUI extends Application implements ClientUI {
@@ -224,17 +223,6 @@ public class GUI extends Application implements ClientUI {
     public void showNotYourTurnScreen() {
 
     }
-
-    @Override
-    public void updateRoundStart(int numRound, List<List<LightDie>> roundtrack) {
-
-    }
-
-    @Override
-    public void updateTurnStart(int playerId, boolean isFirstTurn, Map<Integer, LightDie> draftpool) {
-
-    }
-
     @Override
     public void updateToolUsage(List<LightTool> tools) {
 

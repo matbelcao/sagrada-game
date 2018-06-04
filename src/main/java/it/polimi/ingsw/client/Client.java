@@ -40,8 +40,8 @@ public class Client {
     private ConnectionMode connMode;
     private String username;
     private char [] password;
-    private int playerId;
-    private int turnOfPlayer;
+
+
 
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
@@ -119,17 +119,9 @@ public class Client {
     }
 
     public int getPlayerId() {
-        return playerId;
+        return board.getMyPlayerId();
     }
 
-    //to remove
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
-    }
-
-    public int getPlayerTurnId(){
-        return turnOfPlayer;
-    }
 
 
     public LightBoard getBoard() {
@@ -227,8 +219,6 @@ public class Client {
             }
             clientUI = GUI.getGUI();
         }
-
-        //board.addObserver(clientUI);
     }
 
 
@@ -357,12 +347,15 @@ public class Client {
      */
     public void updateGameStart(int numPlayers, int playerId){
         this.board= new LightBoard(numPlayers);
+        board.addObserver(clientUI);
         clientUI.updateGameStart(numPlayers,playerId);
-        this.playerId=playerId;
+        board.setMyPlayerId(playerId);
         synchronized (lockStatus){
             userStatus=UserStatus.PLAYING;
             lockStatus.notifyAll();
         }
+        clientUI.showDraftedSchemas(clientConn.getSchemaDraft(),clientConn.getPrivateObject());
+
     }
 
     public void updateGameEnd(){
@@ -376,7 +369,7 @@ public class Client {
                 board.updateSchema(i,clientConn.getSchema(i));
             }
             //get other board elements
-            for(int i=0; i< board.NUM_TOOLS;i++){
+            for(int i=0; i< LightBoard.NUM_TOOLS;i++){
                 board.addTools(clientConn.getTools());
             }
 
@@ -390,18 +383,17 @@ public class Client {
     }
 
     public void updateGameTurnStart(int playerId, boolean isFirstTurn){
-        this.turnOfPlayer = playerId;
+
         //board update
         board.setDraftPool(clientConn.getDraftPool());
-        
-        //view update
-        clientUI.updateTurnStart(playerId,isFirstTurn,board.getDraftPool());
-        
+        board.setNowPlaying(playerId);
+        board.setIsFirstTurn(isFirstTurn);
+
     }
 
     public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
         board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
-        // TODO: 04/06/2018  
+
     }
 
     public void updatePlayerStatus(int playerId, UserStatus status){

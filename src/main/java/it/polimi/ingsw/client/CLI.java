@@ -173,16 +173,6 @@ public class CLI implements ClientUI {
     }
 
 
-    @Override
-    public void updateRoundStart(int numRound,List<List<LightDie>> roundtrack){
-
-        this.updateRoundTrack(roundtrack);
-    }
-
-    @Override
-    public void updateTurnStart(int playerId, boolean isFirstTurn, Map<Integer,LightDie> draftpool) {
-        commandQueue.add("init-turn");
-    }
 
     @Override
     public void updateToolUsage(List<LightTool> tools) {
@@ -227,10 +217,15 @@ public class CLI implements ClientUI {
         view.updatePrivObj(board.getPrivObj());
         view.updateObjectives(board.getPubObjs(),board.getPrivObj());
         view.updateNewRound(board.getRoundNumber());
+
         for(int i=0;i<board.getNumPlayers();i++){
             view.updateSchema(board.getPlayerByIndex(i));
         }
         console.printf(view.printMainView());
+
+        if(board.getNowPlaying()==board.getMyPlayerId()){
+            commandQueue.add("init-turn");
+        }
 
     }
 }

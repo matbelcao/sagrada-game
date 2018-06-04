@@ -289,7 +289,7 @@ public class SocketClient implements ClientConn {
      * @return one private objective card immutable object
      */
     @Override
-    public LightCard getPrivateObject() {
+    public LightPrivObj getPrivateObject() {
         ArrayList<String> result= new ArrayList<>();
         LightPrivObj lightObjCard=null;
 

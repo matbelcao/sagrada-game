@@ -1,10 +1,14 @@
 package it.polimi.ingsw.client.uielements;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommandQueue {
     private List<String> queue;
     private final Object lockQueue=new Object();
+    public CommandQueue(){
+        queue=new ArrayList<>();
+    }
 
     public void add(String command){
         synchronized (lockQueue){
