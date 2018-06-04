@@ -489,19 +489,14 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param index the index of the die previously received by the client
      */
     private void selectDie(int index) throws IllegalActionException {
-        int placementIndex=0;
-        Die die;
-        die = user.getGame().selectDie(user,index);
-        if(die!=null){
-                ArrayList<Integer> placements= (ArrayList<Integer>) user.getGame().getUserSchemaCard(user,true).listPossiblePlacements(die);
-                outSocket.print("LIST placements");
-                for (Integer p:placements){
-                    outSocket.print(" "+placementIndex+","+p);
-                    placementIndex++;
-                }
-                outSocket.println("");
-                outSocket.flush();
+        List<Integer> placements = user.getGame().selectDie(user, index);
+
+        outSocket.print("LIST placements");
+        for (Integer p : placements) {
+            outSocket.print(" " + placements.indexOf(p) + "," + p);
         }
+        outSocket.println("");
+        outSocket.flush();
     }
 
     /**

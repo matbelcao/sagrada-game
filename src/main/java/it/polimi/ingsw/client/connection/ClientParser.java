@@ -227,7 +227,7 @@ public class ClientParser {
         if(parsedResult.size()<2){return false;}
         if(parsedResult.get(1).equals("schema")||parsedResult.get(1).equals("roundtrack")||parsedResult.get(1).equals("draftpool")) {
             for (int i = 2; i < parsedResult.size(); i++) {
-                if (parsedResult.get(i).split(",").length < 3 || parsedResult.get(i).split(",").length > 5) {
+                if (parsedResult.get(i).split(",").length !=4 ) {
                     return false;
                 }
             }

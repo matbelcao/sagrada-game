@@ -15,6 +15,12 @@ public class IndexedCellContent {
         this.content=new LightDie(face,color);
         this.index=index;
     }
+
+    public IndexedCellContent(int index, Die die){
+        this.content=new LightDie(die.getShade(),die.getColor());
+        this.index=index;
+    }
+
     public IndexedCellContent(int index, String face, String color){
         this.content=new LightDie(face,color);
         this.index=index;

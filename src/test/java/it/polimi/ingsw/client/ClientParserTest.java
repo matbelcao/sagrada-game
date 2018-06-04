@@ -173,9 +173,9 @@ public class ClientParserTest {
         assertEquals("2,4,RED,TWO",parsedResult.get(2));
         assertEquals("4,7,GREEN,FIVE",parsedResult.get(3));
 
-        assertTrue(ClientParser.parse("LIST roundtrack 3,3,1,RED,THREE", parsedResult));
+        assertTrue(ClientParser.parse("LIST roundtrack 3,1,RED,THREE", parsedResult));
 
-        assertTrue(ClientParser.parse("LIST draftpool 1,RED,THREE", parsedResult));
+        assertTrue(ClientParser.parse("LIST draftpool 1,1,RED,THREE", parsedResult));
 
         assertTrue(ClientParser.parse("LIST placements 2,3", parsedResult));
         assertEquals("LIST",parsedResult.get(0));
@@ -199,6 +199,7 @@ public class ClientParserTest {
 
         assertTrue(ClientParser.parse("LIST schema", parsedResult));
         assertFalse(ClientParser.parse("LIST", parsedResult));
+        assertFalse(ClientParser.parse("LIST schema  2,2,RED", parsedResult));
         assertFalse(ClientParser.parse("LIST schema  2,RED", parsedResult));
         assertFalse(ClientParser.parse("LIST schema 2,3,3,RED,TWO 4,5,2,GREEN,FIVE,TWO", parsedResult));
         assertTrue(ClientParser.parse("LIST placements", parsedResult));

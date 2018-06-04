@@ -3,7 +3,8 @@
     <ToolCard id="1">
         <from>draftpool</from>
         <to>draftpool</to>
-        <modify>increase_decrease</modify>
+        <modify>increase</modify>
+        <modify>decrease</modify>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="2">
@@ -25,7 +26,7 @@
         <quantity>two</quantity>
     </ToolCard>
     <ToolCard id="5">
-        <from>draft</from>
+        <from>draftpool</from>
         <to>roundtrack</to>
         <modify>swap</modify>
         <quantity>one</quantity>
@@ -46,6 +47,7 @@
     <ToolCard id="8">
         <from>draftpool</from>
         <to>schema</to>
+        <ignored-constraint>none</ignored-constraint>
         <quantity>two</quantity>
         <when>first_turn</when>
     </ToolCard>
@@ -64,8 +66,6 @@
     <ToolCard id="11">
         <from>draftpool</from>
         <to>dicebag</to>
-        <to>schema</to>
-        <ignored-constraint>none</ignored-constraint>
         <modify>setshade</modify>
         <quantity>one</quantity>
     </ToolCard>
@@ -73,7 +73,11 @@
         <from>schema</from>
         <to>schema</to>
         <ignored-constraint>none</ignored-constraint>
-        <quantity>one_two</quantity>
-        <when>roundtrack_color_match</when>
+        <quantity>one</quantity>
+        <quantity>two</quantity>
+        <when>
+            <in>roundtrack</in>
+            <match>color</match>
+        </when>
     </ToolCard>
 </tools>

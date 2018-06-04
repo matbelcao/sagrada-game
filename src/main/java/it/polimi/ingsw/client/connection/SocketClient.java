@@ -466,22 +466,16 @@ public class SocketClient implements ClientConn {
     @Override
     public List<IndexedCellContent> getSchemaDiceList(){
         ArrayList<String> result= new ArrayList<>();
-        List<IndexedCellContent> diceList=new ArrayList<>();
-        IndexedCellContent indexedDie;
-        String [] args;
+        List<IndexedCellContent> schemaList=new ArrayList<>();
 
         outSocket.println("GET_DICE_LIST schema");
         outSocket.flush();
 
         while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("schema")){
             inSocket.pop();
-            for(int i=COMMA_PARAMS_START;i<result.size();i++) {
-                args= result.get(i).split(",");
-                indexedDie=new IndexedCellContent(Integer.parseInt(args[1]),args[3],args[2]);
-                diceList.add(indexedDie);
-            }
+            schemaList=buildIndexedList(result);
         }
-        return diceList;
+        return schemaList;
     }
 
     /**
@@ -490,31 +484,18 @@ public class SocketClient implements ClientConn {
      * @return an immutable and indexed list containing the dice
      */
     @Override
-    public List<List<CellContent>> getRoundTrackDiceList(){
-        ArrayList<String> result= new ArrayList<>();
-        List<List<CellContent>> roundTrack=new ArrayList<>();
-        List<CellContent> container=new ArrayList<>();
-        CellContent die;
-        String[] args;
-        int round=-1;
+    public List<IndexedCellContent> getRoundTrackDiceList(){
+        List<String> result= new ArrayList<>();
+        List<IndexedCellContent> roundTrack=new ArrayList<>();
+
 
         outSocket.println("GET_DICE_LIST roundtrack");
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("roundtrack")) {
+        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isList(inSocket.readln()) && result.get(1).equals("roundtrack")){
             inSocket.pop();
-            roundTrack = new ArrayList<>();
-            container = new ArrayList<>();
-            for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
-                args = result.get(i).split(",");
-                die = new LightDie(args[4],args[3]);
-                if (round != Integer.parseInt(args[1])) {
-                    container = new ArrayList<>();
-                    round = Integer.parseInt(args[1]);
-                    roundTrack.add(round,container);
-                }
-                (roundTrack.get(round)).add(die);
-            }
+            roundTrack=buildIndexedList(result);
+
         }
         return roundTrack;
     }
@@ -525,24 +506,35 @@ public class SocketClient implements ClientConn {
      * @return an immutable and indexed list containing the dice
      */
     @Override
-    public List<CellContent> getDraftpoolDiceList() {
+    public List<IndexedCellContent> getDraftpoolDiceList() {
         ArrayList<String> result = new ArrayList<>();
-        List<CellContent> draftPool = new ArrayList<>();
-        CellContent die;
-        String args[];
+        List<IndexedCellContent> draftPool = new ArrayList<>();
 
         outSocket.println("GET_DICE_LIST draftpool");
         outSocket.flush();
 
         while (ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")) {
             inSocket.pop();
-            for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
-                args = result.get(i).split(",");
-                die = new LightDie(args[2], args[1]);
-                draftPool.add(die);
-            }
+            draftPool=buildIndexedList(result);
         }
         return draftPool;
+    }
+
+    /**
+     * Internal indexed list builder
+     * @param result the parsed server response
+     * @return an immutable and indexed list containing the dice
+     */
+    private List<IndexedCellContent> buildIndexedList(List<String> result){
+        List<IndexedCellContent> diceList=new ArrayList<>();
+        IndexedCellContent indexedDie;
+        String [] args;
+        for(int i=COMMA_PARAMS_START;i<result.size();i++) {
+            args= result.get(i).split(",");
+            indexedDie=new IndexedCellContent(Integer.parseInt(args[1]),args[3],args[2]);
+            diceList.add(indexedDie);
+        }
+        return diceList;
     }
 
     /**

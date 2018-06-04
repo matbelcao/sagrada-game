@@ -144,12 +144,12 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public List<List<CellContent>> getRoundTrackDiceList() {
+    public List<IndexedCellContent> getRoundTrackDiceList() {
         return null;
     }
 
     @Override
-    public List<CellContent> getDraftpoolDiceList() {
+    public List<IndexedCellContent> getDraftpoolDiceList() {
         return null;
     }
 

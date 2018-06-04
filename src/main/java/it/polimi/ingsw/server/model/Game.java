@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.model;
 
 
 import it.polimi.ingsw.common.enums.GameStatus;
+import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.common.enums.UserStatus;
@@ -271,6 +272,25 @@ public class Game extends Thread implements Iterable  {
     }
 
 
+    public List<IndexedCellContent> getSchemaDiceList(User user){
+        List<IndexedCellContent> indexedList=new ArrayList<>();
+        IndexedCellContent indexedCell;
+        Die die;
+
+        gameStatus=GameStatus.REQUESTED_SCHEMA_CARD;
+
+        SchemaCard schema = board.getPlayer(user).getSchema();
+        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+
+        while(diceIterator.hasNext()) {
+            die = diceIterator.next().getDie();
+            indexedCell = new IndexedCellContent(diceIterator.getIndex(), die);
+            indexedList.add(indexedCell);
+        }
+        return indexedList;
+    }
+
+
     /**
      * Responds to the request by sending the draftpool's content to the user of the match
      * @param override true to not DISCARD the complex action (and reset the RoundStatus class)
@@ -284,6 +304,23 @@ public class Game extends Thread implements Iterable  {
         return board.getDraftPool().getDraftedDice();
     }
 
+    public List<IndexedCellContent> getDraftedDiceList(){
+        List<IndexedCellContent> indexedList=new ArrayList<>();
+        IndexedCellContent indexedCell;
+        Die die;
+
+        gameStatus=GameStatus.REQUESTED_DRAFT_POOL;
+
+        List<Die> draftedDice= board.getDraftPool().getDraftedDice();
+
+        for (int index=0;index<draftedDice.size();index++){
+            die=draftedDice.get(index);
+            indexedCell=new IndexedCellContent(index,die);
+            indexedList.add(indexedCell);
+        }
+        return indexedList;
+    }
+
     /**
      * Responds to the request by sending the roundracks's content to the user of the match
      * @param override true to not DISCARD the complex action (and reset the RoundStatus class)
@@ -295,6 +332,25 @@ public class Game extends Thread implements Iterable  {
             gameStatus=GameStatus.REQUESTED_ROUND_TRACK;
         }
         return board.getDraftPool().getRoundTrack().getTrack();
+    }
+
+    public List<IndexedCellContent> getRoundTrackDiceList(){
+        List<IndexedCellContent> indexedList=new ArrayList<>();
+        IndexedCellContent indexedCell;
+        Die die;
+
+        gameStatus=GameStatus.REQUESTED_ROUND_TRACK;
+
+        List<List<Die>> dieTrack = board.getDraftPool().getRoundTrack().getTrack();
+        List<Die> dieList;
+        for(int index=0;index<dieTrack.size();index++){
+            dieList= dieTrack.get(index);
+            for(Die d:dieList){
+                indexedCell=new IndexedCellContent(index,d);
+                indexedList.add(indexedCell);
+            }
+        }
+        return indexedList;
     }
 
     /**
@@ -341,43 +397,30 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     * Selects and returns the die from a draftpool/user's schema card/roundtrack
+     * Selects the die from a draftpool/user's schema card/roundtrack a returns the schema card's possible placements
      * @param user the user who made the request
      * @param index the index of the die to select
-     * @return the die selected
+     * @return the list of possible placements in the user's schema card
      */
     // To continue........deve restituire List<Die>...solo per piazzamenti nella schema (o alcune toolcard)
-    public Die selectDie(User user,int index) throws IllegalActionException {
-        if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
+    public List<Integer> selectDie(User user, int index) throws IllegalActionException {
+        List<Integer> placements= new ArrayList<>();
+        Die die;
         int tempIndex=0;
-        /*if(selectedTool!=-1){
-            board.getToolCard(selectedTool).selectDie(index);//da rivedere
-        }*/
+
+        if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
         if(gameStatus.equals(GameStatus.REQUESTED_SCHEMA_CARD)){
             FullCellIterator diceIterator=(FullCellIterator)board.getPlayer(user).getSchema().iterator();
             while(diceIterator.hasNext()){
-                selectedDie=diceIterator.next().getDie();
+                die=diceIterator.next().getDie();
                 if(tempIndex==index){
-                    return selectedDie;
+                    selectedDie=die;
                 }
                 tempIndex++;
             }
-            //Routine selection
-            selectedDie=board.getPlayer(user).getSchema().getCell(index).getDie();
-            if(selectedTool!=-1) {
-                //Toolcard selection
-                board.getToolCard(selectedTool).selectDie(selectedDie, gameStatus);
-            }
-            return selectedDie;
         }
         if(gameStatus.equals(GameStatus.REQUESTED_DRAFT_POOL)){
-            //Routine selection
             selectedDie=board.getDraftPool().getDraftedDice().get(index);
-            if(selectedTool!=-1){
-                //Toolcard selection
-                board.getToolCard(selectedTool).selectDie(selectedDie,gameStatus);
-            }
-            return selectedDie;
         }
         if(gameStatus.equals(GameStatus.REQUESTED_ROUND_TRACK)) {
             List<List<Die>> trackList = getRoundTrackDice(true);
@@ -390,16 +433,16 @@ public class Game extends Thread implements Iterable  {
                     if (tempIndex == index) {
                         //Routine selection
                         selectedDie=d;
-                        if(selectedTool!=-1){
-                            //ToolCard selection
-                            board.getToolCard(selectedTool).selectDie(selectedDie,gameStatus);
-                        }
-                        return selectedDie;
                     }
                     tempIndex++;
                 }
                 roundN++;
             }
+        }
+        if(selectedTool!=-1){
+            //particolar toolcard's contraint
+        }else{
+            placements=board.getPlayer(user).getSchema().listPossiblePlacements(selectedDie);
         }
         return null;
     }

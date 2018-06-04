@@ -1,11 +1,14 @@
 package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.common.enums.*;
+import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
+import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 import it.polimi.ingsw.server.model.toolaction.ToolAction;
+import javafx.scene.control.IndexedCell;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -17,6 +20,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class implements the Cards named "Tools" and their score calculating algorithms
@@ -31,7 +36,10 @@ public class ToolCard extends Card{
     private IgnoredConstraint ignored_constraint;
     private String when;
 
-    private Die die;
+    private boolean executedFrom,executedModify1,executeSelect,executedTo,executedModify2;
+
+
+    private Die selectedDie;
 
 
     /**
@@ -134,76 +142,103 @@ public class ToolCard extends Card{
                 if(turnFirstOrSecond==1){return false;}
                 player.setSkipsNextTurn(true);
             }
-            return turnFirstOrSecond != 0 || this.getId() != 7;
+            executedFrom=false;
+            executedTo=false;
+            executedModify1=false;
         } catch (NegativeTokensException e) {
             return false;
         }
+        return true;
     }
 
-    public void selectDie(Die die,GameStatus status) throws IllegalActionException {
-        if(from!=GameStatus.toPlaceFrom(status)){throw new IllegalActionException();}
-        this.die=die;
-        switch (to){
-            case SCHEMA:
 
+    /*public List<IndexedCellContent> execFrom(Board board,Player player) throws IllegalActionException {
+        if(executedFrom){throw new IllegalActionException();}
+        List<IndexedCellContent> indexedList=execFromOrTo(board,player, from);
+
+        executedFrom=true;
+        if(from==Place.SCHEMA){
+            executedModify1=true;
+            executedTo=true;
+        }else{
+            executeSelect=true;
         }
+        return indexedList;
+    }*/
+
+    /*public List<IndexedCellContent> execTo(Board board,Player player, Place where) throws IllegalActionException {
+        if(!(executeSelect && executedModify1)){throw new IllegalActionException();}
+        List<IndexedCellContent> indexedList=execFromOrTo(board,player, where);
+
+        executedTo=true;
+        return indexedList;
+    }*/
+
+
+
+    public void execSelect(){
+        executeSelect=true;
     }
 
-
-
-
-    private boolean modifyDie(Die die){
-        Die newDie;
-        switch (modify){
-            case FLIP:
-                die.flipShade();
-                return true;
-            case REROLL:
-                die.reroll();
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    //SWAPDIE
-    public boolean swapDie(Die die1,Die die2){
-        if(modify.equals(ModifyDie.SWAP)){
-            Color tmpColor=die1.getColor();
-            Face tmpFace=die1.getShade();
-            die1.setShade(die2.getShade().toInt());
-            die1.setColor(die2.getColor().toString());
-            die2.setShade(tmpFace.toInt());
-            die2.setColor(tmpColor.toString());
-            return true;
-        }
-        return false;
-    }
-
-    //INCREASE_DECREASE
-    private boolean shadeIncreaseOrDecrease(Die die, int num){
+    //CHOOSE die.....
+    public boolean execModify1(Die die){
+        if(executedModify1){return false;}
+        selectedDie=die;
         try {
-            if (num == +1) {
-                die.increaseShade();
-                return true;
-            } else if (num == -1) {
-                die.decreaseShade();
-                return true;
+            switch(modify) {
+            case DECREASE:
+                selectedDie.decreaseShade();
+                break;
+            case INCREASE:
+                selectedDie.increaseShade();
+                break;
+            case REROLL:
+                selectedDie.reroll();
+                break;
+            case NONE:
+                break;
             }
         }catch (IllegalShadeException e) {
             return false;
         }
-        return false;
-    }
-
-    //SETSHADE
-    private  boolean setShade(Die die,int shade){
-        die.setShade(shade);
+        //to implement for tool no.11
+        executedModify1=true;
         return true;
     }
 
+    public boolean execModify2(Die die,int shade){
+        if(executedModify2){return false;}
+        switch(modify){
+            case SETSHADE:
+                die.setShade(shade);
+                break;
+            case SWAP:
+                swapDie(selectedDie,die);
+                break;
+            default:
+                return false;
+        }
+        return true;
+    }
+
+
+    //SWAP DIE
+    public void swapDie(Die die1,Die die2) {
+        Color tmpColor = die1.getColor();
+        Face tmpFace = die1.getShade();
+        die1.setShade(die2.getShade().toInt());
+        die1.setColor(die2.getColor().toString());
+        die2.setShade(tmpFace.toInt());
+        die2.setColor(tmpColor.toString());
+    }
+
     public void discard(){
-        this.die=null;
+        selectedDie=null;
+        executedFrom=false;
+        executedTo=false;
+        executeSelect=false;
+        executedModify1=false;
+        executedModify2=false;
     }
 
     /**
@@ -214,7 +249,11 @@ public class ToolCard extends Card{
         return this.used;
     }
 
-    public Place getDestination(){
+    public Place getFrom(){
+        return from;
+    }
+
+    public Place getTo(){
         return to;
     }
 

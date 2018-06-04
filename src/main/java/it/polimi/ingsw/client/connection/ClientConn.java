@@ -99,14 +99,14 @@ public interface ClientConn {
      * in the roundtrack
      * @return an immutable and indexed list containing the dice
      */
-    List<List<CellContent>> getRoundTrackDiceList();
+    List<IndexedCellContent> getRoundTrackDiceList();
 
     /**
      * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
      * in the draft pool
      * @return an immutable and indexed list containing the dice
      */
-    List<CellContent> getDraftpoolDiceList();
+    List<IndexedCellContent> getDraftpoolDiceList();
 
     /**
      * This function can be invoked to the server to specify the possible placements in the user’s schema of a die that is

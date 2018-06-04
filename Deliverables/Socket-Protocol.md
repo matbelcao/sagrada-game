@@ -282,11 +282,12 @@ This asks the server a list of possible placements for the die that has been rer
 
 ### Server-side
 ###### Notice: the following messages of this section starting with `LIST` require an `ACK list` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
-##### `LIST schema|roundtrack|draftpool [<position>,<color>,<shade>] ...`
+##### `LIST schema|roundtrack|draftpool [<index>,<position>,<color>,<shade>] ...`
 
 +   `schema`: provides an ordered list of the positions of the player's schema that have a die in place. The client can then `SELECT` a die from this list using the command above to obtain a list of possible placements (for example while using tool cards)
 +   `roundtrack`: provides an ordered list of the dice that are in the roundtrack
 +   `draftpool`: provides an ordered list of the dice of the draftpool
++   `<index>`: this is the index (starting from 0) in the list of placements, this will be used to `CHOOSE` or `SELECT` the placement later on
 +   `<position>`: an integer value that carries the information about the position of the die in the element of the board
 +   `<color>,<shade>`: represent the characteristics of the die
 
@@ -295,7 +296,7 @@ This message is used in order to create a list of valid options the client can l
 
 ##### `LIST placements [<index>,<position>] ...`
 +   `placements`: signals that a list of possible placements for a  selected die is being sent
-+   `<index>`: this is the index (starting from 0) in the list of placements, this will be used to `CHOOSE` the placement later on
++   `<index>`: this is the index (starting from 0) in the list of placements, this will be used to `CHOOSE die_placement <index>` later on
 +   `<position>`: this is the actual position inside the schema where the die can be placed (from 0 to 19)
 
 

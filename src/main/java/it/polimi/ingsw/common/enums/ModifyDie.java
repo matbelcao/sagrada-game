@@ -1,7 +1,8 @@
 package it.polimi.ingsw.common.enums;
 
 public enum ModifyDie {
-    INCREASE_DECREASE,
+    INCREASE,
+    DECREASE,
     SWAP,
     REROLL,
     FLIP,
@@ -10,8 +11,10 @@ public enum ModifyDie {
 
     public static ModifyDie toModifyDie(String modify){
         switch(modify){
-            case "increase_decrease":
-                return INCREASE_DECREASE;
+            case "increase":
+                return INCREASE;
+            case "decrease":
+                return DECREASE;
             case "swap":
                 return SWAP;
             case "reroll":

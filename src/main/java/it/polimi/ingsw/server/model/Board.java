@@ -123,7 +123,7 @@ public class Board {
     }
 
     //To continue.....
-    public List<Integer> listPlacements(User user, Die selectedDie, int selectedTool, GameStatus status) throws IllegalActionException {
+    /*public List<Integer> listPlacements(User user, Die selectedDie, int selectedTool, GameStatus status) throws IllegalActionException {
         if(selectedTool!=-1){
             //Tool-specific placements
             Place destination;
@@ -146,7 +146,7 @@ public class Board {
             return getPlayer(user).getSchema().listPossiblePlacements(selectedDie);
         }
         return getPlayer(user).getSchema().listPossiblePlacements(selectedDie);//to change
-    }
+    }*/
 
     public Player getPlayer(User user) {
         for(Player p : players){
