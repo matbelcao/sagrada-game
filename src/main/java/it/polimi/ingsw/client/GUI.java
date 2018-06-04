@@ -29,6 +29,7 @@ import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 
 public class GUI extends Application implements ClientUI {
     private static Client client;
@@ -278,5 +279,10 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void setCommandQueue(CommandQueue commandQueue) {
 
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        
     }
 }
