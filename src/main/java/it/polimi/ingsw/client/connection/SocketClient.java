@@ -333,9 +333,9 @@ public class SocketClient implements ClientConn {
      * @return a list of three toolcards immutable objects
      */
     @Override
-    public List<LightCard> getTools() {
-        ArrayList<String> result= new ArrayList<>();
-        List<LightCard> toolCards=new ArrayList<>();
+    public List<LightTool> getTools() {
+        List<String> result= new ArrayList<>();
+        List<LightTool> toolCards=new ArrayList<>();
         LightTool lightTool;
 
         outSocket.println("GET tool");

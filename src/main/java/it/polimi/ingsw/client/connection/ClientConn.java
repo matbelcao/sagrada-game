@@ -58,7 +58,7 @@ public interface ClientConn {
      * This function can be invoked to request the three toolcards parameters
      * @return a list of three toolcards immutable objects
      */
-    List<LightCard> getTools();
+    List<LightTool> getTools();
 
     /**
      * This function can be invoked to request the dice in the draftpool

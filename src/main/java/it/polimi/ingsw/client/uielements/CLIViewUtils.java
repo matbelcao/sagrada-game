@@ -15,18 +15,18 @@ import java.util.*;
 public class CLIViewUtils {
 
 
-    static final String BOLD = "\u001B[1m";
+    private static final String BOLD = "\u001B[1m";
     static final int SCHEMA_WIDTH = 35;
     static final int SCHEMA_HEIGHT = 18;
     static final int CELL_HEIGHT = 4;
     static final int CELL_WIDTH = 7;
     static final int OBJ_LENGTH = 38;
     static final int SCREEN_WIDTH = 160;
-    static final String SCREEN_CLEAR ="\033[H\033[2J";
+    private static final String SCREEN_CLEAR ="\033[H\033[2J";
     static final int MENU_WIDTH = 80;
     static final int MENU_HEIGHT = 21;
     static final String FAVOR= "●";
-    static final String ESCAPE="\\u001B\\[([0-9]|([0-9][0-9]))m";
+    private static final String ESCAPE="\\u001B\\[([0-9]|([0-9][0-9]))m";
 
 
 

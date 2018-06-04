@@ -20,7 +20,7 @@ public interface RMIClientInt extends Remote {
 
     List<LightCard> getPublicObjects() throws RemoteException;
 
-    List<LightCard> getTools() throws RemoteException;
+    List<LightTool> getTools() throws RemoteException;
 
     List<LightSchemaCard> getSchemaDraft() throws RemoteException, IllegalActionException;
 

@@ -14,6 +14,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class ToolCard extends Card{
     private IgnoredConstraint ignored_constraint;
     private Turn turn;
 
-    private boolean executedFrom,executedModify1,executeSelect,executedTo,executedModify2;
+    private boolean executedFrom,executedModify1,executedSelect1,executedTo,executedModify2,executedSelect2;
 
 
     private Die selectedDie;
@@ -54,7 +55,6 @@ public class ToolCard extends Card{
 
         String className = "ToolAction" + id;
         Class cls = null;
-        discard();
         toolReader(super.getId());
     }
 
@@ -109,6 +109,8 @@ public class ToolCard extends Card{
         }
     }
 
+
+
     /**
      * Checks whether the player can or can not use the tool card, based on the cost in favor tokens
      * @param player the player that wants to use the tool card
@@ -119,18 +121,6 @@ public class ToolCard extends Card{
         if (used) cost = 2;
         else cost = 1;
         return player.getFavorTokens() >= cost;
-    }
-
-    /**
-     * This method calls the card-specific method for using the Tool
-     * @param player the player that wants to use the card
-     * @return if the card has been used successfully
-     */
-    public boolean useTool(Player player) {
-
-
-        if (this.getId()==8){ player.setSkipsNextTurn(true); }
-        return true;
     }
 
     public boolean enableToolCard(Player player,int turnFirstOrSecond){
@@ -145,46 +135,75 @@ public class ToolCard extends Card{
                 if(turnFirstOrSecond==1){return false;}
                 player.setSkipsNextTurn(true);
             }
-            executedFrom=false;
-            executedTo=false;
-            executedModify1=false;
+            discard();
+            initStage();
         } catch (NegativeTokensException e) {
             return false;
         }
         return true;
     }
 
+    /**
+     * Sets to true the stages to skip
+     */
+    public void initStage(){
+        if(from.equals(to) && !from.equals(Place.SCHEMA)){
+            if(quantity.contains(DieQuantity.ALL)){
+                executedModify1=true;
+            }
+            executedSelect1=true;
+            executedTo=true;
+            executedModify2=true;
+            executedSelect2=true;
+            return;
+        }
+        if(from.equals(to) && from.equals(Place.SCHEMA)){
+            if(!quantity.contains(DieQuantity.TWO)){
+                executedSelect2=true;
+                executedTo=true;
+            }
+            executedModify1=true;
+            executedModify2=true;
+            return;
+        }
+        if(!from.equals(to) && to.equals(Place.SCHEMA)){
+            executedModify1=true;
+            executedTo=true;
+            executedModify2=true;
+            executedSelect2=true;
+            return;
+        }
+        if(!from.equals(to) && !to.equals(Place.SCHEMA)){
+            executedSelect1=true;
+            executedSelect2=true;
+            return;
+        }
+    }
 
     public boolean stageFrom(){
         if(!executedFrom){
             executedFrom=true;
-            if(from==Place.SCHEMA){
-                executedModify1=true;
-                executedTo=true;
-            }else{
-                executeSelect=true;
-            }
             return true;
         }
         return false;
     }
 
-    public boolean stageSelect(){
-        if(executedFrom && executedModify1 && !executeSelect){
-            executeSelect=true;
+    public boolean stageSelect1(){
+        if(executedFrom && executedModify1 && !executedSelect1){
+            executedSelect1=true;
             return true;
         }
         return false;
     }
 
-    public boolean stageModify1(Die die,ModifyDie action){
-        if(executedFrom && executeSelect && !executedModify1){
+    public boolean stageModify1(){ //Die die,ModifyDie action
+        if(executedFrom && executedSelect1 && !executedModify1){
             executedModify1=true;
         }else{
             return false;
         }
-        selectedDie=die;
-        try {
+        //selectedDie=die;
+        /*try {
             switch(action) {
                 case DECREASE:
                     die.decreaseShade();
@@ -200,26 +219,26 @@ public class ToolCard extends Card{
             }
         }catch (IllegalShadeException e) {
             return false;
-        }
+        }*/
         //to implement for tool no.11
         return true;
     }
 
     public boolean stageTo() {
-        if(!executedTo && executedModify1 && executeSelect){
+        if(!executedTo && executedModify1 && executedSelect1 && executedFrom){
             executedTo=true;
             return true;
         }
         return false;
     }
 
-    public boolean execModify2(Die die,ModifyDie action, int shade){
-        if(executedTo && !executedModify2){
+    public boolean stageModify2(){ //Die die,ModifyDie action, int shade
+        if(executedTo && !executedModify2 && executedSelect2){
             executedModify2=true;
         }else{
             return false;
         }
-        switch(action){
+        /*switch(action){
             case SETSHADE:
                 die.setShade(shade);
                 break;
@@ -228,17 +247,26 @@ public class ToolCard extends Card{
                 break;
             default:
                 break;
-        }
+        }*/
         return true;
+    }
+
+    public boolean stageSelect2(){
+        if(executedTo && executedModify2 && !executedSelect2){
+            executedSelect2=true;
+            return true;
+        }
+        return false;
     }
 
     public void discard(){
         selectedDie=null;
         executedFrom=false;
-        executeSelect=false;
+        executedSelect1=false;
         executedModify1=false;
         executedTo=false;
         executedModify2=false;
+        executedSelect2=false;
     }
 
     //SWAP DIE

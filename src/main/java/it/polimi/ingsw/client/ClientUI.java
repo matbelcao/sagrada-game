@@ -6,8 +6,9 @@ import it.polimi.ingsw.common.immutables.*;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Observer;
 
-public interface ClientUI {
+public interface ClientUI extends Observer {
     String MESSAGES_FILE="src"+ File.separator+"xml"+File.separator+"client"+File.separator+"UIMessages.xml";
 
     /**

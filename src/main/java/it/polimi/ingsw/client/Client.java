@@ -227,6 +227,8 @@ public class Client {
             }
             clientUI = GUI.getGUI();
         }
+
+        board.addObserver(clientUI);
     }
 
 
@@ -316,7 +318,7 @@ public class Client {
                 try {
                     lockStatus.wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+
                 }
                 lockStatus.notifyAll();
             }
@@ -329,12 +331,17 @@ public class Client {
                 quit();
             }
             if(commandQueue.read().equals("init-turn")){
-
+                initTurn();
 
             }
 
 
         }
+
+    }
+
+    private void initTurn() {
+
 
     }
 
@@ -363,25 +370,42 @@ public class Client {
     }
 
     public void updateGameRoundStart(int numRound){
-        clientUI.updateRoundStart(numRound, board.getRoundTrack());
+        if(numRound==0){
+            //get players schema
+            for(int i=0; i < board.getNumPlayers();i++) {
+                board.updateSchema(i,clientConn.getSchema(i));
+            }
+            //get other board elements
+            for(int i=0; i< board.NUM_TOOLS;i++){
+                board.addTools(clientConn.getTools());
+            }
+
+        }
+
+        
     }
 
     public void updateGameRoundEnd(int numRound){
-        //clientUI.updateGameRoundEnd(numRound);
+        board.setRoundTrack(clientConn.getRoundtrack(),numRound+1);
     }
 
     public void updateGameTurnStart(int playerId, boolean isFirstTurn){
         this.turnOfPlayer = playerId;
-            clientUI.updateTurnStart(playerId,isFirstTurn,board.getDraftPool());
-
+        //board update
+        board.setDraftPool(clientConn.getDraftPool());
+        
+        //view update
+        clientUI.updateTurnStart(playerId,isFirstTurn,board.getDraftPool());
+        
     }
 
     public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
-        //clientUI.updateGameRoundEnd(playerTurnId);
+        board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
+        // TODO: 04/06/2018  
     }
 
     public void updatePlayerStatus(int playerId, UserStatus status){
-        //clientUI.updatePlayerStatus(playerId,status);
+        
     }
 
 
