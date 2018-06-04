@@ -311,7 +311,7 @@ public class Client {
                 try {
                     lockStatus.wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+
                 }
                 lockStatus.notifyAll();
             }
@@ -324,12 +324,17 @@ public class Client {
                 quit();
             }
             if(commandQueue.read().equals("init-turn")){
-
+                initTurn();
 
             }
 
 
         }
+
+    }
+
+    private void initTurn() {
+
 
     }
 
@@ -358,7 +363,8 @@ public class Client {
     }
 
     public void updateGameRoundStart(int numRound){
-        clientUI.updateRoundStart(numRound, board.getRoundTrack());
+        board.setRoundTrack(clientConn.getRoundtrack(),numRound);
+        
     }
 
     public void updateGameRoundEnd(int numRound){
@@ -367,16 +373,21 @@ public class Client {
 
     public void updateGameTurnStart(int playerId, boolean isFirstTurn){
         this.turnOfPlayer = playerId;
-            clientUI.updateTurnStart(playerId,isFirstTurn,board.getDraftPool());
-
+        //board update
+        board.setDraftPool(clientConn.getDraftPool());
+        
+        //view update
+        clientUI.updateTurnStart(playerId,isFirstTurn,board.getDraftPool());
+        
     }
 
     public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
-        //clientUI.updateGameRoundEnd(playerTurnId);
+        board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
+        // TODO: 04/06/2018  
     }
 
     public void updatePlayerStatus(int playerId, UserStatus status){
-        //clientUI.updatePlayerStatus(playerId,status);
+        
     }
 
 
