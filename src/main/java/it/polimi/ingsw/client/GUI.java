@@ -1,6 +1,5 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.uielements.CommandQueue;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
@@ -77,12 +76,14 @@ public class GUI extends Application implements ClientUI {
         grid.add(username, 0, 1);
 
         TextField usernameField = new TextField();
+        usernameField.setPromptText("Username");
         grid.add(usernameField, 1, 1);
 
         Label password = new Label("Password:");
         grid.add(password, 0, 2);
 
         PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Password");
         grid.add(passwordField, 1, 2);
         //-----------------
         Button button = new Button("Sign in");
@@ -105,7 +106,7 @@ public class GUI extends Application implements ClientUI {
 
     private Scene draftedSchemaScene() {
         StackPane layou2 = new StackPane();
-        Scene scene2 = new Scene(layou2, 600, 400);
+        Scene scene2 = new Scene(layou2, 600, 700);
         return scene2;
     }
 
