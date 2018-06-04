@@ -2,7 +2,6 @@ package it.polimi.ingsw.common.connection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.ArrayList;
 
 public class QueuedInReader {
@@ -25,12 +24,12 @@ public class QueuedInReader {
 
                 lockReader.notifyAll();
                 //debug
-                //System.out.println("\t\t\t\t\t"+temp);
+                System.out.println("\t\t\t\t\t"+temp);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
             //debug
-            System.out.println("ERR interrupt");
+            //System.out.println("ERR interrupt");
         }
         put();
     }

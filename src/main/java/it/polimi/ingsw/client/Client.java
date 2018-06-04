@@ -228,7 +228,7 @@ public class Client {
             clientUI = GUI.getGUI();
         }
 
-        board.addObserver(clientUI);
+        //board.addObserver(clientUI);
     }
 
 

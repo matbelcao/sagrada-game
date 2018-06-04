@@ -152,38 +152,32 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void updateLogin(boolean logged) {
         if (logged) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    messageToUser.setFill(Color.GREEN);
-                    messageToUser.setText("Logged in successfully");
-                }
+            Platform.runLater(() -> {
+                messageToUser.setFill(Color.GREEN);
+                messageToUser.setText(String.format(uimsg.getMessage("login-ok"),client.getUsername()));
             });
         } else {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    messageToUser.setFill(Color.FIREBRICK);
-                    messageToUser.setText("Failed login, please retry");
-                }
+            Platform.runLater(() -> {
+                messageToUser.setFill(Color.FIREBRICK);
+                messageToUser.setText(uimsg.getMessage("login-ko"));
             });
         }
-        //primaryStage.close();
     }
 
     @Override
     public void updateLobby(int numUsers) {
-
+        messageToUser.setFill(Color.GREEN);
+        /* TODO add other text field */
+        messageToUser.setText("lobby "+numUsers);
     }
 
     @Override
     public void updateGameStart(int numUsers, int playerId) {
-
     }
 
     @Override
     public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
-
+        Platform.runLater(() -> primaryStage.setScene(getScene2()));
     }
 
     @Override
@@ -263,12 +257,7 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void printmsg(String msg) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                primaryStage.setScene(getScene2());
-            }
-        });
+
     }
 
     @Override
