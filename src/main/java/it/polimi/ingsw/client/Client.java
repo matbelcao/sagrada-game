@@ -219,8 +219,6 @@ public class Client {
             }
             clientUI = GUI.getGUI();
         }
-
-
     }
 
 
