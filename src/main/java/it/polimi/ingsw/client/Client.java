@@ -40,8 +40,8 @@ public class Client {
     private ConnectionMode connMode;
     private String username;
     private char [] password;
-    private int playerId;
-    private int turnOfPlayer;
+
+
 
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
@@ -119,17 +119,9 @@ public class Client {
     }
 
     public int getPlayerId() {
-        return playerId;
+        return board.getMyPlayerId();
     }
 
-    //to remove
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
-    }
-
-    public int getPlayerTurnId(){
-        return turnOfPlayer;
-    }
 
 
     public LightBoard getBoard() {
@@ -226,9 +218,6 @@ public class Client {
                 }
             }
             clientUI = GUI.getGUI();
-            clientUI.printmsg("prova");
-
-
         }
     }
 
@@ -252,7 +241,7 @@ public class Client {
                 if(uiMode==UIMode.CLI){
                     clientUI.showLoginScreen();
                 }else{
-                    while(username==null || password==null){
+                    while(username==null && password==null){
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
@@ -319,7 +308,7 @@ public class Client {
                 try {
                     lockStatus.wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+
                 }
                 lockStatus.notifyAll();
             }
@@ -327,17 +316,22 @@ public class Client {
 
         while(userStatus.equals(UserStatus.PLAYING)) {
 
-            if (commandQueue.read().equals("q")){
+            if(commandQueue.read().equals("q")){
                 commandQueue.pop();
                 quit();
             }
             if(commandQueue.read().equals("init-turn")){
-
+                initTurn();
 
             }
 
 
         }
+
+    }
+
+    private void initTurn() {
+
 
     }
 
@@ -353,12 +347,16 @@ public class Client {
      */
     public void updateGameStart(int numPlayers, int playerId){
         this.board= new LightBoard(numPlayers);
+        board.addObserver(clientUI);
         clientUI.updateGameStart(numPlayers,playerId);
-        this.playerId=playerId;
+        board.setMyPlayerId(playerId);
         synchronized (lockStatus){
             userStatus=UserStatus.PLAYING;
             lockStatus.notifyAll();
         }
+        board.setPrivObj(clientConn.getPrivateObject());
+        clientUI.showDraftedSchemas(clientConn.getSchemaDraft(),board.getPrivObj());
+
     }
 
     public void updateGameEnd(){
@@ -366,25 +364,43 @@ public class Client {
     }
 
     public void updateGameRoundStart(int numRound){
-        clientUI.updateRoundStart(numRound, board.getRoundTrack());
+        if(numRound==0){
+            //get players schema
+            for(int i=0; i < board.getNumPlayers();i++) {
+                board.updateSchema(i,clientConn.getSchema(i));
+            }
+            //get other board elements
+            for(int i=0; i< LightBoard.NUM_TOOLS;i++){
+                board.addTools(clientConn.getTools());
+            }
+
+        }
+
+        
     }
 
     public void updateGameRoundEnd(int numRound){
-        //clientUI.updateGameRoundEnd(numRound);
+        board.setRoundTrack(clientConn.getRoundtrack(),numRound+1);
     }
 
     public void updateGameTurnStart(int playerId, boolean isFirstTurn){
-        this.turnOfPlayer = playerId;
-            clientUI.updateTurnStart(playerId,isFirstTurn,board.getDraftPool());
+
+        //board update
+        board.setDraftPool(clientConn.getDraftPool());
+        board.setNowPlaying(playerId);
+        board.setIsFirstTurn(isFirstTurn);
+
+
 
     }
 
     public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
-        //clientUI.updateGameRoundEnd(playerTurnId);
+        board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
+
     }
 
     public void updatePlayerStatus(int playerId, UserStatus status){
-        //clientUI.updatePlayerStatus(playerId,status);
+        
     }
 
 

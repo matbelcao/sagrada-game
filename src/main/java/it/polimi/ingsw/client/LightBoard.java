@@ -2,12 +2,9 @@ package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.common.immutables.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class LightBoard {
+public class LightBoard extends Observable {
     public static final int NUM_TOOLS=3;
     public static final int NUM_PUB_OBJ=3;
     public static final int MAX_PLAYERS=4;
@@ -19,6 +16,11 @@ public class LightBoard {
     private HashMap<Integer,LightPlayer> players;
     private HashMap<Integer,LightDie> draftPool;
     private List<List<LightDie>> roundTrack;
+    private int roundNumber;
+    private int nowPlaying;
+    private boolean isFirstTurn;
+    private int myPlayerId;
+
 
     public LightBoard(int numPlayers) {
         this.numPlayers=numPlayers;
@@ -27,6 +29,22 @@ public class LightBoard {
         players=new HashMap<>();
         draftPool=new HashMap<>();
         roundTrack= new ArrayList<>();
+    }
+
+    public int getMyPlayerId() {
+        return myPlayerId;
+    }
+
+    public void setMyPlayerId(int myPlayerId) {
+        this.myPlayerId = myPlayerId;
+    }
+
+    public int getNowPlaying() {
+        return nowPlaying;
+    }
+
+    public void setNowPlaying(int nowPlaying) {
+        this.nowPlaying = nowPlaying;
     }
 
     public void addPlayer(LightPlayer player){
@@ -42,9 +60,13 @@ public class LightBoard {
         this.privObj = privObj;
     }
 
-    public void addTool(LightTool tool){
-        assert(tools.size()<NUM_TOOLS );
-        this.tools.add(tool);
+    public void addTools(List<LightTool> tool){
+        this.tools=tool;
+        notifyObservers();
+    }
+
+    public void setNumPlayers(int numPlayers) {
+        this.numPlayers = numPlayers;
     }
 
     public List<LightCard> getPubObjs() {
@@ -70,19 +92,36 @@ public class LightBoard {
 
     public void setDraftPool(Map<Integer, LightDie> draftPool) {
         this.draftPool = (HashMap<Integer, LightDie>) draftPool;
+        notifyObservers();
+    }
+
+    public void setDraftPool(List<LightDie> draftPool) {
+        this.draftPool.clear();
+        for(int i=0; i<draftPool.size();i++){
+            this.draftPool.put(i,draftPool.get(i));
+
+        }
+        notifyObservers();
     }
 
     public List<List<LightDie>> getRoundTrack() {
         return roundTrack;
     }
 
-    public void setRoundTrack(List<List<LightDie>> roundTrack) {
+    public void setRoundTrack(List<List<LightDie>> roundTrack, int numRound) {
         this.roundTrack = roundTrack;
+        this.roundNumber=numRound;
+        notifyObservers();
     }
 
     public void addPubObj(LightTool tool){
         assert(tools.size()<NUM_PUB_OBJ );
         this.tools.add(tool);
+    }
+
+    public void updateSchema(int playerId, LightSchemaCard schema){
+        players.get(playerId).setSchema(schema);
+        notifyObservers();
     }
 
     public LightTool getToolByIndex(int index){
@@ -101,5 +140,15 @@ public class LightBoard {
     }
 
 
+    public int getRoundNumber() {
+        return roundNumber;
+    }
 
+    public void setIsFirstTurn(boolean isFirstTurn) {
+        this.isFirstTurn = isFirstTurn;
+    }
+
+    public boolean getIsFirstTurn() {
+        return isFirstTurn;
+    }
 }

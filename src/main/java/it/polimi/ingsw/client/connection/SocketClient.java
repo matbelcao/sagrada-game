@@ -289,7 +289,7 @@ public class SocketClient implements ClientConn {
      * @return one private objective card immutable object
      */
     @Override
-    public LightCard getPrivateObject() {
+    public LightPrivObj getPrivateObject() {
         ArrayList<String> result= new ArrayList<>();
         LightPrivObj lightObjCard=null;
 
@@ -333,9 +333,9 @@ public class SocketClient implements ClientConn {
      * @return a list of three toolcards immutable objects
      */
     @Override
-    public List<LightCard> getTools() {
-        ArrayList<String> result= new ArrayList<>();
-        List<LightCard> toolCards=new ArrayList<>();
+    public List<LightTool> getTools() {
+        List<String> result= new ArrayList<>();
+        List<LightTool> toolCards=new ArrayList<>();
         LightTool lightTool;
 
         outSocket.println("GET tool");

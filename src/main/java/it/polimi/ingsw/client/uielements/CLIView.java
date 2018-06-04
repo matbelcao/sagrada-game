@@ -83,9 +83,13 @@ public class CLIView {
 
         builder.append(printList(buildBottomSection())).append("%n");
 
-        builder.append(String.format(cliElems.getElem("prompt"), buildOptions()));
+        builder.append(getPrompt());
 
         return builder.toString();
+    }
+
+    private String getPrompt() {
+        return String.format(cliElems.getElem("prompt"), buildOptions());
     }
 
     public String printSchemaChoiceView(){
