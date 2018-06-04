@@ -54,7 +54,7 @@ public class Board {
                 id=randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1;
             }while (draftedTools.contains(id));
             draftedTools.add(id);
-            toolCards[i]=new ToolCard(id, MasterServer.XML_SOURCE+"ToolCard.xml");
+            toolCards[i]=new ToolCard(id);
         }
         return toolCards;
     }
