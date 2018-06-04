@@ -220,7 +220,7 @@ public class Client {
             //Application.launch(GUI.class);//the control passes to the Application, the client is blocked until the window is closed
             clientUI=new GUI(this,lang);
             new Thread(() -> clientUI.showLoginScreen()).start(); //main continues to run
-            clientUI.printmsg("prova di riferimento");
+            clientUI.printmsg("prova");
         }
     }
 

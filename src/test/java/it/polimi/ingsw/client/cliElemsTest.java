@@ -131,9 +131,9 @@ class cliElemsTest {
         roundtrack.get(6).add(new LightDie("FOUR","GREEN"));
         roundtrack.get(6).add(new LightDie("ONE","YELLOW"));
 
-        tools.add(LightTool.toLightTool(new ToolCard(2,MasterServer.XML_SOURCE+"ToolCard.xml")));
-        tools.add(LightTool.toLightTool(new ToolCard(3,MasterServer.XML_SOURCE+"ToolCard.xml")));
-        tools.add(LightTool.toLightTool(new ToolCard(6,MasterServer.XML_SOURCE+"ToolCard.xml")));
+        tools.add(LightTool.toLightTool(new ToolCard(2)));
+        tools.add(LightTool.toLightTool(new ToolCard(3)));
+        tools.add(LightTool.toLightTool(new ToolCard(6)));
         tools.get(2).setUsed(true);
 
         cliview.updateTools(tools);

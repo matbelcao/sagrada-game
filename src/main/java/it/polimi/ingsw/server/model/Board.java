@@ -1,11 +1,7 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.common.enums.GameStatus;
-import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.connection.MasterServer;
-import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
-import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
+import it.polimi.ingsw.server.connection.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +50,7 @@ public class Board {
                 id=randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1;
             }while (draftedTools.contains(id));
             draftedTools.add(id);
-            toolCards[i]=new ToolCard(id, MasterServer.XML_SOURCE+"ToolCard.xml");
+            toolCards[i]=new ToolCard(id);
         }
         return toolCards;
     }

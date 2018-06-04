@@ -4,7 +4,7 @@ public enum DieQuantity {
     ONE,
     TWO,
     ALL,
-    ONE_TWO;
+    NONE;
 
     public static DieQuantity toDieQuantity(String qty) {
         switch (qty) {
@@ -14,10 +14,8 @@ public enum DieQuantity {
                 return TWO;
             case "all":
                 return ALL;
-            case "one_two":
-                return ONE_TWO;
             default:
-                return null;
+                return NONE;
         }
     }
 }
