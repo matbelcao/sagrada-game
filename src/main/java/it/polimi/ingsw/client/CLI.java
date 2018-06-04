@@ -8,8 +8,10 @@ import it.polimi.ingsw.common.immutables.*;
 import java.io.Console;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
-public class CLI implements ClientUI {
+public class CLI implements ClientUI,Observer {
     private final CLIView view;
     private Console console;
     private Client client;
@@ -174,7 +176,7 @@ public class CLI implements ClientUI {
 
     @Override
     public void updateRoundStart(int numRound,List<List<LightDie>> roundtrack){
-        view.updateNewRound(numRound);
+
         this.updateRoundTrack(roundtrack);
     }
 
@@ -217,6 +219,20 @@ public class CLI implements ClientUI {
     @Override
     public void setCommandQueue(CommandQueue commandQueue) {
         this.commandQueue=commandQueue;
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        LightBoard board= (LightBoard) o;
+        view.updateTools(board.getTools());
+        view.updatePrivObj(board.getPrivObj());
+        view.updateObjectives(board.getPubObjs(),board.getPrivObj());
+        view.updateNewRound(board.getRoundNumber());
+        for(int i=0;i<board.getNumPlayers();i++){
+            view.updateSchema(board.getPlayerByIndex(i));
+        }
+        console.printf(view.printMainView());
+
     }
 }
 
