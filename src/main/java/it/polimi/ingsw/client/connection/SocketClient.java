@@ -266,10 +266,9 @@ public class SocketClient implements ClientConn {
         outSocket.println("GET priv");
         outSocket.flush();
 
-        while(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("priv")) {
-            lightObjCard = LightPrivObj.toLightPrivObj(inSocket.readln());
-            inSocket.pop();
-        }
+        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("priv")));
+        lightObjCard = LightPrivObj.toLightPrivObj(inSocket.readln());
+        inSocket.pop();
         return lightObjCard;
     }
 
