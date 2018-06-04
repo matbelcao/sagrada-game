@@ -226,9 +226,6 @@ public class Client {
                 }
             }
             clientUI = GUI.getGUI();
-            clientUI.printmsg("prova");
-
-
         }
     }
 
@@ -252,7 +249,7 @@ public class Client {
                 if(uiMode==UIMode.CLI){
                     clientUI.showLoginScreen();
                 }else{
-                    while(username==null || password==null){
+                    while(username==null && password==null){
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {

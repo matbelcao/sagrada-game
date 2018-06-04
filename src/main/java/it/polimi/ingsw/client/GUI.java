@@ -3,6 +3,7 @@ package it.polimi.ingsw.client;
 import it.polimi.ingsw.client.uielements.CommandQueue;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
+import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.immutables.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -46,7 +47,6 @@ public class GUI extends Application implements ClientUI {
 
 
     public static void launch(Client client, UILanguage lang) {
-
         GUI.client = client;
         GUI.uimsg = new UIMessages(lang);
         Application.launch(GUI.class);
@@ -101,13 +101,12 @@ public class GUI extends Application implements ClientUI {
 
             @Override
             public void handle(ActionEvent e) {
-                /*System.out.println(usernameField.getText());
+                System.out.println(usernameField.getText());
                 actiontarget.setFill(Color.FIREBRICK);
                 actiontarget.setText("Sign in button pressed");
                 System.out.println(usernameField.getText()+"   "+passwordField.getText().toCharArray());
                 client.setUsername(usernameField.getText());
-                client.setPassword(passwordField.toString().toCharArray());*/
-                primaryStage.setScene(getScene2());
+                client.setPassword(Credentials.hash(client.getUsername(),passwordField.getText().toCharArray()));
             }
         });
         return loginScene;
