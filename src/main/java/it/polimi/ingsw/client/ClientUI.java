@@ -116,5 +116,4 @@ public interface ClientUI extends Observer {
 
     String getCommand();
 
-    void setCommandQueue(CommandQueue commandQueue);
 }

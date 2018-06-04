@@ -158,9 +158,12 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void updateLobby(int numUsers) {
-        messageToUser.setFill(Color.GREEN);
-        /* TODO add other text field */
-        messageToUser.setText("lobby "+numUsers);
+        Platform.runLater(() -> {
+            messageToUser.setFill(Color.GREEN);
+            /* TODO add other text field */
+            messageToUser.setText("lobby "+numUsers);
+        });
+
     }
 
     @Override
