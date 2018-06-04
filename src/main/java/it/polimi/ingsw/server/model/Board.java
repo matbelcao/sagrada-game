@@ -123,30 +123,14 @@ public class Board {
     }
 
     //To continue.....
-    /*public List<Integer> listPlacements(User user, Die selectedDie, int selectedTool, GameStatus status) throws IllegalActionException {
+    public List<Integer> listSchemaPlacements(User user,int selectedTool, Die selectedDie){
+        SchemaCard schema=getPlayer(user).getSchema();
         if(selectedTool!=-1){
-            //Tool-specific placements
-            Place destination;
-            IgnoredConstraint ignoredConstraint;
-            destination=toolCards[selectedTool].getDestination();
-            ignoredConstraint=toolCards[selectedTool].getIgnoredConstraint();
-
-            if(destination!=GameStatus.toPlaceFrom(status)){throw new IllegalActionException();}
-            switch(destination){
-                case SCHEMA:
-                    return getPlayer(user).getSchema().listPossiblePlacements(selectedDie,ignoredConstraint);
-                case DRAFTPOOL:
-                    //return draftPool.getDiceList();
-                case ROUNDTRACK:
-                    //return draftPool.getRoundTrack()
-            }
-
-        }else{
-            //Routine placements in the schema card
-            return getPlayer(user).getSchema().listPossiblePlacements(selectedDie);
+            IgnoredConstraint ignored_constraint=toolCards[selectedTool].getIgnoredConstraint();
+            return schema.listPossiblePlacements(selectedDie,ignored_constraint);
         }
-        return getPlayer(user).getSchema().listPossiblePlacements(selectedDie);//to change
-    }*/
+        return schema.listPossiblePlacements(selectedDie);
+    }
 
     public Player getPlayer(User user) {
         for(Player p : players){

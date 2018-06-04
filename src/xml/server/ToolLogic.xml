@@ -5,7 +5,7 @@
         <to>draftpool</to>
         <modify>increase</modify>
         <modify>decrease</modify>
-        <quantity>one</quantity>
+        <quantity>one</quantity>F
     </ToolCard>
     <ToolCard id="2">
         <from>schema</from>
@@ -48,7 +48,7 @@
         <from>draftpool</from>
         <to>schema</to>
         <ignored-constraint>none</ignored-constraint>
-        <quantity>two</quantity>
+        <quantity>one</quantity>
         <when>first_turn</when>
     </ToolCard>
     <ToolCard id="9">
@@ -75,9 +75,7 @@
         <ignored-constraint>none</ignored-constraint>
         <quantity>one</quantity>
         <quantity>two</quantity>
-        <when>
-            <in>roundtrack</in>
-            <match>color</match>
-        </when>
+        <in>roundtrack</in>
+        <match>color</match>
     </ToolCard>
 </tools>
