@@ -391,4 +391,29 @@ public class SchemaCard implements Iterable<Cell>  {
         return temp;
     }
 
+    public int diceDiffSize(SchemaCard temp) {
+        FullCellIterator tempIter = (FullCellIterator) temp.iterator();
+        FullCellIterator thisIter = (FullCellIterator) this.iterator();
+
+        return tempIter.numOfDice() - thisIter.numOfDice();
+    }
+
+    public int diceDiffQual(SchemaCard temp) {
+        FullCellIterator tempIter = (FullCellIterator) temp.iterator();
+        FullCellIterator thisIter = (FullCellIterator) this.iterator();
+        int diff=0;
+        while (tempIter.hasNext()){
+            Cell tempCell= tempIter.next();
+            if(!this.getCell(tempIter.getIndex()).hasDie()
+                    || !tempCell.getDie().equals(this.getCell(tempIter.getIndex()).getDie())){
+                diff++;
+            }
+        }
+        return diff;
+    }
+
+
+
+
+
 }
