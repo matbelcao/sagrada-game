@@ -3,6 +3,7 @@ package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
+import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
 import it.polimi.ingsw.server.model.toolaction.ToolAction;
@@ -14,6 +15,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,7 +40,9 @@ public class ToolCard extends Card {
     private boolean executedFrom, executedModify1, executedSelect1, executedTo, executedModify2, executedSelect2;
 
 
-    private Die selectedDie;
+    private SchemaCard schemaTemp;
+    private List<Die> selectedDice;
+    private List<Integer> selectedIndex;
 
 
     /**
@@ -123,7 +127,7 @@ public class ToolCard extends Card {
         return player.getFavorTokens() >= cost;
     }
 
-    public boolean enableToolCard(Player player, int turnFirstOrSecond) {
+    public boolean enableToolCard(Player player, int turnFirstOrSecond, SchemaCard schema) {
         try {
             if (!used) {
                 used = true;
@@ -137,6 +141,9 @@ public class ToolCard extends Card {
                 }
                 player.setSkipsNextTurn(true);
             }
+            selectedDice=new ArrayList<>();
+            selectedIndex=new ArrayList<>();
+            schemaTemp=schema.cloneSchema();
             discard();
             initStage();
         } catch (NegativeTokensException e) {
@@ -231,8 +238,47 @@ public class ToolCard extends Card {
         return false;
     }
 
+    public boolean canSelectDie() {
+        if(canSelect1()){
+            return true;
+        }
+        if(canSelect2()){
+            return true;
+        }
+        return false;
+    }
+
+    //only for tool that place two die in the same turn
+    public boolean isExternalSchemaPlacement(){
+        if(!from.equals(Place.SCHEMA) && to.equals(Place.SCHEMA)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isInternalSchemaPlacement() {
+        if(from.equals(Place.SCHEMA) && to.equals(Place.SCHEMA)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean canGamePLaceDie(){
+        if(quantity.contains(DieQuantity.toDieQuantity(selectedDice.size()))){
+            return true;
+        }
+        return false;
+    }
+
+    public List<Die> getToolDice(){
+        return selectedDice;
+    }
+
+    public List<Integer> getDiceIndexes(){
+        return selectedIndex;
+    }
+
     public void discard() {
-        selectedDie = null;
         executedFrom = false;
         executedSelect1 = false;
         executedModify1 = false;
@@ -243,7 +289,7 @@ public class ToolCard extends Card {
 
     public boolean modifyDie1(Die die, ModifyDie action){
     if(!modify.contains(action) || !canModify1()){return false;}
-    selectedDie=die;
+    selectedDice.add(die);
     try {
         switch(action) {
             case DECREASE:
@@ -267,12 +313,42 @@ public class ToolCard extends Card {
     }
 
 
-    public boolean selectDie1(Die die){
-        if(!canModify1()){return false;}
-        selectedDie=die;
+    public boolean selectDie(int index){
+        if(canSelect1()) {
+            selectedDice.add(schemaTemp.getCell(index).getDie());
+            schemaTemp.removeDie(index);
+            selectedIndex.add(index);
+            executedSelect1 = true;
+            return true;
+        }else if(canSelect2() && !selectedDice.get(0).equals(schemaTemp.getCell(index).getDie()) && selectedIndex.get(0)!=index){
+            selectedDice.add(schemaTemp.getCell(index).getDie());
+            schemaTemp.removeDie(index);
+            selectedIndex.add(index);
+            executedSelect2=true;
+            return true;
+        }
+        return false;
+    }
 
-        executedModify1=true;
-        return true;
+    //For schema to schema
+    public boolean internalVirtualPlacement(int index) {
+        if(selectedDice.size()>0){
+            try {
+                schemaTemp.putDie(index,selectedDice.get(0),ignored_constraint);
+                selectedDice.remove(0);
+                selectedIndex.remove(0);
+            } catch (IllegalDieException e) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    //for other to schema
+    public boolean externalVirtualPlacement(int index){
+
+        return false;
     }
 
 
@@ -281,18 +357,20 @@ public class ToolCard extends Card {
     public boolean setShade(int shade) {
         if(!modify.contains(ModifyDie.SETSHADE) || !canModify2()){return false;}
 
-        selectedDie.setShade(shade);
+        selectedDice.get(0).setShade(shade);
+        executedModify2=true;
         return true;
     }
 
     public boolean swapDie(Die die) {
         if(!modify.contains(ModifyDie.SWAP) || !canModify2()){return false;}
-        Color tmpColor = selectedDie.getColor();
-        Face tmpFace = selectedDie.getShade();
-        selectedDie.setShade(die.getShade().toInt());
-        selectedDie.setColor(die.getColor().toString());
+        Color tmpColor = selectedDice.get(0).getColor();
+        Face tmpFace = selectedDice.get(0).getShade();
+        selectedDice.get(0).setShade(die.getShade().toInt());
+        selectedDice.get(0).setColor(die.getColor().toString());
         die.setShade(tmpFace.toInt());
         die.setColor(tmpColor.toString());
+        executedModify2=true;
         return true;
     }
 

@@ -18,5 +18,16 @@ public enum DieQuantity {
                 return NONE;
         }
     }
+
+    public static DieQuantity toDieQuantity(int qty) {
+        switch (qty) {
+            case 1:
+                return ONE;
+            case 2:
+                return TWO;
+            default:
+                return NONE;
+        }
+    }
 }
 
