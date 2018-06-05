@@ -55,17 +55,27 @@ public class CLIView {
 
 
     public void updateDraftedSchemas(List<LightSchemaCard> schemaCards){
+        schemas.clear();
         for(int i=0; i<schemaCards.size();i++){
             List<String> schema=new ArrayList<>();
 
             schema.add(buildDraftedSchemaInfo(schemaCards.get(i)));
-            schema.addAll(buildSchema(schemaCards.get(i),false));
+            //add top border
+            schema.add(padUntil("",SCHEMA_WIDTH,'–'));
+            schema.addAll(buildSchema(schemaCards.get(i),false) );
+            schema.add(padUntil("",SCHEMA_WIDTH,'–'));
+            schema= appendRows(
+                            buildSeparator(SCHEMA_HEIGHT+1),
+                            appendRows(schema,
+                                    buildSeparator(SCHEMA_HEIGHT+1)));
+
+
             schemas.put(i,schema);
         }
     }
 
     private String buildDraftedSchemaInfo(LightSchemaCard schemaCard) {
-        return schemaCard.getName()+alignRight(printFavorTokens(schemaCard.getFavorTokens()),SCHEMA_WIDTH);
+        return schemaCard.getName()+alignRight(printFavorTokens(schemaCard.getFavorTokens()),SCHEMA_WIDTH-schemaCard.getName().length());
     }
 
 
@@ -95,7 +105,11 @@ public class CLIView {
     public String printSchemaChoiceView(){
         StringBuilder builder=new StringBuilder();
         builder.append(resetScreenPosition());
-        builder.append(printList(appendRows(buildDraftedSchemas(),privObj))).append("%n%n%n");
+        List<String> priv=new ArrayList<>();
+        priv.addAll(priv);
+        priv.add(0,boldify(uiMsg.getMessage("priv-obj")));
+        priv.add("  ");
+        builder.append(printList(appendRows(buildDraftedSchemas(),priv))).append("%n%n%n");
         return builder.toString();
     }
 
@@ -435,7 +449,7 @@ public class CLIView {
         //add top info
         schem.addAll(0,fitInLength(buildSchemaInfo(player,width), width));
         //add top border
-        schem.add(fitInLength(buildSchemaInfo(player,width), width).size(),padUntil("",width,'–'));
+        schem.add(padUntil("",width,'–'));
 
         schem.addAll(buildSchema(player.getSchema(),player.getPlayerId()==playerId));
 
@@ -503,11 +517,10 @@ public class CLIView {
             result.addAll(buildCard(card));
             result.add("     ");
         }
-        result.add(boldify(uiMsg.getMessage("priv-obj")));
+
         result.addAll(
-                appendRows(
-                        buildCell(new LightConstraint(privObj.getColor())),
-                        buildPrivObj(privObj,OBJ_LENGTH-CELL_WIDTH)));
+
+                        buildPrivObj(privObj,OBJ_LENGTH));
 
 
         return result;

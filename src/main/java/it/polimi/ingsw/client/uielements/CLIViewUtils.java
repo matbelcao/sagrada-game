@@ -269,7 +269,10 @@ public class CLIViewUtils {
         List<String> result=new ArrayList<>();
         result.add(" ");
         result.add(boldify(privObj.getName()+":"));
-        result.addAll(fitInLength(privObj.getDescription(), width));
+        result.addAll(
+                appendRows(
+                        buildCell(new LightConstraint(privObj.getColor())),
+                        buildPrivObj(privObj,width-CELL_WIDTH)));
         return result;
     }
 

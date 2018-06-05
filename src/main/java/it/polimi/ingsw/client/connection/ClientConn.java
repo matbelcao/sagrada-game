@@ -1,7 +1,5 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.common.enums.Face;
-import it.polimi.ingsw.common.enums.ModifyDie;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.rmi.RemoteException;
@@ -89,24 +87,10 @@ public interface ClientConn {
 
     /**
      * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
-     * in the schema card
-     * @return and immutable and indexed list containing the dice
-     */
-    List<IndexedCellContent> getSchemaDiceList();
-
-    /**
-     * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
-     * in the roundtrack
-     * @return an immutable and indexed list containing the dice
-     */
-    List<IndexedCellContent> getRoundTrackDiceList();
-
-    /**
-     * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
      * in the draft pool
      * @return an immutable and indexed list containing the dice
      */
-    List<IndexedCellContent> getDraftpoolDiceList();
+    List<IndexedCellContent> getDiceList();
 
     /**
      * This function can be invoked to the server to specify the possible placements in the user’s schema of a die that is
@@ -116,17 +100,9 @@ public interface ClientConn {
      */
     List<Integer> selectDie(int index);
 
-    public boolean chooseDiePlacement(int index);
+    boolean choose(int index);
 
-    public boolean chooseSchema(int index);
-
-    public boolean chooseTool(int index);
-
-    public boolean chooseDie(int index);
-
-    public boolean chooseDieModify(int index, ModifyDie modify);
-
-    public boolean chooseDieFace(int index, Face shade);
+    boolean chooseTool(int index);
 
     /**
      * This message is sent to the server when the client that received a list of possible placement for a die chooses
