@@ -400,8 +400,8 @@ public class SchemaCard implements Iterable<Cell>  {
 
     public int diceDiffQual(SchemaCard temp) {
         FullCellIterator tempIter = (FullCellIterator) temp.iterator();
-        FullCellIterator thisIter = (FullCellIterator) this.iterator();
         int diff=0;
+        assert(diceDiffSize(temp)==0);
         while (tempIter.hasNext()){
             Cell tempCell= tempIter.next();
             if(!this.getCell(tempIter.getIndex()).hasDie()

@@ -100,6 +100,10 @@ public class  Player {
         return true;
      }
 
+     public void replaceSchema(SchemaCard schema){
+         this.schema=schema;
+     }
+
     /**
      * Gets the schemaCard assigned to the player
      * @return the schema
