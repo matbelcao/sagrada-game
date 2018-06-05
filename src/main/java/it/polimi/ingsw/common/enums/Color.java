@@ -47,4 +47,20 @@ public enum Color { //need to add png address combined with Face's ones
         }
         return false;
     }
+
+    public static javafx.scene.paint.Color toFXColor(Color color){
+        if(color.equals(RED)){
+            return javafx.scene.paint.Color.RED;
+        }else if(color.equals(GREEN)){
+            return javafx.scene.paint.Color.GREEN;
+        }else if(color.equals(YELLOW)){
+            return javafx.scene.paint.Color.YELLOW;
+        }else if(color.equals(BLUE)){
+            return javafx.scene.paint.Color.BLUE;
+        }else if(color.equals(PURPLE)){
+            return javafx.scene.paint.Color.PURPLE;
+        }else{
+            return javafx.scene.paint.Color.GRAY;
+        }
+    }
 }

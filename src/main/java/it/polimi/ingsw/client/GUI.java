@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,9 +17,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Observable;
 
 public class GUI extends Application implements ClientUI {
+    public static final int NUM_COLS=5;
+    public static final int NUM_ROWS=4;
     private static Client client;
     private static UIMessages uimsg;
     private Stage primaryStage;
@@ -55,7 +57,7 @@ public class GUI extends Application implements ClientUI {
         primaryStage.setTitle("LOGIN WINDOW");
         this.primaryStage = primaryStage;
         primaryStage.setScene(logInScene());
-        primaryStage.setResizable(false);
+        //primaryStage.setResizable(false);
         primaryStage.show();
 
     }
@@ -104,33 +106,61 @@ public class GUI extends Application implements ClientUI {
         return loginScene;
     }
 
-    private Scene draftedSchemaScene() {
-        StackPane layou2 = new StackPane();
-        Scene scene2 = new Scene(layou2, 600, 700);
+    private Scene draftedSchemaSceneBuilder(List<LightSchemaCard> draftedSchemas, double width, double heigth) {
+        VBox schemaContainer = new VBox();
+        //HBox schemaContainer = new HBox();
+        Canvas schema0 = schemaToCanvas(draftedSchemas.get(0),width,heigth);
+        Canvas schema1 = schemaToCanvas(draftedSchemas.get(1),width,heigth);
+        Canvas schema2 = schemaToCanvas(draftedSchemas.get(2),width,heigth);
+        Canvas schema3 = schemaToCanvas(draftedSchemas.get(3),width,heigth);
+        schemaContainer.getChildren().addAll(schema0,schema1,schema2,schema3);
+        //mainContainer.getChildren().add(schemaContainer);
+
+
+        Scene scene2 = new Scene(schemaContainer, 1000, 1000);
         return scene2;
     }
 
-    private void drawShapes(GraphicsContext gc) {
-        gc.setFill(Color.GREEN);
-        gc.setStroke(Color.BLUE);
-        gc.setLineWidth(5);
-        gc.strokeLine(40, 10, 10, 40);
-        gc.fillOval(10, 60, 30, 30);
-        gc.strokeOval(60, 60, 30, 30);
-        gc.fillRoundRect(110, 60, 30, 30, 10, 10);
-        gc.strokeRoundRect(160, 60, 30, 30, 10, 10);
-        gc.fillArc(10, 110, 30, 30, 45, 240, ArcType.OPEN);
-        gc.fillArc(60, 110, 30, 30, 45, 240, ArcType.CHORD);
-        gc.fillArc(110, 110, 30, 30, 45, 240, ArcType.ROUND);
-        gc.strokeArc(10, 160, 30, 30, 45, 240, ArcType.OPEN);
-        gc.strokeArc(60, 160, 30, 30, 45, 240, ArcType.CHORD);
-        gc.strokeArc(110, 160, 30, 30, 45, 240, ArcType.ROUND);
-        gc.fillPolygon(new double[]{10, 40, 10, 40},
-                new double[]{210, 210, 240, 240}, 4);
-        gc.strokePolygon(new double[]{60, 90, 60, 90},
-                new double[]{210, 210, 240, 240}, 4);
-        gc.strokePolyline(new double[]{110, 140, 110, 140},
-                new double[]{210, 210, 240, 240}, 4);
+    private Canvas schemaToCanvas(LightSchemaCard lightSchemaCard,double width, double height) {
+        Canvas canvas = new Canvas(width, height);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        drawSchema(lightSchemaCard,gc, width,  height);
+        return canvas;
+    }
+
+    private void drawSchema(LightSchemaCard lightSchemaCard, GraphicsContext gc, double width, double height) {
+        double diceDim = width / 5;
+        double x = 0;
+        double y = 0;
+        for(int i = 0; i < NUM_ROWS; i++){
+            for(int j = 0; j < NUM_COLS; j++){
+                if(lightSchemaCard.hasDieAt(i,j)){
+                    drawDie(lightSchemaCard.getDieAt(i,j),gc,x,y,diceDim);
+                }else if(lightSchemaCard.hasConstraintAt(i,j)){
+                    drawConstraint(lightSchemaCard.getConstraintAt(i,j),gc,x,y,diceDim);
+                }else{
+                    drawWhiteSquare(gc,x,y,diceDim);
+                }
+                x += diceDim;
+            }
+            y += diceDim;
+        }
+    }
+
+    private void drawWhiteSquare(GraphicsContext gc, double x, double y, double diceDim) {
+        gc.setFill(Color.WHITE);
+        gc.fillRect(x,y,diceDim,diceDim);
+    }
+
+    private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double diceDim) {
+        if (constraint.hasColor())
+        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
+        gc.fillRect(x,y,diceDim,diceDim);
+    }
+
+    private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double diceDim) {
+        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
+        gc.fillRect(x,y,diceDim,diceDim);
     }
 
     @Override
@@ -173,7 +203,7 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
-        Platform.runLater(() -> primaryStage.setScene(draftedSchemaScene()));
+        Platform.runLater(() -> primaryStage.setScene(draftedSchemaSceneBuilder(draftedSchemas,250,200)));
     }
 
     @Override
