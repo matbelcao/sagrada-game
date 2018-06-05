@@ -157,20 +157,7 @@ public class SchemaCard implements Iterable<Cell>  {
      * @return the list of valid positions for the die
      */
     public List<Integer> listPossiblePlacements(Die die) {
-        List <Integer> list= new ArrayList<>();
-        FullCellIterator diceIterator;
-        diceIterator=new FullCellIterator(this.cell);
-
-        if(isFirstDie){
-            //first and last rows
-            checkBorder(die, list);
-        }else{
-            while(diceIterator.hasNext()){
-                diceIterator.next();
-                checkCloseCells(die, diceIterator, list);
-            }
-        }
-        return list;
+        return listPossiblePlacements(die,IgnoredConstraint.NONE);
     }
 
     /**
@@ -205,31 +192,6 @@ public class SchemaCard implements Iterable<Cell>  {
     }
 
 
-    /**
-     * Checks if cells close to the one given by the iterator(that contains a die) could accept the die
-     * @param die the die to be possibly put in place
-     * @param diceIterator iterates on full cells
-     * @param list the list of possible positions for the die
-     */
-    private void checkCloseCells(Die die, FullCellIterator diceIterator, List<Integer> list) {
-        int row;
-        int column;
-        Integer index;
-        for(int i = -1; i<2; i++){
-            row=diceIterator.getRow()+i;
-            for(int j=-1; j<2; j++){
-                column=diceIterator.getColumn()+j;
-                if( (row>=0 && row<NUM_ROWS) && (column>=0 && column<NUM_COLS)){
-                    index=(row * NUM_COLS + column);
-
-                    if (!list.contains(index) && canBePlacedHere(row, column, die)) {
-                        list.add(index);
-                    }
-
-                }
-            }
-        }
-    }
 
     /**
      * Checks if cells close to the one given by the iterator(that contains a die) could accept the die
@@ -259,33 +221,6 @@ public class SchemaCard implements Iterable<Cell>  {
     }
 
 
-    /**
-     * Calculates a list of indexes where the die can be put, if it's the first being placed (only on the border of the schema card)
-     * @param die die to be put in place
-     * @param list list of possible placements
-     */
-    private void checkBorder(Die die, List<Integer> list) {
-        int row;
-        int column;
-        //first and last rows
-        for(row=0,column=0; column < NUM_COLS; column++){
-            if(this.cell[row][column].canAcceptDie(die)){
-                list.add(row * NUM_COLS + column);
-            }
-            if(this.cell[row+NUM_ROWS-1][column].canAcceptDie(die)){
-                list.add((row+NUM_ROWS-1) * NUM_COLS + column);
-            }
-        }
-        //first and last columns
-        for(row=0,column=0; row<NUM_ROWS-1;row++){
-            if(this.cell[row][column].canAcceptDie(die)){
-                list.add(row * NUM_COLS );
-            }
-            if(this.cell[row][column+NUM_COLS-1].canAcceptDie(die)){
-                list.add(row * NUM_COLS + NUM_COLS-1);
-            }
-        }
-    }
 
     /**
      * Calculates a list of indexes where the die can be put, if it's the first being placed (only on the border of the schema card)
