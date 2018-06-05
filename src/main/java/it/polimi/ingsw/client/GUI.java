@@ -198,7 +198,45 @@ public class GUI extends Application implements ClientUI {
         gc.setLineWidth(LINE_WIDTH);
         gc.strokeRect(x, y, diceDim, diceDim);
     }
+    private void drawSpots(GraphicsContext gc, int w, int h, int count) {
+        switch (count) {
+            case 1:
+                drawSpot(gc, w / 2, h / 2);
+                break;
+            case 3:
+                drawSpot(gc, w / 2, h / 2);
+                // Fall thru to next case
+            case 2:
+                drawSpot(gc, w / 4, h / 4);
+                drawSpot(gc, 3 * w / 4, 3 * h / 4);
+                break;
+            case 5:
+                drawSpot(gc, w / 2, h / 2);
+                // Fall thru to next case
+            case 4:
+                drawSpot(gc, w / 4, h / 4);
+                drawSpot(gc, 3 * w / 4, 3 * h / 4);
+                drawSpot(gc, 3 * w / 4, h / 4);
+                drawSpot(gc, w / 4, 3 * h / 4);
+                break;
+            case 6:
+                drawSpot(gc, w / 4, h / 4);
+                drawSpot(gc, 3 * w / 4, 3 * h / 4);
+                drawSpot(gc, 3 * w / 4, h / 4);
+                drawSpot(gc, w / 4, 3 * h / 4);
+                drawSpot(gc, w / 4, h / 2);
+                drawSpot(gc, 3 * w / 4, h / 2);
+                break;
+        }
+    }
 
+    private void drawSpot(GraphicsContext gc, int x, int y) {
+        gc.setFill(Color.BLACK);
+        gc.fillOval(x - SPOT_DIAMETER / 2, y - SPOT_DIAMETER / 2,
+                SPOT_DIAMETER, SPOT_DIAMETER);
+    }
+
+}
     @Override
     public void updateConnectionOk() {
 
