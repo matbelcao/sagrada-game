@@ -4,10 +4,7 @@ import it.polimi.ingsw.common.enums.DieQuantity;
 import it.polimi.ingsw.common.enums.ModifyDie;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Turn;
-import it.polimi.ingsw.server.connection.MasterServer;
-import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.Die;
-import it.polimi.ingsw.server.model.Player;
 import it.polimi.ingsw.server.model.ToolCard;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import org.junit.jupiter.api.Test;
@@ -71,110 +68,110 @@ class ToolCardTest {
         ToolCard tool1 = new ToolCard(1);
         tool1.initStage();
         assertTrue(tool1.stageFrom());
-        assertTrue(tool1.stageModify1());
+        assertTrue(tool1.canModify1());
         assertFalse(tool1.stageSelect1());
         assertFalse(tool1.stageTo());
         assertFalse(tool1.stageModify2());
-        assertFalse(tool1.stageSelect2());
+        assertFalse(tool1.canSelect2());
 
         ToolCard tool2 = new ToolCard(2);
         tool2.initStage();
         assertTrue(tool2.stageFrom());
-        assertFalse(tool2.stageModify1());
+        assertFalse(tool2.canModify1());
         assertTrue(tool2.stageSelect1());
         assertFalse(tool2.stageTo());
         assertFalse(tool2.stageModify2());
-        assertFalse(tool2.stageSelect2());
+        assertFalse(tool2.canSelect2());
 
         ToolCard tool3 = new ToolCard(3);
         tool3.initStage();
         assertTrue(tool3.stageFrom());
-        assertFalse(tool3.stageModify1());
+        assertFalse(tool3.canModify1());
         assertTrue(tool3.stageSelect1());
         assertFalse(tool3.stageTo());
         assertFalse(tool3.stageModify2());
-        assertFalse(tool3.stageSelect2());
+        assertFalse(tool3.canSelect2());
 
         ToolCard tool4 = new ToolCard(4);
         tool4.initStage();
         assertTrue(tool4.stageFrom());
-        assertFalse(tool4.stageModify1());
+        assertFalse(tool4.canModify1());
         assertTrue(tool4.stageSelect1());
         assertTrue(tool4.stageTo());
         assertFalse(tool4.stageModify2());
-        assertTrue(tool4.stageSelect2());
+        assertTrue(tool4.canSelect2());
 
         ToolCard tool5 = new ToolCard(5);
         tool5.initStage();
         assertTrue(tool5.stageFrom());
-        assertTrue(tool5.stageModify1());
+        assertTrue(tool5.canModify1());
         assertFalse(tool5.stageSelect1());
         assertTrue(tool5.stageTo());
         assertTrue(tool5.stageModify2());
-        assertFalse(tool5.stageSelect2());
+        assertFalse(tool5.canSelect2());
 
         ToolCard tool6 = new ToolCard(6);
         tool6.initStage();
         assertTrue(tool6.stageFrom());
-        assertTrue(tool6.stageModify1());
+        assertTrue(tool6.canModify1());
         assertFalse(tool6.stageSelect1());
         assertFalse(tool6.stageTo());
         assertFalse(tool6.stageModify2());
-        assertFalse(tool6.stageSelect2());
+        assertFalse(tool6.canSelect2());
 
         ToolCard tool7 = new ToolCard(7);
         tool7.initStage();
         assertTrue(tool7.stageFrom());
-        assertFalse(tool7.stageModify1());
+        assertFalse(tool7.canModify1());
         assertFalse(tool7.stageSelect1());
         assertFalse(tool7.stageTo());
         assertFalse(tool7.stageModify2());
-        assertFalse(tool7.stageSelect2());
+        assertFalse(tool7.canSelect2());
 
         ToolCard tool8 = new ToolCard(8);
         tool8.initStage();
         assertTrue(tool8.stageFrom());
-        assertFalse(tool8.stageModify1());
+        assertFalse(tool8.canModify1());
         assertTrue(tool8.stageSelect1());
         assertFalse(tool8.stageTo());
         assertFalse(tool8.stageModify2());
-        assertFalse(tool8.stageSelect2());
+        assertFalse(tool8.canSelect2());
 
         ToolCard tool9 = new ToolCard(9);
         tool9.initStage();
         assertTrue(tool9.stageFrom());
-        assertFalse(tool9.stageModify1());
+        assertFalse(tool9.canModify1());
         assertTrue(tool9.stageSelect1());
         assertFalse(tool9.stageTo());
         assertFalse(tool9.stageModify2());
-        assertFalse(tool9.stageSelect2());
+        assertFalse(tool9.canSelect2());
 
         ToolCard tool10 = new ToolCard(10);
         tool10.initStage();
         assertTrue(tool10.stageFrom());
-        assertTrue(tool10.stageModify1());
+        assertTrue(tool10.canModify1());
         assertFalse(tool10.stageSelect1());
         assertFalse(tool10.stageTo());
         assertFalse(tool10.stageModify2());
-        assertFalse(tool10.stageSelect2());
+        assertFalse(tool10.canSelect2());
 
         ToolCard tool11 = new ToolCard(11);
         tool11.initStage();
         assertTrue(tool11.stageFrom());
-        assertTrue(tool11.stageModify1());
+        assertTrue(tool11.canModify1());
         assertFalse(tool11.stageSelect1());
         assertTrue(tool11.stageTo());
         assertTrue(tool11.stageModify2());
-        assertFalse(tool11.stageSelect2());
+        assertFalse(tool11.canSelect2());
 
         /*ToolCard tool12 = new ToolCard(12);
         tool12.initStage();
         assertTrue(tool12.stageFrom());
-        assertFalse(tool12.stageModify1());
+        assertFalse(tool12.canModify1());
         assertTrue(tool12.stageSelect1());
         assertFalse(tool12.stageTo());
         assertFalse(tool12.stageModify2());
-        assertFalse(tool12.stageSelect2());*/
+        assertFalse(tool12.canSelect2());*/
     }
 
     @Test
@@ -184,12 +181,12 @@ class ToolCardTest {
         assertTrue(tool5.stageFrom());
         assertFalse(tool5.stageFrom());
         assertFalse(tool5.stageModify2());
-        assertTrue(tool5.stageModify1());
+        assertTrue(tool5.canModify1());
         assertFalse(tool5.stageSelect1());
         assertFalse(tool5.stageModify2());
         assertTrue(tool5.stageTo());
         assertTrue(tool5.stageModify2());
-        assertFalse(tool5.stageSelect2());
+        assertFalse(tool5.canSelect2());
         assertFalse(tool5.stageModify2());
     }
 }

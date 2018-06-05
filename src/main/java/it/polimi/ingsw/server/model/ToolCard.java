@@ -14,7 +14,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.validation.Schema;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ public class ToolCard extends Card {
     private List<ModifyDie> modify;
     private IgnoredConstraint ignored_constraint;
     private Turn turn;
-
+    //states
     private boolean executedFrom, executedModify1, executedSelect1, executedTo, executedModify2, executedSelect2;
 
 
@@ -150,6 +149,8 @@ public class ToolCard extends Card {
      * Sets to true the stages to skip
      */
     public void initStage() {
+
+        // set to true if they can't be executed
         if (from.equals(to) && !from.equals(Place.SCHEMA)) {
             if (quantity.contains(DieQuantity.ALL)) {
                 executedModify1 = true;
@@ -191,21 +192,20 @@ public class ToolCard extends Card {
         return false;
     }
 
-    public boolean stageSelect1() {
+    public boolean canSelect1() {
         if (executedFrom && executedModify1 && !executedSelect1) {
-            executedSelect1 = true;
             return true;
         }
         return false;
     }
 
-    public boolean stageModify1() { //Die die,ModifyDie action
+    public boolean canModify1() { //Die die,ModifyDie action
         if (executedFrom && executedSelect1 && !executedModify1) {
-            executedModify1 = true;
+            return true;
         } else {
             return false;
         }
-        return true;
+
     }
 
     public boolean stageTo(Place gamePlace) {
@@ -216,28 +216,16 @@ public class ToolCard extends Card {
         return false;
     }
 
-    public boolean stageModify2() { //Die die,ModifyDie action, int shade
+    public boolean canModify2() { //Die die,ModifyDie action, int shade
         if (executedTo && !executedModify2 && executedSelect2) {
-            executedModify2 = true;
+            return true;
         } else {
             return false;
         }
-        /*switch(action){
-            case SETSHADE:
-                die.setShade(shade);
-                break;
-            case SWAP:
-                swapDie(selectedDie,die);
-                break;
-            default:
-                break;
-        }*/
-        return true;
     }
 
-    public boolean stageSelect2() {
+    public boolean canSelect2() {
         if (executedTo && executedModify2 && !executedSelect2) {
-            executedSelect2 = true;
             return true;
         }
         return false;
@@ -254,7 +242,7 @@ public class ToolCard extends Card {
     }
 
     public boolean modifyDie1(Die die, ModifyDie action){
-    if(!modify.contains(action) || executedModify1){return false;}
+    if(!modify.contains(action) || !canModify1()){return false;}
     selectedDie=die;
     try {
         switch(action) {
@@ -280,8 +268,10 @@ public class ToolCard extends Card {
 
 
     public boolean selectDie1(Die die){
-        if(!stageModify1()){return false;}
+        if(!canModify1()){return false;}
         selectedDie=die;
+
+        executedModify1=true;
         return true;
     }
 
@@ -289,14 +279,14 @@ public class ToolCard extends Card {
 
     //setshade
     public boolean setShade(int shade) {
-        if(!modify.contains(ModifyDie.SETSHADE) || !stageModify2()){return false;}
+        if(!modify.contains(ModifyDie.SETSHADE) || !canModify2()){return false;}
 
         selectedDie.setShade(shade);
         return true;
     }
 
     public boolean swapDie(Die die) {
-        if(!modify.contains(ModifyDie.SWAP) || !stageModify2()){return false;}
+        if(!modify.contains(ModifyDie.SWAP) || !canModify2()){return false;}
         Color tmpColor = selectedDie.getColor();
         Face tmpFace = selectedDie.getShade();
         selectedDie.setShade(die.getShade().toInt());
