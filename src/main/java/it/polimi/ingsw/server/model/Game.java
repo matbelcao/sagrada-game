@@ -7,7 +7,6 @@ import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.common.enums.UserStatus;
-import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
@@ -509,7 +508,7 @@ public class Game extends Thread implements Iterable  {
 
     public boolean chooseToolDie(int index,String action) throws IllegalActionException {
         boolean result;
-        Die die=findChoosedDie(index);
+        Die die= findChosenDie(index);
 
         if(gameStatus==GameStatus.INITIALIZING || gameStatus==GameStatus.TURN_RUN || selectedTool==-1){ throw new IllegalActionException(); }
 
@@ -522,7 +521,7 @@ public class Game extends Thread implements Iterable  {
 
     public boolean chooseToolDie(int index) throws IllegalActionException {
         boolean result;
-        Die die=findChoosedDie(index);
+        Die die= findChosenDie(index);
 
         if(gameStatus==GameStatus.INITIALIZING || gameStatus==GameStatus.TURN_RUN || selectedTool==-1){ throw new IllegalActionException(); }
 
@@ -539,7 +538,7 @@ public class Game extends Thread implements Iterable  {
         return result;
     }
 
-    private Die findChoosedDie(int index)  {
+    private Die findChosenDie(int index)  {
         int tempIndex=0;
 
         if(gameStatus.equals(GameStatus.REQUESTED_DRAFT_POOL)){

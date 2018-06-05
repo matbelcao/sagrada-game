@@ -371,7 +371,7 @@ public class SocketServer extends Thread implements ServerConn  {
         ArrayList<ToolCard> toolCards= (ArrayList<ToolCard>) user.getGame().getToolCards();
 
         for (ToolCard t:toolCards){
-            outSocket.println("SEND tool "+t.getId()+" "+t.getName().replaceAll(" ", "_")+" "+t.getDescription().replaceAll(" ", "_") +" "+t.hasAlreadyUsed());
+            outSocket.println("SEND tool "+t.getId()+" "+t.getName().replaceAll(" ", "_")+" "+t.getDescription().replaceAll(" ", "_") +" "+t.isAlreadyUsed());
             outSocket.flush();
         }
     }

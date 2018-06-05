@@ -6,7 +6,6 @@ import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
-import it.polimi.ingsw.server.model.toolaction.ToolAction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -15,7 +14,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.validation.Schema;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,15 +27,20 @@ public class ToolCard extends Card {
     private static final String xmlLogic = MasterServer.XML_SOURCE + "ToolLogic.xml";
 
     private boolean used;
-    private ToolAction toolAction;
     public static final int NUM_TOOL_CARDS = 12;
-    private Place from, to;
+    private Place from;
+    private Place to;
     private List<DieQuantity> quantity;
     private List<ModifyDie> modify;
     private IgnoredConstraint ignored_constraint;
     private Turn turn;
     //states
-    private boolean executedFrom, executedModify1, executedSelect1, executedTo, executedModify2, executedSelect2;
+    private boolean executedFrom;
+    private boolean executedModify1;
+    private boolean executedSelect1;
+    private boolean executedTo;
+    private boolean executedModify2;
+    private boolean executedSelect2;
 
 
     private SchemaCard schemaTemp;
@@ -57,8 +60,6 @@ public class ToolCard extends Card {
         modify = new ArrayList<>();
         quantity = new ArrayList<>();
 
-        String className = "ToolAction" + id;
-        Class cls = null;
         toolReader(super.getId());
     }
 
@@ -153,7 +154,7 @@ public class ToolCard extends Card {
     }
 
     /**
-     * Sets to true the stages to skip
+     * Sets to true the stages to be skipped
      */
     public void initStage() {
 
@@ -380,7 +381,7 @@ public class ToolCard extends Card {
      * This method provide the information about if the card has been yet used
      * @return true iff has been used yet
      */
-    public boolean hasAlreadyUsed(){
+    public boolean isAlreadyUsed(){
         return this.used;
     }
 

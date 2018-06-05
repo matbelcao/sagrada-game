@@ -25,7 +25,7 @@ public class LightTool extends LightCard {
     }
 
     public static LightTool toLightTool(ToolCard tool){
-        return new LightTool(tool.getName(),tool.getDescription(),tool.getId(),tool.hasAlreadyUsed());
+        return new LightTool(tool.getName(),tool.getDescription(),tool.getId(),tool.isAlreadyUsed());
     }
 
     public static LightTool toLightTool(String objective){
