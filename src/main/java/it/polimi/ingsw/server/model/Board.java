@@ -45,8 +45,10 @@ public class Board {
         toolCards= new ToolCard[Board.NUM_TOOLS];
         Random randomGen = new Random();
         List<Integer> draftedTools= new ArrayList<>();
+        draftedTools.add(1);
+        toolCards[0]=new ToolCard(1);
         Integer id;
-        for(int i =0; i<Board.NUM_TOOLS;i++){
+        for(int i =1; i<Board.NUM_TOOLS;i++){
             do{
                 id=randomGen.nextInt(ToolCard.NUM_TOOL_CARDS) + 1;
             }while (draftedTools.contains(id));

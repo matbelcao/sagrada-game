@@ -3,9 +3,9 @@ package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
+import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
-import it.polimi.ingsw.server.model.toolaction.ToolAction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -27,18 +27,26 @@ public class ToolCard extends Card {
     private static final String xmlLogic = MasterServer.XML_SOURCE + "ToolLogic.xml";
 
     private boolean used;
-    private ToolAction toolAction;
     public static final int NUM_TOOL_CARDS = 12;
-    private Place from, to;
+    private Place from;
+    private Place to;
     private List<DieQuantity> quantity;
     private List<ModifyDie> modify;
     private IgnoredConstraint ignored_constraint;
     private Turn turn;
     //states
-    private boolean executedFrom, executedModify1, executedSelect1, executedTo, executedModify2, executedSelect2;
+    private boolean executedFrom;
+    private boolean executedModify1;
+    private boolean executedSelect1;
+    private boolean executedTo;
+    private boolean executedModify2;
+    private boolean executedSelect2;
 
 
-    private Die selectedDie;
+    private int numSelectedDice;
+    private SchemaCard schemaTemp;
+    private List<Die> selectedDice;
+    private List<Integer> selectedIndex;
 
 
     /**
@@ -53,8 +61,6 @@ public class ToolCard extends Card {
         modify = new ArrayList<>();
         quantity = new ArrayList<>();
 
-        String className = "ToolAction" + id;
-        Class cls = null;
         toolReader(super.getId());
     }
 
@@ -123,7 +129,7 @@ public class ToolCard extends Card {
         return player.getFavorTokens() >= cost;
     }
 
-    public boolean enableToolCard(Player player, int turnFirstOrSecond) {
+    public boolean enableToolCard(Player player, int turnFirstOrSecond, SchemaCard schema) {
         try {
             if (!used) {
                 used = true;
@@ -137,6 +143,10 @@ public class ToolCard extends Card {
                 }
                 player.setSkipsNextTurn(true);
             }
+            selectedDice=new ArrayList<>();
+            selectedIndex=new ArrayList<>();
+            schemaTemp=schema.cloneSchema();
+            numSelectedDice=0;
             discard();
             initStage();
         } catch (NegativeTokensException e) {
@@ -146,7 +156,7 @@ public class ToolCard extends Card {
     }
 
     /**
-     * Sets to true the stages to skip
+     * Sets to true the stages to be skipped
      */
     public void initStage() {
 
@@ -231,8 +241,54 @@ public class ToolCard extends Card {
         return false;
     }
 
+    public boolean canSelectDie() {
+        if(canSelect1()){
+            return true;
+        }
+        if(canSelect2()){
+            return true;
+        }
+        return false;
+    }
+
+    //only for tool that place two die in the same turn
+    public boolean isExternalSchemaPlacement(){
+        if(!from.equals(Place.SCHEMA) && to.equals(Place.SCHEMA)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isInternalSchemaPlacement() {
+        if(from.equals(Place.SCHEMA) && to.equals(Place.SCHEMA)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean placementsCompleted(){
+        if(quantity.equals(DieQuantity.ONE) && executedSelect1){
+            return true;
+        }
+        if(quantity.equals(DieQuantity.TWO) && executedSelect1 && executedSelect2){
+            return true;
+        }
+        return false;
+    }
+
+    public SchemaCard getNewSchema(){
+        return schemaTemp;
+    }
+
+    public List<Die> getToolDice(){
+        return selectedDice;
+    }
+
+    public List<Integer> getDiceIndexes(){
+        return selectedIndex;
+    }
+
     public void discard() {
-        selectedDie = null;
         executedFrom = false;
         executedSelect1 = false;
         executedModify1 = false;
@@ -243,7 +299,7 @@ public class ToolCard extends Card {
 
     public boolean modifyDie1(Die die, ModifyDie action){
     if(!modify.contains(action) || !canModify1()){return false;}
-    selectedDie=die;
+    selectedDice.add(die);
     try {
         switch(action) {
             case DECREASE:
@@ -267,12 +323,46 @@ public class ToolCard extends Card {
     }
 
 
-    public boolean selectDie1(Die die){
-        if(!canModify1()){return false;}
-        selectedDie=die;
+    public boolean selectDie(int index){
+        if(canSelect1()) {
+            selectedDice.add(schemaTemp.getCell(index).getDie());
+            schemaTemp.removeDie(index);
+            selectedIndex.add(index);
+            return true;
+        }else if(canSelect2() && !selectedDice.get(0).equals(schemaTemp.getCell(index).getDie()) && selectedIndex.get(0)!=index){
+            selectedDice.add(schemaTemp.getCell(index).getDie());
+            schemaTemp.removeDie(index);
+            selectedIndex.add(index);
+            return true;
+        }
+        return false;
+    }
 
-        executedModify1=true;
-        return true;
+    //For schema to schema
+    public boolean virtualPlacement(int index) {
+        if(!canSelectDie()){return false;}
+        if(selectedDice.size()>0){
+            try {
+                schemaTemp.putDie(index,selectedDice.get(0),ignored_constraint);
+                selectedDice.remove(0);
+                selectedIndex.remove(0);
+            } catch (IllegalDieException e) {
+                return false;
+            }
+            if(canSelect1()) {
+                executedSelect1=true;
+            }else{
+                executedSelect2=true;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    //for other to schema
+    public boolean externalVirtualPlacement(int index){
+
+        return false;
     }
 
 
@@ -281,18 +371,20 @@ public class ToolCard extends Card {
     public boolean setShade(int shade) {
         if(!modify.contains(ModifyDie.SETSHADE) || !canModify2()){return false;}
 
-        selectedDie.setShade(shade);
+        selectedDice.get(0).setShade(shade);
+        executedModify2=true;
         return true;
     }
 
     public boolean swapDie(Die die) {
         if(!modify.contains(ModifyDie.SWAP) || !canModify2()){return false;}
-        Color tmpColor = selectedDie.getColor();
-        Face tmpFace = selectedDie.getShade();
-        selectedDie.setShade(die.getShade().toInt());
-        selectedDie.setColor(die.getColor().toString());
+        Color tmpColor = selectedDice.get(0).getColor();
+        Face tmpFace = selectedDice.get(0).getShade();
+        selectedDice.get(0).setShade(die.getShade().toInt());
+        selectedDice.get(0).setColor(die.getColor().toString());
         die.setShade(tmpFace.toInt());
         die.setColor(tmpColor.toString());
+        executedModify2=true;
         return true;
     }
 
@@ -302,7 +394,7 @@ public class ToolCard extends Card {
      * This method provide the information about if the card has been yet used
      * @return true iff has been used yet
      */
-    public boolean hasAlreadyUsed(){
+    public boolean isAlreadyUsed(){
         return this.used;
     }
 

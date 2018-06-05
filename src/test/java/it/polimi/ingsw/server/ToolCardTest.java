@@ -4,7 +4,6 @@ import it.polimi.ingsw.common.enums.DieQuantity;
 import it.polimi.ingsw.common.enums.ModifyDie;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Turn;
-import it.polimi.ingsw.server.model.Die;
 import it.polimi.ingsw.server.model.ToolCard;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,7 @@ class ToolCardTest {
         assertEquals("src"+File.separator+"img"+File.separator+"ToolCard"+File.separator+"1.png",tool1.getImgSrc());
         assertEquals("Dopo aver scelto un dado, aumenta o dominuisci il valore del dado scelto di 1 (Non puoi cambiare un 6 in 1 o un 1 in 6)",tool1.getDescription());
 
-        assertFalse(tool1.hasAlreadyUsed());
+        assertFalse(tool1.isAlreadyUsed());
         assertEquals(Place.DRAFTPOOL,tool1.getFrom());
         assertEquals(Place.DRAFTPOOL,tool1.getTo());
         assertEquals(DieQuantity.ONE,tool1.getQuantity().get(0));
