@@ -17,7 +17,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -27,9 +26,12 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.Observable;
 
+import static javafx.geometry.Pos.CENTER;
+
 public class GUI extends Application implements ClientUI {
-    public static final int NUM_COLS=5;
-    public static final int NUM_ROWS=4;
+    public static final int NUM_COLS = 5;
+    public static final int NUM_ROWS = 4;
+    public static final int LINE_WIDTH = 1;
     private static Client client;
     private static UIMessages uimsg;
     private Stage primaryStage;
@@ -64,7 +66,7 @@ public class GUI extends Application implements ClientUI {
 
     private Scene logInScene() {
         GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
+        grid.setAlignment(CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
@@ -107,17 +109,37 @@ public class GUI extends Application implements ClientUI {
     }
 
     private Scene draftedSchemaSceneBuilder(List<LightSchemaCard> draftedSchemas, double width, double heigth) {
-        VBox schemaContainer = new VBox();
-        //HBox schemaContainer = new HBox();
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
         Canvas schema0 = schemaToCanvas(draftedSchemas.get(0),width,heigth);
         Canvas schema1 = schemaToCanvas(draftedSchemas.get(1),width,heigth);
         Canvas schema2 = schemaToCanvas(draftedSchemas.get(2),width,heigth);
         Canvas schema3 = schemaToCanvas(draftedSchemas.get(3),width,heigth);
-        schemaContainer.getChildren().addAll(schema0,schema1,schema2,schema3);
-        //mainContainer.getChildren().add(schemaContainer);
+
+        Button b0 = new Button("Select");
+        Button b1 = new Button("Select");
+        Button b2 = new Button("Select");
+        Button b3 = new Button("Select");
+
+        b0.setAlignment(CENTER);
+        b1.setAlignment(CENTER);
+        b2.setAlignment(CENTER);
+        b3.setAlignment(CENTER);
+
+        grid.add(schema0,0,0);
+        grid.add(schema1,1,0);
+        grid.add(schema2,2,0);
+        grid.add(schema3,3,0);
+        grid.add(b0,0,1);
+        grid.add(b1,1,1);
+        grid.add(b2,2,1);
+        grid.add(b3,3,1);
 
 
-        Scene scene2 = new Scene(schemaContainer, 1000, 1000);
+        Scene scene2 = new Scene(grid, 1200, 300);
         return scene2;
     }
 
@@ -130,8 +152,8 @@ public class GUI extends Application implements ClientUI {
 
     private void drawSchema(LightSchemaCard lightSchemaCard, GraphicsContext gc, double width, double height) {
         double diceDim = width / 5;
-        double x = 0;
         double y = 0;
+        double x = 0;
         for(int i = 0; i < NUM_ROWS; i++){
             for(int j = 0; j < NUM_COLS; j++){
                 if(lightSchemaCard.hasDieAt(i,j)){
@@ -143,24 +165,38 @@ public class GUI extends Application implements ClientUI {
                 }
                 x += diceDim;
             }
+            x = 0;
             y += diceDim;
         }
     }
 
     private void drawWhiteSquare(GraphicsContext gc, double x, double y, double diceDim) {
         gc.setFill(Color.WHITE);
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(LINE_WIDTH);
         gc.fillRect(x,y,diceDim,diceDim);
+        gc.strokeRect(x,y,diceDim,diceDim);
     }
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double diceDim) {
-        if (constraint.hasColor())
-        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
-        gc.fillRect(x,y,diceDim,diceDim);
+        if (constraint.hasColor()) {
+            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
+            gc.fillRect(x, y, diceDim, diceDim);
+        }else{
+            gc.setFill(Color.GRAY);
+            gc.fillRect(x, y, diceDim, diceDim);
+        }
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(LINE_WIDTH);
+        gc.strokeRect(x, y, diceDim, diceDim);
     }
 
     private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double diceDim) {
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
         gc.fillRect(x,y,diceDim,diceDim);
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(LINE_WIDTH);
+        gc.strokeRect(x, y, diceDim, diceDim);
     }
 
     @Override
