@@ -10,9 +10,9 @@ class CredentialsTest {
     @Test
     void testHash(){
         System.out.println("1:"+ Arrays.toString(Credentials.hash("ciccio","password1".toCharArray())));
-        System.out.println("2:"+Credentials.hash("ciccio","password2".toCharArray()));
-        System.out.println("3:"+Credentials.hash("ciccio","p4ssword1".toCharArray()));
-        System.out.println("4:"+Credentials.hash("ciccio","passw0rd1".toCharArray()));
+        System.out.println("2:"+Credentials.toString(Credentials.hash("ciccio","password2".toCharArray())));
+        System.out.println("3:"+Credentials.toString(Credentials.hash("ciccio  ","".toCharArray())));
+        System.out.println("4:"+Credentials.toString(Credentials.hash("cicco ","".toCharArray())));
     }
 
 }

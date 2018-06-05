@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.model;
 import java.io.File;
 import javax.xml.parsers.*;
 
+import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
@@ -20,7 +21,7 @@ import org.xml.sax.SAXException;
 /**
  * This class represents a schema card of the game
  */
-public class SchemaCard implements Iterable<Cell> {
+public class SchemaCard implements Iterable<Cell>  {
     private String name;
     private int id;
     private int favorTokens;
@@ -29,20 +30,42 @@ public class SchemaCard implements Iterable<Cell> {
     public static final int NUM_COLS=5;
     public static final int NUM_ROWS=4;
     public static final int NUM_SCHEMA=24;
+    private static String xmlSource=MasterServer.XML_SOURCE+"SchemaCard.xml";
 
     /**
      * Retrieves the SchemaCard(id) data from the xml file and instantiates it
      * @param id ToolCard id
-     * @param xmlSrc xml file path
      */
-    public SchemaCard(int id, String xmlSrc){
-        super();
+    public SchemaCard(Cell [] [] cells,int id, String name,int favorTokens){
 
-        int row;
-        int column;
-        cell = new Cell[NUM_ROWS][NUM_COLS];
+        cell = cells;
+        this.id=id;
+        this.name=name;
+        this.favorTokens=favorTokens;
+        isFirstDie=true;
 
-        File xmlFile= new File(xmlSrc);
+    }
+
+    public SchemaCard(int id){
+
+
+        SchemaCard temp= parser(id);
+
+        assert temp != null;
+        cell = temp.cell;
+        this.id=id;
+        this.name=temp.name;
+        this.favorTokens=temp.favorTokens;
+        isFirstDie=true;
+    }
+
+
+    public static SchemaCard parser(int id){
+        File xmlFile= new File(xmlSource);
+        String name="";
+        int favorTokens=0;
+        Cell[][] cells= new Cell[NUM_ROWS][NUM_COLS];
+
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -56,30 +79,34 @@ public class SchemaCard implements Iterable<Cell> {
                 Element eElement = (Element)nodeList.item(temp1);
 
                 if(Integer.parseInt(eElement.getAttribute("id"))==id){
-                    this.name=eElement.getElementsByTagName("name").item(0).getTextContent();
-                    this.id=id;
-                    this.favorTokens = Integer.parseInt(eElement.getElementsByTagName("token").item(0).getTextContent());
-                    this.isFirstDie=true;
+                    name=eElement.getElementsByTagName("name").item(0).getTextContent();
+
+                    favorTokens = Integer.parseInt(eElement.getElementsByTagName("token").item(0).getTextContent());
+
 
                     for (int temp2 = 0; temp2 < eElement.getElementsByTagName("data").getLength(); temp2++) {
-                        row = Integer.parseInt(eElement.getElementsByTagName("row").item(temp2).getTextContent());
-                        column = Integer.parseInt(eElement.getElementsByTagName("col").item(temp2).getTextContent());
-                        cell[row][column]=new Cell(eElement.getElementsByTagName("data").item(temp2).getTextContent());
+                        int row = Integer.parseInt(eElement.getElementsByTagName("row").item(temp2).getTextContent());
+                        int column = Integer.parseInt(eElement.getElementsByTagName("col").item(temp2).getTextContent());
+                        cells[row][column]=new Cell(eElement.getElementsByTagName("data").item(temp2).getTextContent());
                     }
                 }
             }
 
             for (int i=0; i<NUM_ROWS ; i++){
                 for (int j=0; j<NUM_COLS ; j++){
-                    if (cell[i][j] == null){
-                        cell[i][j] = new Cell();
+                    if (cells[i][j] == null){
+                        cells[i][j] = new Cell();
                     }
                 }
             }
 
+            return new SchemaCard(cells,id,name,favorTokens);
         }catch (SAXException | ParserConfigurationException | IOException e1) {
-            e1.printStackTrace();
+            System.err.println("ERR: couldn't load schema card");
         }
+
+
+        return null;
     }
 
     /**
@@ -408,6 +435,25 @@ public class SchemaCard implements Iterable<Cell> {
     @Override
     public void forEach(Consumer<?super Cell> action){
         throw new UnsupportedOperationException();
+    }
+
+
+
+
+    public SchemaCard cloneSchema(){
+        SchemaCard temp= new SchemaCard(this.id);
+        FullCellIterator iter= (FullCellIterator) iterator();
+        Cell tempCell;
+        while(iter.hasNext()){
+            tempCell=iter.next();
+            try {
+                temp.putDie(iter.getIndex(),new Die(tempCell.getDie().getShade(),tempCell.getDie().getColor()),IgnoredConstraint.FORCE);
+            } catch (IllegalDieException e) {
+                return null;
+            }
+
+        }
+        return temp;
     }
 
 }

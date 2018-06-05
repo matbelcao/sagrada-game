@@ -1,6 +1,5 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.model.*;
 
@@ -29,7 +28,7 @@ public class PlayerTest {
 
         board = new Board(users, additionalSchemas);
 
-        schema = new SchemaCard(1, MasterServer.XML_SOURCE + "SchemaCard.xml");
+        schema = new SchemaCard(1);
     }
 
     @Test

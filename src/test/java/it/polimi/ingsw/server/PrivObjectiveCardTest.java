@@ -29,7 +29,7 @@ class PrivObjectiveCardTest {
 
     @Test
     void testGetCardScore(){
-        SchemaCard schema1 = new SchemaCard(1,MasterServer.XML_SOURCE +"SchemaCard.xml");
+        SchemaCard schema1 = new SchemaCard(1);
 
         //PrivateObjective cards
         PrivObjectiveCard priv1 = new PrivObjectiveCard(1,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");

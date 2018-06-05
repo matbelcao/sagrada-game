@@ -47,7 +47,7 @@ class ToolCardTest {
         assertEquals("src"+File.separator+"img"+File.separator+"ToolCard"+File.separator+"12.png",tool3.getImgSrc());
         assertEquals("Muovi fino a due dadi dello stesso colore di un solo dado sul Tracciato dei Round (Devi rispettare tutte le restrizioni di piazzamento)",tool3.getDescription());
     }
-
+/*
     @Test
     void testSwapDie(){
         Die die1=new Die("THREE","RED");
@@ -62,8 +62,9 @@ class ToolCardTest {
         assertEquals("THREE",die2.getShade().toString());
         assertEquals("SIX",die1.getShade().toString());
     }
+    */
 
-    @Test
+   /* @Test
     void testStageFlowExecution(){
         ToolCard tool1 = new ToolCard(1);
         tool1.initStage();
@@ -172,8 +173,8 @@ class ToolCardTest {
         assertFalse(tool12.stageTo());
         assertFalse(tool12.stageModify2());
         assertFalse(tool12.canSelect2());*/
-    }
-
+    //}
+   /*
     @Test
     public void testWrongFlowExecution(){
         ToolCard tool5 = new ToolCard(5);
@@ -189,4 +190,5 @@ class ToolCardTest {
         assertFalse(tool5.canSelect2());
         assertFalse(tool5.stageModify2());
     }
+    */
 }

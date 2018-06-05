@@ -114,7 +114,7 @@ public class Board {
             } while(draftedSchemas.contains(id));
 
             draftedSchemas.add(id);
-            schemaChoices[i]=new SchemaCard(id,MasterServer.XML_SOURCE+"SchemaCard.xml");
+            schemaChoices[i]=new SchemaCard(id);
         }
         return schemaChoices;
     }

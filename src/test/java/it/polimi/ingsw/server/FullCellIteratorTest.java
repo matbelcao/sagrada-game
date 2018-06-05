@@ -1,5 +1,4 @@
 package it.polimi.ingsw.server;
-import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.Die;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
@@ -7,8 +6,6 @@ import it.polimi.ingsw.server.model.SchemaCard;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-
-import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,7 +21,7 @@ public class FullCellIteratorTest {
     @BeforeAll
     static void setUp(){
         //Aurorae Magnificus schema
-        schema = new SchemaCard(11, MasterServer.XML_SOURCE + "SchemaCard.xml");
+        schema = new SchemaCard(11);
         iter= (FullCellIterator) schema.iterator();
         int num=0;
         //SchemaCard's dice
