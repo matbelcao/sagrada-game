@@ -43,6 +43,7 @@ public class ToolCard extends Card {
     private boolean executedSelect2;
 
 
+    private int numSelectedDice;
     private SchemaCard schemaTemp;
     private List<Die> selectedDice;
     private List<Integer> selectedIndex;
@@ -145,6 +146,7 @@ public class ToolCard extends Card {
             selectedDice=new ArrayList<>();
             selectedIndex=new ArrayList<>();
             schemaTemp=schema.cloneSchema();
+            numSelectedDice=0;
             discard();
             initStage();
         } catch (NegativeTokensException e) {
@@ -264,11 +266,18 @@ public class ToolCard extends Card {
         return false;
     }
 
-    public boolean canGamePLaceDie(){
-        if(quantity.contains(DieQuantity.toDieQuantity(selectedDice.size()))){
+    public boolean placementsCompleted(){
+        if(quantity.equals(DieQuantity.ONE) && executedSelect1){
+            return true;
+        }
+        if(quantity.equals(DieQuantity.TWO) && executedSelect1 && executedSelect2){
             return true;
         }
         return false;
+    }
+
+    public SchemaCard getNewSchema(){
+        return schemaTemp;
     }
 
     public List<Die> getToolDice(){
@@ -319,20 +328,19 @@ public class ToolCard extends Card {
             selectedDice.add(schemaTemp.getCell(index).getDie());
             schemaTemp.removeDie(index);
             selectedIndex.add(index);
-            executedSelect1 = true;
             return true;
         }else if(canSelect2() && !selectedDice.get(0).equals(schemaTemp.getCell(index).getDie()) && selectedIndex.get(0)!=index){
             selectedDice.add(schemaTemp.getCell(index).getDie());
             schemaTemp.removeDie(index);
             selectedIndex.add(index);
-            executedSelect2=true;
             return true;
         }
         return false;
     }
 
     //For schema to schema
-    public boolean internalVirtualPlacement(int index) {
+    public boolean virtualPlacement(int index) {
+        if(!canSelectDie()){return false;}
         if(selectedDice.size()>0){
             try {
                 schemaTemp.putDie(index,selectedDice.get(0),ignored_constraint);
@@ -340,6 +348,11 @@ public class ToolCard extends Card {
                 selectedIndex.remove(0);
             } catch (IllegalDieException e) {
                 return false;
+            }
+            if(canSelect1()) {
+                executedSelect1=true;
+            }else{
+                executedSelect2=true;
             }
             return true;
         }

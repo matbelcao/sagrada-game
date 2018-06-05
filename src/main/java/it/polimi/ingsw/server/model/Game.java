@@ -446,10 +446,8 @@ public class Game extends Thread implements Iterable  {
 
         if(isSelectedToolCard()){
             ToolCard tool=board.getToolCard(selectedTool);
-            if(tool.isInternalSchemaPlacement()){
+            if(tool.isInternalSchemaPlacement() || (tool.isExternalSchemaPlacement() && !placedDie)){
                 canPerformPlacement=true;
-            }else if(tool.isExternalSchemaPlacement()){
-                canPerformPlacement=!placedDie;
             }else{
                 throw new IllegalActionException();
             }
@@ -464,21 +462,17 @@ public class Game extends Thread implements Iterable  {
 
                     if(isSelectedToolCard()){
                         ToolCard tool=board.getToolCard(selectedTool);
-                        if(tool.canGamePLaceDie()){
-                            gameStatus=GameStatus.TURN_RUN;
-                            List<Die> dice=tool.getToolDice();
-                            List<Integer> indexes=tool.getDiceIndexes();
-
-                            if(tool.isInternalSchemaPlacement()){
-
-                            }else{
-
-                            }
-
-                            }
+                        if(tool.canSelectDie()) {
+                            gameStatus = GameStatus.TURN_RUN;
+                            tool.virtualPlacement(index);
+                        }else{
+                            return false;
+                        }
+                        if(tool.placementsCompleted()){
+                            board.getPlayer(user).replaceSchema(tool.getNewSchema());
+                        }
                     }else{
-                        schemaCard.putDie(realIndex,selectedDie);
-                        board.getDraftPool().chooseDie(realIndex);
+                        schemaCard.putDie(realIndex,board.getDraftPool().chooseDie(realIndex));
                         gameStatus=GameStatus.TURN_RUN;
                         placedDie=true;
                     }
