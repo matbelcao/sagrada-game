@@ -3,6 +3,7 @@ package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.GameStatus;
 import it.polimi.ingsw.common.enums.ModifyDie;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
@@ -252,6 +253,11 @@ public class Game extends Thread implements Iterable  {
      */
     public SchemaCard getUserSchemaCard(int playerId,boolean override) throws IllegalActionException {
         if(board.getPlayerById(playerId).getSchema()==null){ throw new IllegalActionException(); }
+        if(selectedTool!=-1){
+            if(!board.getToolCard(selectedTool).stageFrom(Place.SCHEMA)){
+                if(!board.getToolCard(selectedTool).stageTo(Place.SCHEMA)){throw new IllegalActionException();}
+            }
+        }
         if(!override){
             gameStatus=GameStatus.REQUESTED_SCHEMA_CARD;
         }
@@ -269,6 +275,11 @@ public class Game extends Thread implements Iterable  {
      */
     public SchemaCard getUserSchemaCard(User user, boolean override) throws IllegalActionException {
         if(board.getPlayer(user).getSchema()==null){ throw new IllegalActionException(); }
+        if(selectedTool!=-1){
+            if(!board.getToolCard(selectedTool).stageFrom(Place.SCHEMA)){
+                if(!board.getToolCard(selectedTool).stageTo(Place.SCHEMA)){throw new IllegalActionException();}
+            }
+        }
         if(!override){
             gameStatus=GameStatus.REQUESTED_SCHEMA_CARD;
         }
@@ -286,6 +297,11 @@ public class Game extends Thread implements Iterable  {
      */
     public List<Die> getDraftedDice(boolean override) throws IllegalActionException {
         if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
+        if(selectedTool!=-1){
+            if(!board.getToolCard(selectedTool).stageFrom(Place.DRAFTPOOL)){
+                if(!board.getToolCard(selectedTool).stageTo(Place.DRAFTPOOL)){throw new IllegalActionException();}
+            }
+        }
         if(!override){
             gameStatus=GameStatus.REQUESTED_DRAFT_POOL;
         }
@@ -301,6 +317,11 @@ public class Game extends Thread implements Iterable  {
      */
     public List<List<Die>> getRoundTrackDice(boolean override) throws IllegalActionException {
         if(gameStatus==GameStatus.INITIALIZING){ throw new IllegalActionException(); }
+        if(selectedTool!=-1){
+            if(!board.getToolCard(selectedTool).stageFrom(Place.ROUNDTRACK)){
+                if(!board.getToolCard(selectedTool).stageTo(Place.ROUNDTRACK)){throw new IllegalActionException();}
+            }
+        }
         if(!override){
             gameStatus=GameStatus.REQUESTED_ROUND_TRACK;
         }
@@ -393,11 +414,6 @@ public class Game extends Thread implements Iterable  {
                     tempIndex++;
                 }
                 roundN++;
-            }
-        }
-        if(selectedTool!=-1){
-            if(!board.getToolCard(selectedTool).stageFrom()){
-                if(!board.getToolCard(selectedTool).stageFrom()){throw new IllegalActionException();}
             }
         }
         placements=board.listSchemaPlacements(user,selectedTool,selectedDie);

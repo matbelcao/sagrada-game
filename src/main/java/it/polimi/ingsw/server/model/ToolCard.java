@@ -183,8 +183,8 @@ public class ToolCard extends Card {
         }
     }
 
-    public boolean stageFrom() {
-        if (!executedFrom) {
+    public boolean stageFrom(Place gamePlace) {
+        if (!executedFrom && gamePlace.equals(from)) {
             executedFrom = true;
             return true;
         }
@@ -208,8 +208,8 @@ public class ToolCard extends Card {
         return true;
     }
 
-    public boolean stageTo() {
-        if (!executedTo && executedModify1 && executedSelect1 && executedFrom) {
+    public boolean stageTo(Place gamePlace) {
+        if (!executedTo && executedModify1 && executedSelect1 && executedFrom && gamePlace.equals(to)) {
             executedTo = true;
             return true;
         }
@@ -277,6 +277,7 @@ public class ToolCard extends Card {
     executedModify1=true;
     return true;
     }
+
 
     public boolean selectDie1(Die die){
         if(!stageModify1()){return false;}
