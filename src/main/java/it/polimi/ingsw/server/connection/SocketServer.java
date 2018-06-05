@@ -561,8 +561,8 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void discardAction() throws IllegalActionException {
         user.getGame().discard();
-        outSocket.println("DISCARD ack");
-        outSocket.flush();
+        /*outSocket.println("DISCARD ack");
+        outSocket.flush();*/
     }
 
     /*public void pingThread(){
@@ -607,8 +607,8 @@ public class SocketServer extends Thread implements ServerConn  {
     public boolean ping() {
         List<String> result= new ArrayList<>();
         try{
-            outSocket.println("STATUS check");
-            outSocket.flush();
+            //outSocket.println("STATUS check");
+            //outSocket.flush();
             //debug
             //System.out.println(inSocket.isEmpty());
             while(inSocket.isEmpty()){
