@@ -300,23 +300,23 @@ public class ToolCard extends Card {
     public boolean modifyDie1(Die die, Commands action){
     if(!modify.contains(action) || !canModify1()){return false;}
     selectedDice.add(die);
-    try {
+    //try {
         switch(action) {
-            case DECREASE:
+            /*case DECREASE:
                 die.decreaseShade();
                 break;
             case INCREASE:
                 die.increaseShade();
                 break;
-            case REROLL:
+            */case REROLL:
                 die.reroll();
                 break;
             default:
                 return false;
         }
-    }catch (IllegalShadeException e) {
+   /* }catch (IllegalShadeException e) {
         return false;
-    }
+    }*/
     //to implement for tool no.11
     executedModify1=true;
     return true;
@@ -369,7 +369,7 @@ public class ToolCard extends Card {
 
     //setshade
     public boolean setShade(int shade) {
-        if(!modify.contains(Commands.SETSHADE) || !canModify2()){return false;}
+        if(!modify.contains(Commands.SET_SHADE) || !canModify2()){return false;}
 
         selectedDice.get(0).setShade(shade);
         executedModify2=true;

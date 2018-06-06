@@ -3,8 +3,7 @@
     <ToolCard id="1">
         <from>draftpool</from>
         <to>draftpool</to>
-        <modify>increase</modify>
-        <modify>decrease</modify>
+        <modify>increase_decrease</modify>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="2">

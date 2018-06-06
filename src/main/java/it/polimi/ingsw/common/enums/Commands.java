@@ -1,12 +1,12 @@
 package it.polimi.ingsw.common.enums;
 
 public enum Commands {
-    INCREASE,
-    DECREASE,
+    INCREASE_DECREASE,
     SWAP,
     REROLL,
     FLIP,
-    SETSHADE,
+    SET_SHADE,
+    SET_COLOR,
     NONE,
-    PLACE;
+    PLACE_DIE;
 }
