@@ -142,11 +142,11 @@ public class GUI extends Application implements ClientUI {
         b1.setAlignment(CENTER);
         b2.setAlignment(CENTER);
         b3.setAlignment(CENTER);
-
+/*
         b0.setOnAction(e ->client.getClientConn().chooseSchema(0));
         b1.setOnAction(e ->client.getClientConn().chooseSchema(1));
         b2.setOnAction(e ->client.getClientConn().chooseSchema(2));
-        b3.setOnAction(e ->client.getClientConn().chooseSchema(3));
+        b3.setOnAction(e ->client.getClientConn().chooseSchema(3));*/
 
         grid.add(schema0, 0, 0);
         grid.add(schema1, 1, 0);

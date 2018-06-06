@@ -31,7 +31,7 @@ public class ToolCard extends Card {
     private Place from;
     private Place to;
     private List<DieQuantity> quantity;
-    private List<ModifyDie> modify;
+    private List<Commands> modify;
     private IgnoredConstraint ignored_constraint;
     private Turn turn;
     //states
@@ -91,10 +91,10 @@ public class ToolCard extends Card {
                     int temp2;
                     for (temp2 = 0; temp2 < eElement.getElementsByTagName("modify").getLength(); temp2++) {
                         text = eElement.getElementsByTagName("modify").item(temp2).getTextContent();
-                        modify.add(ModifyDie.toModifyDie(text));
+                       // modify.add(Commands.toModifyDie(text));
                     }
                     if (temp2 == 0) {
-                        modify.add(ModifyDie.NONE);
+                        modify.add(Commands.NONE);
                     }
 
                     try {
@@ -297,7 +297,7 @@ public class ToolCard extends Card {
         executedSelect2 = false;
     }
 
-    public boolean modifyDie1(Die die, ModifyDie action){
+    public boolean modifyDie1(Die die, Commands action){
     if(!modify.contains(action) || !canModify1()){return false;}
     selectedDice.add(die);
     try {
@@ -369,7 +369,7 @@ public class ToolCard extends Card {
 
     //setshade
     public boolean setShade(int shade) {
-        if(!modify.contains(ModifyDie.SETSHADE) || !canModify2()){return false;}
+        if(!modify.contains(Commands.SETSHADE) || !canModify2()){return false;}
 
         selectedDice.get(0).setShade(shade);
         executedModify2=true;
@@ -377,7 +377,7 @@ public class ToolCard extends Card {
     }
 
     public boolean swapDie(Die die) {
-        if(!modify.contains(ModifyDie.SWAP) || !canModify2()){return false;}
+        if(!modify.contains(Commands.SWAP) || !canModify2()){return false;}
         Color tmpColor = selectedDice.get(0).getColor();
         Face tmpFace = selectedDice.get(0).getShade();
         selectedDice.get(0).setShade(die.getShade().toInt());
@@ -410,7 +410,7 @@ public class ToolCard extends Card {
         return quantity;
     }
 
-    public List<ModifyDie> getModify(){
+    public List<Commands> getModify(){
         return modify;
     }
 

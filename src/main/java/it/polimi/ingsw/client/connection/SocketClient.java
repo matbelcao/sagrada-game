@@ -4,7 +4,7 @@ import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.enums.Face;
-import it.polimi.ingsw.common.enums.ModifyDie;
+import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.immutables.*;
 
@@ -470,12 +470,16 @@ public class SocketClient implements ClientConn {
         return favor_tokens;
     }
 
+    @Override
+    public List<IndexedCellContent> getDiceList() {
+        return null;
+    }
+
     /**
      * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
      * in the schema card
      * @return and immutable and indexed list containing the dice
      */
-    @Override
     public List<IndexedCellContent> getSchemaDiceList(){
         ArrayList<String> result= new ArrayList<>();
         List<IndexedCellContent> schemaList=new ArrayList<>();
@@ -500,7 +504,6 @@ public class SocketClient implements ClientConn {
      * in the roundtrack
      * @return an immutable and indexed list containing the dice
      */
-    @Override
     public List<IndexedCellContent> getRoundTrackDiceList(){
         List<String> result= new ArrayList<>();
         List<IndexedCellContent> roundTrack=new ArrayList<>();
@@ -526,7 +529,7 @@ public class SocketClient implements ClientConn {
      * in the draft pool
      * @return an immutable and indexed list containing the dice
      */
-    @Override
+
     public List<IndexedCellContent> getDraftpoolDiceList() {
         ArrayList<String> result = new ArrayList<>();
         List<IndexedCellContent> draftPool = new ArrayList<>();
@@ -592,13 +595,18 @@ public class SocketClient implements ClientConn {
         return positions;
     }
 
+    @Override
+    public boolean choose(int index) {
+        return false;
+    }
+
     /**
      *  This function can be invoked to notify the server in order to make a possibly definitive choice. The server is
      *  still going to do his checks and will reply.
      * @param index the index of the object in the list previously sent by the server
      * @return true if the procedure is successful
      */
-    @Override
+
     public boolean chooseDiePlacement(int index){
         outSocket.println("CHOOSE die_placement "+index);
         outSocket.flush();
@@ -606,7 +614,6 @@ public class SocketClient implements ClientConn {
         return socketChoice();
     }
 
-    @Override
     public boolean chooseSchema(int index){
         outSocket.println("CHOOSE schema "+index);
         outSocket.flush();
@@ -622,7 +629,7 @@ public class SocketClient implements ClientConn {
         return socketChoice();
     }
 
-    @Override
+
     public boolean chooseDie(int index){
         outSocket.println("CHOOSE die "+index);
         outSocket.flush();
@@ -631,15 +638,14 @@ public class SocketClient implements ClientConn {
     }
 
     //Da rivedere come fare enum
-    @Override
-    public boolean chooseDieModify(int index, ModifyDie modify){
+
+    public boolean chooseDieModify(int index, Commands modify){
         outSocket.println("CHOOSE die "+index+" "+modify.toString());
         outSocket.flush();
 
         return socketChoice();
     }
 
-    @Override
     public boolean chooseDieFace(int index, Face shade){
         outSocket.println("CHOOSE die "+index+" "+shade.toInt());
         outSocket.flush();

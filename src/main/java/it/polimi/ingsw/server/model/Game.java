@@ -2,7 +2,6 @@ package it.polimi.ingsw.server.model;
 
 
 import it.polimi.ingsw.common.enums.GameStatus;
-import it.polimi.ingsw.common.enums.ModifyDie;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
@@ -500,18 +499,18 @@ public class Game extends Thread implements Iterable  {
         return toolEnabled;
     }
 
-    public boolean chooseToolDie(int index,String action) throws IllegalActionException {
+   /* public boolean chooseToolDie(int index,String action) throws IllegalActionException {
         boolean result;
         Die die= findChosenDie(index);
 
         if(gameStatus==GameStatus.INITIALIZING || gameStatus==GameStatus.TURN_RUN || selectedTool==-1){ throw new IllegalActionException(); }
 
-        result=board.getToolCard(selectedTool).modifyDie1(die,ModifyDie.toModifyDie(action));
+        //result=board.getToolCard(selectedTool).modifyDie1(die,Commands.toModifyDie(action));
         if(!result){
             result=board.getToolCard(selectedTool).swapDie(die);
         }
         return result;
-    }
+    }*/
 
     public boolean chooseToolDie(int index) throws IllegalActionException {
         boolean result;

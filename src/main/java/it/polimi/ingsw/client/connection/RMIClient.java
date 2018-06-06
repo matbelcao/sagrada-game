@@ -1,8 +1,6 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.common.enums.Face;
-import it.polimi.ingsw.common.enums.ModifyDie;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 
@@ -107,6 +105,11 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
+    public List<IndexedCellContent> getDiceList() {
+        return null;
+    }
+
+    @Override
     public LightSchemaCard getSchema(int playerId) {
         LightSchemaCard returnedCard=null;
         try {
@@ -139,32 +142,12 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public List<IndexedCellContent> getSchemaDiceList() {
-        return null;
-    }
-
-    @Override
-    public List<IndexedCellContent> getRoundTrackDiceList() {
-        return null;
-    }
-
-    @Override
-    public List<IndexedCellContent> getDraftpoolDiceList() {
-        return null;
-    }
-
-    @Override
     public List<Integer> selectDie(int index) {
         return null;
     }
 
     @Override
-    public boolean chooseDiePlacement(int index) {
-        return false;
-    }
-
-    @Override
-    public boolean chooseSchema(int index) {
+    public boolean choose(int index) {
         return false;
     }
 
@@ -173,21 +156,6 @@ public class RMIClient implements ClientConn {
         return false;
     }
 
-    @Override
-    public boolean chooseDie(int index) {
-        return false;
-    }
-
-    @Override
-    public boolean chooseDieModify(int index, ModifyDie modify) {
-        return false;
-    }
-
-    @Override
-    public boolean chooseDieFace(int index, Face shade) {
-        return false;
-    }
-    
 
     @Override
     public void discard() {

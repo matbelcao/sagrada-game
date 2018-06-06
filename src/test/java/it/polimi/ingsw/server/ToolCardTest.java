@@ -1,7 +1,7 @@
 package it.polimi.ingsw.server;
 
+import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.DieQuantity;
-import it.polimi.ingsw.common.enums.ModifyDie;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Turn;
 import it.polimi.ingsw.server.model.ToolCard;
@@ -12,7 +12,6 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ToolCardTest {
     @Test
@@ -27,8 +26,8 @@ class ToolCardTest {
         assertEquals(Place.DRAFTPOOL,tool1.getFrom());
         assertEquals(Place.DRAFTPOOL,tool1.getTo());
         assertEquals(DieQuantity.ONE,tool1.getQuantity().get(0));
-        assertEquals(ModifyDie.INCREASE,tool1.getModify().get(0));
-        assertEquals(ModifyDie.DECREASE,tool1.getModify().get(1));
+        assertEquals(Commands.INCREASE,tool1.getModify().get(0));
+        assertEquals(Commands.DECREASE,tool1.getModify().get(1));
         assertEquals(IgnoredConstraint.NONE,tool1.getIgnoredConstraint());
         assertEquals(Turn.NONE,tool1.getTurn());
 

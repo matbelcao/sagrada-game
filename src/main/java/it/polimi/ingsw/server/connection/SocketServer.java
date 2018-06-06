@@ -163,7 +163,7 @@ public class SocketServer extends Thread implements ServerConn  {
         } else if ("tool".equals(parsedResult.get(1))) {
             useTool(Integer.parseInt(parsedResult.get(2)));
         }else if("die".equals(parsedResult.get(1))){
-            chooseToolDie(parsedResult);
+           // chooseToolDie(parsedResult);
         }else if("face".equals(parsedResult.get(1))){
             setShade(parsedResult.get(2));
         }
@@ -528,7 +528,7 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
-    private void chooseToolDie(List<String> parsedResult) throws IllegalActionException {
+   /* private void chooseToolDie(List<String> parsedResult) throws IllegalActionException {
         Boolean choosed;
         if(parsedResult.size()==4){
             choosed=user.getGame().chooseToolDie(Integer.parseInt(parsedResult.get(2)),parsedResult.get(3));
@@ -543,7 +543,7 @@ public class SocketServer extends Thread implements ServerConn  {
         }
         outSocket.flush();
     }
-
+*/
     private void setShade(String shade) throws IllegalActionException {
         Boolean setted=user.getGame().chooseToolDieFace(Integer.parseInt(shade));
 
