@@ -7,6 +7,6 @@ public enum Commands {
     FLIP,
     SET_SHADE,
     SET_COLOR,
-    NONE,
-    PLACE_DIE;
+    PLACE_DIE,
+    NONE;
 }

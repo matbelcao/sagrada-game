@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.connection;
 
+import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.rmi.RemoteException;
@@ -14,17 +15,6 @@ public interface ClientConn {
      * @return true iff the user has been logged into the server
      */
     boolean login(String username,char[] password);
-
-
-    /**
-     * This method tells the server the end of the session
-     */
-    void quit();
-
-    /**
-     * This function can be invoked to notify the server in case the client wants to end his turn before the timer goes off.
-     */
-    void endTurn();
 
     /**
      * This function can be invoked to request the updated schema card or the complete schema card (in case of reconnection
@@ -87,28 +77,67 @@ public interface ClientConn {
 
     /**
      * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
-     * in the draft pool
+     * in the actual selected element (schema,draftpool,roundtrack....)
      * @return an immutable and indexed list containing the dice
      */
     List<IndexedCellContent> getDiceList();
 
     /**
-     * This function can be invoked to the server to specify the possible placements in the user’s schema of a die that is
-     * temporarily selected by the user.
-     * @param index the index (starting from 0) of the die in a given list
+     * This function can be invoked to select one die of a previolsly GET_DICE_LIST command and obtain
+     * a list of to options to manipulate it
+     * @return and immutable and indexed list containing the dice
+     */
+    List<Commands> select(int die_index);
+
+    /**
+     * This function can be invoked by the client to request the list of possible placements of a die (that is
+     * temporarily selected by the user) in his schema card
      * @return an immutable and indexed list of possible placements
      */
-    List<Integer> selectDie(int index);
+    List<Integer> getPlacementsList();
 
-    boolean choose(int index);
+    /**
+     *  This function can be invoked to notify the server in order to make a possibly definitive choice. The server is
+     *  still going to do his checks and will reply.
+     * @param option_index the index of the object in the list previously sent by the server
+     * @return true if the procedure is successful
+     */
+    boolean choose(int option_index);
 
-    boolean chooseTool(int index);
+    /**
+     *  This function can be invoked to notify the server the intenction to select a tool car. The server is
+     *  still going to do his checks and will reply.
+     * @param tool_index the index of the toolcard the user wants to use
+     * @return true iff the toolcard has been activated
+     */
+    boolean enableTool(int tool_index);
+
+    /**
+     * This function is invoked by the client to know if the toolcard's execution flow is still active
+     * @return true iff the toolcard is active
+     */
+    boolean toolCanContinue();
+
+    /**
+     * This function can be invoked to notify the server in case the client wants to end his turn before the timer goes off.
+     */
+    void endTurn();
 
     /**
      * This message is sent to the server when the client that received a list of possible placement for a die chooses
      * not to place that die
      */
     void discard();
+
+    /**
+     * This message is sent to the server when the client wants to stop using a toolcard before it ends
+     */
+    void exit();
+
+    /**
+     * This method tells the server the end of the session
+     */
+    void quit();
 
     /**
      * This method provides the ping functionality for the client-side hearthBreath thread

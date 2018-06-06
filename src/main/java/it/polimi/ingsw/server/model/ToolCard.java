@@ -84,7 +84,7 @@ public class ToolCard extends Card {
                     to = Place.toPlace(eElement.getElementsByTagName("to").item(0).getTextContent());
 
                     for (int temp2 = 0; temp2 < eElement.getElementsByTagName("command").getLength(); temp2++) {
-                        text = eElement.getElementsByTagName("command").item(temp2).getTextContent();
+                        text = eElement.getElementsByTagName("command").item(temp2).getTextContent().toUpperCase();
                         actions.add(Commands.valueOf(text.toUpperCase().trim()));
                     }
 

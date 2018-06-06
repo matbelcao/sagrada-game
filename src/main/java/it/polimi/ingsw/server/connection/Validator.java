@@ -46,36 +46,72 @@ public class Validator {
             case "LOGIN":
                 return checkLoginParams(command, parsedResult);
 
+            case "GAME":
+                return checkGameParams(command,parsedResult);
+
             case "GET":
                 return checkGetParams(command, parsedResult);
 
             case "GET_DICE_LIST":
-                return checkGetDiceListParams(command, parsedResult);
+                return checkGetDiceList(command);
 
             case "SELECT":
                 return checkSelectParams(command, parsedResult);
 
-            case "DISCARD":
-                return checkDiscardParams(command, parsedResult);
-
             case "CHOOSE":
                 return checkChooseParams(command, parsedResult);
 
+            case "TOOL":
+                return checkToolParams(command,parsedResult);
+
+            case "DISCARD":
+                return checkDiscard(command);
+
+            case "EXIT":
+                return checkExit(command);
+
             case "QUIT":
-                return checkQuitParams(command, parsedResult);
+                return checkQuit(command);
 
-            case "ACK":
-                return checkAckParams(command, parsedResult);
+            case "PONG":
+                return checkPong(command);
 
-            case "GAME":
-                return checkGameParams(command,parsedResult);
             default:
                 return false;
 
         }
     }
 
+    /**
+     * This method checks if the login parameters are valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
+     * @return true iff the parameters are valid
+     */
+    public static boolean checkLoginParams(String  rawCommand, List<String> parsedResult){
+        if( rawCommand==null){ return false; }
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(!command[0].equals("LOGIN")){ return false; }
+        if(command.length!=3||!isValidUsername(command[1])){
+            return false;
+        }
 
+        parsedResult.addAll(Arrays.asList(command));
+        return true;
+    }
+
+    /**
+     * Checks if the the passed username is valid (which means it doesn't contain any non-ALPHANUMERIC character
+     * and doesn't begin with a number)
+     * @param username the username to check
+     * @return true iff the username has a valid format
+     */
+    public static boolean isValidUsername(String username){
+        return  username.matches(ALPHANUMERIC)
+                && !username.matches(BEGINS_WITH_DIGIT)
+                && username.length()<=MAX_USERNAME_LENGTH;
+    }
 
     public static boolean checkGameParams(String rawCommand, List<String> parsedResult){
         if( rawCommand==null){ return false; }
@@ -85,211 +121,6 @@ public class Validator {
         if(command.length==2) {
             switch (command[1]) {
                 case "end_turn":
-                    parsedResult.addAll(Arrays.asList(command));
-                    return true;
-                default:
-                    return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * This method checks if the ACK parameters are valid
-     * @param rawCommand the raw string containing all parameters of the command and the command itself
-     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
-     * @return true iff the parameters are valid
-     */
-    public static boolean checkAckParams(String rawCommand, List<String> parsedResult) {
-        if( rawCommand==null){ return false; }
-        String [] command= rawCommand.trim().split("\\s+");
-        parsedResult.clear();
-        if(!command[0].equals("ACK")){ return false; }
-        if(command.length==2) {
-            switch (command[1]) {
-                case "game":
-                case "send":
-                case "list":
-                case "status":
-                    parsedResult.addAll(Arrays.asList(command));
-                    return true;
-
-                default:
-                    return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * This method checks if the CHOOSE parameters are valid
-     * @param rawCommand the raw string containing all parameters of the command and the command itself
-     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
-     * @return true iff the parameters are valid
-     */
-    public static boolean checkChooseParams(String rawCommand, List<String> parsedResult) {
-        if( rawCommand==null){ return false; }
-        String [] command= rawCommand.trim().split("\\s+");
-        parsedResult.clear();
-        if(!command[0].equals("CHOOSE") || command.length <=2){ return false; }
-        switch (command[1]){
-            case "die_placement":
-                if((command.length == 3) && command[2].matches(CELL_INDEX)){
-                    parsedResult.addAll(Arrays.asList(command));
-                    return true;
-                }
-
-                return false;
-            case "die":
-                return checkChooseDie(parsedResult, command);
-
-
-            case "schema":
-                if((command.length == 3) && command[2].matches(PLAYER_ID)){
-                    parsedResult.addAll(Arrays.asList(command));
-                    return true;
-                }
-                return false;
-
-            case "tool":
-                if((command.length == 3) && command[2].matches(TOOL_INDEX)){
-                    parsedResult.addAll(Arrays.asList(command));
-                    return true;
-                }
-                return false;
-
-            case "face":
-                if((command.length == 3) && command[2].matches(DIE_FACE)){
-                    parsedResult.addAll(Arrays.asList(command));
-                    return true;
-                }
-                return false;
-
-            default:
-                return false;
-        }
-    }
-
-    /**
-     * This method checks if the GET parameters are valid
-     * @param command the string array containing all parameters of the command and the command itself
-     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
-     * @return true iff the parameters are valid
-     */
-    private static Boolean checkChooseDie(List<String> parsedResult, String[] command) {
-        if((command.length == 3) && command[2].matches(TWO_DIGITS_MAX)){
-            parsedResult.addAll(Arrays.asList(command));
-            return true;
-        }
-        if((command.length == 4) && command[2].matches(DRAFT_POOL_DIE)){
-            switch (command[3]){
-                case "increase":
-                case "decrease":
-                case "reroll":
-                case "flip":
-                case "put_in_bag":
-                    parsedResult.addAll(Arrays.asList(command));
-                    return true;
-                default:
-                    return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * This method checks if the DISCARD parameters are valid
-     * @param rawCommand the raw string containing all parameters of the command and the command itself
-     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
-     * @return true iff the parameters are valid
-     */
-    public static boolean checkDiscardParams(String rawCommand, List<String> parsedResult) {
-        if( rawCommand==null){ return false; }
-        String [] command= rawCommand.trim().split("\\s+");
-        parsedResult.clear();
-        if(!command[0].equals("DISCARD")){ return false; }
-        if(command.length==1){
-            parsedResult.addAll(Arrays.asList(command));
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * This method checks if the QUIT parameters are valid
-     * @param rawCommand the raw string containing all parameters of the command and the command itself
-     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
-     * @return true iff the parameters are valid
-     */
-    public static boolean checkQuitParams(String rawCommand, List<String> parsedResult) {
-        if( rawCommand==null){ return false; }
-        String [] command= rawCommand.trim().split("\\s+");
-        parsedResult.clear();
-        if(!command[0].equals("QUIT")){ return false; }
-        if(command.length==1){
-            parsedResult.addAll(Arrays.asList(command));
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * This method checks if the SELECT parameters are valid
-     * @param rawCommand the raw string containing all parameters of the command and the command itself
-     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
-     * @return true iff the parameters are valid
-     */
-    public static boolean checkSelectParams(String rawCommand, List<String> parsedResult) {
-        if( rawCommand==null){ return false; }
-        String [] command= rawCommand.trim().split("\\s+");
-        parsedResult.clear();
-        if(!command[0].equals("SELECT")){ return false; }
-        if(command.length>=2) {
-            switch (command[1]){
-                case "die":
-                    if(command.length==3 && command[2].matches(TWO_DIGITS_MAX)){
-                        parsedResult.addAll(Arrays.asList(command));
-                        return true;
-                    }
-                    return false;
-
-                case "modified_die":
-                    if(command.length==2){
-                        parsedResult.addAll(Arrays.asList(command));
-                        return true;
-                    }
-                    return false;
-
-                case "tool":
-                    if(command.length==3 && command[2].matches(TOOL_INDEX)){
-                        parsedResult.addAll(Arrays.asList(command));
-                        return true;
-                    }
-                    return false;
-
-                default:
-                    return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * This method checks if the GET_DICE_LIST parameters are valid
-     * @param rawCommand the raw string containing all parameters of the command and the command itself
-     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
-     * @return true iff the parameters are valid
-     */
-    public static boolean checkGetDiceListParams(String rawCommand, List<String> parsedResult) {
-        if( rawCommand==null){ return false; }
-        String [] command= rawCommand.trim().split("\\s+");
-        parsedResult.clear();
-        if(!command[0].equals("GET_DICE_LIST")){ return false; }
-        if(command.length==2) {
-            switch (command[1]) {
-                case "schema":
-                case "draftpool":
-                case "roundtrack":
                     parsedResult.addAll(Arrays.asList(command));
                     return true;
                 default:
@@ -352,38 +183,127 @@ public class Validator {
         return false;
     }
 
+    /**
+     * This method checks if the GET_DICE_LIST command is valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @return true iff the syntax is valid
+     */
+    public static boolean checkGetDiceList(String rawCommand) {
+        if( rawCommand==null){ return false; }
+        String [] command= rawCommand.trim().split("\\s+");
+        return command.length == 1 && command[0].equals("GET_DICE_LIST");
+    }
 
     /**
-     * This method checks if the login parameters are valid
+     * This method checks if the SELECT parameters are valid
      * @param rawCommand the raw string containing all parameters of the command and the command itself
      * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
      * @return true iff the parameters are valid
      */
-    public static boolean checkLoginParams(String  rawCommand, List<String> parsedResult){
+    public static boolean checkSelectParams(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         parsedResult.clear();
-        if(!command[0].equals("LOGIN")){ return false; }
-        if(command.length!=3||!isValidUsername(command[1])){
-            return false;
-        }
+        if(command.length!=2 || !command[0].equals("SELECT") ){ return false; }
 
-        parsedResult.addAll(Arrays.asList(command));
-        return true;
+        if(command[1].matches(TWO_DIGITS_MAX)){
+            parsedResult.addAll(Arrays.asList(command));
+            return true;
+        }
+        return false;
     }
 
     /**
-     * Checks if the the passed username is valid (which means it doesn't contain any non-ALPHANUMERIC character
-     * and doesn't begin with a number)
-     * @param username the username to check
-     * @return true iff the username has a valid format
+     * This method checks if the CHOOSE parameters are valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @param parsedResult the parsed parameters this is modified and will contain the parse result only if the parameters are valid
+     * @return true iff the parameters are valid
      */
-    public static boolean isValidUsername(String username){
-        return  username.matches(ALPHANUMERIC)
-                && !username.matches(BEGINS_WITH_DIGIT)
-                && username.length()<=MAX_USERNAME_LENGTH;
+    public static boolean checkChooseParams(String rawCommand, List<String> parsedResult) {
+        if( rawCommand==null){ return false; }
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(command.length!=2 || !command[0].equals("CHOOSE")){ return false; }
+        if(command[1].matches(TWO_DIGITS_MAX)) {
+            parsedResult.addAll(Arrays.asList(command));
+            return true;
+        }
+        return false;
     }
 
+
+
+    public static boolean checkToolParams(String rawCommand, List<String> parsedResult) {
+        if( rawCommand==null){ return false; }
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(command.length<2 || !command[0].equals("TOOL")){ return false; }
+        switch (command[1]){
+            case "enable":
+                if((command.length == 3) && command[2].matches(TOOL_INDEX)){
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
+                }
+                return false;
+
+            case "can_continue":
+                if((command.length == 2)){
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * This method checks if the DISCARD syntax is valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @return true iff the parameters are valid
+     */
+    public static boolean checkDiscard(String rawCommand) {
+        if( rawCommand==null){ return false; }
+        String [] command= rawCommand.trim().split("\\s+");
+        if(!command[0].equals("DISCARD")){ return false; }
+        return command.length == 1;
+    }
+
+    /**
+     * This method checks if the EXIT syntax is valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @return true iff the parameters are valid
+     */
+    public static boolean checkExit(String rawCommand) {
+        if( rawCommand==null){ return false; }
+        String [] command= rawCommand.trim().split("\\s+");
+        if(!command[0].equals("EXIT")){ return false; }
+        return command.length == 1;
+    }
+
+    /**
+     * This method checks if the QUIT syntax is valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @return true iff the parameters are valid
+     */
+    public static boolean checkQuit(String rawCommand) {
+        if( rawCommand==null){ return false; }
+        String [] command= rawCommand.trim().split("\\s+");
+        if(!command[0].equals("QUIT")){ return false; }
+        return command.length == 1;
+    }
+
+    /**
+     * This method checks if the PONG message is valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @return true iff the parameters are valid
+     */
+    public static boolean checkPong(String rawCommand) {
+        if( rawCommand==null){ return false; }
+        String [] command= rawCommand.trim().split("\\s+");
+        if(!command[0].equals("PONG")){ return false; }
+        return command.length == 1;
+    }
 
 }
 

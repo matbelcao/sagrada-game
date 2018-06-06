@@ -73,7 +73,7 @@
     <ToolCard id="11">
         <from>draftpool</from>
         <to>dicebag</to>
-        <command>setshade</command>
+        <command>set_shade</command>
         <command>place_die</command>
         <quantity>one</quantity>
     </ToolCard>

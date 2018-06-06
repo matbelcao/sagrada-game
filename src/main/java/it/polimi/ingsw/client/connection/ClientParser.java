@@ -38,14 +38,20 @@ public class ClientParser {
                 return checkGame(parsedResult);
             case "SEND":
                 return checkSend(parsedResult);
-            case "LIST":
-                return checkList(parsedResult);
-            case "DISCARD":
-                return checkDiscard(parsedResult);
+            case "LIST_DICE":
+                return checkDiceList(parsedResult);
+            case "LIST_OPTIONS":
+                return parsedResult.size()>=2;
+            case "LIST_PLACEMENTS":
+                return parsedResult.size()>=2;
             case "CHOICE":
                 return checkChoice(parsedResult);
+            case "TOOL":
+                return checkTool(parsedResult);
             case "STATUS":
                 return checkStatus(parsedResult);
+            case "PING":
+                return parsedResult.size()==1;
             case "INVALID":
                 return true;
             case "ILLEGAL":
@@ -63,36 +69,54 @@ public class ClientParser {
         return message.trim().split("\\s+",2)[0].equals("LOGIN");
 
     }
+
     public static boolean isLobby(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals("LOBBY");
 
     }
+
     public static boolean isGame(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals("GAME");
 
     }
+
     public static boolean isSend(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals("SEND");
 
     }
-    public static boolean isList(String message){
+
+    public static boolean isDiceList(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("LIST");
+        return message.trim().split("\\s+",2)[0].equals("LIST_DICE");
 
     }
-    public static boolean isDiscard(String message){
+
+    public static boolean isOptionList(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("DISCARD");
+        return message.trim().split("\\s+",2)[0].equals("LIST_OPTIONS");
 
     }
+
+    public static boolean isPlacementList(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("LIST_PLACEMENTS");
+
+    }
+
     public static boolean isChoice(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals("CHOICE");
 
     }
+
+    public static boolean isTool(String message){
+        if (message == null) throw new IllegalArgumentException();
+        return message.trim().split("\\s+",2)[0].equals("TOOL");
+    }
+
     public static boolean isStatus(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals("STATUS");
@@ -104,14 +128,14 @@ public class ClientParser {
         return message.trim().split("\\s+",2)[0].equals("INVALID");
     }
 
-    /*public static boolean isAck(String message){
+    public static boolean isPing(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("ACK");
-    }*/
+        return message.trim().split("\\s+",2)[0].equals("PING");
+    }
 
     public static boolean isIllegalAction(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("INVALID");
+        return message.trim().split("\\s+",2)[0].equals("ILLEGAL");
     }
 
     /**
@@ -168,7 +192,7 @@ public class ClientParser {
      */
     private static boolean checkSend(List<String> parsedResult){
         if(parsedResult.size()<2){return false;}
-        if(parsedResult.get(1).equals("schema") && parsedResult.size()>3) {
+        if(parsedResult.get(1).equals("schema") && parsedResult.size()>4) {
             return checkSendSchema(parsedResult);
         }
         if(parsedResult.get(1).equals("favor_tokens") && parsedResult.size()==3){return true;}
@@ -190,7 +214,7 @@ public class ClientParser {
      * @return true iff the parameters are valid
      */
     private static boolean checkSendSchema(List<String> parsedResult) {
-        for (int i = 3; i < parsedResult.size(); i++) {
+        for (int i = 4; i < parsedResult.size(); i++) {
             if(parsedResult.get(i).matches("[0-9]")){
                 i++;
             }
@@ -219,38 +243,28 @@ public class ClientParser {
     }
 
     /**
-     * This method checks if the LIST parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * This method checks if the DICE LIST parameters have a correct number of arguments (nothing has been lost during the communication) and format
      * @param parsedResult the parsed parameters of the command
      * @return true iff the parameters are valid
      */
-    private static boolean checkList(List<String> parsedResult){
-        if(parsedResult.size()<2){return false;}
-        if(parsedResult.get(1).equals("schema")||parsedResult.get(1).equals("roundtrack")||parsedResult.get(1).equals("draftpool")) {
-            for (int i = 2; i < parsedResult.size(); i++) {
-                if (parsedResult.get(i).split(",").length !=4 ) {
-                    return false;
-                }
+    private static boolean checkDiceList(List<String> parsedResult){
+        if(!parsedResult.get(0).equals("LIST_DICE") || parsedResult.size()<2) {return false;}
+        for (int i = 1; i < parsedResult.size(); i++) {
+            if (parsedResult.get(i).split(",").length != 3) {
+                return false;
             }
-            return true;
         }
-        if(parsedResult.get(1).equals("placements")){
-            for (int i = 2; i < parsedResult.size(); i++) {
-                if (parsedResult.get(i).split(",").length != 2) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return parsedResult.get(1).equals("tool_details") && parsedResult.size() == 6;
+        return true;
     }
 
     /**
-     * This method checks if the DISCARD parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * This method checks if the TOOL parameters have a correct number of arguments (nothing has been lost during the communication) and format
      * @param parsedResult the parsed parameters of the command
      * @return true iff the parameters are valid
      */
-    private static boolean checkDiscard(List<String> parsedResult){
-        return parsedResult.size() == 2;
+    private static boolean checkTool(List<String> parsedResult){
+        if(parsedResult.size()!=2){return false;}
+        return parsedResult.get(1).equals("ok") || parsedResult.get(1).equals("ko");
     }
 
     /**
@@ -259,12 +273,8 @@ public class ClientParser {
      * @return true iff the parameters are valid
      */
     private static boolean checkChoice(List<String> parsedResult){
-        if(parsedResult.size()<2){return false;}
-        if(parsedResult.size()==2){return true;}
-        if(parsedResult.get(2).equals("modified_die")){
-            return parsedResult.get(3).split(",").length <= 2;
-        }
-        return parsedResult.get(2).equals("rerolled_dice") && parsedResult.size() == 3 ;
+        if(parsedResult.size()!=2){return false;}
+        return parsedResult.get(1).equals("ok") || parsedResult.get(1).equals("ko");
     }
 
     private static boolean checkStatus(List<String> parsedResult) {

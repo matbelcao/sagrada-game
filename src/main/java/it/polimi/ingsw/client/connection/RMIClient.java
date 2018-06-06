@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 
@@ -110,6 +111,16 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
+    public List<Commands> select(int die_index) {
+        return null;
+    }
+
+    @Override
+    public List<Integer> getPlacementsList() {
+        return null;
+    }
+
+    @Override
     public LightSchemaCard getSchema(int playerId) {
         LightSchemaCard returnedCard=null;
         try {
@@ -141,10 +152,6 @@ public class RMIClient implements ClientConn {
         return result;
     }
 
-    @Override
-    public List<Integer> selectDie(int index) {
-        return null;
-    }
 
     @Override
     public boolean choose(int index) {
@@ -152,13 +159,23 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public boolean chooseTool(int index) {
+    public boolean enableTool(int tool_index) {
+        return false;
+    }
+
+    @Override
+    public boolean toolCanContinue() {
         return false;
     }
 
 
     @Override
     public void discard() {
+
+    }
+
+    @Override
+    public void exit() {
 
     }
 

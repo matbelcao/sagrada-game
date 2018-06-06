@@ -92,18 +92,19 @@ public class ClientParserTest {
     @Test
     void testCheckSend(){
 
-        assertTrue(ClientParser.parse("SEND schema name D,2,RED,THREE", parsedResult));
+        assertTrue(ClientParser.parse("SEND schema name 1 D,2,RED,THREE", parsedResult));
         assertEquals("SEND",parsedResult.get(0));
         assertEquals("schema",parsedResult.get(1));
         assertEquals("name",parsedResult.get(2));
-        assertEquals("D,2,RED,THREE",parsedResult.get(3));
+        assertEquals("1",parsedResult.get(3));
+        assertEquals("D,2,RED,THREE",parsedResult.get(4));
 
-        assertTrue(ClientParser.parse("SEND schema name D,2,RED,THREE C,2,GREEN", parsedResult));
+        assertTrue(ClientParser.parse("SEND schema name 5 D,2,RED,THREE C,2,GREEN", parsedResult));
         assertEquals("SEND",parsedResult.get(0));
         assertEquals("schema",parsedResult.get(1));
         assertEquals("name",parsedResult.get(2));
-        assertEquals("D,2,RED,THREE",parsedResult.get(3));
-        assertEquals("C,2,GREEN",parsedResult.get(4));
+        assertEquals("D,2,RED,THREE",parsedResult.get(4));
+        assertEquals("C,2,GREEN",parsedResult.get(5));
 
         assertTrue(ClientParser.parse("SEND priv 1 4 schemaName description", parsedResult));
         assertEquals("SEND",parsedResult.get(0));
@@ -162,62 +163,27 @@ public class ClientParserTest {
 
     @Test
     void testCheckList(){
+        assertTrue(ClientParser.parse("LIST_DICE 2,TWO,RED", parsedResult));
+        assertTrue(ClientParser.parse("LIST_DICE 2,TWO,RED 5,THREE,GREEN", parsedResult));
+        assertEquals("LIST_DICE",parsedResult.get(0));
+        assertEquals("2,TWO,RED",parsedResult.get(1));
+        assertEquals("5,THREE,GREEN",parsedResult.get(2));
 
-        assertTrue(ClientParser.parse("LIST schema 2,1,RED,TWO", parsedResult));
-        assertEquals("LIST",parsedResult.get(0));
-        assertEquals("schema",parsedResult.get(1));
-        assertEquals("2,1,RED,TWO",parsedResult.get(2));
+        assertTrue(ClientParser.parse("LIST_OPTIONS PUT_DIE", parsedResult));
+        assertTrue(ClientParser.parse("LIST_OPTIONS PUT_DIE NULL", parsedResult));
+        assertEquals("LIST_OPTIONS",parsedResult.get(0));
+        assertEquals("PUT_DIE",parsedResult.get(1));
+        assertEquals("NULL",parsedResult.get(2));
 
-        assertTrue(ClientParser.parse("LIST schema 2,4,RED,TWO 4,7,GREEN,FIVE", parsedResult));
-        assertEquals("LIST",parsedResult.get(0));
-        assertEquals("schema",parsedResult.get(1));
-        assertEquals("2,4,RED,TWO",parsedResult.get(2));
-        assertEquals("4,7,GREEN,FIVE",parsedResult.get(3));
+        assertTrue(ClientParser.parse("LIST_PLACEMENTS 5", parsedResult));
+        assertTrue(ClientParser.parse("LIST_PLACEMENTS 1 5 15", parsedResult));
 
-        assertTrue(ClientParser.parse("LIST roundtrack 3,1,RED,THREE", parsedResult));
-
-        assertTrue(ClientParser.parse("LIST draftpool 1,1,RED,THREE", parsedResult));
-
-        assertTrue(ClientParser.parse("LIST placements 2,3", parsedResult));
-        assertEquals("LIST",parsedResult.get(0));
-        assertEquals("placements",parsedResult.get(1));
-        assertEquals("2,3",parsedResult.get(2));
-
-        assertTrue(ClientParser.parse("LIST placements 2,3 4,5 1,2", parsedResult));
-        assertEquals("LIST",parsedResult.get(0));
-        assertEquals("placements",parsedResult.get(1));
-        assertEquals("2,3",parsedResult.get(2));
-        assertEquals("4,5",parsedResult.get(3));
-        assertEquals("1,2",parsedResult.get(4));
-
-        assertTrue(ClientParser.parse("LIST tool_details 1 3 true ok", parsedResult));
-        assertEquals("LIST",parsedResult.get(0));
-        assertEquals("tool_details",parsedResult.get(1));
-        assertEquals("1",parsedResult.get(2));
-        assertEquals("3",parsedResult.get(3));
-        assertEquals("true",parsedResult.get(4));
-        assertEquals("ok",parsedResult.get(5));
-
-        assertTrue(ClientParser.parse("LIST schema", parsedResult));
-        assertFalse(ClientParser.parse("LIST", parsedResult));
-        assertFalse(ClientParser.parse("LIST schema  2,2,RED", parsedResult));
-        assertFalse(ClientParser.parse("LIST schema  2,RED", parsedResult));
-        assertFalse(ClientParser.parse("LIST schema 2,3,3,RED,TWO 4,5,2,GREEN,FIVE,TWO", parsedResult));
-        assertTrue(ClientParser.parse("LIST placements", parsedResult));
-        assertFalse(ClientParser.parse("LIST placements 2,3,5", parsedResult));
-        assertFalse(ClientParser.parse("LIST tool_details", parsedResult));
-        assertFalse(ClientParser.parse("LIST tool_details 1 3 true ok ko", parsedResult));
-    }
-
-    @Test
-    void testCheckDiscard(){
-
-        assertTrue(ClientParser.parse("DISCARD ack", parsedResult));
-        assertEquals("DISCARD",parsedResult.get(0));
-        assertEquals("ack",parsedResult.get(1));
-
-        assertFalse(ClientParser.parse("DISCARD", parsedResult));
-        assertFalse(ClientParser.parse("DISCARD ack xxx", parsedResult));
+        assertFalse(ClientParser.parse("LIST_DICE", parsedResult));
+        assertFalse(ClientParser.parse("LIST_OPTIONS", parsedResult));
+        assertFalse(ClientParser.parse("LIST_PLACEMENTS", parsedResult));
+        assertFalse(ClientParser.parse("LIST 2,RED", parsedResult));
+        assertFalse(ClientParser.parse("LIST_DICE 1,2", parsedResult));
+        assertFalse(ClientParser.parse("LIST_DICE 1,2,greeN,TWO,SIX", parsedResult));
     }
 
     @Test
@@ -231,24 +197,35 @@ public class ClientParserTest {
         assertEquals("CHOICE",parsedResult.get(0));
         assertEquals("ko",parsedResult.get(1));
 
-        assertTrue(ClientParser.parse("CHOICE ok modified_die RED,THREE", parsedResult));
-        assertEquals("CHOICE",parsedResult.get(0));
-        assertEquals("ok",parsedResult.get(1));
-        assertEquals("modified_die",parsedResult.get(2));
-        assertEquals("RED,THREE",parsedResult.get(3));
-
-        //assertTrue(ClientParser.parse("CHOICE ok modified_die RED", parsedResult));
-
-        assertTrue(ClientParser.parse("CHOICE ok rerolled_dice", parsedResult));
-        assertEquals("CHOICE",parsedResult.get(0));
-        assertEquals("ok",parsedResult.get(1));
-        assertEquals("rerolled_dice",parsedResult.get(2));
-
         assertFalse(ClientParser.parse("CHOICE", parsedResult));
+        assertFalse(ClientParser.parse("CHOICE OK", parsedResult));
         assertFalse(ClientParser.parse("CHOICE ok ko", parsedResult));
-        assertTrue(ClientParser.parse("CHOICE ok modified_die RED", parsedResult));
-        assertFalse(ClientParser.parse("CHOICE ok modified_die RED,THREE,4", parsedResult));
-        assertFalse(ClientParser.parse("CHOICE ok rerolled_dice 3 4", parsedResult));
+    }
+
+    @Test
+    void testCheckTool(){
+
+        assertTrue(ClientParser.isTool("TOOL ok"));
+        assertTrue(ClientParser.parse("TOOL ok", parsedResult));
+        assertEquals("TOOL",parsedResult.get(0));
+        assertEquals("ok",parsedResult.get(1));
+
+        assertTrue(ClientParser.parse("TOOL ko", parsedResult));
+        assertEquals("TOOL",parsedResult.get(0));
+        assertEquals("ko",parsedResult.get(1));
+
+        assertFalse(ClientParser.parse("TOOL", parsedResult));
+        assertFalse(ClientParser.parse("TOOL OK", parsedResult));
+        assertFalse(ClientParser.parse("TOOL ok ko", parsedResult));
+    }
+
+    @Test
+    void testCheckPinf(){
+        assertTrue(ClientParser.isPing("PING"));
+        assertTrue(ClientParser.parse("PING", parsedResult));
+        assertEquals("PING",parsedResult.get(0));
+
+        assertFalse(ClientParser.parse("PING PING", parsedResult));
     }
 
     @Test

@@ -20,8 +20,9 @@ public class LightSchemaCard {
      * @param name the name of the schema card
      * @param contentMap a map containing indexes and content(dice or constraints)
      */
-    public LightSchemaCard(String name, Map<Integer,CellContent> contentMap){
+    public LightSchemaCard(String name,int tokens, Map<Integer,CellContent> contentMap){
         this.name = name;
+        this.initialFavorTokens=tokens;
         if(!hasValidKeys(contentMap)){ throw new IllegalArgumentException(); }
         this.cells.putAll(contentMap);
         contentMap.clear();
@@ -62,19 +63,15 @@ public class LightSchemaCard {
                 }
             }
         }
-        return new LightSchemaCard(schemaCard.getName(),contentMap);
+        return new LightSchemaCard(schemaCard.getName(),contentMap,schemaCard.getFavorTokens());
     }
 
 
     public static  LightSchemaCard toLightSchema(String schemaCard){
         String [] parsed= schemaCard.trim().split("\\s+");
         Map<Integer,CellContent> map=new HashMap<>();
-        int favorTokens;
-        int start=3;
-        if(parsed[3].matches("[0-9]")){
-            start++;
-        }
-        for(int i=start;i<parsed.length;i++){
+        int favorTokens=Integer.parseInt(parsed[3]);
+        for(int i=4;i<parsed.length;i++){
             String [] cellcontent=parsed[i].trim().split(",");
             int index= Integer.parseInt(cellcontent[1]);
             if(cellcontent[0].equals("D")){
@@ -83,12 +80,8 @@ public class LightSchemaCard {
                 map.put(index,new LightConstraint(cellcontent[2]));
             }
         }
-        if(parsed[3].matches("[0-9]")){
-            favorTokens=Integer.parseInt(parsed[3]);
-            return new LightSchemaCard(parsed[2].replaceAll("_"," "),map,favorTokens);
-        }
 
-        return new LightSchemaCard(parsed[2].replaceAll("_"," "),map);
+        return new LightSchemaCard(parsed[2].replaceAll("_"," "),map,favorTokens);
     }
 
     public int getFavorTokens() {
