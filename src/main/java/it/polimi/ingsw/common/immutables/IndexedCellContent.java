@@ -3,6 +3,7 @@ package it.polimi.ingsw.common.immutables;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Face;
 import it.polimi.ingsw.common.enums.GameStatus;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.model.Die;
 import it.polimi.ingsw.server.model.SchemaCard;
@@ -12,39 +13,45 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IndexedCellContent {
+    private Place place;
+    private int position;
     private CellContent content;
-    private int index;
 
-    public IndexedCellContent(int index, Face face, Color color){
+
+    public IndexedCellContent(int position, Face face, Color color){
         this.content=new LightDie(face,color);
-        this.index=index;
+        this.position=position;
     }
 
-    public IndexedCellContent(int index, Die die){
+    public IndexedCellContent(int position, Die die){
         this.content=new LightDie(die.getShade(),die.getColor());
-        this.index=index;
+        this.position=position;
     }
 
-    public IndexedCellContent(int index, String face, String color){
+    public IndexedCellContent(int position, String face, String color){
         this.content=new LightDie(face,color);
-        this.index=index;
+        this.position=position;
     }
 
-    public IndexedCellContent(int index, String constraint){
+    public IndexedCellContent(int position, String constraint){
         this.content=new LightConstraint(constraint);
-        this.index=index;
+        this.position=position;
     }
-    public IndexedCellContent(int index, Face shade){
+    public IndexedCellContent(int position, Face shade){
         this.content=new LightConstraint(shade);
-        this.index=index;
+        this.position=position;
     }
-    public IndexedCellContent(int index, Color color){
+    public IndexedCellContent(int position, Color color){
         this.content=new LightConstraint(color);
-        this.index=index;
+        this.position=position;
     }
 
-    public int getIndex(){
-        return index;
+    public int getPosition(){
+        return position;
+    }
+
+    public Place getPlace() {
+        return place;
     }
 
     public CellContent getContent() {

@@ -3,49 +3,56 @@
     <ToolCard id="1">
         <from>draftpool</from>
         <to>draftpool</to>
-        <modify>increase_decrease</modify>
+        <command>increase_decrease</command>
+        <command>none</command>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="2">
         <from>schema</from>
         <to>schema</to>
+        <command>place_die</command>
         <ignored-constraint>color</ignored-constraint>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="3">
         <from>schema</from>
         <to>schema</to>
+        <command>place_die</command>
         <ignored-constraint>shade</ignored-constraint>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="4">
         <from>schema</from>
         <to>schema</to>
+        <command>place_die</command>
+        <command>place_die</command>
         <ignored-constraint>none</ignored-constraint>
         <quantity>two</quantity>
     </ToolCard>
     <ToolCard id="5">
         <from>draftpool</from>
         <to>roundtrack</to>
-        <modify>swap</modify>
+        <command>swap</command>
+        <command>none</command>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="6">
         <from>draftpool</from>
         <to>draftpool</to>
-        <modify>reroll</modify>
+        <command>reroll</command>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="7">
         <from>draftpool</from>
         <to>draftpool</to>
-        <modify>reroll</modify>
+        <command>none</command>
         <quantity>all</quantity>
         <when>second_turn</when>
     </ToolCard>
     <ToolCard id="8">
         <from>draftpool</from>
         <to>schema</to>
+        <command>place_die</command>
         <ignored-constraint>none</ignored-constraint>
         <quantity>one</quantity>
         <when>first_turn</when>
@@ -53,28 +60,31 @@
     <ToolCard id="9">
         <from>draftpool</from>
         <to>schema</to>
+        <command>place_die</command>
         <ignored-constraint>adjacency</ignored-constraint>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="10">
         <from>draftpool</from>
         <to>draftpool</to>
-        <modify>flip</modify>
+        <command>flip</command>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="11">
         <from>draftpool</from>
         <to>dicebag</to>
-        <modify>setshade</modify>
+        <command>setshade</command>
+        <command>place_die</command>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="12">
         <from>schema</from>
         <to>schema</to>
+        <command>set_color</command>
+        <command>place_die</command>
+        <command>place_die</command>
         <ignored-constraint>none</ignored-constraint>
         <quantity>one</quantity>
         <quantity>two</quantity>
-        <in>roundtrack</in>
-        <match>color</match>
     </ToolCard>
 </tools>

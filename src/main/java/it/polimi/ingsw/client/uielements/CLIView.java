@@ -147,11 +147,11 @@ public class CLIView {
         StringBuilder entry= new StringBuilder();
         entry.append(CLIViewUtils.buildSmallDie(die.getContent())).append(" ");
         if(place.equals(Place.SCHEMA)){
-            entry.append(rowColmumn(die.getIndex()));
+            entry.append(rowColmumn(die.getPosition()));
         } else if(place.equals(Place.ROUNDTRACK)){
-            entry.append(String.format(cliElems.getElem("index"),uiMsg.getMessage("round-number"),die.getIndex()));
+            entry.append(String.format(cliElems.getElem("index"),uiMsg.getMessage("round-number"),die.getPosition()));
         }else{
-            entry.append(String.format(cliElems.getElem("index"),uiMsg.getMessage("pos"),die.getIndex()));
+            entry.append(String.format(cliElems.getElem("index"),uiMsg.getMessage("pos"),die.getPosition()));
         }
         return entry.toString();
     }

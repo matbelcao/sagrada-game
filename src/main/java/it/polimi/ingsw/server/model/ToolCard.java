@@ -30,9 +30,9 @@ public class ToolCard extends Card {
     public static final int NUM_TOOL_CARDS = 12;
     private Place from;
     private Place to;
-    private List<DieQuantity> quantity;
-    private List<Commands> modify;
+    private List<Commands> actions;
     private IgnoredConstraint ignored_constraint;
+    private List<DieQuantity> quantity;
     private Turn turn;
     //states
     private boolean executedFrom;
@@ -58,7 +58,7 @@ public class ToolCard extends Card {
         super();
         super.xmlReader(id, xmlTool, "ToolCard");
         this.used = false;
-        modify = new ArrayList<>();
+        actions = new ArrayList<>();
         quantity = new ArrayList<>();
 
         toolReader(super.getId());
@@ -83,24 +83,20 @@ public class ToolCard extends Card {
                     from = Place.toPlace(eElement.getElementsByTagName("from").item(0).getTextContent());
                     to = Place.toPlace(eElement.getElementsByTagName("to").item(0).getTextContent());
 
+                    for (int temp2 = 0; temp2 < eElement.getElementsByTagName("command").getLength(); temp2++) {
+                        text = eElement.getElementsByTagName("command").item(temp2).getTextContent();
+                        actions.add(Commands.valueOf(text.toUpperCase().trim()));
+                    }
+
+                    if(to.equals(Place.SCHEMA)){
+                        ignored_constraint = IgnoredConstraint.toIgnoredConstraint(eElement.getElementsByTagName("ignored-constraint").item(0).getTextContent());
+                    }else{
+                        ignored_constraint = IgnoredConstraint.NONE;
+                    }
+
                     for (int temp2 = 0; temp2 < eElement.getElementsByTagName("quantity").getLength(); temp2++) {
                         text = eElement.getElementsByTagName("quantity").item(temp2).getTextContent();
-                        quantity.add(DieQuantity.toDieQuantity(text));
-                    }
-
-                    int temp2;
-                    for (temp2 = 0; temp2 < eElement.getElementsByTagName("modify").getLength(); temp2++) {
-                        text = eElement.getElementsByTagName("modify").item(temp2).getTextContent();
-                       // modify.add(Commands.toModifyDie(text));
-                    }
-                    if (temp2 == 0) {
-                        modify.add(Commands.NONE);
-                    }
-
-                    try {
-                        ignored_constraint = IgnoredConstraint.toIgnoredConstraint(eElement.getElementsByTagName("ignored-constraint").item(0).getTextContent());
-                    } catch (NullPointerException e) {
-                        ignored_constraint = IgnoredConstraint.NONE;
+                        quantity.add(DieQuantity.valueOf(text.toUpperCase().trim()));
                     }
 
                     try {
@@ -298,7 +294,7 @@ public class ToolCard extends Card {
     }
 
     public boolean modifyDie1(Die die, Commands action){
-    if(!modify.contains(action) || !canModify1()){return false;}
+    if(!actions.contains(action) || !canModify1()){return false;}
     selectedDice.add(die);
     //try {
         switch(action) {
@@ -369,7 +365,7 @@ public class ToolCard extends Card {
 
     //setshade
     public boolean setShade(int shade) {
-        if(!modify.contains(Commands.SET_SHADE) || !canModify2()){return false;}
+        if(!actions.contains(Commands.SET_SHADE) || !canModify2()){return false;}
 
         selectedDice.get(0).setShade(shade);
         executedModify2=true;
@@ -377,7 +373,7 @@ public class ToolCard extends Card {
     }
 
     public boolean swapDie(Die die) {
-        if(!modify.contains(Commands.SWAP) || !canModify2()){return false;}
+        if(!actions.contains(Commands.SWAP) || !canModify2()){return false;}
         Color tmpColor = selectedDice.get(0).getColor();
         Face tmpFace = selectedDice.get(0).getShade();
         selectedDice.get(0).setShade(die.getShade().toInt());
@@ -410,8 +406,8 @@ public class ToolCard extends Card {
         return quantity;
     }
 
-    public List<Commands> getModify(){
-        return modify;
+    public List<Commands> getActions(){
+        return actions;
     }
 
     public IgnoredConstraint getIgnoredConstraint(){

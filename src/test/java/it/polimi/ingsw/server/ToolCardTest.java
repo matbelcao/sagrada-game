@@ -26,8 +26,8 @@ class ToolCardTest {
         assertEquals(Place.DRAFTPOOL,tool1.getFrom());
         assertEquals(Place.DRAFTPOOL,tool1.getTo());
         assertEquals(DieQuantity.ONE,tool1.getQuantity().get(0));
-        //assertEquals(Commands.INCREASE,tool1.getModify().get(0));
-        //assertEquals(Commands.DECREASE,tool1.getModify().get(1));
+        assertEquals(Commands.INCREASE_DECREASE,tool1.getActions().get(0));
+        assertEquals(Commands.NONE,tool1.getActions().get(1));
         assertEquals(IgnoredConstraint.NONE,tool1.getIgnoredConstraint());
         assertEquals(Turn.NONE,tool1.getTurn());
 

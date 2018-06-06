@@ -1,6 +1,9 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Place;
+import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
@@ -127,7 +130,7 @@ public class SocketServer extends Thread implements ServerConn  {
     private void listCommand(ArrayList<String> parsedResult) throws IllegalActionException {
         if(!user.isMyTurn()){throw new IllegalActionException();}
         switch (parsedResult.get(1)) {
-            case "schema":
+            /*case "schema":
                 sendSchemaDiceList();
                 break;
             case "roundtrack":
@@ -135,7 +138,7 @@ public class SocketServer extends Thread implements ServerConn  {
                 break;
             case "draftpool":
                 sendDraftPoolDiceList();
-                break;
+                break;*/
         }
     }
 
@@ -429,62 +432,23 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Sends the client a text list of the dice contained in the schema card parameter (with an unique INDEX)
      */
-    private void sendSchemaDiceList() throws IllegalActionException {
-        int index=0;
-        Die die;
-        SchemaCard schema=user.getGame().getUserSchemaCard(user,false);
-        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+    private void sendDiceList() throws IllegalActionException {
+        List<IndexedCellContent> dice=new ArrayList<>();
 
-        outSocket.print("LIST schema");
-        while(diceIterator.hasNext()){
-            die=diceIterator.next().getDie();
-            outSocket.print(" "+index+","+diceIterator.getIndex()+","+die.getColor().toString()
-                    +","+die.getShade().toString());
-            index++;
-        }
-        outSocket.println("");
-        outSocket.flush();
-    }
+        //dice= (ArrayList<Die>) user.getGame().getDiceList(false);
 
-    /**
-     * Sends the client a text list of the dice contained in the RoundTrack (with an unique INDEX)
-     */
-    private void sendRoundTrackDiceList() throws IllegalActionException {
-        int index=0;
-        int numberInRound;
-        List<List<Die>> trackList = user.getGame().getRoundTrackDice(false);
-        ArrayList<Die> dieList;
-
-        outSocket.print("LIST roundtrack");
-        for(int round=0;round<trackList.size();round++){
-            numberInRound=0;
-            dieList= (ArrayList<Die>) trackList.get(round);
-            for(Die d:dieList){
-                outSocket.print(" "+index+","+round+","+d.getColor().toString()+","+d.getShade().toString());
-                numberInRound++;
+        if(dice.size()>0){
+            outSocket.print("LIST_DICE "+dice.get(0).getPlace().toString().toLowerCase());
+            for(int index=0;index<dice.size();index++){
+                outSocket.print(" "+index+","+dice.get(index).getPosition()+","+dice.get(index).getContent().getShade().toString()
+                        +"," +dice.get(index).getContent().getShade().toString());
                 index++;
             }
+        }else{
+            throw new IllegalActionException();
         }
         outSocket.println("");
         outSocket.flush();
-    }
-
-
-    /**
-     * Sends the client a text list of the dice contained in the DraftPool (with an unique INDEX)
-     */
-    private void sendDraftPoolDiceList() throws IllegalActionException {
-        Die die;
-        ArrayList<Die> draftedDice= (ArrayList<Die>) user.getGame().getDraftedDice(false);
-
-        outSocket.print("LIST draftpool");
-        for (int i=0;i<draftedDice.size();i++){
-            die=draftedDice.get(i);
-            outSocket.print(" "+i+","+i+","+die.getColor().toString()+","+die.getShade().toString());
-        }
-        outSocket.println("");
-        outSocket.flush();
-
     }
 
     /**
@@ -492,11 +456,13 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param index the index of the die previously received by the client
      */
     private void selectDie(int index) throws IllegalActionException {
-        List<Integer> placements = user.getGame().selectDie(user, index);
+        List<Commands> options =new ArrayList<>();
 
-        outSocket.print("LIST placements");
-        for (Integer p : placements) {
-            outSocket.print(" " + placements.indexOf(p) + "," + p);
+        //options = user.getGame().selectDie(int index);
+
+        outSocket.print("LIST_OPTIONS");
+        for(int i=0;i<options.size();i++){
+            outSocket.print(" "+i+ ","+options.get(i).toString());
         }
         outSocket.println("");
         outSocket.flush();
