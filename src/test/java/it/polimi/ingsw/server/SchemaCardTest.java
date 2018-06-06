@@ -1,16 +1,19 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
+import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.server.model.Die;
-import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.SchemaCard;
+import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
+import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SchemaCardTest {
     @Test
@@ -89,7 +92,27 @@ class SchemaCardTest {
 
 
     }
+    @Test
 
+    void testListPlacementsSwap() throws IllegalDieException {
+        SchemaCard schema1 = new SchemaCard(1);
+
+
+        schema1.putDie(2,new Die("FOUR","RED"));
+
+
+        schema1.putDie(6,new Die("ONE","YELLOW"));
+
+        List<Integer> list = schema1.listPossiblePlacements(new Die("TWO","RED"));
+        list.add(2);
+        assertEquals(list,schema1.listPossiblePlacementsSwap(new Die("TWO","RED"), Color.RED));
+        System.out.println(schema1.listPossiblePlacementsSwap(new Die("TWO","RED"), Color.RED));
+
+        schema1.putDie(7,new Die("FIVE","RED"),IgnoredConstraint.FORCE);
+        System.out.println(schema1.listPossiblePlacementsSwap(new Die("TWO","RED"), Color.RED));
+        System.out.println(schema1.listPossiblePlacements(new Die("TWO","RED")));
+
+    }
     @Test
     void testDiePlacement(){
         SchemaCard schema1 = new SchemaCard(1);
