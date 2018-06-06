@@ -87,6 +87,9 @@ public class CLI implements ClientUI {
 
     }
 
+    public void showPlacementsList(List<Integer> placements,LightDie die){
+        view.updateMenuListPlacements(placements,Place.SCHEMA,die);
+    }
 
     @Override
     public void updateConnectionOk() {
@@ -97,7 +100,7 @@ public class CLI implements ClientUI {
 
     @Override
     public void updateLobby(int numUsers){
-        resetScreen();
+
         view.setClientInfo(client.getConnMode(),client.getUsername());
 
         console.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
@@ -180,6 +183,11 @@ public class CLI implements ClientUI {
     @Override
     public void updateToolUsage(List<LightTool> tools) {
 
+    }
+
+    @Override
+    public void showPlacementsList(List<Integer> placements, Place to, LightDie die) {
+        view.updateMenuListPlacements(placements,to,die);
     }
 
     @Override

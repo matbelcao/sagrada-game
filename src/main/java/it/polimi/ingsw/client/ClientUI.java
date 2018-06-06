@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.io.File;
@@ -93,6 +94,7 @@ public interface ClientUI extends Observer {
     void updateToolUsage(List<LightTool> tools);
 
 
+    void showPlacementsList(List<Integer> placements, Place to,LightDie die);
 
 
     /**

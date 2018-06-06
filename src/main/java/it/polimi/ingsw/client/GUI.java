@@ -3,6 +3,7 @@ package it.polimi.ingsw.client;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -424,6 +425,11 @@ public class GUI extends Application implements ClientUI {
     }
     @Override
     public void updateToolUsage(List<LightTool> tools) {
+
+    }
+
+    @Override
+    public void showPlacementsList(List<Integer> placements, Place to, LightDie die) {
 
     }
 

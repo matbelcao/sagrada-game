@@ -5,7 +5,7 @@
         <to>draftpool</to>
         <modify>increase</modify>
         <modify>decrease</modify>
-        <quantity>one</quantity>F
+        <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="2">
         <from>schema</from>
