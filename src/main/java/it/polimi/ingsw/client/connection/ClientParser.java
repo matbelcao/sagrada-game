@@ -43,7 +43,7 @@ public class ClientParser {
             case "LIST_OPTIONS":
                 return parsedResult.size()>=2;
             case "LIST_PLACEMENTS":
-                return parsedResult.size()>=2;
+                return true;
             case "CHOICE":
                 return checkChoice(parsedResult);
             case "TOOL":
@@ -248,7 +248,7 @@ public class ClientParser {
      * @return true iff the parameters are valid
      */
     private static boolean checkDiceList(List<String> parsedResult){
-        if(!parsedResult.get(0).equals("LIST_DICE") || parsedResult.size()<2) {return false;}
+        if(!parsedResult.get(0).equals("LIST_DICE")) {return false;}
         for (int i = 1; i < parsedResult.size(); i++) {
             if (parsedResult.get(i).split(",").length != 3) {
                 return false;

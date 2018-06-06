@@ -414,7 +414,7 @@ public class SocketServer extends Thread implements ServerConn  {
             outSocket.print("LIST_DICE "+dice.get(0).getPlace().toString().toLowerCase());
             for(int index=0;index<dice.size();index++){
                 outSocket.print(" "+index+","+dice.get(index).getPosition()+","+dice.get(index).getContent().getShade().toString()
-                        +"," +dice.get(index).getContent().getShade().toString());
+                        +"," +dice.get(index).getContent().getColor().toString());
                 index++;
             }
         }else{

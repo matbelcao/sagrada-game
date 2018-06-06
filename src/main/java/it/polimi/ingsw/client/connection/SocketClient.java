@@ -92,7 +92,6 @@ public class SocketClient implements ClientConn {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     try {
                         socket.close();
                     } catch (IOException e1) {

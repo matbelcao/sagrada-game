@@ -178,9 +178,9 @@ public class ClientParserTest {
         assertTrue(ClientParser.parse("LIST_PLACEMENTS 5", parsedResult));
         assertTrue(ClientParser.parse("LIST_PLACEMENTS 1 5 15", parsedResult));
 
-        assertFalse(ClientParser.parse("LIST_DICE", parsedResult));
+        assertTrue(ClientParser.parse("LIST_DICE", parsedResult));
         assertFalse(ClientParser.parse("LIST_OPTIONS", parsedResult));
-        assertFalse(ClientParser.parse("LIST_PLACEMENTS", parsedResult));
+        assertTrue(ClientParser.parse("LIST_PLACEMENTS", parsedResult));
         assertFalse(ClientParser.parse("LIST 2,RED", parsedResult));
         assertFalse(ClientParser.parse("LIST_DICE 1,2", parsedResult));
         assertFalse(ClientParser.parse("LIST_DICE 1,2,greeN,TWO,SIX", parsedResult));
