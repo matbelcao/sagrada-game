@@ -141,6 +141,7 @@ public class RMIClient implements ClientConn {
         return result;
     }
 
+
     @Override
     public List<Integer> selectDie(int index) {
         return null;
@@ -155,7 +156,6 @@ public class RMIClient implements ClientConn {
     public boolean chooseTool(int index) {
         return false;
     }
-
 
     @Override
     public void discard() {

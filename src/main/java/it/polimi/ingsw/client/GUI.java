@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.client.uielements.GUIutil;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
@@ -9,7 +10,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -18,10 +19,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -36,6 +35,7 @@ import java.util.Observable;
 import static javafx.geometry.Pos.CENTER;
 
 public class GUI extends Application implements ClientUI {
+    private GUIutil elementSize;
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
     public static final int LINE_WIDTH = 1;
@@ -64,7 +64,8 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void start(Stage primaryStage) {
-        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+        //get the dimensions of the screen
+        elementSize = new GUIutil(Screen.getPrimary().getVisualBounds());
         primaryStage.setTitle("Login");
         this.primaryStage = primaryStage;
         primaryStage.setScene(logInScene());
@@ -81,7 +82,8 @@ public class GUI extends Application implements ClientUI {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
-        Scene loginScene = new Scene(grid, 325, 300);
+
+        Scene loginScene = new Scene(grid, elementSize.getLoginWidth(), elementSize.getLoginWidth());
 
         Text scenetitle = new Text("Sagrada");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
@@ -102,90 +104,50 @@ public class GUI extends Application implements ClientUI {
         passwordField.setPromptText("Password");
         passwordField.setText(textGen.getRandomString()); //TODO delete
         grid.add(passwordField, 1, 2);
-        //-----------------
+
         Button button = new Button("Sign in");
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(button);
         grid.add(hbBtn, 1, 4);
-
-        //---
-
         grid.add(messageToUser, 1, 6);
-
-        //----
         button.setOnAction(e -> {
             client.setUsername(usernameField.getText());
             client.setPassword(Credentials.hash(client.getUsername(),passwordField.getText().toCharArray()));
         });
+        usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //delete
         return loginScene;
     }
 
-    //TODO uncomment
-    private Scene draftedSchemaSceneBuilder(List<LightSchemaCard> draftedSchemas, double width, double heigth) {
+    /*private Scene draftedSchemaSceneBuilder(List<LightSchemaCard> draftedSchemas) {
+        double schemaWidth = elementSize.getSchemaWidth();
+        double schemaHeigth = elementSize.getSchemaHeigth();
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        GridPane schema0 = schemaToGrid(draftedSchemas.get(0), width, heigth);
-        GridPane schema1 = schemaToGrid(draftedSchemas.get(1), width, heigth);
-        GridPane schema2 = schemaToGrid(draftedSchemas.get(2), width, heigth);
-        GridPane schema3 = schemaToGrid(draftedSchemas.get(3), width, heigth);
-
-        Button b0 = new Button("Select");
-        Button b1 = new Button("Select");
-        Button b2 = new Button("Select");
-        Button b3 = new Button("Select");
-
-        b0.setAlignment(CENTER);
-        b1.setAlignment(CENTER);
-        b2.setAlignment(CENTER);
-        b3.setAlignment(CENTER);
-/*
-        b0.setOnAction(e ->client.getClientConn().chooseSchema(0));
-        b1.setOnAction(e ->client.getClientConn().chooseSchema(1));
-        b2.setOnAction(e ->client.getClientConn().chooseSchema(2));
-        b3.setOnAction(e ->client.getClientConn().chooseSchema(3));*/
+        GridPane schema0 = schemaToGrid(draftedSchemas.get(0), schemaWidth, schemaHeigth);
+        GridPane schema1 = schemaToGrid(draftedSchemas.get(1), schemaWidth, schemaHeigth);
+        GridPane schema2 = schemaToGrid(draftedSchemas.get(2), schemaWidth, schemaHeigth);
+        GridPane schema3 = schemaToGrid(draftedSchemas.get(3), schemaWidth, schemaHeigth);
 
         grid.add(schema0, 0, 0);
         grid.add(schema1, 1, 0);
         grid.add(schema2, 2, 0);
         grid.add(schema3, 3, 0);
-        grid.add(b0, 0, 1);
-        grid.add(b1, 1, 1);
-        grid.add(b2, 2, 1);
-        grid.add(b3, 3, 1);
-
         schema0.addEventHandler(MouseEvent.MOUSE_ENTERED, e->System.out.println(e));
 
-        Scene scene2 = new Scene(grid, 800, 200);
-        return scene2;
-    }
-
-
-    /*private Scene draftedSchemaSceneBuilder(List<LightSchemaCard> draftedSchemas, double width, double heigth) {
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
-
-        Canvas schema0 = schemaToCanvas(draftedSchemas.get(0),width,heigth);
-        Canvas schema1 = schemaToCanvas(draftedSchemas.get(1),width,heigth);
-        Canvas schema2 = schemaToCanvas(draftedSchemas.get(2),width,heigth);
-        Canvas schema3 = schemaToCanvas(draftedSchemas.get(3),width,heigth);
-        grid.add(schema0,0,0);
-        grid.add(schema1,1,0);
-        grid.add(schema2,2,0);
-        grid.add(schema3,3,0);
-
-        Scene scene2 = new Scene(grid, 1200, 300);
+        Scene scene2 = new Scene(grid);
         return scene2;
     }*/
 
+
+
+
     private GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth){
         GridPane grid = new GridPane();
-        double dieDim = width / NUM_COLS;
+        double dieDim = elementSize.getDieDimension();
         for(int i = 0; i < NUM_ROWS; i++){
             for(int j = 0; j < NUM_COLS; j++){
                 if(lightSchemaCard.hasDieAt(i,j)){
@@ -214,34 +176,34 @@ public class GUI extends Application implements ClientUI {
     private Canvas lightDieToCanvas(LightDie die,double dieDim){
         Canvas dieCanvas = new Canvas(dieDim,dieDim);
         GraphicsContext gc = dieCanvas.getGraphicsContext2D();
-        drawDie(die,dieCanvas.getGraphicsContext2D(),0,0,dieDim);
+        drawDie(die,dieCanvas.getGraphicsContext2D(),dieDim);
         return dieCanvas;
     }
 
     private Canvas schemaToCanvas(LightSchemaCard lightSchemaCard,double width, double height) {
         Canvas canvas = new Canvas(width, height);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        drawSchema(lightSchemaCard,gc, width,  height);
+        drawSchema(lightSchemaCard,gc);
         return canvas;
     }
 
-    private void drawSchema(LightSchemaCard lightSchemaCard, GraphicsContext gc, double width, double height) {
-        double diceDim = width / NUM_COLS;
+    private void drawSchema(LightSchemaCard lightSchemaCard, GraphicsContext gc) {
+        double dieDim = elementSize.getDieDimension();
         double y = 0;
         double x = 0;
         for(int i = 0; i < NUM_ROWS; i++){
             for(int j = 0; j < NUM_COLS; j++){
                 if(lightSchemaCard.hasDieAt(i,j)){
-                    drawDie(lightSchemaCard.getDieAt(i,j),gc,x,y,diceDim);
+                    drawDie(lightSchemaCard.getDieAt(i,j),gc,x,y,dieDim);
                 }else if(lightSchemaCard.hasConstraintAt(i,j)){
-                    drawConstraint(lightSchemaCard.getConstraintAt(i,j),gc,x,y,diceDim);
+                    drawConstraint(lightSchemaCard.getConstraintAt(i,j),gc,x,y,dieDim);
                 }else{
-                    drawWhiteSquare(gc,x,y,diceDim);
+                    drawWhiteSquare(gc,x,y,dieDim);
                 }
-                x += diceDim;
+                x += dieDim;
             }
             x = 0;
-            y += diceDim;
+            y += dieDim;
         }
     }
 
@@ -253,6 +215,20 @@ public class GUI extends Application implements ClientUI {
         gc.strokeRect(x,y,diceDim,diceDim);
     }
 
+    private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double dieDim) {
+        if (constraint.hasColor()) {
+            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
+            gc.fillRect(0, 0, dieDim, dieDim);
+        }else{
+            gc.setFill(Color.GRAY);
+            gc.fillRect(0, 0, dieDim, dieDim);
+            drawSpots(gc,dieDim,constraint.getShade().toInt());
+        }
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(LINE_WIDTH);
+        gc.strokeRect(0, 0, dieDim, dieDim);
+    }
+
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double dieDim) {
         if (constraint.hasColor()) {
             gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
@@ -260,13 +236,21 @@ public class GUI extends Application implements ClientUI {
         }else{
             gc.setFill(Color.GRAY);
             gc.fillRect(x, y, dieDim, dieDim);
-            drawSpots(gc,dieDim,constraint.getShade().toInt());
+            drawSpots(gc,x,y,dieDim,constraint.getShade().toInt());
         }
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(LINE_WIDTH);
         gc.strokeRect(x, y, dieDim, dieDim);
     }
 
+    private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
+        graphicsContext2D.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
+        graphicsContext2D.fillRect(0,0,dieDim,dieDim);
+        graphicsContext2D.setStroke(Color.BLACK);
+        graphicsContext2D.setLineWidth(LINE_WIDTH);
+        graphicsContext2D.strokeRect(0,0,dieDim, dieDim);
+    }
+    //to be used when drawing schema to canvas
     private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double diceDim) {
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
         gc.fillRect(x,y,diceDim,diceDim);
@@ -274,6 +258,7 @@ public class GUI extends Application implements ClientUI {
         gc.setLineWidth(LINE_WIDTH);
         gc.strokeRect(x, y, diceDim, diceDim);
     }
+
     private void drawSpots(GraphicsContext gc, double dieDim, int count) {
         switch (count) {
             case 1:
@@ -306,11 +291,50 @@ public class GUI extends Application implements ClientUI {
         }
     }
 
+    private void drawSpots(GraphicsContext gc,double X_axis_die_position,double Y_axis_die_position,double dieDim, int count) {
+        switch (count) {
+            case 1:
+                drawSpot(gc, dieDim / 2, dieDim / 2,dieDim, X_axis_die_position, Y_axis_die_position);
+                break;
+            case 3:
+                drawSpot(gc, dieDim/ 2, dieDim/ 2,dieDim, X_axis_die_position, Y_axis_die_position);
+                // Fall thru to next case
+            case 2:
+                drawSpot(gc, dieDim/ 4, dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
+                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4,dieDim, X_axis_die_position, Y_axis_die_position);
+                break;
+            case 5:
+                drawSpot(gc, dieDim/ 2, dieDim/ 2,dieDim, X_axis_die_position, Y_axis_die_position);
+                // Fall thru to next case
+            case 4:
+                drawSpot(gc, dieDim/ 4, dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
+                drawSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
+                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
+                drawSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
+                break;
+            case 6:
+                drawSpot(gc, dieDim / 4, dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
+                drawSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
+                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
+                drawSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
+                drawSpot(gc, dieDim/ 4, dieDim/ 2,dieDim, X_axis_die_position, Y_axis_die_position);
+                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 2,dieDim, X_axis_die_position, Y_axis_die_position);
+                break;
+        }
+    }
+
+
     private void drawSpot(GraphicsContext gc, double x, double y, double dieDim) {
         double spotDiameter = dieDim/SPOT_RATIO;
         gc.setFill(Color.BLACK);
         gc.fillOval(x - spotDiameter / 2, y - spotDiameter / 2,
                 spotDiameter, spotDiameter);
+    }
+
+    private void drawSpot(GraphicsContext gc, double x, double y,double dieDim,double X_axis_die_position,double Y_axis_die_position) {
+        double spotDiameter = dieDim/SPOT_RATIO;
+        gc.setFill(Color.BLACK);
+        gc.fillOval(X_axis_die_position +(x - spotDiameter / 2), Y_axis_die_position + (y - spotDiameter / 2), spotDiameter, spotDiameter);
     }
 
     @Override
@@ -350,8 +374,7 @@ public class GUI extends Application implements ClientUI {
     private Scene gameScene(){
         VBox layout = new VBox();
         layout.getChildren().add(draftPool(client.getBoard().getDraftPool()));
-
-        Scene scene2 = new Scene(layout, 1200, 300);
+        Scene scene2 = new Scene(layout);
         return scene2;
     }
 
@@ -373,10 +396,38 @@ public class GUI extends Application implements ClientUI {
         Platform.runLater(() -> {
             primaryStage.setTitle("Sagrada");
             primaryStage.setResizable(true);
-            primaryStage.sizeToScene();
-            primaryStage.setScene(draftedSchemaSceneBuilder(draftedSchemas,250,200));
-            primaryStage.sizeToScene();
+            Scene scene = draftedSchemaSceneBuilder(draftedSchemas);
+            primaryStage.setScene(scene);
+            primaryStage.minWidthProperty().bind(scene.heightProperty().multiply(1));
+            primaryStage.minHeightProperty().bind(scene.widthProperty().divide(1));
         });
+    }
+
+    private Scene draftedSchemaSceneBuilder(List<LightSchemaCard> draftedSchemas) {
+        double schemaWidth = elementSize.getSchemaWidth();
+        double schemaHeigth = elementSize.getSchemaHeigth();
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(15, 15, 15, 15));
+
+        Canvas schema0 = schemaToCanvas(draftedSchemas.get(0),schemaWidth,schemaHeigth);
+        Canvas schema1 = schemaToCanvas(draftedSchemas.get(1),schemaWidth,schemaHeigth);
+        Canvas schema2 = schemaToCanvas(draftedSchemas.get(2),schemaWidth,schemaHeigth);
+        Canvas schema3 = schemaToCanvas(draftedSchemas.get(3),schemaWidth,schemaHeigth);
+        grid.add(schema0,0,0);
+        grid.add(schema1,1,0);
+        grid.add(schema2,0,1);
+        grid.add(schema3,1,1);
+
+        Group group = new Group( grid );
+        StackPane rootPane = new StackPane();
+        rootPane.getChildren().add( group );
+        Scene scene2 = new Scene(rootPane);
+
+        group.scaleXProperty().bind( scene2.widthProperty().divide(elementSize.getDraftedSchemasWidth()+40));
+        group.scaleYProperty().bind( scene2.heightProperty().divide( elementSize.getDraftedSchemasHeight()+40));
+        return scene2;
     }
 
     @Override
