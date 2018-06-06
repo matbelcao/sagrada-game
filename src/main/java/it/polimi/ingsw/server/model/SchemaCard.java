@@ -1,6 +1,4 @@
 package it.polimi.ingsw.server.model;
-import java.io.File;
-import javax.xml.parsers.*;
 
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.server.connection.MasterServer;
@@ -8,16 +6,21 @@ import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 import org.jetbrains.annotations.NotNull;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
-
-import org.xml.sax.SAXException;
 
 /**
  * This class represents a schema card of the game
@@ -193,9 +196,45 @@ public class SchemaCard implements Iterable<Cell>  {
     }
 
     public List<Integer> listPossiblePlacementsSwap(Die die, Color fixedColor){
+        if(!fixedColor.equals(Color.NONE) && !die.getColor().equals(fixedColor)){
+            throw new IllegalArgumentException();
+        }
         List <Integer> list= new ArrayList<>();
         FullCellIterator diceIterator;
         diceIterator= (FullCellIterator) this.iterator();
+        while(diceIterator.hasNext()){
+            diceIterator.next();
+            checkCloseCells(die, diceIterator, list, IgnoredConstraint.NONE);
+        }
+
+        diceIterator= (FullCellIterator)this.iterator();
+
+        while(diceIterator.hasNext()){
+            Cell celll=diceIterator.next();
+
+            if(celll.getDie().getColor().equals(fixedColor) || fixedColor.equals(Color.NONE)){
+                SchemaCard tempschema=cloneSchema();
+                tempschema.removeDie(diceIterator.getIndex());
+
+                if(tempschema.listPossiblePlacements(die).contains(diceIterator.getIndex())) {
+
+                    try {
+                        tempschema.putDie(diceIterator.getIndex(), die);
+                    } catch (IllegalDieException e) {
+
+                    }
+
+                    if (!tempschema.listPossiblePlacements(celll.getDie()).isEmpty()) {
+                        list.add(diceIterator.getIndex());
+                    }
+                }
+
+                checkCloseCells(die,diceIterator,list,IgnoredConstraint.NONE);
+
+            }
+        }
+
+
         return list;
     }
 
@@ -265,17 +304,7 @@ public class SchemaCard implements Iterable<Cell>  {
      */
     @NotNull
     private Boolean canBePlacedHere (int row, int column, Die die){
-        if(this.cell[row][column].hasDie()){ return false; }
-
-        if(!this.cell[row][column].canAcceptDie(die)){ return false; }
-
-        if((row > 0)                    && this.cell[row - 1][column].hasDie() && this.cell[row - 1][column].checkNeighbor(die)) { return false; }
-
-        if((row < (NUM_ROWS - 1))       && this.cell[row + 1][column].hasDie() && this.cell[row + 1][column].checkNeighbor(die)) { return false; }
-
-        if((column > 0)                 && this.cell[row][column - 1].hasDie() && this.cell[row][column - 1].checkNeighbor(die)) { return false; }
-
-        return !((column < (NUM_COLS - 1)) && this.cell[row][column + 1].hasDie() && this.cell[row][column + 1].checkNeighbor(die));
+        return canBePlacedHere(row,column,die,IgnoredConstraint.NONE);
     }
 
     /**
@@ -309,10 +338,7 @@ public class SchemaCard implements Iterable<Cell>  {
      */
     public void putDie (int index,Die die) throws IllegalDieException{
 
-        if (!this.listPossiblePlacements(die).contains(index)) throw new IllegalDieException("You can't place this die here!");
-
-        this.cell[index/NUM_COLS][index%NUM_COLS].setDie(die);
-        this.isFirstDie=false;
+        putDie(index,die,IgnoredConstraint.NONE);
     }
 
     /**

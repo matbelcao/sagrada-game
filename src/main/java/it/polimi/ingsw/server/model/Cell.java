@@ -35,17 +35,8 @@ public class Cell {
      * @return true iff the die respects the Cell constraint
      */
     public Boolean canAcceptDie(Die die){
-        if(die==null){return false;}
-        if(this.constraint==null) {
-            return true;
-        }
 
-        if( this.constraint.isColorConstraint() && die.getColor().toString().equals(this.constraint.getColor().toString())){
-            return true;
-        }
-
-        return !this.constraint.isColorConstraint() && die.getShade().toString().equals(this.constraint.getShade().toString());
-
+        return canAcceptDie(die,IgnoredConstraint.NONE);
     }
 
     /**
@@ -55,12 +46,18 @@ public class Cell {
      * @return true iff the die respects the Cell constraint
      */
     public Boolean canAcceptDie(Die die, IgnoredConstraint ignoreConstraint){
+        if(die==null){throw new IllegalArgumentException();}
         if(this.constraint==null ) {
             return true;
         }
 
         if(die==null){return false;}
-        if(ignoreConstraint.equals(IgnoredConstraint.NONE)){ return canAcceptDie(die); }
+        if(ignoreConstraint.equals(IgnoredConstraint.NONE)){
+            if( this.constraint.isColorConstraint() && die.getColor().toString().equals(this.constraint.getColor().toString())){
+                return true;
+            }
+            return !this.constraint.isColorConstraint() && die.getShade().toString().equals(this.constraint.getShade().toString());
+        }
         if(ignoreConstraint.equals(IgnoredConstraint.ALL)){ return true; }
         if(ignoreConstraint.equals(IgnoredConstraint.COLOR) && this.constraint.isColorConstraint()){ return true; }
         if(ignoreConstraint.equals(IgnoredConstraint.SHADE) && !this.constraint.isColorConstraint()){ return true; }
@@ -79,8 +76,7 @@ public class Cell {
      * @param die die to be placed in the Cell
      */
     public void setDie(Die die) {
-        assert canAcceptDie(die);
-        this.die=die;
+        setDie(die,IgnoredConstraint.NONE);
     }
 
     /**
@@ -101,7 +97,7 @@ public class Cell {
      */
     public void setDie(Die die,IgnoredConstraint ignoreConstraint) {
 
-        assert canAcceptDie(die,ignoreConstraint) && !ignoreConstraint.equals(IgnoredConstraint.FORCE);
+        assert canAcceptDie(die,ignoreConstraint) || ignoreConstraint.equals(IgnoredConstraint.FORCE);
         this.die=die;
     }
 

@@ -176,9 +176,4 @@ class cliElemsTest {
 
     }
 
-    public static void main(String [] args){
-        setup();
-        new cliElemsTest().testGetOne();
-    }
-
 }

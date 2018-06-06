@@ -168,7 +168,6 @@ public class RMIClient implements ClientConn {
         return false;
     }
 
-
     @Override
     public void discard() {
 
