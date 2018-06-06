@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.model;
 import java.io.File;
 import javax.xml.parsers.*;
 
+import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
@@ -169,7 +170,7 @@ public class SchemaCard implements Iterable<Cell>  {
     public List<Integer> listPossiblePlacements(Die die, IgnoredConstraint ignoreConstraint) {
         List <Integer> list= new ArrayList<>();
         FullCellIterator diceIterator;
-        diceIterator=new FullCellIterator(this.cell);
+        diceIterator= (FullCellIterator) this.iterator();
         if(ignoreConstraint.equals(IgnoredConstraint.ADJACENCY)){
             for(int i=0; i < SchemaCard.NUM_COLS * SchemaCard.NUM_ROWS; i++ ){
                 if(canBePlacedHere(i/SchemaCard.NUM_COLS, i%SchemaCard.NUM_COLS , die)){
@@ -191,7 +192,12 @@ public class SchemaCard implements Iterable<Cell>  {
         return list;
     }
 
-
+    public List<Integer> listPossiblePlacementsSwap(Die die, Color fixedColor){
+        List <Integer> list= new ArrayList<>();
+        FullCellIterator diceIterator;
+        diceIterator= (FullCellIterator) this.iterator();
+        return list;
+    }
 
     /**
      * Checks if cells close to the one given by the iterator(that contains a die) could accept the die
@@ -375,6 +381,8 @@ public class SchemaCard implements Iterable<Cell>  {
 
 
 
+
+
     public SchemaCard cloneSchema(){
         SchemaCard temp= new SchemaCard(this.id);
         FullCellIterator iter= (FullCellIterator) iterator();
@@ -411,8 +419,6 @@ public class SchemaCard implements Iterable<Cell>  {
         }
         return diff;
     }
-
-
 
 
 

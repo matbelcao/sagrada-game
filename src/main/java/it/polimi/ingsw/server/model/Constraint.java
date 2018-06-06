@@ -73,9 +73,9 @@ public class Constraint {
      */
     public String toUtf(){
         if(isColorConstraint()){
-            return this.constraint.getColor().getUtf()+Face.EMPTY+Color.RESET;
+            return this.constraint.getColor().getUtf()+Face.EMPTY+Color.NONE.getUtf();
         }else{
-            return Color.RESET+this.constraint.getShade().getUtf();
+            return Color.NONE.getUtf() +this.constraint.getShade().getUtf();
         }
 
     }

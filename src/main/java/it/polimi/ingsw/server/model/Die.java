@@ -114,6 +114,6 @@ public class Die {
      * @return said string
      */
     public String toUtf(){
-        return this.getColor().getUtf()+this.getShade().getUtf()+Color.RESET;
+        return this.getColor().getUtf()+this.getShade().getUtf()+Color.NONE.getUtf();
     }
 }

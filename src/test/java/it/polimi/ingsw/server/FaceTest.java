@@ -14,7 +14,7 @@ public class FaceTest {
         assertTrue(Face.contains("FOUR"));
         assertTrue(Face.contains("FIVE"));
         assertTrue(Face.contains("SIX"));
-        assertFalse(Face.contains("RESET"));
+        assertFalse(Face.contains("NONE"));
         assertFalse(Face.contains(""));
         assertFalse(Face.contains("a")); //randomtest
         assertFalse(Face.contains(null));

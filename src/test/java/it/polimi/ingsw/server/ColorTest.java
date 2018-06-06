@@ -14,7 +14,7 @@ public class ColorTest {
         assertTrue(Color.contains("YELLOW"));
         assertTrue(Color.contains("BLUE"));
         assertTrue(Color.contains("PURPLE"));
-        assertFalse(Color.contains("RESET"));
+        assertTrue(Color.contains("NONE"));
         assertFalse(Color.contains(""));
         assertFalse(Color.contains("a")); //random test case
 

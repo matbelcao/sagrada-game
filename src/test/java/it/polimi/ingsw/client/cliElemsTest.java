@@ -158,7 +158,7 @@ class cliElemsTest {
         System.out.println("");
         System.out.printf(cliel.getBigDie("FOUR"));
         System.out.println("");
-        System.out.printf(Color.BLUE.getUtf()+cliel.getBigDie("FIVE")+ Color.RESET);
+        System.out.printf(Color.BLUE.getUtf()+cliel.getBigDie("FIVE")+ Color.NONE.getUtf());
         System.out.println("");
         System.out.printf(cliel.getBigDie("SIX"));
         System.out.println("");

@@ -10,9 +10,8 @@ public enum Color { //need to add png address combined with Face's ones
     GREEN("\u001B[32m"),
     YELLOW("\u001B[33m"),
     BLUE("\u001B[34m"),
-    PURPLE("\u001B[35m");
-
-    public static final String RESET = "\u001B[0m"; //to be used (also) in shade restrictions
+    PURPLE("\u001B[35m"),
+    NONE ("\u001B[0m"); //to be used (also) in shade restrictions
 
     private final String utf;
 

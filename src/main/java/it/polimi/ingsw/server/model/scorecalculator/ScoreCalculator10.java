@@ -16,7 +16,7 @@ public class ScoreCalculator10 implements ScoreCalculator{
     @Override
     public int calculateScore(SchemaCard schema) {
         int points;
-        int[] count = new int[Color.values().length];
+        int[] count = new int[Color.values().length -1];
         FullCellIterator diceIterator = (FullCellIterator) schema.iterator();
         Die die;
 

@@ -254,7 +254,7 @@ public class CLIViewUtils {
      * @return the bold string
      */
     public static String boldify(String line){
-        return BOLD +line+Color.RESET;
+        return BOLD +line+Color.NONE.getUtf();
 
     }
 
@@ -272,7 +272,7 @@ public class CLIViewUtils {
         result.addAll(
                 appendRows(
                         buildCell(new LightConstraint(privObj.getColor())),
-                        buildPrivObj(privObj,width-CELL_WIDTH)));
+                        buildCard(privObj,width-CELL_WIDTH)));
         return result;
     }
 
@@ -335,11 +335,11 @@ public class CLIViewUtils {
      * @param card the card to be represented
      * @return a list that is the card's representation
      */
-    static List<String> buildCard( LightCard card) {
+    static List<String> buildCard( LightCard card,int width) {
         List<String> result=new ArrayList<>();
 
         result.add(boldify(card.getName()+":"));
-        result.addAll(fitInLength(card.getDescription(), OBJ_LENGTH));
+        result.addAll(fitInLength(card.getDescription(), width));
         return result;
     }
 
@@ -351,7 +351,7 @@ public class CLIViewUtils {
      */
     static List<String> buildTool(LightTool tool){
         List<String> result;
-        result= buildCard(tool);
+        result= buildCard(tool,OBJ_LENGTH);
         if(tool.isUsed()) {
             result.set(0, result.get(0)+" "+ FAVOR);
         }
@@ -436,7 +436,7 @@ public class CLIViewUtils {
      * @return the colored string
      */
     public static String addColorToLine(String line, Color color){
-        return color.getUtf()+line+Color.RESET;
+        return color.getUtf()+line+Color.NONE.getUtf();
     }
 
     /**

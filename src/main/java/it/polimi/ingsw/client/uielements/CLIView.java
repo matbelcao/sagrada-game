@@ -514,7 +514,7 @@ public class CLIView {
         result.add(boldify(uiMsg.getMessage("pub-obj")));
         result.add(" ");
         for(LightCard card : pubObj){
-            result.addAll(buildCard(card));
+            result.addAll(buildCard(card,OBJ_LENGTH));
             result.add("     ");
         }
 
