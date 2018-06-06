@@ -10,8 +10,8 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public class RMIClient implements ClientConn {
-    RMIClientInt remoteObj; //user
-    Client client;
+    private RMIClientInt remoteObj; //user
+    private Client client;
 
     public RMIClient(RMIClientInt remoteObj, Client client) {
         this.remoteObj = remoteObj;
@@ -73,9 +73,7 @@ public class RMIClient implements ClientConn {
         List<LightDie> draftPool = null;
         try {
             draftPool = remoteObj.getDraftPool();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (IllegalActionException e) {
+        } catch (RemoteException | IllegalActionException e) {
             e.printStackTrace();
         }
         return draftPool;

@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -16,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -23,6 +25,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -60,10 +63,13 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void start(Stage primaryStage) {
+        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         primaryStage.setTitle("Login");
         this.primaryStage = primaryStage;
         primaryStage.setScene(logInScene());
         primaryStage.setResizable(false);
+        primaryStage.setOnCloseRequest(e->client.quit());
+        primaryStage.sizeToScene();
         primaryStage.show();
 
     }
@@ -114,6 +120,7 @@ public class GUI extends Application implements ClientUI {
         return loginScene;
     }
 
+    //TODO uncomment
     private Scene draftedSchemaSceneBuilder(List<LightSchemaCard> draftedSchemas, double width, double heigth) {
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -149,12 +156,13 @@ public class GUI extends Application implements ClientUI {
         grid.add(b2, 2, 1);
         grid.add(b3, 3, 1);
 
+        schema0.addEventHandler(MouseEvent.MOUSE_ENTERED, e->System.out.println(e));
 
-        Scene scene2 = new Scene(grid, 1200, 300);
+        Scene scene2 = new Scene(grid, 800, 200);
         return scene2;
     }
 
-    //TODO uncomment
+
     /*private Scene draftedSchemaSceneBuilder(List<LightSchemaCard> draftedSchemas, double width, double heigth) {
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -165,26 +173,10 @@ public class GUI extends Application implements ClientUI {
         Canvas schema1 = schemaToCanvas(draftedSchemas.get(1),width,heigth);
         Canvas schema2 = schemaToCanvas(draftedSchemas.get(2),width,heigth);
         Canvas schema3 = schemaToCanvas(draftedSchemas.get(3),width,heigth);
-
-        Button b0 = new Button("Select");
-        Button b1 = new Button("Select");
-        Button b2 = new Button("Select");
-        Button b3 = new Button("Select");
-
-        b0.setAlignment(CENTER);
-        b1.setAlignment(CENTER);
-        b2.setAlignment(CENTER);
-        b3.setAlignment(CENTER);
-
         grid.add(schema0,0,0);
         grid.add(schema1,1,0);
         grid.add(schema2,2,0);
         grid.add(schema3,3,0);
-        grid.add(b0,0,1);
-        grid.add(b1,1,1);
-        grid.add(b2,2,1);
-        grid.add(b3,3,1);
-
 
         Scene scene2 = new Scene(grid, 1200, 300);
         return scene2;
@@ -379,7 +371,10 @@ public class GUI extends Application implements ClientUI {
     public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
         Platform.runLater(() -> {
             primaryStage.setTitle("Sagrada");
+            primaryStage.setResizable(true);
+            primaryStage.sizeToScene();
             primaryStage.setScene(draftedSchemaSceneBuilder(draftedSchemas,250,200));
+            primaryStage.sizeToScene();
         });
     }
 
