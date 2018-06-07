@@ -12,6 +12,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -121,32 +122,6 @@ public class GUI extends Application implements ClientUI {
         return loginScene;
     }
 
-    /*private Scene draftedSchemaSceneBuilder(List<LightSchemaCard> draftedSchemas) {
-        double schemaWidth = elementSize.getSchemaWidth();
-        double schemaHeigth = elementSize.getSchemaHeigth();
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
-
-        GridPane schema0 = schemaToGrid(draftedSchemas.get(0), schemaWidth, schemaHeigth);
-        GridPane schema1 = schemaToGrid(draftedSchemas.get(1), schemaWidth, schemaHeigth);
-        GridPane schema2 = schemaToGrid(draftedSchemas.get(2), schemaWidth, schemaHeigth);
-        GridPane schema3 = schemaToGrid(draftedSchemas.get(3), schemaWidth, schemaHeigth);
-
-        grid.add(schema0, 0, 0);
-        grid.add(schema1, 1, 0);
-        grid.add(schema2, 2, 0);
-        grid.add(schema3, 3, 0);
-        schema0.addEventHandler(MouseEvent.MOUSE_ENTERED, e->System.out.println(e));
-
-        Scene scene2 = new Scene(grid);
-        return scene2;
-    }*/
-
-
-
-
     private GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth){
         GridPane grid = new GridPane();
         double dieDim = elementSize.getDieDimension();
@@ -169,18 +144,6 @@ public class GUI extends Application implements ClientUI {
         drawWhiteSquare(gc,0,0,dim);
         return whiteCanvas;
     }
-    private Canvas lightConstraintToCanvas(LightConstraint constraint,double dieDim){
-        Canvas dieCanvas = new Canvas(dieDim,dieDim);
-        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
-        drawConstraint(constraint,dieCanvas.getGraphicsContext2D(),0,0,dieDim);
-        return dieCanvas;
-    }
-    private Canvas lightDieToCanvas(LightDie die,double dieDim){
-        Canvas dieCanvas = new Canvas(dieDim,dieDim);
-        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
-        drawDie(die,dieCanvas.getGraphicsContext2D(),dieDim);
-        return dieCanvas;
-    }
 
     private Canvas schemaToCanvas(LightSchemaCard lightSchemaCard,double width, double height) {
         Canvas canvas = new Canvas(width, height);
@@ -188,6 +151,22 @@ public class GUI extends Application implements ClientUI {
         drawSchema(lightSchemaCard,gc);
         return canvas;
     }
+
+    private Canvas lightDieToCanvas(LightDie die,double dieDim){
+        Canvas dieCanvas = new Canvas(dieDim,dieDim);
+        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
+        drawDie(die,dieCanvas.getGraphicsContext2D(),dieDim);
+        return dieCanvas;
+    }
+
+    private Canvas lightConstraintToCanvas(LightConstraint constraint,double dieDim){
+        Canvas dieCanvas = new Canvas(dieDim,dieDim);
+        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
+        drawConstraint(constraint,dieCanvas.getGraphicsContext2D(),0,0,dieDim);
+        return dieCanvas;
+    }
+
+
 
     private void drawSchema(LightSchemaCard lightSchemaCard, GraphicsContext gc) {
         double dieDim = elementSize.getDieDimension();
@@ -416,18 +395,15 @@ public class GUI extends Application implements ClientUI {
             grid.add(schema2,0,1);
             grid.add(schema3,1,1);
 
-            //Group group = new Group( grid );
-            //StackPane rootPane = new StackPane(group);
+            Group group = new Group( grid );
+            StackPane rootPane = new StackPane(group);
 
             Scene scene = new Scene(grid);
 
             primaryStage.setScene(scene);
+
             letterbox(scene, grid);
 
-
-            //primaryStage.minWidthProperty().bind(scene.heightProperty().multiply(1));
-            //primaryStage.maxWidthProperty().bind(scene.widthProperty().divide(1));
-            //primaryStage.setMinHeight(400);
         });
     }
 
@@ -435,7 +411,6 @@ public class GUI extends Application implements ClientUI {
         final double initWidth  = scene.getWidth();
         final double initHeight = scene.getHeight();
         final double ratio      = initWidth / initHeight;
-
         SceneSizeChangeListener sizeListener = new SceneSizeChangeListener(scene, ratio, initHeight, initWidth, contentPane);
         scene.widthProperty().addListener(sizeListener);
         scene.heightProperty().addListener(sizeListener);
@@ -460,11 +435,13 @@ public class GUI extends Application implements ClientUI {
         public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
             final double newWidth  = scene.getWidth();
             final double newHeight = scene.getHeight();
+            double scaleFactor;
 
-            double scaleFactor =
-                    newWidth / newHeight > ratio
-                            ? newHeight / initHeight
-                            : newWidth / initWidth;
+            if( newWidth / newHeight > ratio)
+                scaleFactor = newHeight / initHeight;
+            else
+                scaleFactor = newWidth / initWidth;
+
 
             if (scaleFactor >= 1) {
                 Scale scale = new Scale(scaleFactor, scaleFactor);
