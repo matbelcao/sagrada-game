@@ -20,7 +20,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -38,8 +41,8 @@ public class GUI extends Application implements ClientUI {
     private GUIutil elementSize;
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
-    public static final int LINE_WIDTH = 1;
-    public static final int SPOT_RATIO = 7;
+    public static final int LINE_WIDTH = 2;
+    public static final double SPOT_RATIO = 6;
     private static Client client;
     private static UIMessages uimsg;
     private Stage primaryStage;
@@ -220,7 +223,7 @@ public class GUI extends Application implements ClientUI {
             gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
             gc.fillRect(0, 0, dieDim, dieDim);
         }else{
-            gc.setFill(Color.GRAY);
+            gc.setFill(Color.LIGHTGRAY);
             gc.fillRect(0, 0, dieDim, dieDim);
             drawSpots(gc,dieDim,constraint.getShade().toInt());
         }
@@ -234,7 +237,7 @@ public class GUI extends Application implements ClientUI {
             gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
             gc.fillRect(x, y, dieDim, dieDim);
         }else{
-            gc.setFill(Color.GRAY);
+            gc.setFill(Color.LIGHTGRAY);
             gc.fillRect(x, y, dieDim, dieDim);
             drawSpots(gc,x,y,dieDim,constraint.getShade().toInt());
         }
@@ -399,7 +402,8 @@ public class GUI extends Application implements ClientUI {
             Scene scene = draftedSchemaSceneBuilder(draftedSchemas);
             primaryStage.setScene(scene);
             primaryStage.minWidthProperty().bind(scene.heightProperty().multiply(1));
-            primaryStage.minHeightProperty().bind(scene.widthProperty().divide(1));
+            primaryStage.maxWidthProperty().bind(scene.widthProperty().divide(1));
+            primaryStage.setMinHeight(600);
         });
     }
 
@@ -415,6 +419,7 @@ public class GUI extends Application implements ClientUI {
         Canvas schema1 = schemaToCanvas(draftedSchemas.get(1),schemaWidth,schemaHeigth);
         Canvas schema2 = schemaToCanvas(draftedSchemas.get(2),schemaWidth,schemaHeigth);
         Canvas schema3 = schemaToCanvas(draftedSchemas.get(3),schemaWidth,schemaHeigth);
+
         grid.add(schema0,0,0);
         grid.add(schema1,1,0);
         grid.add(schema2,0,1);
