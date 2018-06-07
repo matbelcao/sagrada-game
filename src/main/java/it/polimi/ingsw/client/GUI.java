@@ -8,9 +8,10 @@ import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -20,14 +21,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Scale;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -399,41 +398,89 @@ public class GUI extends Application implements ClientUI {
         Platform.runLater(() -> {
             primaryStage.setTitle("Sagrada");
             primaryStage.setResizable(true);
-            Scene scene = draftedSchemaSceneBuilder(draftedSchemas);
+
+            double schemaWidth = elementSize.getSchemaWidth();
+            double schemaHeigth = elementSize.getSchemaHeigth();
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(15, 15, 15, 15));
+
+            Canvas schema0 = schemaToCanvas(draftedSchemas.get(0),schemaWidth,schemaHeigth);
+            Canvas schema1 = schemaToCanvas(draftedSchemas.get(1),schemaWidth,schemaHeigth);
+            Canvas schema2 = schemaToCanvas(draftedSchemas.get(2),schemaWidth,schemaHeigth);
+            Canvas schema3 = schemaToCanvas(draftedSchemas.get(3),schemaWidth,schemaHeigth);
+
+            grid.add(schema0,0,0);
+            grid.add(schema1,1,0);
+            grid.add(schema2,0,1);
+            grid.add(schema3,1,1);
+
+            //Group group = new Group( grid );
+            //StackPane rootPane = new StackPane(group);
+
+            Scene scene = new Scene(grid);
+
             primaryStage.setScene(scene);
-            primaryStage.minWidthProperty().bind(scene.heightProperty().multiply(1));
-            primaryStage.maxWidthProperty().bind(scene.widthProperty().divide(1));
-            primaryStage.setMinHeight(600);
+            letterbox(scene, grid);
+
+
+            //primaryStage.minWidthProperty().bind(scene.heightProperty().multiply(1));
+            //primaryStage.maxWidthProperty().bind(scene.widthProperty().divide(1));
+            //primaryStage.setMinHeight(400);
         });
     }
 
-    private Scene draftedSchemaSceneBuilder(List<LightSchemaCard> draftedSchemas) {
-        double schemaWidth = elementSize.getSchemaWidth();
-        double schemaHeigth = elementSize.getSchemaHeigth();
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(15, 15, 15, 15));
+    private void letterbox(final Scene scene, final Pane contentPane) {
+        final double initWidth  = scene.getWidth();
+        final double initHeight = scene.getHeight();
+        final double ratio      = initWidth / initHeight;
 
-        Canvas schema0 = schemaToCanvas(draftedSchemas.get(0),schemaWidth,schemaHeigth);
-        Canvas schema1 = schemaToCanvas(draftedSchemas.get(1),schemaWidth,schemaHeigth);
-        Canvas schema2 = schemaToCanvas(draftedSchemas.get(2),schemaWidth,schemaHeigth);
-        Canvas schema3 = schemaToCanvas(draftedSchemas.get(3),schemaWidth,schemaHeigth);
-
-        grid.add(schema0,0,0);
-        grid.add(schema1,1,0);
-        grid.add(schema2,0,1);
-        grid.add(schema3,1,1);
-
-        Group group = new Group( grid );
-        StackPane rootPane = new StackPane();
-        rootPane.getChildren().add( group );
-        Scene scene2 = new Scene(rootPane);
-
-        group.scaleXProperty().bind( scene2.widthProperty().divide(elementSize.getDraftedSchemasWidth()+40));
-        group.scaleYProperty().bind( scene2.heightProperty().divide( elementSize.getDraftedSchemasHeight()+40));
-        return scene2;
+        SceneSizeChangeListener sizeListener = new SceneSizeChangeListener(scene, ratio, initHeight, initWidth, contentPane);
+        scene.widthProperty().addListener(sizeListener);
+        scene.heightProperty().addListener(sizeListener);
     }
+
+    private static class SceneSizeChangeListener implements ChangeListener<Number> {
+        private final Scene scene;
+        private final double ratio;
+        private final double initHeight;
+        private final double initWidth;
+        private final Pane contentPane;
+
+        public SceneSizeChangeListener(Scene scene, double ratio, double initHeight, double initWidth, Pane contentPane) {
+            this.scene = scene;
+            this.ratio = ratio;
+            this.initHeight = initHeight;
+            this.initWidth = initWidth;
+            this.contentPane = contentPane;
+        }
+
+        @Override
+        public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+            final double newWidth  = scene.getWidth();
+            final double newHeight = scene.getHeight();
+
+            double scaleFactor =
+                    newWidth / newHeight > ratio
+                            ? newHeight / initHeight
+                            : newWidth / initWidth;
+
+            if (scaleFactor >= 1) {
+                Scale scale = new Scale(scaleFactor, scaleFactor);
+                scale.setPivotX(0);
+                scale.setPivotY(0);
+                scene.getRoot().getTransforms().setAll(scale);
+
+                contentPane.setPrefWidth (newWidth  / scaleFactor);
+                contentPane.setPrefHeight(newHeight / scaleFactor);
+            } else {
+                contentPane.setPrefWidth (Math.max(initWidth,  newWidth));
+                contentPane.setPrefHeight(Math.max(initHeight, newHeight));
+            }
+        }
+    }
+
 
     @Override
     public void updateBoard(LightBoard board) {
