@@ -121,6 +121,8 @@ public class Client {
         return newClient;
     }
 
+    public Object getLockCredentials(){ return lockCredentials;  }
+
     public int getPlayerId() {
         return board.getMyPlayerId();
     }
