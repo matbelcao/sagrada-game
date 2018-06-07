@@ -12,7 +12,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -22,7 +21,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -115,8 +117,12 @@ public class GUI extends Application implements ClientUI {
         grid.add(hbBtn, 1, 4);
         grid.add(messageToUser, 1, 6);
         button.setOnAction(e -> {
-            client.setUsername(usernameField.getText());
-            client.setPassword(Credentials.hash(client.getUsername(),passwordField.getText().toCharArray()));
+            synchronized (client.getLockCredentials()) {
+                client.setUsername(usernameField.getText());
+                client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
+                client.getLockCredentials().notifyAll();
+            }
+            System.out.println("u = " + usernameField.getText());
         });
         usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //delete
         return loginScene;
@@ -395,8 +401,8 @@ public class GUI extends Application implements ClientUI {
             grid.add(schema2,0,1);
             grid.add(schema3,1,1);
 
-            Group group = new Group( grid );
-            StackPane rootPane = new StackPane(group);
+            //Group group = new Group( grid );
+            //StackPane rootPane = new StackPane(group);
 
             Scene scene = new Scene(grid);
 
