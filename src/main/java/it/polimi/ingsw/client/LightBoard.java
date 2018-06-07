@@ -29,6 +29,7 @@ public class LightBoard extends Observable {
         players=new HashMap<>();
         draftPool=new HashMap<>();
         roundTrack= new ArrayList<>();
+        nowPlaying=-1;
     }
 
     public int getMyPlayerId() {

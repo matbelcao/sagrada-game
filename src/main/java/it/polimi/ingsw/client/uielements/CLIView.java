@@ -59,7 +59,7 @@ public class CLIView {
         for(int i=0; i<schemaCards.size();i++){
             List<String> schema=new ArrayList<>();
 
-            schema.add(buildDraftedSchemaInfo(schemaCards.get(i)));
+            schema.add(buildDraftedSchemaInfo(schemaCards.get(i),i ));
             //add top border
             schema.add(padUntil("",SCHEMA_WIDTH,'–'));
             schema.addAll(buildSchema(schemaCards.get(i),false) );
@@ -74,8 +74,9 @@ public class CLIView {
         }
     }
 
-    private String buildDraftedSchemaInfo(LightSchemaCard schemaCard) {
-        return schemaCard.getName()+alignRight(printFavorTokens(schemaCard.getFavorTokens()),SCHEMA_WIDTH-schemaCard.getName().length());
+    private String buildDraftedSchemaInfo(LightSchemaCard schemaCard, int number) {
+        String indexname= boldify("("+number +") "+schemaCard.getName());
+        return indexname + alignRight(printFavorTokens(schemaCard.getFavorTokens()),SCHEMA_WIDTH-printableLength(indexname));
     }
 
 
@@ -105,11 +106,12 @@ public class CLIView {
     public String printSchemaChoiceView(){
         StringBuilder builder=new StringBuilder();
         builder.append(resetScreenPosition());
-        List<String> priv=new ArrayList<>();
-        priv.addAll(priv);
+        List<String> priv = new ArrayList<>(privObj);
+        List<String> drafted = new ArrayList<>(buildDraftedSchemas());
         priv.add(0,boldify(uiMsg.getMessage("priv-obj")));
         priv.add("  ");
-        builder.append(printList(appendRows(buildDraftedSchemas(),priv))).append("%n%n%n");
+        builder.append("%n%n%n%n");
+        builder.append(printList(appendRows(appendRows(buildWall(' ',drafted.size(),SCHEMA_WIDTH+10),drafted),priv))).append("%n%n%n");
         return builder.toString();
     }
 
@@ -118,10 +120,9 @@ public class CLIView {
     }
 
     private List<String> buildDraftedSchemas() {
-        List<String> result= new ArrayList<>(SCHEMA_HEIGHT+2);
-        for(Map.Entry<Integer,List<String>> entry: schemas.entrySet()){
-            result=appendRows(result,entry.getValue());
-        }
+        List<String> result;
+        result= appendRows(schemas.get(0),schemas.get(1));
+        result.addAll(appendRows(schemas.get(2),schemas.get(3)));
         return result;
     }
 
@@ -242,8 +243,6 @@ public class CLIView {
     public void updateMenuTurnInit(){
         menuList.clear();
         menuList.addAll(padUntil(buildTurnInitOptions(),MENU_WIDTH,' '));
-
-
 
         fillMenu();
     }
