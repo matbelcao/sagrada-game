@@ -31,6 +31,7 @@ public class CLI implements ClientUI {
         this.uimsg=new UIMessages(lang);
         this.client = client;
         this.view=new CLIView(lang);
+        resetScreen();
     }
 
 

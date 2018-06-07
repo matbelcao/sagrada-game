@@ -518,9 +518,8 @@ public class CLIView {
             result.add("     ");
         }
 
-        result.addAll(
-
-                        buildPrivObj(privObj,OBJ_LENGTH));
+        result.add(boldify(uiMsg.getMessage("priv-obj")));
+        result.addAll(buildPrivObj(privObj,OBJ_LENGTH));
 
 
         return result;

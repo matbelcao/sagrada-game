@@ -267,12 +267,12 @@ public class CLIViewUtils {
      */
     static List<String> buildPrivObj(LightPrivObj privObj, int width) {
         List<String> result=new ArrayList<>();
-        result.add(" ");
-        result.add(boldify(privObj.getName()+":"));
+        List<String> description=buildCard(privObj,width-CELL_WIDTH);
+        description.add(0,padUntil("",width-CELL_WIDTH,' '));
         result.addAll(
                 appendRows(
                         buildCell(new LightConstraint(privObj.getColor())),
-                        buildCard(privObj,width-CELL_WIDTH)));
+                        description));
         return result;
     }
 

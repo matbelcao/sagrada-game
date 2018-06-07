@@ -2,7 +2,18 @@ package it.polimi.ingsw.client;
 
 public enum ClientFSMState {
 
+    CHOOSING_SCHEMA{
+        @Override
+        public ClientFSMState nextState(boolean hasChosen, boolean exit, boolean endTurn, boolean discard){
+            if(hasChosen){
+                return NOT_MY_TURN;
+            }
+            return CHOOSING_SCHEMA;
+        }
+    },
+
     NOT_MY_TURN{
+        @Override
         public ClientFSMState nextState(boolean isMyTurn, boolean exit, boolean endTurn, boolean discard){
             if(exit){ return NOT_MY_TURN; }
             if(endTurn){ return NOT_MY_TURN; }
@@ -14,6 +25,7 @@ public enum ClientFSMState {
     },
 
     MAIN{
+        @Override
         public ClientFSMState nextState(boolean enabledTool, boolean exit, boolean endTurn, boolean discard){
             if(exit){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
@@ -26,6 +38,7 @@ public enum ClientFSMState {
         }
     },
     GET_DICE_LIST{
+        @Override
         public ClientFSMState nextState(boolean isListEmpty, boolean exit, boolean endTurn, boolean discard){
             if(exit){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
@@ -41,6 +54,7 @@ public enum ClientFSMState {
         }
     },
     SELECT_DIE{
+        @Override
         public ClientFSMState nextState(boolean isPlaceDie, boolean exit, boolean endTurn, boolean discard){
             if(exit){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
@@ -55,6 +69,7 @@ public enum ClientFSMState {
         }
     },
     LIST_PLACEMENTS{
+        @Override
         public ClientFSMState nextState(boolean placedDie, boolean exit, boolean endTurn, boolean discard){
             if(exit){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
@@ -75,6 +90,7 @@ public enum ClientFSMState {
     },
 
     TOOL_CAN_CONTINUE{
+        @Override
         public ClientFSMState nextState(boolean canContinue, boolean exit, boolean endTurn, boolean discard){
             if(exit){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
@@ -88,6 +104,8 @@ public enum ClientFSMState {
         }
     };
 
-
     private static boolean toolEnabled;
+
+    public abstract ClientFSMState nextState(boolean stateSpecific, boolean exit, boolean endTurn, boolean discard);
+
 }
