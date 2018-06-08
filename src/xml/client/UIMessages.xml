@@ -104,10 +104,10 @@
         <eng>d -> discard the selection</eng>
         <ita>d -> ignorare la selezione</ita>
     </discard-option>
-    <discard-option>
+    <endturn-option>
         <eng>e -> end your turn</eng>
         <ita>e -> termina il turno</ita>
-    </discard-option>
+    </endturn-option>
     <dice-list>
         <eng>Choose one of the following dice from the %s by entering the index of the row:</eng>
         <ita>Scegli uno dei seguenti dadi da %s attreverso il numero di riga:</ita>

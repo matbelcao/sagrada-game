@@ -1,11 +1,11 @@
 package it.polimi.ingsw.client;
+
 import it.polimi.ingsw.client.connection.ClientParser;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ClientParserTest {
     private static ArrayList<String> parsedResult = new ArrayList<>();
@@ -175,12 +175,12 @@ public class ClientParserTest {
         assertEquals("PUT_DIE",parsedResult.get(1));
         assertEquals("NULL",parsedResult.get(2));
 
-        assertTrue(ClientParser.parse("LIST_PLACEMENTS 5", parsedResult));
-        assertTrue(ClientParser.parse("LIST_PLACEMENTS 1 5 15", parsedResult));
+        assertTrue(ClientParser.parse("CHOOSE_PLACEMENT 5", parsedResult));
+        assertTrue(ClientParser.parse("CHOOSE_PLACEMENT 1 5 15", parsedResult));
 
         assertTrue(ClientParser.parse("LIST_DICE", parsedResult));
         assertFalse(ClientParser.parse("LIST_OPTIONS", parsedResult));
-        assertTrue(ClientParser.parse("LIST_PLACEMENTS", parsedResult));
+        assertTrue(ClientParser.parse("CHOOSE_PLACEMENT", parsedResult));
         assertFalse(ClientParser.parse("LIST 2,RED", parsedResult));
         assertFalse(ClientParser.parse("LIST_DICE 1,2", parsedResult));
         assertFalse(ClientParser.parse("LIST_DICE 1,2,greeN,TWO,SIX", parsedResult));

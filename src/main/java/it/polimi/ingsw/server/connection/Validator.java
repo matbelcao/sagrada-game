@@ -52,7 +52,7 @@ public class Validator {
             case "GET":
                 return checkGetParams(command, parsedResult);
 
-            case "GET_DICE_LIST":
+            case "SELECT_DIE":
                 return checkGetDiceList(command);
 
             case "SELECT":
@@ -184,14 +184,14 @@ public class Validator {
     }
 
     /**
-     * This method checks if the GET_DICE_LIST command is valid
+     * This method checks if the SELECT_DIE command is valid
      * @param rawCommand the raw string containing all parameters of the command and the command itself
      * @return true iff the syntax is valid
      */
     public static boolean checkGetDiceList(String rawCommand) {
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
-        return command.length == 1 && command[0].equals("GET_DICE_LIST");
+        return command.length == 1 && command[0].equals("SELECT_DIE");
     }
 
     /**

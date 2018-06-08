@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.uielements;
 
+import it.polimi.ingsw.client.ClientFSMState;
 import it.polimi.ingsw.client.LightBoard;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
@@ -81,7 +82,7 @@ public class CLIView {
 
 
 
-    public String printMainView(){
+    public String printMainView(ClientFSMState state){
         StringBuilder builder=new StringBuilder();
         builder.append(resetScreenPosition());
         builder.append(printList(buildRoundTrack())).append(" |%n");
@@ -94,13 +95,13 @@ public class CLIView {
 
         builder.append(printList(buildBottomSection())).append("%n");
 
-        builder.append(getPrompt());
+        builder.append(getPrompt(state));
 
         return builder.toString();
     }
 
-    private String getPrompt() {
-        return String.format(cliElems.getElem("prompt"), buildOptions());
+    private String getPrompt(ClientFSMState state) {
+        return String.format(cliElems.getElem("prompt"), buildOptions(state));
     }
 
     public String printSchemaChoiceView(){
@@ -200,19 +201,40 @@ public class CLIView {
         menuList.clear();
     }
 
-    private String buildOptions() {
+    private String buildOptions(ClientFSMState state) {
         StringBuilder defaultMenu= new StringBuilder();
 
+        switch (state){
+            case CHOOSE_PLACEMENT:
+                defaultMenu.append(discardOption());
+            case SELECT_DIE:
+            case MAIN:
+
+            case CHOOSE_SCHEMA:
+            case CHOOSE_OPTION:
+            case NOT_MY_TURN:
+                defaultMenu.append(quitOption());
+        }
             defaultMenu.append(
-                            (nowPlaying==playerId?
-                                    (uiMsg.getMessage("discard-option")+"|"+uiMsg.getMessage("passturn-option")):
-                                    "")
+
+                                    (uiMsg.getMessage("discard-option")+"|"+uiMsg.getMessage("passturn-option"))
                                     + uiMsg.getMessage("quit-option"));
 
 
         return defaultMenu.toString();
     }
 
+    private String discardOption(){
+        return uiMsg.getMessage("discard-option")+"|";
+    }
+
+    private String endTurnOption(){
+        return uiMsg.getMessage("endturn-option")+"|";
+    }
+
+    private String quitOption(){
+        return uiMsg.getMessage("quit-option")+"|";
+    }
     /**
      * Creates a list of possible placements for a die
      * @param placements the list of placements

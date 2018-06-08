@@ -5,9 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ValidatorTest {
     private static ArrayList<String> parsedResult = new ArrayList<>();
@@ -123,7 +121,7 @@ public class ValidatorTest {
     @Test
     public void testCheckChoose() {
 
-        assertTrue(Validator.isValid("GET_DICE_LIST", parsedResult));
+        assertTrue(Validator.isValid("SELECT_DIE", parsedResult));
 
         //valid
         command = "CHOOSE 6";

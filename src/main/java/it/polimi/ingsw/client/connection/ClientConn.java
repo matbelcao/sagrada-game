@@ -83,7 +83,7 @@ public interface ClientConn {
     List<IndexedCellContent> getDiceList();
 
     /**
-     * This function can be invoked to select one die of a previolsly GET_DICE_LIST command and obtain
+     * This function can be invoked to select one die of a previolsly SELECT_DIE command and obtain
      * a list of to options to manipulate it
      * @return and immutable and indexed list containing the dice
      */

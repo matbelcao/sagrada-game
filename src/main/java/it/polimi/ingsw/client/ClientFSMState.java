@@ -2,20 +2,20 @@ package it.polimi.ingsw.client;
 
 public enum ClientFSMState {
 
-    CHOOSING_SCHEMA{
+    CHOOSE_SCHEMA {//the game start message was just received and the client is choosing the schema among the drafted ones
         @Override
-        public ClientFSMState nextState(boolean hasChosen, boolean exit, boolean endTurn, boolean discard){
+        public ClientFSMState nextState(boolean hasChosen, boolean back, boolean endTurn, boolean discard){
             if(hasChosen){
                 return NOT_MY_TURN;
             }
-            return CHOOSING_SCHEMA;
+            return CHOOSE_SCHEMA;
         }
     },
 
-    NOT_MY_TURN{
+    NOT_MY_TURN{//the match is being played, schemas were selected but it' is not this user's turn
         @Override
-        public ClientFSMState nextState(boolean isMyTurn, boolean exit, boolean endTurn, boolean discard){
-            if(exit){ return NOT_MY_TURN; }
+        public ClientFSMState nextState(boolean isMyTurn, boolean back, boolean endTurn, boolean discard){
+            if(back){ return NOT_MY_TURN; }
             if(endTurn){ return NOT_MY_TURN; }
             if(isMyTurn){
                 return MAIN;
@@ -24,23 +24,23 @@ public enum ClientFSMState {
         }
     },
 
-    MAIN{
+    MAIN{ //it is the player's turn, he/she is choosing what to do (tool/placement)
         @Override
-        public ClientFSMState nextState(boolean enabledTool, boolean exit, boolean endTurn, boolean discard){
-            if(exit){ return MAIN; }
+        public ClientFSMState nextState(boolean enabledTool, boolean back, boolean endTurn, boolean discard){
+            if(back){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
             if(enabledTool){
                 toolEnabled=true;
             }
-            return GET_DICE_LIST;
+            return SELECT_DIE;
 
         }
     },
-    GET_DICE_LIST{
+    SELECT_DIE {//the client decided what to do and sent a get_dice_list command, he is being presented with the dice he got from the server
         @Override
-        public ClientFSMState nextState(boolean isListEmpty, boolean exit, boolean endTurn, boolean discard){
-            if(exit){ return MAIN; }
+        public ClientFSMState nextState(boolean isListEmpty, boolean back, boolean endTurn, boolean discard){
+            if(back){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
             if(isListEmpty){
@@ -50,17 +50,17 @@ public enum ClientFSMState {
                 }
                 return MAIN;
             }
-            return SELECT_DIE;
+            return CHOOSE_OPTION;
         }
     },
-    SELECT_DIE{
+    CHOOSE_OPTION { // the user has selected a die and was sent a list of options
         @Override
-        public ClientFSMState nextState(boolean isPlaceDie, boolean exit, boolean endTurn, boolean discard){
-            if(exit){ return MAIN; }
+        public ClientFSMState nextState(boolean isPlaceDie, boolean back, boolean endTurn, boolean discard){
+            if(back){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
             if(isPlaceDie){
-                return LIST_PLACEMENTS;
+                return CHOOSE_PLACEMENT;
             }
             if(toolEnabled){
                 return TOOL_CAN_CONTINUE;
@@ -68,14 +68,14 @@ public enum ClientFSMState {
             return MAIN;
         }
     },
-    LIST_PLACEMENTS{
+    CHOOSE_PLACEMENT {// the client has received a list of placements
         @Override
-        public ClientFSMState nextState(boolean placedDie, boolean exit, boolean endTurn, boolean discard){
-            if(exit){ return MAIN; }
+        public ClientFSMState nextState(boolean placedDie, boolean back, boolean endTurn, boolean discard){
+            if(back){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
             if(discard){
-                return GET_DICE_LIST;
+                return SELECT_DIE;
             }
             if(toolEnabled){
                 return TOOL_CAN_CONTINUE;
@@ -85,18 +85,18 @@ public enum ClientFSMState {
                 return MAIN;
             }
             //this should never happen
-            return LIST_PLACEMENTS;
+            return CHOOSE_PLACEMENT;
         }
     },
 
-    TOOL_CAN_CONTINUE{
+    TOOL_CAN_CONTINUE{ //the client has requested and received the tool can continue response
         @Override
-        public ClientFSMState nextState(boolean canContinue, boolean exit, boolean endTurn, boolean discard){
-            if(exit){ return MAIN; }
+        public ClientFSMState nextState(boolean canContinue, boolean back, boolean endTurn, boolean discard){
+            if(back){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
             if(canContinue){
-                return GET_DICE_LIST;
+                return SELECT_DIE;
             }
 
             //this should never happen
@@ -106,6 +106,6 @@ public enum ClientFSMState {
 
     private static boolean toolEnabled;
 
-    public abstract ClientFSMState nextState(boolean stateSpecific, boolean exit, boolean endTurn, boolean discard);
+    public abstract ClientFSMState nextState(boolean stateSpecific, boolean back, boolean endTurn, boolean discard);
 
 }

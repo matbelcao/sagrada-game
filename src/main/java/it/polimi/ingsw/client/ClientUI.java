@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 
@@ -116,4 +117,5 @@ public interface ClientUI extends Observer {
 
     String getCommand();
 
+    void showOptions(List<Commands> optionsList);
 }

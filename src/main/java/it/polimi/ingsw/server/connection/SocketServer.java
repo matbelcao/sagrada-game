@@ -94,7 +94,7 @@ public class SocketServer extends Thread implements ServerConn  {
             case "GET":
                 getCommands(parsedResult);
                 break;
-            case "GET_DICE_LIST":
+            case "SELECT_DIE":
                 sendDiceList();
                 break;
             case "SELECT":
@@ -431,7 +431,7 @@ public class SocketServer extends Thread implements ServerConn  {
         List<Integer> placements=new ArrayList<>();
 
         //placements=user.getGame().getPlacements(user);
-        outSocket.print("LIST_PLACEMENTS");
+        outSocket.print("CHOOSE_PLACEMENT");
         for(Integer position:placements){
             outSocket.print(" "+position);
         }

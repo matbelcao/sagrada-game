@@ -1,21 +1,22 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.uielements.*;
+import it.polimi.ingsw.client.uielements.CLIView;
+import it.polimi.ingsw.client.uielements.CLIViewUtils;
+import it.polimi.ingsw.client.uielements.UILanguage;
+import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
-import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 
-import java.io.BufferedReader;
 import java.io.Console;
-import java.io.IOException;
 import java.util.List;
 import java.util.Observable;
 
 public class CLI implements ClientUI {
     private final CLIView view;
     private Console console;
-    private QueuedInReader commandQueue;
+
     private Client client;
     private UIMessages uimsg;
 
@@ -27,26 +28,13 @@ public class CLI implements ClientUI {
             System.err.println("ERR: couldn't retrieve any console!");
             System.exit(1);
         }
-        this.commandQueue = new QueuedInReader(new BufferedReader(console.reader()));
+
         this.uimsg=new UIMessages(lang);
         this.client = client;
         this.view=new CLIView(lang);
         resetScreen();
     }
 
-
-    private void commandListener(){
-        new Thread(() -> {
-            while(client.isLogged()){
-                try {
-                    commandQueue.add();
-                } catch (IOException e) {
-                    System.err.println("ERR: couldn't read from the console");
-                    System.exit(1);
-                }
-            }
-        }).start();
-    }
 
 
 
@@ -81,7 +69,7 @@ public class CLI implements ClientUI {
         resetScreen();
         if (logged) {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ok")), client.getUsername());
-            commandListener();
+
         } else {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ko")));
         }
@@ -133,25 +121,25 @@ public class CLI implements ClientUI {
         for(int i=0;i<board.getNumPlayers();i++){
             view.updateSchema(board.getPlayerByIndex(i));
         }
-        console.printf(view.printMainView());
+        console.printf(view.printMainView(client.getTurnState()));
     }
 
     @Override
     public void updateDraftPool(List<LightDie> draftpool) {
         view.updateDraftPool(draftpool);
-        console.printf(view.printMainView());
+        console.printf(view.printMainView(client.getTurnState()));
     }
 
     @Override
     public void updateSchema(LightPlayer player) {
         view.updateSchema(player);
-        console.printf(view.printMainView());
+        console.printf(view.printMainView(client.getTurnState()));
     }
 
     @Override
     public void updateRoundTrack(List<List<LightDie>> roundtrack) {
         view.updateRoundTrack(roundtrack);
-        console.printf(view.printMainView());
+        console.printf(view.printMainView(client.getTurnState()));
     }
 
     @Override
@@ -214,9 +202,13 @@ public class CLI implements ClientUI {
 
     @Override
     public String getCommand() {
-        return commandQueue.getln();
+        return console.readLine();
     }
 
+    @Override
+    public void showOptions(List<Commands> optionsList) {
+
+    }
 
 
     @Override
@@ -230,7 +222,7 @@ public class CLI implements ClientUI {
         for(int i=0;i<board.getNumPlayers();i++){
             view.updateSchema(board.getPlayerByIndex(i));
         }
-        console.printf(view.printMainView());
+        console.printf(view.printMainView(client.getTurnState()));
 
         if(board.getNowPlaying()==board.getMyPlayerId()){
             showTurnInitScreen();
