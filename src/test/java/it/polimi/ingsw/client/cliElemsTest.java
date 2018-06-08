@@ -169,7 +169,7 @@ class cliElemsTest {
         System.out.println("");System.out.println("");System.out.println("");
 
 
-        System.out.printf(cliview.printMainView());
+        System.out.printf(cliview.printMainView(ClientFSMState.CHOOSE_PLACEMENT));
 
 
 

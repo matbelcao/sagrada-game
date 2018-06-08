@@ -296,6 +296,7 @@ public class Client {
 
             //start collecting commands from ui
             commandFilter();
+            commandManager();
 
             synchronized (lockStatus) {
                 userStatus = UserStatus.LOBBY;
@@ -343,19 +344,17 @@ public class Client {
             while(isLogged()){
                 try {
                     synchronized (lockCommandQueue) {
-                        while(commandQueue.isEmpty()){
-                            lockCommandQueue.wait();
-                        }
+                        commandQueue.waitForLine();
                         command=commandQueue.getln();
                         lockCommandQueue.notifyAll();
                     }
-
-                } catch (InterruptedException e) {
-                    System.err.println("ERR: command manager interrupted");
+                } catch (IOException e) {
+                    System.err.println("ERR: io error");
                     System.exit(1);
                 }
 
                 boolean isOk=false;
+                printDebug(command);
                 if(command.matches(INDEX)){
                     switch(turnState){
 

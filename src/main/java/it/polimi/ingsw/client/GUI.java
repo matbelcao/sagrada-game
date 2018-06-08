@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.uielements.GUIutil;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
+import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import javafx.application.Application;
@@ -543,7 +544,12 @@ public class GUI extends Application implements ClientUI {
     public String getCommand() {
         return null;
     }
-    
+
+    @Override
+    public void showOptions(List<Commands> optionsList) {
+
+    }
+
 
     @Override
     public void update(Observable o, Object arg) {

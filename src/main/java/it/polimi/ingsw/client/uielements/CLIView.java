@@ -32,6 +32,7 @@ public class CLIView {
     private int playerId;
     private int turnNumber;
     private int nowPlaying;
+    private String lastScreen;
 
     public CLIView(UILanguage lang) {
         this.uiMsg=new UIMessages(lang);
@@ -81,6 +82,9 @@ public class CLIView {
     }
 
 
+    public String printLastScreen(){
+        return lastScreen;
+    }
 
     public String printMainView(ClientFSMState state){
         StringBuilder builder=new StringBuilder();
@@ -96,8 +100,8 @@ public class CLIView {
         builder.append(printList(buildBottomSection())).append("%n");
 
         builder.append(getPrompt(state));
-
-        return builder.toString();
+        lastScreen=builder.toString();
+        return lastScreen;
     }
 
     private String getPrompt(ClientFSMState state) {
@@ -113,7 +117,10 @@ public class CLIView {
         priv.add("  ");
         builder.append("%n%n%n%n");
         builder.append(printList(appendRows(appendRows(buildWall(' ',drafted.size(),SCHEMA_WIDTH+10),drafted),priv))).append("%n%n%n");
-        return builder.toString();
+        builder.append(uiMsg.getMessage("choose-schema")).append("%n%n");
+        builder.append(buildOptions(ClientFSMState.CHOOSE_SCHEMA));
+        lastScreen=builder.toString();
+        return lastScreen;
     }
 
     public void updatePrivObj(LightPrivObj priv){
@@ -208,32 +215,35 @@ public class CLIView {
             case CHOOSE_PLACEMENT:
                 defaultMenu.append(discardOption());
             case SELECT_DIE:
-            case MAIN:
 
-            case CHOOSE_SCHEMA:
             case CHOOSE_OPTION:
+                defaultMenu.append(backOption());
+            case MAIN:
+                defaultMenu.append(endTurnOption());
             case NOT_MY_TURN:
+            case CHOOSE_SCHEMA:
                 defaultMenu.append(quitOption());
+                break;
+            case TOOL_CAN_CONTINUE:
+                break;
+            default:
+                break;
         }
-            defaultMenu.append(
 
-                                    (uiMsg.getMessage("discard-option")+"|"+uiMsg.getMessage("passturn-option"))
-                                    + uiMsg.getMessage("quit-option"));
-
-
-        return defaultMenu.toString();
+        return String.format(cliElems.getElem("prompt"),defaultMenu.toString());
     }
 
+    private String backOption(){ return uiMsg.getMessage("back-option")+" | ";}
     private String discardOption(){
-        return uiMsg.getMessage("discard-option")+"|";
+        return uiMsg.getMessage("discard-option")+" | ";
     }
 
     private String endTurnOption(){
-        return uiMsg.getMessage("endturn-option")+"|";
+        return uiMsg.getMessage("endturn-option")+" | ";
     }
 
     private String quitOption(){
-        return uiMsg.getMessage("quit-option")+"|";
+        return uiMsg.getMessage("quit-option");
     }
     /**
      * Creates a list of possible placements for a die

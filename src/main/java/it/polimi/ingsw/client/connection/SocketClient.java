@@ -91,11 +91,13 @@ public class SocketClient implements ClientConn {
                             System.out.println("ERR: control error caused by:  " + inSocket.readln());
                         }
                     }
-                } catch (Exception e) {
-                    try {
-                        socket.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
+                } catch (IOException e) {
+                    if(!socket.isClosed()) {
+                        try {
+                            socket.close();
+                        } catch (IOException e1) {
+                            System.err.println("ERR: error while closing the socket");
+                        }
                     }
                     client.setUserStatus(UserStatus.DISCONNECTED);
                 }
@@ -265,7 +267,7 @@ public class SocketClient implements ClientConn {
 
         lightObjCard = LightPrivObj.toLightPrivObj(inSocket.readln());
         inSocket.pop();
-        System.out.println("qui");
+
         return lightObjCard;
     }
 
