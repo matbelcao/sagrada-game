@@ -94,7 +94,7 @@ public class SocketServer extends Thread implements ServerConn  {
             case "GET":
                 getCommands(parsedResult);
                 break;
-            case "GET_DICE_LIST":
+            case "SELECT_DIE":
                 sendDiceList();
                 break;
             case "SELECT":

@@ -187,7 +187,7 @@ public class Validator {
     }
 
     /**
-     * This method checks if the GET_DICE_LIST command is valid
+     * This method checks if the SELECT_DIE command is valid
      * @param rawCommand the raw string containing all parameters of the command and the command itself
      * @return true iff the syntax is valid
      */

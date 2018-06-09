@@ -5,9 +5,13 @@ import it.polimi.ingsw.client.connection.RMIClient;
 import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.client.connection.SocketClient;
 import it.polimi.ingsw.client.uielements.UILanguage;
+import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UIMode;
 import it.polimi.ingsw.common.enums.UserStatus;
+import it.polimi.ingsw.common.immutables.LightCard;
+import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 import it.polimi.ingsw.server.connection.RMIServerObject;
@@ -19,6 +23,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -28,6 +33,9 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import static it.polimi.ingsw.client.ClientFSMState.CHOOSE_PLACEMENT;
 
 /**
  * This class represents a client that can connect to the server and participate to a match of the game.
@@ -35,12 +43,16 @@ import java.util.Arrays;
  */
 public class Client {
 
+    private static final String INDEX = "([0-9]|([1-9][0-9]))";
+    private static final String SINGLE_CHAR = "([a-z])";
+    private static final String QUIT = "q";
+    private static final String END_TURN = "e";
+    private static final String BACK = "b";
+    private static final String DISCARD = "d";
     private UIMode uiMode;
     private ConnectionMode connMode;
     private String username;
     private char [] password;
-
-
 
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
@@ -50,8 +62,12 @@ public class Client {
     private ClientUI clientUI;
     private UILanguage lang;
     private LightBoard board;
+    private final Object lockState=new Object();
+    private ClientFSMState turnState;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
-
+    private final Object lockCredentials=new Object();
+    private final Object lockCommandQueue= new Object();
+    private QueuedInReader commandQueue;
 
 
     public static boolean isWindows()
@@ -75,8 +91,13 @@ public class Client {
         this.port = port;
         this.lang = lang;
         this.userStatus = UserStatus.DISCONNECTED;
+
     }
 
+
+    public ClientFSMState getTurnState() {
+        return turnState;
+    }
 
     /**
      * parses the default settings in the xml file and creates a client based on that
@@ -206,6 +227,11 @@ public class Client {
                 AnsiConsole.systemInstall();
             }
             clientUI=new CLI(this,lang);
+
+            //commands retreival
+            this.commandQueue = new QueuedInReader(new BufferedReader(System.console().reader()));
+
+            clientUI.showLoginScreen();
         }else{
             System.out.println("Launching GUI (still not implemented....");
             new Thread(() -> GUI.launch(this,lang)).start();
@@ -221,11 +247,13 @@ public class Client {
     }
 
 
+
+
     /**
      * This method sets up a connection accordingly to the selected mode and starts the login procedure to gather username and password of the user and try to login to the server.
      * If the login is successful the client will be put in the lobby where he will wait for the beginning of a new match
      */
-    private void connectAndLogin(){
+    private void connectAndLogin() throws InterruptedException {
         boolean logged=false;
         synchronized (lockStatus) {
             userStatus = UserStatus.CONNECTED;
@@ -237,32 +265,44 @@ public class Client {
                 clientConn = new SocketClient(this, serverIP, port);
             }
             do {
-                if(uiMode==UIMode.CLI){
-                    clientUI.showLoginScreen();
-                }else{
-                    while(username==null && password==null){
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+
+                synchronized (lockCredentials) {
+                    while (username == null || password == null) {
+                        lockCredentials.wait();
                     }
+                    lockCredentials.notifyAll();
                 }
+
                 if (connMode.equals(ConnectionMode.RMI)) {
                     logged = loginRMI();
                 } else {
                     logged = clientConn.login(username, password);
                 }
-                Arrays.fill(this.password, ' ');
-                if(!logged){
-                    username = null;
-                    password = null;
+
+                synchronized (lockCredentials) {
+                    Arrays.fill(this.password, ' ');
+                    lockCredentials.notifyAll();
                 }
+
+                if(!logged){
+                    synchronized (lockCredentials) {
+                        username = null;
+                        password = null;
+                        lockCredentials.notifyAll();
+                    }
+                }
+
             } while (!logged);
+
+            //start collecting commands from ui
+            commandFilter();
+            commandManager();
+
             synchronized (lockStatus) {
                 userStatus = UserStatus.LOBBY;
                 lockStatus.notifyAll();
             }
+
         } catch (IOException | NotBoundException e) {
             synchronized (lockStatus) {
                 userStatus = UserStatus.DISCONNECTED;
@@ -271,6 +311,114 @@ public class Client {
             clientUI.updateConnectionBroken();
         }
     }
+
+
+    private void commandFilter(){
+        new Thread(() -> {
+            while(isLogged()){
+                try {
+                    synchronized (lockCommandQueue) {
+                        while (commandQueue.isEmpty()) {
+                            commandQueue.waitForLine();
+                            commandQueue.add();
+
+                            if (!commandQueue.readln().matches(INDEX + "|" + SINGLE_CHAR)) {
+                                commandQueue.pop();
+                            }
+                        }
+                        lockCommandQueue.notifyAll();
+                    }
+                } catch (IOException e) {
+                    System.err.println("ERR: couldn't read from the console");
+                    System.exit(1);
+                }
+            }
+        }).start();
+    }
+
+
+    private void commandManager(){
+
+        new Thread(() -> {
+            String command="";
+            while(isLogged()){
+                try {
+                    synchronized (lockCommandQueue) {
+                        commandQueue.waitForLine();
+                        command=commandQueue.getln();
+                        lockCommandQueue.notifyAll();
+                    }
+                } catch (IOException e) {
+                    System.err.println("ERR: io error");
+                    System.exit(1);
+                }
+
+                boolean isOk=false;
+                printDebug(command);
+                if(command.matches(INDEX)){
+                    switch(turnState){
+
+                        case CHOOSE_SCHEMA:
+                            if(!clientConn.choose(Integer.parseInt(command))) {
+                                clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
+                            }
+                            break;
+
+                        case SELECT_DIE:
+                            board.setOptionsList(clientConn.select(Integer.parseInt(command)));
+                            if(board.getOptionsList().size()==1){
+
+                                clientConn.choose(0);
+                                synchronized (lockState){
+                                    turnState=turnState.nextState(board.getOptionsList().get(0).equals(Commands.PLACE_DIE),false,false,false);
+                                }
+                            }else{
+                                clientUI.showOptions(board.getOptionsList());
+                            }
+                            break;
+                        case CHOOSE_PLACEMENT:
+
+
+                        case CHOOSE_OPTION:
+                            if(clientConn.choose(Integer.parseInt(command))){
+
+                            }
+
+
+
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                if(command.matches(SINGLE_CHAR)){
+                    if(command.equals(END_TURN)){
+                        clientConn.endTurn();
+                        turnState=turnState.nextState(false,false,true,false);
+                    }
+                    if(command.equals(QUIT)){ quit();}
+
+                    if(command.equals(BACK)){
+                        turnState=turnState.nextState(false,true,false,false);
+
+                    }
+
+                    if(turnState==CHOOSE_PLACEMENT) {
+                        if (command.equals(DISCARD)) {
+                            turnState = turnState.nextState(false, false, false, true);
+                        }
+                    }
+                }
+
+
+
+
+
+            }
+        }).start();
+    }
+
 
     /**
      * This method implements the login to the server via rmi
@@ -296,36 +444,7 @@ public class Client {
         return false;
     }
 
-    /**
-     * this method manages the game itself in its parts
-     */
-    private void match(){
-        String command;
-
-        synchronized (lockStatus){
-            while(userStatus.equals(UserStatus.LOBBY)){
-                try {
-                    lockStatus.wait();
-                } catch (InterruptedException e) {
-
-                }
-                lockStatus.notifyAll();
-            }
-        }
-
-        while(userStatus.equals(UserStatus.PLAYING)) {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-
-        }
-
-    }
-
-
+    public Object getLockCredentials(){ return lockCredentials;  }
 
     public boolean isLogged(){
         return userStatus.equals(UserStatus.LOBBY)||userStatus.equals(UserStatus.PLAYING);
@@ -341,13 +460,19 @@ public class Client {
         board.addObserver(clientUI);
         clientUI.updateGameStart(numPlayers,playerId);
         board.setMyPlayerId(playerId);
+
         synchronized (lockStatus){
             userStatus=UserStatus.PLAYING;
             lockStatus.notifyAll();
         }
         board.setPrivObj(clientConn.getPrivateObject());
-        clientUI.showDraftedSchemas(clientConn.getSchemaDraft(),board.getPrivObj());
+        board.setDraftedSchemas(clientConn.getSchemaDraft());
+        clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
 
+        synchronized (lockState) {
+            this.turnState = ClientFSMState.CHOOSE_SCHEMA;
+            lockState.notifyAll();
+        }
     }
 
     public void updateGameEnd(){
@@ -355,45 +480,82 @@ public class Client {
     }
 
     public void updateGameRoundStart(int numRound){
-        if(numRound==0){
-            //get players schema
-            for(int i=0; i < board.getNumPlayers();i++) {
-                board.updateSchema(i,clientConn.getSchema(i));
-            }
-            //get other board elements
-            for(int i=0; i< LightBoard.NUM_TOOLS;i++){
-                board.addTools(clientConn.getTools());
-            }
 
+        if(numRound==0){
+            synchronized (lockState){
+                assert(turnState.equals(ClientFSMState.CHOOSE_SCHEMA));
+                turnState = turnState.nextState(true,false,false,false);
+            }
+            //get players
+            List<LightPlayer> players= clientConn.getPlayers();
+            for(int i=0; i<board.getNumPlayers();i++){
+
+                board.addPlayer(players.get(i));
+
+                //get players schema
+                board.updateSchema(i,clientConn.getSchema(i));
+
+                //set favor tokens
+                board.getPlayerByIndex(i).setFavorTokens(clientConn.getFavorTokens(i));
+            }
+            players=null;
+
+            //get tools
+            board.addTools(clientConn.getTools());
+
+            List<LightCard> pubObj= clientConn.getPublicObjects();
+            //get public objectives
+            for(int i=0; i< LightBoard.NUM_PUB_OBJ;i++){
+                board.addPubObj(pubObj.get(i));
+            }
+            clientUI.showTurnInitScreen();
         }
 
-        
+        board.notifyObservers();
+
     }
 
     public void updateGameRoundEnd(int numRound){
         board.setRoundTrack(clientConn.getRoundtrack(),numRound+1);
+
+        board.notifyObservers();
     }
 
     public void updateGameTurnStart(int playerId, boolean isFirstTurn){
 
-        //board update
         board.setDraftPool(clientConn.getDraftPool());
         board.setNowPlaying(playerId);
         board.setIsFirstTurn(isFirstTurn);
-        if(playerId==board.getMyPlayerId()){
+        board.setRoundTrack(clientConn.getRoundtrack(),board.getRoundNumber());
 
+        synchronized (lockState) {
+            turnState=turnState.nextState(playerId == board.getMyPlayerId(), false, false, false);
+            lockState.notifyAll();
         }
 
 
+        board.notifyObservers();
     }
 
     public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
         board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
+        board.getPlayerByIndex(playerTurnId).setFavorTokens(clientConn.getFavorTokens(playerTurnId));
+        for (int i=0; i<LightBoard.NUM_TOOLS; i++) {
+            if(!board.getTools().get(i).isUsed()){
+                board.getTools().set(i,clientConn.getTools().get(i));
+            }
+        }
+        synchronized (lockState) {
+            turnState=turnState.nextState(false,false,playerTurnId==getPlayerId(),false);
+            lockState.notifyAll();
+        }
+
+        board.notifyObservers();
 
     }
 
     public void updatePlayerStatus(int playerId, UserStatus status){
-        
+
     }
 
 
@@ -429,8 +591,9 @@ public class Client {
         try {
             client = Client.getNewClient();
         } catch (InstantiationException e) {
-            System.out.println("\u001B[31m"+"ERR: couldn't start the Client"+"\u001B[0m");
-            return;
+            System.err.println("\u001B[31m"+"ERR: couldn't start the Client"+"\u001B[0m");
+
+            System.exit(1);
         }
         if (args.length>0) {
             if(!ClientOptions.getOptions(args,options) || options.contains("h")){
@@ -442,7 +605,12 @@ public class Client {
         }
 
         client.setupUI();
-        client.connectAndLogin();
-        client.match();
+        try {
+            client.connectAndLogin();
+        } catch (InterruptedException e) {
+            System.err.println("ERR: connectAndLogin method interrupted");
+            System.exit(1);
+        }
+
     }
 }

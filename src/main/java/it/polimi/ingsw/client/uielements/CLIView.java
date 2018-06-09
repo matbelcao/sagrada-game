@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.uielements;
 
+import it.polimi.ingsw.client.ClientFSMState;
 import it.polimi.ingsw.client.LightBoard;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
@@ -31,6 +32,7 @@ public class CLIView {
     private int playerId;
     private int turnNumber;
     private int nowPlaying;
+    private String lastScreen;
 
     public CLIView(UILanguage lang) {
         this.uiMsg=new UIMessages(lang);
@@ -59,7 +61,7 @@ public class CLIView {
         for(int i=0; i<schemaCards.size();i++){
             List<String> schema=new ArrayList<>();
 
-            schema.add(buildDraftedSchemaInfo(schemaCards.get(i)));
+            schema.add(buildDraftedSchemaInfo(schemaCards.get(i),i ));
             //add top border
             schema.add(padUntil("",SCHEMA_WIDTH,'–'));
             schema.addAll(buildSchema(schemaCards.get(i),false) );
@@ -74,13 +76,17 @@ public class CLIView {
         }
     }
 
-    private String buildDraftedSchemaInfo(LightSchemaCard schemaCard) {
-        return schemaCard.getName()+alignRight(printFavorTokens(schemaCard.getFavorTokens()),SCHEMA_WIDTH-schemaCard.getName().length());
+    private String buildDraftedSchemaInfo(LightSchemaCard schemaCard, int number) {
+        String indexname= boldify("("+number +") "+schemaCard.getName());
+        return indexname + alignRight(printFavorTokens(schemaCard.getFavorTokens()),SCHEMA_WIDTH-printableLength(indexname));
     }
 
 
+    public String printLastScreen(){
+        return lastScreen;
+    }
 
-    public String printMainView(){
+    public String printMainView(ClientFSMState state){
         StringBuilder builder=new StringBuilder();
         builder.append(resetScreenPosition());
         builder.append(printList(buildRoundTrack())).append(" |%n");
@@ -93,24 +99,28 @@ public class CLIView {
 
         builder.append(printList(buildBottomSection())).append("%n");
 
-        builder.append(getPrompt());
-
-        return builder.toString();
+        builder.append(getPrompt(state));
+        lastScreen=builder.toString();
+        return lastScreen;
     }
 
-    private String getPrompt() {
-        return String.format(cliElems.getElem("prompt"), buildOptions());
+    private String getPrompt(ClientFSMState state) {
+        return String.format(cliElems.getElem("prompt"), buildOptions(state));
     }
 
     public String printSchemaChoiceView(){
         StringBuilder builder=new StringBuilder();
         builder.append(resetScreenPosition());
-        List<String> priv=new ArrayList<>();
-        priv.addAll(priv);
+        List<String> priv = new ArrayList<>(privObj);
+        List<String> drafted = new ArrayList<>(buildDraftedSchemas());
         priv.add(0,boldify(uiMsg.getMessage("priv-obj")));
         priv.add("  ");
-        builder.append(printList(appendRows(buildDraftedSchemas(),priv))).append("%n%n%n");
-        return builder.toString();
+        builder.append("%n%n%n%n");
+        builder.append(printList(appendRows(appendRows(buildWall(' ',drafted.size(),SCHEMA_WIDTH+10),drafted),priv))).append("%n%n%n");
+        builder.append(uiMsg.getMessage("choose-schema")).append("%n%n");
+        builder.append(buildOptions(ClientFSMState.CHOOSE_SCHEMA));
+        lastScreen=builder.toString();
+        return lastScreen;
     }
 
     public void updatePrivObj(LightPrivObj priv){
@@ -118,10 +128,9 @@ public class CLIView {
     }
 
     private List<String> buildDraftedSchemas() {
-        List<String> result= new ArrayList<>(SCHEMA_HEIGHT+2);
-        for(Map.Entry<Integer,List<String>> entry: schemas.entrySet()){
-            result=appendRows(result,entry.getValue());
-        }
+        List<String> result;
+        result= appendRows(schemas.get(0),schemas.get(1));
+        result.addAll(appendRows(schemas.get(2),schemas.get(3)));
         return result;
     }
 
@@ -199,19 +208,43 @@ public class CLIView {
         menuList.clear();
     }
 
-    private String buildOptions() {
+    private String buildOptions(ClientFSMState state) {
         StringBuilder defaultMenu= new StringBuilder();
 
-            defaultMenu.append(
-                            (nowPlaying==playerId?
-                                    (uiMsg.getMessage("discard-option")+"|"+uiMsg.getMessage("passturn-option")):
-                                    "")
-                                    + uiMsg.getMessage("quit-option"));
+        switch (state){
+            case CHOOSE_PLACEMENT:
+                defaultMenu.append(discardOption());
+            case SELECT_DIE:
 
+            case CHOOSE_OPTION:
+                defaultMenu.append(backOption());
+            case MAIN:
+                defaultMenu.append(endTurnOption());
+            case NOT_MY_TURN:
+            case CHOOSE_SCHEMA:
+                defaultMenu.append(quitOption());
+                break;
+            case TOOL_CAN_CONTINUE:
+                break;
+            default:
+                break;
+        }
 
-        return defaultMenu.toString();
+        return String.format(cliElems.getElem("prompt"),defaultMenu.toString());
     }
 
+    private String backOption(){ return uiMsg.getMessage("back-option")+" | ";}
+    private String discardOption(){
+        return uiMsg.getMessage("discard-option")+" | ";
+    }
+
+    private String endTurnOption(){
+        return uiMsg.getMessage("endturn-option")+" | ";
+    }
+
+    private String quitOption(){
+        return uiMsg.getMessage("quit-option");
+    }
     /**
      * Creates a list of possible placements for a die
      * @param placements the list of placements
@@ -242,8 +275,6 @@ public class CLIView {
     public void updateMenuTurnInit(){
         menuList.clear();
         menuList.addAll(padUntil(buildTurnInitOptions(),MENU_WIDTH,' '));
-
-
 
         fillMenu();
     }
@@ -518,9 +549,8 @@ public class CLIView {
             result.add("     ");
         }
 
-        result.addAll(
-
-                        buildPrivObj(privObj,OBJ_LENGTH));
+        result.add(boldify(uiMsg.getMessage("priv-obj")));
+        result.addAll(buildPrivObj(privObj,OBJ_LENGTH));
 
 
         return result;

@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.uielements.GUIutil;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
+import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import javafx.application.Application;
@@ -21,7 +22,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -114,38 +118,16 @@ public class GUI extends Application implements ClientUI {
         grid.add(hbBtn, 1, 4);
         grid.add(messageToUser, 1, 6);
         button.setOnAction(e -> {
-            client.setUsername(usernameField.getText());
-            client.setPassword(Credentials.hash(client.getUsername(),passwordField.getText().toCharArray()));
+            synchronized (client.getLockCredentials()) {
+                client.setUsername(usernameField.getText());
+                client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
+                client.getLockCredentials().notifyAll();
+            }
+            System.out.println("u = " + usernameField.getText());
         });
         usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //delete
         return loginScene;
     }
-
-    /*private Scene draftedSchemaSceneBuilder(List<LightSchemaCard> draftedSchemas) {
-        double schemaWidth = elementSize.getSchemaWidth();
-        double schemaHeigth = elementSize.getSchemaHeigth();
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
-
-        GridPane schema0 = schemaToGrid(draftedSchemas.get(0), schemaWidth, schemaHeigth);
-        GridPane schema1 = schemaToGrid(draftedSchemas.get(1), schemaWidth, schemaHeigth);
-        GridPane schema2 = schemaToGrid(draftedSchemas.get(2), schemaWidth, schemaHeigth);
-        GridPane schema3 = schemaToGrid(draftedSchemas.get(3), schemaWidth, schemaHeigth);
-
-        grid.add(schema0, 0, 0);
-        grid.add(schema1, 1, 0);
-        grid.add(schema2, 2, 0);
-        grid.add(schema3, 3, 0);
-        schema0.addEventHandler(MouseEvent.MOUSE_ENTERED, e->System.out.println(e));
-
-        Scene scene2 = new Scene(grid);
-        return scene2;
-    }*/
-
-
-
 
     private GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth){
         GridPane grid = new GridPane();
@@ -169,18 +151,6 @@ public class GUI extends Application implements ClientUI {
         drawWhiteSquare(gc,0,0,dim);
         return whiteCanvas;
     }
-    private Canvas lightConstraintToCanvas(LightConstraint constraint,double dieDim){
-        Canvas dieCanvas = new Canvas(dieDim,dieDim);
-        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
-        drawConstraint(constraint,dieCanvas.getGraphicsContext2D(),0,0,dieDim);
-        return dieCanvas;
-    }
-    private Canvas lightDieToCanvas(LightDie die,double dieDim){
-        Canvas dieCanvas = new Canvas(dieDim,dieDim);
-        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
-        drawDie(die,dieCanvas.getGraphicsContext2D(),dieDim);
-        return dieCanvas;
-    }
 
     private Canvas schemaToCanvas(LightSchemaCard lightSchemaCard,double width, double height) {
         Canvas canvas = new Canvas(width, height);
@@ -188,6 +158,22 @@ public class GUI extends Application implements ClientUI {
         drawSchema(lightSchemaCard,gc);
         return canvas;
     }
+
+    private Canvas lightDieToCanvas(LightDie die,double dieDim){
+        Canvas dieCanvas = new Canvas(dieDim,dieDim);
+        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
+        drawDie(die,dieCanvas.getGraphicsContext2D(),dieDim);
+        return dieCanvas;
+    }
+
+    private Canvas lightConstraintToCanvas(LightConstraint constraint,double dieDim){
+        Canvas dieCanvas = new Canvas(dieDim,dieDim);
+        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
+        drawConstraint(constraint,dieCanvas.getGraphicsContext2D(),0,0,dieDim);
+        return dieCanvas;
+    }
+
+
 
     private void drawSchema(LightSchemaCard lightSchemaCard, GraphicsContext gc) {
         double dieDim = elementSize.getDieDimension();
@@ -422,12 +408,9 @@ public class GUI extends Application implements ClientUI {
             Scene scene = new Scene(grid);
 
             primaryStage.setScene(scene);
+
             letterbox(scene, grid);
 
-
-            //primaryStage.minWidthProperty().bind(scene.heightProperty().multiply(1));
-            //primaryStage.maxWidthProperty().bind(scene.widthProperty().divide(1));
-            //primaryStage.setMinHeight(400);
         });
     }
 
@@ -435,7 +418,6 @@ public class GUI extends Application implements ClientUI {
         final double initWidth  = scene.getWidth();
         final double initHeight = scene.getHeight();
         final double ratio      = initWidth / initHeight;
-
         SceneSizeChangeListener sizeListener = new SceneSizeChangeListener(scene, ratio, initHeight, initWidth, contentPane);
         scene.widthProperty().addListener(sizeListener);
         scene.heightProperty().addListener(sizeListener);
@@ -460,11 +442,13 @@ public class GUI extends Application implements ClientUI {
         public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
             final double newWidth  = scene.getWidth();
             final double newHeight = scene.getHeight();
+            double scaleFactor;
 
-            double scaleFactor =
-                    newWidth / newHeight > ratio
-                            ? newHeight / initHeight
-                            : newWidth / initWidth;
+            if( newWidth / newHeight > ratio)
+                scaleFactor = newHeight / initHeight;
+            else
+                scaleFactor = newWidth / initWidth;
+
 
             if (scaleFactor >= 1) {
                 Scale scale = new Scale(scaleFactor, scaleFactor);
@@ -560,7 +544,12 @@ public class GUI extends Application implements ClientUI {
     public String getCommand() {
         return null;
     }
-    
+
+    @Override
+    public void showOptions(List<Commands> optionsList) {
+
+    }
+
 
     @Override
     public void update(Observable o, Object arg) {

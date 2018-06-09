@@ -91,11 +91,13 @@ public class SocketClient implements ClientConn {
                             System.out.println("ERR: control error caused by:  " + inSocket.readln());
                         }
                     }
-                } catch (Exception e) {
-                    try {
-                        socket.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
+                } catch (IOException e) {
+                    if(!socket.isClosed()) {
+                        try {
+                            socket.close();
+                        } catch (IOException e1) {
+                            System.err.println("ERR: error while closing the socket");
+                        }
                     }
                     client.setUserStatus(UserStatus.DISCONNECTED);
                 }
@@ -265,7 +267,7 @@ public class SocketClient implements ClientConn {
 
         lightObjCard = LightPrivObj.toLightPrivObj(inSocket.readln());
         inSocket.pop();
-        System.out.println("qui");
+
         return lightObjCard;
     }
 
@@ -465,7 +467,7 @@ public class SocketClient implements ClientConn {
         IndexedCellContent indexedDie;
         String [] args;
 
-        outSocket.println("GET_DICE_LIST");
+        outSocket.println("SELECT_DIE");
         outSocket.flush();
 
         try {
@@ -486,7 +488,7 @@ public class SocketClient implements ClientConn {
     }
 
     /**
-     * This function can be invoked to select one die of a previolsly GET_DICE_LIST command and obtain
+     * This function can be invoked to select one die of a previolsly SELECT_DIE command and obtain
      * a list of to options to manipulate it
      * @return and immutable and indexed list containing the dice
      */

@@ -97,17 +97,21 @@
         <ita>Digita qui le tue mosse</ita>
     </message-prompt>
     <quit-option>
-        <eng>q -> abandon the match </eng>
-        <ita>q -> abbandonare partita</ita>
+        <eng>q › abandon the match</eng>
+        <ita>q › abbandona partita</ita>
     </quit-option>
     <discard-option>
-        <eng>d -> discard the selection</eng>
-        <ita>d -> ignorare la selezione</ita>
+        <eng>d › select another die</eng>
+        <ita>d › seleziona un altro dado</ita>
     </discard-option>
-    <discard-option>
-        <eng>e -> end your turn</eng>
-        <ita>e -> termina il turno</ita>
-    </discard-option>
+    <endturn-option>
+        <eng>e › end your turn</eng>
+        <ita>e › termina turno</ita>
+    </endturn-option>
+    <back-option>
+        <eng>b › go back to tool/placement choice</eng>
+        <ita>b › torna alla scelta tool/piazzamento</ita>
+    </back-option>
     <dice-list>
         <eng>Choose one of the following dice from the %s by entering the index of the row:</eng>
         <ita>Scegli uno dei seguenti dadi da %s attreverso il numero di riga:</ita>
@@ -120,4 +124,8 @@
         <eng>Use a Tool</eng>
         <ita>Usa un Utensile</ita>
     </use-tool>
+    <choose-schema>
+        <eng>Choose your schema by entering its number</eng>
+        <ita>Scegli la tua vetrata digitandone il numero</ita>
+    </choose-schema>
 </messages>
