@@ -124,6 +124,7 @@ public class ValidatorTest {
     public void testCheckChoose() {
 
         assertTrue(Validator.isValid("GET_DICE_LIST", parsedResult));
+        assertEquals("GET_DICE_LIST",parsedResult.get(0));
 
         //valid
         command = "CHOOSE 6";
@@ -147,7 +148,13 @@ public class ValidatorTest {
 
     }
 
-        @Test
+    @Test
+    public void testGetPlacementsList(){
+        assertTrue(Validator.isValid("GET_PLACEMENTS_LIST", parsedResult));
+        assertEquals("GET_PLACEMENTS_LIST",parsedResult.get(0));
+    }
+
+    @Test
     public void testIsValidUsername(){
         assertTrue(Validator.isValidUsername("luca"));
         assertFalse(Validator.isValidUsername("luca.ssd"));

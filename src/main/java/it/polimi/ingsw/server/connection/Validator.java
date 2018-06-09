@@ -53,7 +53,7 @@ public class Validator {
                 return checkGetParams(command, parsedResult);
 
             case "GET_DICE_LIST":
-                return checkGetDiceList(command);
+                return checkGetDiceList(command,parsedResult);
 
             case "SELECT":
                 return checkSelectParams(command, parsedResult);
@@ -61,20 +61,23 @@ public class Validator {
             case "CHOOSE":
                 return checkChooseParams(command, parsedResult);
 
+            case "GET_PLACEMENTS_LIST":
+                return checkPlacementsDiceList(command,parsedResult);
+
             case "TOOL":
                 return checkToolParams(command,parsedResult);
 
             case "DISCARD":
-                return checkDiscard(command);
+                return checkDiscard(command,parsedResult);
 
             case "EXIT":
-                return checkExit(command);
+                return checkExit(command,parsedResult);
 
             case "QUIT":
-                return checkQuit(command);
+                return checkQuit(command,parsedResult);
 
             case "PONG":
-                return checkPong(command);
+                return checkPong(command,parsedResult);
 
             default:
                 return false;
@@ -188,10 +191,31 @@ public class Validator {
      * @param rawCommand the raw string containing all parameters of the command and the command itself
      * @return true iff the syntax is valid
      */
-    public static boolean checkGetDiceList(String rawCommand) {
+    public static boolean checkGetDiceList(String rawCommand,List<String> parsedResult) {
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
-        return command.length == 1 && command[0].equals("GET_DICE_LIST");
+        parsedResult.clear();
+        if(command.length == 1 && command[0].equals("GET_DICE_LIST")){
+            parsedResult.addAll(Arrays.asList(command));
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * This method checks if the GET_DICE_LIST command is valid
+     * @param rawCommand the raw string containing all parameters of the command and the command itself
+     * @return true iff the syntax is valid
+     */
+    public static boolean checkPlacementsDiceList(String rawCommand, List<String> parsedResult) {
+        if( rawCommand==null){ return false; }
+        String [] command= rawCommand.trim().split("\\s+");
+        parsedResult.clear();
+        if(command.length == 1 && command[0].equals("GET_PLACEMENTS_LIST")){
+            parsedResult.addAll(Arrays.asList(command));
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -262,11 +286,17 @@ public class Validator {
      * @param rawCommand the raw string containing all parameters of the command and the command itself
      * @return true iff the parameters are valid
      */
-    public static boolean checkDiscard(String rawCommand) {
+    public static boolean checkDiscard(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         if(!command[0].equals("DISCARD")){ return false; }
-        return command.length == 1;
+
+        parsedResult.clear();
+        if(command.length == 1) {
+            parsedResult.addAll(Arrays.asList(command));
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -274,11 +304,17 @@ public class Validator {
      * @param rawCommand the raw string containing all parameters of the command and the command itself
      * @return true iff the parameters are valid
      */
-    public static boolean checkExit(String rawCommand) {
+    public static boolean checkExit(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         if(!command[0].equals("EXIT")){ return false; }
-        return command.length == 1;
+
+        parsedResult.clear();
+        if(command.length == 1) {
+            parsedResult.addAll(Arrays.asList(command));
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -286,11 +322,17 @@ public class Validator {
      * @param rawCommand the raw string containing all parameters of the command and the command itself
      * @return true iff the parameters are valid
      */
-    public static boolean checkQuit(String rawCommand) {
+    public static boolean checkQuit(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         if(!command[0].equals("QUIT")){ return false; }
-        return command.length == 1;
+
+        parsedResult.clear();
+        if(command.length == 1) {
+            parsedResult.addAll(Arrays.asList(command));
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -298,11 +340,17 @@ public class Validator {
      * @param rawCommand the raw string containing all parameters of the command and the command itself
      * @return true iff the parameters are valid
      */
-    public static boolean checkPong(String rawCommand) {
+    public static boolean checkPong(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
         if(!command[0].equals("PONG")){ return false; }
-        return command.length == 1;
+
+        parsedResult.clear();
+        if(command.length == 1) {
+            parsedResult.addAll(Arrays.asList(command));
+            return true;
+        }
+        return false;
     }
 
 }
