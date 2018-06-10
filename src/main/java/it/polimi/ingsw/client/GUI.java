@@ -22,10 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -44,8 +41,6 @@ public class GUI extends Application implements ClientUI {
     private GUIutil elementSize;
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
-    public static final int LINE_WIDTH = 2;
-    public static final double SPOT_RATIO = 6;
     private static Client client;
     private static UIMessages uimsg;
     private Stage primaryStage;
@@ -123,207 +118,11 @@ public class GUI extends Application implements ClientUI {
                 client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
                 client.getLockCredentials().notifyAll();
             }
-            System.out.println("u = " + usernameField.getText());
         });
         usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //delete
         return loginScene;
     }
 
-    private GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth){
-        GridPane grid = new GridPane();
-        double dieDim = elementSize.getDieDimension();
-        for(int i = 0; i < NUM_ROWS; i++){
-            for(int j = 0; j < NUM_COLS; j++){
-                if(lightSchemaCard.hasDieAt(i,j)){
-                        grid.add(lightDieToCanvas(lightSchemaCard.getDieAt(i,j),dieDim),j,i);
-                }else if(lightSchemaCard.hasConstraintAt(i,j)){
-                    grid.add(lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i,j),dieDim),j,i);
-                }else{
-                    grid.add(whiteCanvas(dieDim),j,i);
-                }
-            }
-        }
-        return grid;
-    }
-    private Canvas whiteCanvas(double dim){
-        Canvas whiteCanvas = new Canvas(dim,dim);
-        GraphicsContext gc = whiteCanvas.getGraphicsContext2D();
-        drawWhiteSquare(gc,0,0,dim);
-        return whiteCanvas;
-    }
-
-    private Canvas schemaToCanvas(LightSchemaCard lightSchemaCard,double width, double height) {
-        Canvas canvas = new Canvas(width, height);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        drawSchema(lightSchemaCard,gc);
-        return canvas;
-    }
-
-    private Canvas lightDieToCanvas(LightDie die,double dieDim){
-        Canvas dieCanvas = new Canvas(dieDim,dieDim);
-        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
-        drawDie(die,dieCanvas.getGraphicsContext2D(),dieDim);
-        return dieCanvas;
-    }
-
-    private Canvas lightConstraintToCanvas(LightConstraint constraint,double dieDim){
-        Canvas dieCanvas = new Canvas(dieDim,dieDim);
-        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
-        drawConstraint(constraint,dieCanvas.getGraphicsContext2D(),0,0,dieDim);
-        return dieCanvas;
-    }
-
-
-
-    private void drawSchema(LightSchemaCard lightSchemaCard, GraphicsContext gc) {
-        double dieDim = elementSize.getDieDimension();
-        double y = 0;
-        double x = 0;
-        for(int i = 0; i < NUM_ROWS; i++){
-            for(int j = 0; j < NUM_COLS; j++){
-                if(lightSchemaCard.hasDieAt(i,j)){
-                    drawDie(lightSchemaCard.getDieAt(i,j),gc,x,y,dieDim);
-                }else if(lightSchemaCard.hasConstraintAt(i,j)){
-                    drawConstraint(lightSchemaCard.getConstraintAt(i,j),gc,x,y,dieDim);
-                }else{
-                    drawWhiteSquare(gc,x,y,dieDim);
-                }
-                x += dieDim;
-            }
-            x = 0;
-            y += dieDim;
-        }
-    }
-
-    private void drawWhiteSquare(GraphicsContext gc, double x, double y, double diceDim) {
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(LINE_WIDTH);
-        gc.fillRect(x,y,diceDim,diceDim);
-        gc.strokeRect(x,y,diceDim,diceDim);
-    }
-
-    private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double dieDim) {
-        if (constraint.hasColor()) {
-            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
-            gc.fillRect(0, 0, dieDim, dieDim);
-        }else{
-            gc.setFill(Color.LIGHTGRAY);
-            gc.fillRect(0, 0, dieDim, dieDim);
-            drawSpots(gc,dieDim,constraint.getShade().toInt());
-        }
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(LINE_WIDTH);
-        gc.strokeRect(0, 0, dieDim, dieDim);
-    }
-
-    private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double dieDim) {
-        if (constraint.hasColor()) {
-            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
-            gc.fillRect(x, y, dieDim, dieDim);
-        }else{
-            gc.setFill(Color.LIGHTGRAY);
-            gc.fillRect(x, y, dieDim, dieDim);
-            drawSpots(gc,x,y,dieDim,constraint.getShade().toInt());
-        }
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(LINE_WIDTH);
-        gc.strokeRect(x, y, dieDim, dieDim);
-    }
-
-    private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
-        graphicsContext2D.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
-        graphicsContext2D.fillRect(0,0,dieDim,dieDim);
-        graphicsContext2D.setStroke(Color.BLACK);
-        graphicsContext2D.setLineWidth(LINE_WIDTH);
-        graphicsContext2D.strokeRect(0,0,dieDim, dieDim);
-    }
-    //to be used when drawing schema to canvas
-    private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double diceDim) {
-        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
-        gc.fillRect(x,y,diceDim,diceDim);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(LINE_WIDTH);
-        gc.strokeRect(x, y, diceDim, diceDim);
-    }
-
-    private void drawSpots(GraphicsContext gc, double dieDim, int count) {
-        switch (count) {
-            case 1:
-                drawSpot(gc, dieDim / 2, dieDim / 2,dieDim);
-                break;
-            case 3:
-                drawSpot(gc, dieDim/ 2, dieDim/ 2,dieDim);
-                // Fall thru to next case
-            case 2:
-                drawSpot(gc, dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4,dieDim);
-                break;
-            case 5:
-                drawSpot(gc, dieDim/ 2, dieDim/ 2,dieDim);
-                // Fall thru to next case
-            case 4:
-                drawSpot(gc, dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                break;
-            case 6:
-                drawSpot(gc, dieDim / 4, dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawSpot(gc, dieDim/ 4, dieDim/ 2,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 2,dieDim);
-                break;
-        }
-    }
-
-    private void drawSpots(GraphicsContext gc,double X_axis_die_position,double Y_axis_die_position,double dieDim, int count) {
-        switch (count) {
-            case 1:
-                drawSpot(gc, dieDim / 2, dieDim / 2,dieDim, X_axis_die_position, Y_axis_die_position);
-                break;
-            case 3:
-                drawSpot(gc, dieDim/ 2, dieDim/ 2,dieDim, X_axis_die_position, Y_axis_die_position);
-                // Fall thru to next case
-            case 2:
-                drawSpot(gc, dieDim/ 4, dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4,dieDim, X_axis_die_position, Y_axis_die_position);
-                break;
-            case 5:
-                drawSpot(gc, dieDim/ 2, dieDim/ 2,dieDim, X_axis_die_position, Y_axis_die_position);
-                // Fall thru to next case
-            case 4:
-                drawSpot(gc, dieDim/ 4, dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
-                drawSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
-                break;
-            case 6:
-                drawSpot(gc, dieDim / 4, dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
-                drawSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim, X_axis_die_position, Y_axis_die_position);
-                drawSpot(gc, dieDim/ 4, dieDim/ 2,dieDim, X_axis_die_position, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 2,dieDim, X_axis_die_position, Y_axis_die_position);
-                break;
-        }
-    }
-
-
-    private void drawSpot(GraphicsContext gc, double x, double y, double dieDim) {
-        double spotDiameter = dieDim/SPOT_RATIO;
-        gc.setFill(Color.BLACK);
-        gc.fillOval(x - spotDiameter / 2, y - spotDiameter / 2,
-                spotDiameter, spotDiameter);
-    }
-
-    private void drawSpot(GraphicsContext gc, double x, double y,double dieDim,double X_axis_die_position,double Y_axis_die_position) {
-        double spotDiameter = dieDim/SPOT_RATIO;
-        gc.setFill(Color.BLACK);
-        gc.fillOval(X_axis_die_position +(x - spotDiameter / 2), Y_axis_die_position + (y - spotDiameter / 2), spotDiameter, spotDiameter);
-    }
 
     @Override
     public void updateConnectionOk() {
@@ -369,7 +168,7 @@ public class GUI extends Application implements ClientUI {
     private Node draftPool(Map<Integer, LightDie> draftPool) {
         HBox layout = new HBox();
         for(LightDie l : draftPool.values()){
-            layout.getChildren().add(lightDieToCanvas(l,200));
+            layout.getChildren().add(elementSize.lightDieToCanvas(l,200));
         }
         return layout;
     }
@@ -384,34 +183,58 @@ public class GUI extends Application implements ClientUI {
         Platform.runLater(() -> {
             primaryStage.setTitle("Sagrada");
             primaryStage.setResizable(true);
-
-            double schemaWidth = elementSize.getSchemaWidth();
-            double schemaHeigth = elementSize.getSchemaHeigth();
-            GridPane grid = new GridPane();
-            grid.setHgap(10);
-            grid.setVgap(10);
-            grid.setPadding(new Insets(15, 15, 15, 15));
-
-            Canvas schema0 = schemaToCanvas(draftedSchemas.get(0),schemaWidth,schemaHeigth);
-            Canvas schema1 = schemaToCanvas(draftedSchemas.get(1),schemaWidth,schemaHeigth);
-            Canvas schema2 = schemaToCanvas(draftedSchemas.get(2),schemaWidth,schemaHeigth);
-            Canvas schema3 = schemaToCanvas(draftedSchemas.get(3),schemaWidth,schemaHeigth);
-
-            grid.add(schema0,0,0);
-            grid.add(schema1,1,0);
-            grid.add(schema2,0,1);
-            grid.add(schema3,1,1);
-
-            //Group group = new Group( grid );
-            //StackPane rootPane = new StackPane(group);
-
-            Scene scene = new Scene(grid);
-
+            ResizableCanvas canvas = new ResizableCanvas(draftedSchemas,privObj);
+            StackPane stackPane = new StackPane(canvas);
+            // Bind canvas size to stack pane size.
+            canvas.widthProperty().bind(stackPane.widthProperty());
+            canvas.heightProperty().bind(stackPane.heightProperty());
+            Scene scene = new Scene(stackPane);
             primaryStage.setScene(scene);
-
-            letterbox(scene, grid);
+            primaryStage.setMinHeight(elementSize.getDraftedSchemasMinHeight());
+            primaryStage.setMinWidth(elementSize.getDraftedSchemasMinWidth());
 
         });
+    }
+    class ResizableCanvas extends Canvas {
+        List<LightSchemaCard> draftedSchemas;
+        LightPrivObj privObj;
+
+        public ResizableCanvas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
+            this.draftedSchemas = draftedSchemas;
+            this.privObj = privObj;
+            // Redraw canvas when size changes.
+            widthProperty().addListener(evt -> draw());
+            heightProperty().addListener(evt -> draw());
+        }
+
+        private void draw() {
+            double width = getWidth();
+            double height = getHeight();
+
+            GraphicsContext gc = getGraphicsContext2D();
+            gc.clearRect(0, 0, width, height);
+            elementSize.drawDraftedSchemas(draftedSchemas,privObj,gc,width,height);
+
+            gc.setStroke(Color.RED);//to delete
+            gc.strokeLine(0, 0, width, height);
+            gc.strokeLine(0, height, width, 0);
+
+        }
+
+        @Override
+        public boolean isResizable() {
+            return true;
+        }
+
+        @Override
+        public double prefWidth(double height) {
+            return getWidth();
+        }
+
+        @Override
+        public double prefHeight(double width) {
+            return getHeight();
+        }
     }
 
     private void letterbox(final Scene scene, final Pane contentPane) {
