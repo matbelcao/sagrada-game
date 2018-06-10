@@ -49,17 +49,17 @@ public enum Color { //need to add png address combined with Face's ones
 
     public static javafx.scene.paint.Color toFXColor(Color color){
         if(color.equals(RED)){
-            return javafx.scene.paint.Color.RED;
+            return javafx.scene.paint.Color.web("#bb331a");
         }else if(color.equals(GREEN)){
-            return javafx.scene.paint.Color.GREEN;
+            return javafx.scene.paint.Color.web("#579b55");
         }else if(color.equals(YELLOW)){
-            return javafx.scene.paint.Color.YELLOW;
+            return javafx.scene.paint.Color.web("#e3d107");
         }else if(color.equals(BLUE)){
-            return javafx.scene.paint.Color.BLUE;
+            return javafx.scene.paint.Color.web("#5faab9");
         }else if(color.equals(PURPLE)){
-            return javafx.scene.paint.Color.PURPLE;
+            return javafx.scene.paint.Color.web("#a5468c");
         }else{
-            return javafx.scene.paint.Color.GRAY;
+            return javafx.scene.paint.Color.web("#9e9e9e");
         }
     }
 }
