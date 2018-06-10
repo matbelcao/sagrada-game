@@ -316,6 +316,7 @@ public class Game extends Thread implements Iterable  {
 
 
     public List<IndexedCellContent> getDiceList(User user) throws IllegalActionException {
+        System.out.println("dice_list: "+status);
         if(!status.equals(ServerState.MAIN)){throw new IllegalActionException();}
         switch(fsm.getCurPlace()){
             case SCHEMA:
@@ -380,7 +381,7 @@ public class Game extends Thread implements Iterable  {
                     }*/
                     response=false;
                 }else{
-                    response=board.schemaPlacement(user,index,selectedDie);//to verify
+                    response=board.schemaPlacement(user,selectedTool,index,selectedDie);//to verify
 
                 }
         }else{

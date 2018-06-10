@@ -211,11 +211,23 @@ public class Board {
         return null;
     }
 
-    public boolean schemaPlacement(User user, int die_index, Die selectedDie){
+    public boolean schemaPlacement(User user,int selectedTool, int die_index, Die selectedDie){
         SchemaCard schemaCard=getPlayer(user).getSchema();
-        int realIndex=schemaCard.listPossiblePlacements(selectedDie).get(die_index);
+        List<Integer> placerments = new ArrayList<>();
+        IgnoredConstraint ignored_constraint=null;
+        if(selectedTool!=-1){
+            ignored_constraint=toolCards[selectedTool].getIgnoredConstraint();
+            placerments= schemaCard.listPossiblePlacements(selectedDie,ignored_constraint);
+        }else{
+            placerments= schemaCard.listPossiblePlacements(selectedDie);
+        }
+
         try {
-                schemaCard.putDie(realIndex,getDraftPool().chooseDie(realIndex));
+                if(selectedTool!=-1){
+                    schemaCard.putDie(placerments.get(die_index),selectedDie,ignored_constraint);
+                }else{
+                    schemaCard.putDie(placerments.get(die_index),selectedDie);
+                }
                 return true;
         } catch (IllegalDieException e) {
             return false;
