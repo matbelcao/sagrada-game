@@ -103,6 +103,9 @@ public class SocketServer extends Thread implements ServerConn  {
             case "CHOOSE":
                 choose(Integer.parseInt(parsedResult.get(1)));
                 break;
+            case "GET_PLACEMENTS_LIST":
+                sendPlacementList();
+                break;
             case "TOOL":
                 toolCommand(parsedResult);
                 break;
@@ -110,7 +113,7 @@ public class SocketServer extends Thread implements ServerConn  {
                 user.getGame().discard();
                 break;
             case "EXIT":
-                //user.getGame().exit();
+                user.getGame().exit();
                 break;
             case "QUIT":
                 user.quit();
@@ -248,22 +251,6 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sets the schema card during the match if it's possible
-     * @param schemaId the schema's id
-     */
-    private void chooseSchema(int schemaId){
-        Game game= user.getGame();
-        boolean result;
-        result=game.chooseSchemaCard(user,schemaId);
-        if(result){
-            outSocket.println("CHOICE ok");
-        }else{
-            outSocket.println("CHOICE ko");
-        }
-        outSocket.flush();
-    }
-
-    /**
      * Sends the client a text description of the four drafted schema card passed as a parameter
      */
     private void draftSchemaCards() throws IllegalActionException {
@@ -293,7 +280,7 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void sendUserSchemaCard(int playerId) throws IllegalActionException {
         Cell cell;
-        SchemaCard schemaCard = user.getGame().getUserSchemaCard(playerId,false);
+        SchemaCard schemaCard = user.getGame().getUserSchemaCard(user);
 
         outSocket.print("SEND schema "+schemaCard.getName());
         for (int index=0; index < SchemaCard.NUM_ROWS*SchemaCard.NUM_COLS ; index++) {
@@ -357,7 +344,7 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void sendDraftPoolDice() throws IllegalActionException {
         Die die;
-        ArrayList<Die> dice= (ArrayList<Die>) user.getGame().getDraftedDice(false);
+        ArrayList<Die> dice= (ArrayList<Die>) user.getGame().getDraftedDice();
 
         outSocket.print("SEND draftpool");
         for (int i=0;i<dice.size();i++){
@@ -373,7 +360,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a textual list of the dice in the RoundTrack (can be placed multiple die at the same index)
      */
     private void sendRoundTrackDice() throws IllegalActionException {
-        List<List<Die>> trackList = user.getGame().getRoundTrackDice(false);
+        List<List<Die>> trackList = user.getGame().getRoundTrackDice();
         ArrayList<Die> dieList;
 
         outSocket.print("SEND roundtrack");
@@ -406,19 +393,17 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends to the client a text list of the dice contained in the selected area (with an unique INDEX)
      */
     private void sendDiceList() throws IllegalActionException {
-        List<IndexedCellContent> dice=new ArrayList<>();
-
-        //dice= (ArrayList<Die>) user.getGame().getDiceList(false);
+        List<IndexedCellContent> dice=user.getGame().getDiceList(user);
 
         if(dice.size()>0){
             outSocket.print("LIST_DICE "+dice.get(0).getPlace().toString().toLowerCase());
             for(int index=0;index<dice.size();index++){
-                outSocket.print(" "+index+","+dice.get(index).getPosition()+","+dice.get(index).getContent().getShade().toString()
+                outSocket.print(" "+dice.get(index).getPosition()+","+dice.get(index).getContent().getShade().toString()
                         +"," +dice.get(index).getContent().getColor().toString());
-                index++;
             }
         }else{
-            throw new IllegalActionException();
+            System.out.println("errore dicelist vuota");
+            //throw new IllegalActionException();
         }
         outSocket.println("");
         outSocket.flush();
@@ -427,11 +412,11 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Sends to the client a text list of possible placements in his schema card (with an unique INDEX)
      */
-    private void sendPlacementList(){
-        List<Integer> placements=new ArrayList<>();
+    private void sendPlacementList() throws IllegalActionException {
+        System.out.println("QUIXXXXX");
+        List<Integer> placements=user.getGame().getPlacements(user);
 
-        //placements=user.getGame().getPlacements(user);
-        outSocket.print("CHOOSE_PLACEMENT");
+        outSocket.print("LIST_PLACEMENTS");
         for(Integer position:placements){
             outSocket.print(" "+position);
         }
@@ -444,9 +429,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param index the index of the die previously received by the client
      */
     private void selectDie(int index) throws IllegalActionException {
-        List<Commands> options =new ArrayList<>();
-
-        //options = user.getGame().selectDie(int index);
+        List<Commands> options = user.getGame().selectDie(user, index);
 
         outSocket.print("LIST_OPTIONS");
         for(int i=0;i<options.size();i++){
@@ -461,9 +444,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param index the index of the die previously selected
      */
     private void choose(int index) throws IllegalActionException {
-        Boolean result=null;
-
-        //result=user.getGame().choose(user,index);
+        Boolean result=user.getGame().choose(user,index);
         if(result){
             outSocket.println("CHOICE ok");
         }else{
@@ -474,22 +455,22 @@ public class SocketServer extends Thread implements ServerConn  {
 
     private void toolEnable(int index) throws IllegalActionException {
         Boolean used;
-        used=user.getGame().chooseTool(user,index);
+        used=user.getGame().activeTool(user,index);
         if(used){
-            outSocket.println("CHOICE ok");
+            outSocket.println("TOOL ok");
         }else{
-            outSocket.println("CHOICE ko");
+            outSocket.println("TOOL ko");
         }
         outSocket.flush();
     }
 
-    private void toolCanContinue(){
+    private void toolCanContinue() throws IllegalActionException {
         Boolean isActive=null;
-        //isActive=user.getGame().toolStatus(user);
+        isActive=user.getGame().toolStatus(user);
         if(isActive){
-            outSocket.println("CHOICE ok");
+            outSocket.println("TOOL ok");
         }else{
-            outSocket.println("CHOICE ko");
+            outSocket.println("TOOL ko");
         }
         outSocket.flush();
     }
@@ -546,7 +527,7 @@ public class SocketServer extends Thread implements ServerConn  {
                 Thread.sleep(50);
             }
             if(Validator.isValid(inSocket.readln(),result) ){
-                if(Validator.checkPong(inSocket.readln())){
+                if(Validator.checkPong(inSocket.readln(),result)){
                     inSocket.pop();
                 }
                 return true;

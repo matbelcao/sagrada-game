@@ -27,7 +27,7 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
 
     @Override
     public LightSchemaCard getSchema(int playerId) throws IllegalActionException {
-        return LightSchemaCard.toLightSchema(user.getGame().getUserSchemaCard(playerId,false)); //TODO check if the params have changed
+        return LightSchemaCard.toLightSchema(user.getGame().getUserSchemaCard(user)); //TODO check if the params have changed
     }
 
     @Override
@@ -82,11 +82,11 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
 
     @Override
     public List<LightDie> getDraftPool() throws IllegalActionException {
-         List<Die> draftPool = user.getGame().getDraftedDice(false);
+         //List<Die> draftPool = user.getGame().getDiceList(false);
          List<LightDie> lightDraftPool = new ArrayList<>();
-         for(Die d : draftPool){
+         /*for(Die d : draftPool){
              lightDraftPool.add(new LightDie(d.getShade(),d.getColor()));
-         }
+         }*/
          return lightDraftPool;
     }
 }

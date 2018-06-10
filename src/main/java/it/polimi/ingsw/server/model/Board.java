@@ -1,8 +1,14 @@
 package it.polimi.ingsw.server.model;
 
+import it.polimi.ingsw.common.enums.GameStatus;
+import it.polimi.ingsw.common.enums.Place;
+import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
+import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
+import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
+import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,6 +124,105 @@ public class Board {
         }
         return schemaChoices;
     }
+
+    public  List<IndexedCellContent> indexedSchemaDiceList(User user){
+        List<IndexedCellContent> indexedList=new ArrayList<>();
+        IndexedCellContent indexedCell;
+        SchemaCard schema= getPlayer(user).getSchema();
+        Die die;
+
+        FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+
+        while(diceIterator.hasNext()) {
+            die = diceIterator.next().getDie();
+            indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
+            indexedList.add(indexedCell);
+        }
+        return indexedList;
+    }
+
+    public List<IndexedCellContent> indexedDraftpoolDiceList(){
+        List<Die> draftedDice=getDraftPool().getDraftedDice();
+        List<IndexedCellContent> indexedList=new ArrayList<>();
+        IndexedCellContent indexedCell;
+        Die die;
+
+        for (int index=0;index<draftedDice.size();index++){
+            die=draftedDice.get(index);
+            indexedCell=new IndexedCellContent(index,Place.DRAFTPOOL,die);
+            indexedList.add(indexedCell);
+        }
+        return indexedList;
+    }
+
+    public List<IndexedCellContent> indexedRoundTrackDiceList(){
+        List<List<Die>> dieTrack=getDraftPool().getRoundTrack().getTrack();
+        List<IndexedCellContent> indexedList=new ArrayList<>();
+        IndexedCellContent indexedCell;
+
+        for(int index=0;index<dieTrack.size();index++){
+            List<Die> dieList= dieTrack.get(index);
+            for(Die d:dieList){
+                indexedCell=new IndexedCellContent(index,Place.ROUNDTRACK,d);
+                indexedList.add(indexedCell);
+            }
+        }
+        return indexedList;
+    }
+
+    /**
+     * Selects the die from a draftpool/user's schema card/roundtrack a returns the schema card's possible placements
+     * @param user the user who made the request
+     * @return the list of possible placements in the user's schema card
+     */
+    public Die selectDie(User user,Place place, int die_index) {
+        Die die;
+        int tempIndex=0;
+
+        switch (place){
+            case SCHEMA:
+                FullCellIterator diceIterator=(FullCellIterator)getPlayer(user).getSchema().iterator();
+                while(diceIterator.hasNext()) {
+                    die = diceIterator.next().getDie();
+                    if (tempIndex == die_index) {
+                        return die;
+                    }
+                    tempIndex++;
+                }
+                break;
+            case DRAFTPOOL:
+                return getDraftPool().getDraftedDice().get(die_index);
+            case ROUNDTRACK:
+                List<List<Die>> trackList = getDraftPool().getRoundTrack().getTrack();
+                List<Die> dieList;
+                int roundN = 0;
+
+                while (tempIndex <= die_index) {
+                    dieList = trackList.get(roundN);
+                    for (Die d : dieList) {
+                        if (tempIndex == die_index) {
+                            return d;
+                        }
+                        tempIndex++;
+                    }
+                    roundN++;
+                }
+        }
+        return null;
+    }
+
+    public boolean schemaPlacement(User user, int die_index, Die selectedDie){
+        SchemaCard schemaCard=getPlayer(user).getSchema();
+        int realIndex=schemaCard.listPossiblePlacements(selectedDie).get(die_index);
+        try {
+                schemaCard.putDie(realIndex,getDraftPool().chooseDie(realIndex));
+                return true;
+        } catch (IllegalDieException e) {
+            return false;
+        }
+    }
+
+
 
     //To continue.....
     public List<Integer> listSchemaPlacements(User user,int selectedTool, Die selectedDie){
