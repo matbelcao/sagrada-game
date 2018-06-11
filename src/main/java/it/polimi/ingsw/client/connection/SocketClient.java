@@ -86,10 +86,10 @@ public class SocketClient implements ClientConn {
                         } else if (ClientParser.isIllegalAction(inSocket.readln())) {
                             inSocket.pop();
                             System.out.println("ILLEGAL ACTION!");
-                        } else {
+                        } //else {
                             //debug
-                            System.out.println("ERR: control error caused by:  " + inSocket.readln());
-                        }
+                           // System.out.println("ERR: control error caused by:  " + inSocket.readln());
+                        //}
                     }
                 } catch (IOException e) {
                     if(!socket.isClosed()) {
@@ -368,7 +368,7 @@ public class SocketClient implements ClientConn {
     @Override
     public List<List<LightDie>> getRoundtrack() {
         ArrayList<String> result= new ArrayList<>();
-        List<List<LightDie>> roundTrack=new ArrayList<>();
+        List<List<LightDie>> roundTrack;
         List<LightDie> container;
         LightDie die;
         int index=-1;
@@ -386,7 +386,6 @@ public class SocketClient implements ClientConn {
 
         inSocket.pop();
         roundTrack = new ArrayList<>();
-        container = new ArrayList<>();
         for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
             args = result.get(i).split(",");
             die = new LightDie(args[2], args[1]);
@@ -545,14 +544,14 @@ public class SocketClient implements ClientConn {
     /**
      *  This function can be invoked to notify the server in order to make a possibly definitive choice. The server is
      *  still going to do his checks and will reply.
-     * @param option_index the index of the object in the list previously sent by the server
+     * @param optionIndex the index of the object in the list previously sent by the server
      * @return true if the procedure is successful
      */
     @Override
-    public boolean choose(int option_index){
+    public boolean choose(int optionIndex){
         ArrayList<String> result=new ArrayList<>();
 
-        outSocket.println("CHOOSE "+option_index);
+        outSocket.println("CHOOSE "+optionIndex);
         outSocket.flush();
 
         try {

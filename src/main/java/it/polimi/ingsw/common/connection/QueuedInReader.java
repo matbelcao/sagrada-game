@@ -29,7 +29,7 @@ public class QueuedInReader {
         } catch (InterruptedException e) {
             e.printStackTrace();
             //debug
-            //System.out.println("ERR interrupt");
+            System.err.println("ERR interrupt");
         }
         put();
     }
@@ -72,7 +72,7 @@ public class QueuedInReader {
         }
     }
     public void waitForLine() throws IOException {
-        while(isEmpty()){
+        if (isEmpty()){
             add();
         }
     }

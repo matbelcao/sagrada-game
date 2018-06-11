@@ -28,6 +28,7 @@ public interface ClientUI extends Observer {
     void updateLogin(boolean logged);
 
 
+    void showLastScreen();
     /**
      * this method sends to the client an update regarding the number of players connected and waiting to begin a match
      * @param numUsers the number of connected players at the moment
@@ -118,4 +119,6 @@ public interface ClientUI extends Observer {
     String getCommand();
 
     void showOptions(List<Commands> optionsList);
+
+    void showWaitingForGameStartScreen();
 }

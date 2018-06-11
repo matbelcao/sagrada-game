@@ -49,18 +49,19 @@ public class CLI implements ClientUI {
         String username;
         char [] password;
 
-        try {
-            console.printf(view.showLoginUsername());
-            username=console.readLine().trim();
+            try {
+                console.printf(view.showLoginUsername());
+                username = console.readLine().trim();
 
-            console.printf(view.showLoginPassword());
-            password= Credentials.hash(username,console.readPassword());
+                console.printf(view.showLoginPassword());
+                password = Credentials.hash(username, console.readPassword());
 
-            client.setPassword(password);
-            client.setUsername(username);
-        } catch (Exception e) {
-            client.disconnect();
-        }
+                client.setPassword(password);
+                client.setUsername(username);
+            } catch (Exception e) {
+                client.disconnect();
+            }
+
     }
 
 
@@ -72,8 +73,14 @@ public class CLI implements ClientUI {
 
         } else {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ko")));
+            showLoginScreen();
         }
 
+    }
+
+    @Override
+    public void showLastScreen() {
+        console.printf(view.printLastScreen());
     }
 
     public void showPlacementsList(List<Integer> placements,LightDie die){
@@ -98,6 +105,7 @@ public class CLI implements ClientUI {
 
     @Override
     public void updateGameStart(int numUsers, int playerId){
+
         resetScreen();
         console.printf(String.format("%s%n", uimsg.getMessage("game-start")),numUsers,playerId);
         this.view.setMatchInfo(client.getPlayerId(),client.getBoard().getNumPlayers());
@@ -164,6 +172,7 @@ public class CLI implements ClientUI {
 
     @Override
     public void showNotYourTurnScreen() {
+        console.printf(view.printMainView(ClientFSMState.NOT_MY_TURN));
 
     }
 
@@ -208,6 +217,12 @@ public class CLI implements ClientUI {
     @Override
     public void showOptions(List<Commands> optionsList) {
 
+    }
+
+    @Override
+    public void showWaitingForGameStartScreen() {
+        resetScreen();
+        console.printf(String.format("%s%n", uimsg.getMessage("waiting-game-start")));
     }
 
 
