@@ -121,7 +121,7 @@ public class SocketServer extends Thread implements ServerConn  {
             case "PONG":
                 break;
             default:
-                return false;
+                return true;
         }
         } catch (IllegalActionException e) {
             outSocket.println("ILLEGAL ACTION!!");

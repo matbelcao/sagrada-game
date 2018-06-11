@@ -21,10 +21,6 @@ public class ServerFSM {
         placeTo=Place.SCHEMA;
     }
 
-    /*public ServerState getCurState(){
-        return curState;
-    }*/
-
     public ServerState discard(){
         if (curState.equals(ServerState.CHOOSE_PLACEMENT)){
             curState=ServerState.GET_DICE_LIST;
@@ -49,6 +45,14 @@ public class ServerFSM {
         this.isFirstTurn=isFirstTurn;
         placeFrom=Place.DRAFTPOOL;
         placeTo=Place.SCHEMA;
+        return curState;
+    }
+
+    public ServerState newToolUsage(ToolCard toolCard){
+        curState=ServerState.MAIN;
+        toolActive=true;
+        placeFrom=toolCard.getPlaceFrom();
+        placeTo=toolCard.getPlaceTo();
         return curState;
     }
 

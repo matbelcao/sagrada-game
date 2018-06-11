@@ -49,9 +49,7 @@ public class DraftPool {
         return die;
     }
 
-    public List<Die> getDraftedDice(){
-        return this.drafted;
-    }
+    public List<Die> getDraftedDice(){ return this.drafted; }
 
     public List<Integer> getDicePoolList(){
         List<Integer> positions=new ArrayList<>();

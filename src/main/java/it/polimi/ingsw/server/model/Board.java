@@ -185,7 +185,7 @@ public class Board {
      * @param user the user who made the request
      * @return the list of possible placements in the user's schema card
      */
-    public Die selectDie(User user,Place place, int die_index) {
+    public Die selectDie(User user,Place place, int die_index,Color constraint) {
         Die die;
         int tempIndex=0;
 
@@ -194,10 +194,19 @@ public class Board {
                 FullCellIterator diceIterator=(FullCellIterator)getPlayer(user).getSchema().iterator();
                 while(diceIterator.hasNext()) {
                     die = diceIterator.next().getDie();
-                    if (tempIndex == die_index) {
-                        return die;
+                    if(!constraint.equals(Color.NONE)){
+                        if(die.getColor().equals(constraint)){
+                            if (tempIndex == die_index) {
+                                return die;
+                            }
+                            tempIndex++;
+                        }
+                    }else{
+                        if (tempIndex == die_index) {
+                            return die;
+                        }
+                        tempIndex++;
                     }
-                    tempIndex++;
                 }
                 break;
             case DRAFTPOOL:

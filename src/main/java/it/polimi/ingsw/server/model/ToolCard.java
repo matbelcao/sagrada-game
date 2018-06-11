@@ -206,6 +206,12 @@ public class ToolCard extends Card {
         return toIndexedDieList(dieList);
     }
 
+    public void rerollAll(List<Die> rerollList){
+        for(Die d:rerollList){
+            d.reroll();
+        }
+    }
+
     public List<IndexedCellContent> flipDie(){
         List<Die> dieList= new ArrayList<>();
         selectedDice.get(0).flipShade();

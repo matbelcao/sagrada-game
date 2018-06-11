@@ -346,14 +346,18 @@ public class Game extends Thread implements Iterable  {
         return diceList;
     }
 
-    public List<Commands> selectDie(User user, int die_index) throws IllegalActionException {
-        System.out.println("select: "+status+" "+diceList.size()+" "+die_index);
+    public List<Commands> selectDie(User user, int dieIndex) throws IllegalActionException {
+        System.out.println("select: "+status+" "+diceList.size()+" "+dieIndex);
 
-        if(!status.equals(ServerState.SELECT) || diceList.size()<die_index){throw new IllegalActionException();}
+        Color constraint = Color.NONE;
+        if(!status.equals(ServerState.SELECT) || diceList.size()<dieIndex){throw new IllegalActionException();}
         if(fsm.getPlaceFrom()!=Place.DICEBAG && fsm.getPlaceFrom()!=Place.NONE) {
-            selectedDie = board.selectDie(user, fsm.getPlaceFrom(), die_index);
+            if(fsm.isToolActive()){
+                constraint=board.getToolCard(selectedTool).getColorConstraint();
+            }
+            selectedDie = board.selectDie(user, fsm.getPlaceFrom(), dieIndex,constraint);
         }else{
-            selectedDie=new Die(diceList.get(die_index).getContent().getShade(),diceList.get(die_index).getContent().getColor());
+            selectedDie=new Die(diceList.get(dieIndex).getContent().getShade(),diceList.get(dieIndex).getContent().getColor());
         }
 
         if(fsm.isToolActive()){
@@ -405,35 +409,23 @@ public class Game extends Thread implements Iterable  {
         switch (action){
             case INCREASE_DECREASE:
                 diceList=toolCard.shadeIncreaseDecrease(selectedDie);
-                //overrideList=true;
-                if(diceList!=null){
-                    return true;
-                }else{
-                    return false;
-                }
+                break;
             case SWAP:
                 return toolCard.swapDie();
             case REROLL:
-                diceList=toolCard.rerollDie();
-                if(diceList!=null){
+                if(toolCard.getQuantity().get(0).equals(DieQuantity.ALL)){
+                    toolCard.rerollAll(board.getDraftPool().getDraftedDice());
                     return true;
                 }else{
-                    return false;
+                    diceList=toolCard.rerollDie();
                 }
+                break;
             case FLIP:
                 diceList=toolCard.flipDie();
-                if(diceList!=null){
-                    return true;
-                }else{
-                    return false;
-                }
+                break;
             case SET_SHADE:
                 diceList=toolCard.chooseShade();
-                if(diceList!=null){
-                    return true;
-                }else{
-                    return false;
-                }
+                break;
             case SET_COLOR:
                 toolCard.setColor();
                 return true;
@@ -443,6 +435,12 @@ public class Game extends Thread implements Iterable  {
                 return true;
             default:
                 return false;
+        }
+        sendSchemaDiceList=true;
+        if(diceList!=null){
+            return true;
+        }else{
+            return false;
         }
     }
 
@@ -478,14 +476,14 @@ public class Game extends Thread implements Iterable  {
 
     //selects and enables the tool
     public boolean activeTool(User user,int index) throws IllegalActionException {
+        System.out.println("TOOL_ENABLE: "+status);
         Boolean toolEnabled;
         if(!status.equals(ServerState.MAIN)){ throw new IllegalActionException(); }
         if(index<0||index>2){return false;}
         toolEnabled=board.getToolCard(index).enableToolCard(board.getPlayer(user),round.isFirstTurn()?0:1,board.getPlayer(user).getSchema());
         if(toolEnabled){
             selectedTool=index;
-            fsm.setToolActive(true);
-            status=fsm.nextState(Commands.NONE);
+            status=fsm.newToolUsage(board.getToolCard(selectedTool));
         }else{
             discard();
             status=fsm.exit();
@@ -494,6 +492,7 @@ public class Game extends Thread implements Iterable  {
     }
 
     public boolean toolStatus(User user) throws IllegalActionException {
+        System.out.println("TOOL_STATUS: "+status);
         if(!status.equals(ServerState.TOOL_CAN_CONTINUE)){throw new IllegalActionException();}
         if(!board.getToolCard(selectedTool).toolCanContinue(board.getPlayer(user))){
             selectedTool=-1;

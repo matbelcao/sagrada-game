@@ -45,7 +45,7 @@
     <ToolCard id="7">
         <from>draftpool</from>
         <to>draftpool</to>
-        <command>none</command>
+        <command>reroll</command>
         <quantity>all</quantity>
         <when>second_turn</when>
     </ToolCard>
