@@ -139,6 +139,7 @@ public class ToolCard extends Card {
             selectedDice=new ArrayList<>();
             selectedIndex=new ArrayList<>();
             schemaTemp=schema.cloneSchema();
+            constraint=Color.NONE;
             numSelectedDice=0;
         } catch (NegativeTokensException e) {
             return false;
@@ -224,9 +225,15 @@ public class ToolCard extends Card {
         constraint=selectedDice.get(0).getColor();
     }
 
+    public Color getColorConstraint(){
+        return constraint;
+    }
+
     public boolean placeDie(int index){
+        List<Integer> placerments= schemaTemp.listPossiblePlacements(selectedDice.get(0),ignored_constraint);
+
         try {
-            schemaTemp.putDie(index,selectedDice.get(0),ignored_constraint);
+            schemaTemp.putDie(placerments.get(index),selectedDice.get(0),ignored_constraint);
         } catch (IllegalDieException e) {
             return false;
         }

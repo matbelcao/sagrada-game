@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.model;
 
+import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.GameStatus;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
@@ -125,7 +126,7 @@ public class Board {
         return schemaChoices;
     }
 
-    public  List<IndexedCellContent> indexedSchemaDiceList(User user){
+    public  List<IndexedCellContent> indexedSchemaDiceList(User user, Color constraint){
         List<IndexedCellContent> indexedList=new ArrayList<>();
         IndexedCellContent indexedCell;
         SchemaCard schema= getPlayer(user).getSchema();
@@ -135,6 +136,15 @@ public class Board {
 
         while(diceIterator.hasNext()) {
             die = diceIterator.next().getDie();
+            if(!constraint.equals(Color.NONE)){
+                if(die.getColor().equals(constraint)){
+                    indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
+                    indexedList.add(indexedCell);
+                }
+            }else{
+                indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
+                indexedList.add(indexedCell);
+            }
             indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
             indexedList.add(indexedCell);
         }

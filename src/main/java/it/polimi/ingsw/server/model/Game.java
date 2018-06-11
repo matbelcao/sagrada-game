@@ -1,10 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 
-import it.polimi.ingsw.common.enums.Commands;
-import it.polimi.ingsw.common.enums.GameStatus;
-import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.enums.UserStatus;
+import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.connection.User;
@@ -37,6 +34,7 @@ public class Game extends Thread implements Iterable  {
     private int selectedTool;
     private Die selectedDie;
     private Commands selectedCommand;
+    private Boolean sendSchemaDiceList;
     List<IndexedCellContent> diceList;
     List<Commands> commandsList;
     List<Integer> placements;
@@ -156,6 +154,7 @@ public class Game extends Thread implements Iterable  {
 
         while (round.hasNextRound()){
             round.nextRound();
+            sendSchemaDiceList=false;
             board.getDraftPool().draftDice(users.size());
 
             //Notify to all the users the starting of the round
@@ -166,6 +165,7 @@ public class Game extends Thread implements Iterable  {
             while(round.hasNext()){
                 userPlaying = round.next();
                 status=fsm.newTurn(round.isFirstTurn());
+                sendSchemaDiceList=false;
                 exit();
                 System.out.println(status+"  "+fsm.getPlaceFrom());
                 endLock=false;
@@ -317,25 +317,29 @@ public class Game extends Thread implements Iterable  {
 
     public List<IndexedCellContent> getDiceList(User user) throws IllegalActionException {
         System.out.println("dice_list: "+status);
+        Color constraint = Color.NONE;
         if(!status.equals(ServerState.MAIN)){throw new IllegalActionException();}
 
         if(fsm.isToolActive()){
             fsm.setPlaceFrom(board.getToolCard(selectedTool).getFrom());
+            constraint=board.getToolCard(selectedTool).getColorConstraint();
         }
 
-        switch(fsm.getPlaceFrom()) {
-            case SCHEMA:
-                diceList = board.indexedSchemaDiceList(user);
-                break;
-            case DRAFTPOOL:
-                diceList = board.indexedDraftpoolDiceList();
-                break;
-            case ROUNDTRACK:
-                diceList = board.indexedRoundTrackDiceList();
-                break;
-            case DICEBAG:
-                //to define better.....
-                return new ArrayList<>();
+        if(!sendSchemaDiceList){
+            switch(fsm.getPlaceFrom()) {
+                case SCHEMA:
+                    diceList = board.indexedSchemaDiceList(user,constraint);
+                    break;
+                case DRAFTPOOL:
+                    diceList = board.indexedDraftpoolDiceList();
+                    break;
+                case ROUNDTRACK:
+                    diceList = board.indexedRoundTrackDiceList();
+                    break;
+                case DICEBAG:
+                    //to define better.....
+                    return new ArrayList<>();
+            }
         }
         status=fsm.nextState(selectedCommand);
         status=fsm.nextState(selectedCommand);
@@ -379,7 +383,7 @@ public class Game extends Thread implements Iterable  {
             System.out.println("CHOOSE_PLACEMENTS: "+placements.size()+" "+selectedCommand+" "+selectedDie);
             if(placements.size()<index || !selectedCommand.equals(Commands.PLACE_DIE) || selectedDie==null){return false;}
                 if(fsm.isToolActive()){
-                    response=executeAction();
+                    response=board.getToolCard(selectedTool).placeDie(index);
                 }else{
                     response=board.schemaPlacement(user,selectedTool,index,selectedDie);//to verify
 
@@ -510,6 +514,7 @@ public class Game extends Thread implements Iterable  {
     }
 
     public void exit(){
+        sendSchemaDiceList=false;
         status=fsm.exit();
         selectedTool=-1;
         selectedDie=null;
