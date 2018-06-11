@@ -86,10 +86,13 @@ public class SocketClient implements ClientConn {
                         } else if (ClientParser.isIllegalAction(inSocket.readln())) {
                             inSocket.pop();
                             System.out.println("ILLEGAL ACTION!");
-                        } //else {
-                            //debug
-                           // System.out.println("ERR: control error caused by:  " + inSocket.readln());
-                        //}
+                        } else {
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace(); // TODO: 11/06/2018  
+                            }
+                        }
                     }
                 } catch (IOException e) {
                     if(!socket.isClosed()) {
@@ -554,12 +557,13 @@ public class SocketClient implements ClientConn {
         outSocket.println("CHOOSE "+optionIndex);
         outSocket.flush();
 
-        try {
+        /*try {
             inSocket.waitForLine();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
         while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isChoice(inSocket.readln())));
+        System.out.println("bubububub"); // TODO: remove
         inSocket.pop();
         return result.get(1).equals("ok");
     }

@@ -366,6 +366,7 @@ public class Client {
 
                         case CHOOSE_SCHEMA:
                             if(clientConn.choose(Integer.parseInt(command))) {
+                                printDebug("sonwqa"); // TODO: 11/06/2018  
                                 clientUI.showWaitingForGameStartScreen();
                             }else{
                                 clientUI.showLastScreen();

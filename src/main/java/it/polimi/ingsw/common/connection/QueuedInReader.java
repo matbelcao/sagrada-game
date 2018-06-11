@@ -43,6 +43,9 @@ public class QueuedInReader {
     }
 
     public String readln(){
+        if(isEmpty()){
+            return "";
+        }
         return queue.get(0);
     }
 
