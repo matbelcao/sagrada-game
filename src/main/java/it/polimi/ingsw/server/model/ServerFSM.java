@@ -9,7 +9,7 @@ public class ServerFSM {
     private boolean diePlaced;
     private boolean isFirstTurn;
 
-    Place curPlace;
+    Place placeFrom,placeTo;
     private ServerState curState;
 
 
@@ -17,7 +17,8 @@ public class ServerFSM {
         curState=ServerState.INIT;
         toolActive=false;
         diePlaced=false;
-        curPlace=Place.DRAFTPOOL;
+        placeFrom=Place.DRAFTPOOL;
+        placeTo=Place.SCHEMA;
     }
 
     /*public ServerState getCurState(){
@@ -25,7 +26,7 @@ public class ServerFSM {
     }*/
 
     public ServerState discard(){
-        if (curPlace.equals(ServerState.CHOOSE_PLACEMENT)){
+        if (curState.equals(ServerState.CHOOSE_PLACEMENT)){
             curState=ServerState.GET_DICE_LIST;
         }
         return curState;
@@ -35,7 +36,8 @@ public class ServerFSM {
         if(!curState.equals(ServerState.INIT)){
             curState=ServerState.MAIN;
             toolActive=false;
-            curPlace=Place.DRAFTPOOL;
+            placeFrom=Place.DRAFTPOOL;
+            placeTo=Place.SCHEMA;
         }
         return curState;
     }
@@ -45,7 +47,8 @@ public class ServerFSM {
         toolActive=false;
         diePlaced=false;
         this.isFirstTurn=isFirstTurn;
-        curPlace=Place.DRAFTPOOL;
+        placeFrom=Place.DRAFTPOOL;
+        placeTo=Place.SCHEMA;
         return curState;
     }
 
@@ -117,11 +120,19 @@ public class ServerFSM {
         return isFirstTurn;
     }
 
-    public void setCurPlace(Place place){
-        curPlace=place;
+    public void setPlaceTo(Place place){
+        placeTo=place;
     }
 
-    public Place getCurPlace(){
-        return curPlace;
+    public Place getPlaceTo(){
+        return placeTo;
+    }
+
+    public void setPlaceFrom(Place place){
+        placeFrom=place;
+    }
+
+    public Place getPlaceFrom(){
+        return placeFrom;
     }
 }

@@ -180,7 +180,7 @@ public class ClientParserTest {
 
         assertTrue(ClientParser.parse("LIST_DICE", parsedResult));
         assertFalse(ClientParser.parse("LIST_OPTIONS", parsedResult));
-        assertTrue(ClientParser.parse("CHOOSE_PLACEMENT", parsedResult));
+        assertTrue(ClientParser.parse("CHOOSE", parsedResult));
         assertFalse(ClientParser.parse("LIST 2,RED", parsedResult));
         assertFalse(ClientParser.parse("LIST_DICE 1,2", parsedResult));
         assertFalse(ClientParser.parse("LIST_DICE 1,2,greeN,TWO,SIX", parsedResult));
