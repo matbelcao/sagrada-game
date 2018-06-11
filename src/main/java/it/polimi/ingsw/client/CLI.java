@@ -109,6 +109,7 @@ public class CLI implements ClientUI {
         resetScreen();
         console.printf(String.format("%s%n", uimsg.getMessage("game-start")),numUsers,playerId);
         this.view.setMatchInfo(client.getPlayerId(),client.getBoard().getNumPlayers());
+
     }
 
     @Override
@@ -222,7 +223,10 @@ public class CLI implements ClientUI {
     @Override
     public void showWaitingForGameStartScreen() {
         resetScreen();
-        console.printf(String.format("%s%n", uimsg.getMessage("waiting-game-start")));
+
+        String msg=String.format("%s%n", uimsg.getMessage("waiting-game-start"));
+        view.setLastScreen(msg);
+        console.printf(msg);
     }
 
 

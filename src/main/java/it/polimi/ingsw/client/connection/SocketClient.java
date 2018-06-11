@@ -3,7 +3,6 @@ package it.polimi.ingsw.client.connection;
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedInReader;
-import it.polimi.ingsw.common.enums.Face;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.immutables.*;
@@ -26,6 +25,7 @@ public class SocketClient implements ClientConn {
     private QueuedInReader inSocket;
     private PrintWriter outSocket;
     private Client client;
+    private final Object lockin=new Object();
 
     /**
      * Thi is the class constructor, it instantiates the new socket and the input/output buffers for the communications
@@ -39,7 +39,6 @@ public class SocketClient implements ClientConn {
         socket = new Socket(address, port);
         inSocket = new QueuedInReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
         outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
-
         inSocket.add();
 
         inSocket.pop();
@@ -56,43 +55,41 @@ public class SocketClient implements ClientConn {
             ArrayList<String> result= new ArrayList<>();
             while(!socket.isClosed()) {
                 try {
-                    inSocket.add();
 
-                    if(ClientParser.parse(inSocket.readln(),result)) {
-                        if (ClientParser.isStatus(inSocket.readln())) {
-                            inSocket.pop();
-                            switch (result.get(1)) {
-                                case "check":
-                                    pong();
-                                    break;
-                                case "reconnect":
-                                    break;
-                                case "disconnect":
-                                    break;
-                                case "quit":
-                                    break;
-                            }
-                        } else if (ClientParser.isLobby(inSocket.readln())) {
-                            inSocket.pop();
-                            updateLobby(result.get(1));
-                        } else if (ClientParser.isGame(inSocket.readln())) {
-                            inSocket.pop();
-                            updateMessages(result);
-                        } else if (ClientParser.isPing(inSocket.readln())) {
-                            pong();
-                        } else if (ClientParser.isInvalid(inSocket.readln())) {
-                            inSocket.pop();
-                            System.out.println("INVALID message");
-                        } else if (ClientParser.isIllegalAction(inSocket.readln())) {
-                            inSocket.pop();
-                            System.out.println("ILLEGAL ACTION!");
-                        } else {
-                            try {
-                                Thread.sleep(200);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace(); // TODO: 11/06/2018  
+                    synchronized (lockin) {
+                        inSocket.waitForLine();
+
+                        if (ClientParser.parse(inSocket.readln(), result)) {
+                            if (ClientParser.isStatus(inSocket.readln())) {
+                                inSocket.pop();
+                                switch (result.get(1)) {
+                                    case "check":
+                                        pong();
+                                        break;
+                                    case "reconnect":
+                                        break;
+                                    case "disconnect":
+                                        break;
+                                    case "quit":
+                                        break;
+                                }
+                            } else if (ClientParser.isLobby(inSocket.readln())) {
+                                inSocket.pop();
+                                updateLobby(result.get(1));
+                            } else if (ClientParser.isGame(inSocket.readln())) {
+                                inSocket.pop();
+                                updateMessages(result);
+                            } else if (ClientParser.isPing(inSocket.readln())) {
+                                pong();
+                            } else if (ClientParser.isInvalid(inSocket.readln())) {
+                                inSocket.pop();
+                                System.out.println("INVALID message");
+                            } else if (ClientParser.isIllegalAction(inSocket.readln())) {
+                                inSocket.pop();
+                                System.out.println("ILLEGAL ACTION!");
                             }
                         }
+                        lockin.notifyAll();
                     }
                 } catch (IOException e) {
                     if(!socket.isClosed()) {
@@ -135,12 +132,9 @@ public class SocketClient implements ClientConn {
             inSocket.pop();
             if (parsedResult.get(1).equals("ok")) {
                 startListening();
-                client.getClientUI().updateLogin(true);
                 return true;
             }
         }
-
-        client.getClientUI().updateLogin(false);
         return false;
     }
 
@@ -158,7 +152,7 @@ public class SocketClient implements ClientConn {
      * @param outcomes the server's parsed message
      */
     private void updateMessages(List<String> outcomes){
-        String param[];
+        String [] param;
         int i;
         switch(outcomes.get(1)){
             case "start":
@@ -208,17 +202,29 @@ public class SocketClient implements ClientConn {
 
         int i=0;
         while(i<NUM_DRAFTED_SCHEMAS){
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")){
-                lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
+            synchronized (lockin) {
+                try {
+                    inSocket.waitForLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema"))) {
+                    lockin.notifyAll();
+                    try {
+                        lockin.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                lightSchema = LightSchemaCard.toLightSchema(inSocket.readln());
                 lightSchemaCards.add(lightSchema);
                 inSocket.pop();
+                lockin.notifyAll();
                 i++;
             }
+
         }
         return lightSchemaCards;
     }
@@ -236,16 +242,26 @@ public class SocketClient implements ClientConn {
 
         outSocket.println("GET schema "+playerId);
         outSocket.flush();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema"))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            lightSchema = LightSchemaCard.toLightSchema(inSocket.readln());
+            inSocket.pop();
+            lockin.notifyAll();
         }
-        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("schema")));
-
-        lightSchema=LightSchemaCard.toLightSchema(inSocket.readln());
-        inSocket.pop();
         return lightSchema;
     }
 
@@ -260,17 +276,27 @@ public class SocketClient implements ClientConn {
 
         outSocket.println("GET priv");
         outSocket.flush();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("priv"))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+            lightObjCard = LightPrivObj.toLightPrivObj(inSocket.readln());
+            inSocket.pop();
+            lockin.notifyAll();
         }
-        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("priv")));
-
-        lightObjCard = LightPrivObj.toLightPrivObj(inSocket.readln());
-        inSocket.pop();
-
         return lightObjCard;
     }
 
@@ -289,17 +315,28 @@ public class SocketClient implements ClientConn {
 
             int i=0;
             while(i<NUM_CARDS){
-                try {
-                    inSocket.waitForLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("pub")){
-                    lightObjCard=LightCard.toLightCard(inSocket.readln());
+                synchronized (lockin) {
+                    try {
+                        inSocket.waitForLine();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("pub"))) {
+                        lockin.notifyAll();
+                        try {
+                            lockin.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    lightObjCard = LightCard.toLightCard(inSocket.readln());
                     pubObjCards.add(lightObjCard);
                     inSocket.pop();
+                    lockin.notifyAll();
                     i++;
                 }
+
             }
             return pubObjCards;
     }
@@ -319,17 +356,28 @@ public class SocketClient implements ClientConn {
 
         int i=0;
         while(i<NUM_CARDS){
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("tool")){
-                lightTool=LightTool.toLightTool(inSocket.readln());
+
+            synchronized (lockin) {
+                try {
+                    inSocket.waitForLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("tool"))) {
+                    lockin.notifyAll();
+                    try {
+                        lockin.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                lightTool = LightTool.toLightTool(inSocket.readln());
                 toolCards.add(lightTool);
                 inSocket.pop();
-                i++;
+                lockin.notifyAll();
             }
+            i++;
         }
         return toolCards;
     }
@@ -347,15 +395,25 @@ public class SocketClient implements ClientConn {
 
         outSocket.println("GET draftpool");
         outSocket.flush();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool"))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            inSocket.pop();
+            lockin.notifyAll();
         }
-        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("draftpool")));
-
-        inSocket.pop();
         for(int i=COMMA_PARAMS_START;i<result.size();i++) {
             args = result.get(i).split(",");
             die = new LightDie(args[2], args[1]);
@@ -379,15 +437,25 @@ public class SocketClient implements ClientConn {
 
         outSocket.println("GET roundtrack");
         outSocket.flush();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("roundtrack"))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            inSocket.pop();
+            lockin.notifyAll();
         }
-        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("roundtrack")));
-
-        inSocket.pop();
         roundTrack = new ArrayList<>();
         for (int i = COMMA_PARAMS_START; i < result.size(); i++) {
             args = result.get(i).split(",");
@@ -415,15 +483,25 @@ public class SocketClient implements ClientConn {
 
         outSocket.println("GET players");
         outSocket.flush();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("players"))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            inSocket.pop();
+            lockin.notifyAll();
         }
-        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("players")));
-
-        inSocket.pop();
         for(int i=COMMA_PARAMS_START;i<result.size();i++) {
             args = result.get(i).split(",");
             player = new LightPlayer(args[1], Integer.parseInt(args[0]));
@@ -444,15 +522,24 @@ public class SocketClient implements ClientConn {
 
         outSocket.println("GET favor_tokens "+playerId);
         outSocket.flush();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("favor_tokens"))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            inSocket.pop();
+            lockin.notifyAll();
         }
-        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("favor_tokens")));
-
-        inSocket.pop();
         favor_tokens=Integer.parseInt(result.get(1));
         return favor_tokens;
     }
@@ -463,23 +550,33 @@ public class SocketClient implements ClientConn {
      * @return and immutable and indexed list containing the dice
      */
     @Override
-    public List<IndexedCellContent> getDiceList(){
-        ArrayList<String> result= new ArrayList<>();
-        List<IndexedCellContent> diceList=new ArrayList<>();
+    public List<IndexedCellContent> getDiceList() {
+        ArrayList<String> result = new ArrayList<>();
+        List<IndexedCellContent> diceList = new ArrayList<>();
         IndexedCellContent indexedDie;
-        String [] args;
+        String[] args;
 
         outSocket.println("SELECT_DIE");
         outSocket.flush();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isDiceList(inSocket.readln()))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            inSocket.pop();
+            lockin.notifyAll();
         }
-        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isDiceList(inSocket.readln())));
-
-        inSocket.pop();
         for(int i=LIST_START;i<result.size();i++) {
             args= result.get(i).split(",");
             indexedDie=new IndexedCellContent(Integer.parseInt(args[0]),args[1],args[2],args[3]);
@@ -500,15 +597,25 @@ public class SocketClient implements ClientConn {
 
         outSocket.println("SELECT "+die_index);
         outSocket.flush();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isOptionList(inSocket.readln()))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            inSocket.pop();
+            lockin.notifyAll();
         }
-        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isOptionList(inSocket.readln())));
-
-        inSocket.pop();
         for(int i=LIST_START;i<result.size();i++) {
             options.add(Commands.valueOf(result.get(i)));
         }
@@ -528,15 +635,24 @@ public class SocketClient implements ClientConn {
 
         outSocket.println("GET_PLACEMENTS_LIST");
         outSocket.flush();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isPlacementList(inSocket.readln()) && result.get(1).equals("placements"))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            inSocket.pop();
+            lockin.notifyAll();
         }
-        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isPlacementList(inSocket.readln()) && result.get(1).equals("placements")));
-
-        inSocket.pop();
         for(int i=LIST_START;i<result.size();i++) {
             positions.add(Integer.parseInt(result.get(i)));
         }
@@ -557,37 +673,57 @@ public class SocketClient implements ClientConn {
         outSocket.println("CHOOSE "+optionIndex);
         outSocket.flush();
 
-        /*try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isChoice(inSocket.readln())));
-        System.out.println("bubububub"); // TODO: remove
-        inSocket.pop();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isChoice(inSocket.readln()))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            inSocket.pop();
+            lockin.notifyAll();
+        }
         return result.get(1).equals("ok");
     }
 
     /**
      *  This function can be invoked to notify the server the intenction to select a tool car. The server is
      *  still going to do his checks and will reply.
-     * @param tool_index the index of the toolcard the user wants to use
+     * @param toolIndex the index of the toolcard the user wants to use
      * @return true iff the toolcard has been activated
      */
     @Override
-    public boolean enableTool(int tool_index){
+    public boolean enableTool(int toolIndex){
         ArrayList<String> result=new ArrayList<>();
 
-        outSocket.println("TOOL enable "+tool_index);
+        outSocket.println("TOOL enable "+toolIndex);
         outSocket.flush();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isTool(inSocket.readln()))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            inSocket.pop();
+            lockin.notifyAll();
         }
-        while(!(ClientParser.parse(inSocket.readln(),result) && ClientParser.isTool(inSocket.readln())));
-        inSocket.pop();
         return result.get(1).equals("ok");
     }
 
@@ -601,14 +737,23 @@ public class SocketClient implements ClientConn {
 
         outSocket.println("TOOL can_continue");
         outSocket.flush();
-
-        try {
-            inSocket.waitForLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isTool(inSocket.readln()))) {
+                lockin.notifyAll();
+                try {
+                    lockin.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            inSocket.pop();
+            lockin.notifyAll();
         }
-        while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isTool(inSocket.readln()))) ;
-        inSocket.pop();
         return result.get(1).equals("ok");
     }
 

@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,7 +33,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -245,7 +245,7 @@ public class Client {
             new Thread(() -> GUI.launch(this,lang)).start();
             while(GUI.getGUI() == null){
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -272,15 +272,12 @@ public class Client {
             if (connMode.equals(ConnectionMode.SOCKET)) {
                 clientConn = new SocketClient(this, serverIP, port);
             }
-            while(!logged){
-
-
+            do{
+                
                 synchronized (lockCredentials) {
                     while (username == null || password == null) {
                         lockCredentials.wait();
-                        System.out.println("here");
                     }
-                    lockCredentials.notifyAll();
                 }
 
                 if (connMode.equals(ConnectionMode.RMI)) {
@@ -300,10 +297,10 @@ public class Client {
 
                 clientUI.updateLogin(logged);
 
-            }
+            }while(!logged);
+
 
             //start collecting commands from ui
-            commandFilter();
             commandManager();
 
             synchronized (lockStatus) {
@@ -320,92 +317,69 @@ public class Client {
         }
     }
 
-
-    private void commandFilter(){
-        new Thread(() -> {
-            while(isLogged()){
-                try {
-                    commandQueue.waitForLine();
-                    commandQueue.add();
-
-                    if (!commandQueue.readln().matches(INDEX + "|" + SINGLE_CHAR)) {
-                        commandQueue.pop();
-                    }
-
-                } catch (IOException e) {
-                    System.err.println("ERR: couldn't read from the console");
-                    System.exit(1);
-                }
-            }
-        }).start();
-    }
-
-
     private void commandManager(){
 
         new Thread(() -> {
             String command="";
-            while(isLogged()){
+            synchronized (lockState){
+                turnState=ClientFSMState.CHOOSE_SCHEMA;
+            }
+
+            while(isLogged()) {
+
                 try {
-
-                        commandQueue.waitForLine();
-                        command=commandQueue.getln();
-
-
+                    commandQueue.waitForLine();
                 } catch (IOException e) {
-                    System.err.println("ERR: io error");
-                    System.exit(1);
+                    System.err.println("ERR: couldn't read from console");
+                    System.exit(2);
                 }
 
-                boolean isOk=false;
-                printDebug(command);
-                clientUI.printmsg(turnState.toString());
-                if(command.matches(INDEX)){
-
-                    switch(turnState){
+                command = commandQueue.readln();
+                commandQueue.pop();
+                if (command.matches(INDEX)) {
+                    switch (turnState) {
 
                         case CHOOSE_SCHEMA:
-                            if(clientConn.choose(Integer.parseInt(command))) {
-                                printDebug("sonwqa"); // TODO: 11/06/2018  
+                            if (clientConn.choose(Integer.parseInt(command))) {
+
                                 clientUI.showWaitingForGameStartScreen();
-                            }else{
+                            } else {
                                 clientUI.showLastScreen();
                             }
                             break;
 
                         case SELECT_DIE:
                             board.setOptionsList(clientConn.select(Integer.parseInt(command)));
-                            if(board.getOptionsList().size()==1){
+                            if (board.getOptionsList().size() == 1) {
 
                                 clientConn.choose(0);
-                                synchronized (lockState){
-                                    turnState=turnState.nextState(false,false,false,false);
+                                synchronized (lockState) {
+                                    turnState = turnState.nextState(false, false, false, false);
 
-                                    turnState=turnState.nextState(
+                                    turnState = turnState.nextState(
                                             board.getOptionsList().get(0).equals(Commands.PLACE_DIE),
                                             false,
                                             false,
                                             false);
                                     lockState.notifyAll();
                                 }
-                            }else{
+                            } else {
                                 clientUI.showOptions(board.getOptionsList());
                             }
                             break;
                         case CHOOSE_PLACEMENT:
-
-
+                            break;
                         case CHOOSE_OPTION:
-                            if(clientConn.choose(Integer.parseInt(command))){
-                                synchronized (lockState){
-                                    turnState=turnState.nextState(
+                            if (clientConn.choose(Integer.parseInt(command))) {
+                                synchronized (lockState) {
+                                    turnState = turnState.nextState(
                                             board.getOptionsList().get(Integer.parseInt(command)).equals(Commands.PLACE_DIE),
                                             false,
                                             false,
                                             false);
                                     lockState.notifyAll();
                                 }
-                            }else{
+                            } else {
                                 clientUI.showLastScreen();
                             }
 
@@ -414,29 +388,36 @@ public class Client {
                         default:
                             break;
                     }
+                }else if (command.matches(SINGLE_CHAR)) {
+
+                    switch (command) {
+
+                        case QUIT:
+                            quit();
+                            break;
+                        case END_TURN:
+                            clientConn.endTurn();
+                            break;
+                        case BACK:
+                            clientConn.exit();
+                            break;
+                        case DISCARD:
+                            if (turnState.equals(ClientFSMState.CHOOSE_PLACEMENT)) {
+                                clientConn.discard();
+                            }
+                            break;
+
+                        default:
+                            clientUI.showLastScreen();
+                            break;
+                    }
+
+                    synchronized (lockState) {
+                        turnState = turnState.nextState(false, command.equals(BACK), command.equals(END_TURN), command.equals(DISCARD));
+                        lockState.notifyAll();
+                    }
+
                 }
-                if(command.matches(SINGLE_CHAR)){
-                    if(command.equals(END_TURN)){
-                        clientConn.endTurn();
-                        turnState=turnState.nextState(false,false,true,false);
-                    }
-                    if(command.equals(QUIT)){ quit();}
-
-                    if(command.equals(BACK)){
-                        turnState=turnState.nextState(false,true,false,false);
-
-                    }
-
-                    if(turnState.equals(ClientFSMState.CHOOSE_PLACEMENT)) {
-                        if (command.equals(DISCARD)) {
-                            turnState = turnState.nextState(false, false, false, true);
-                        }
-                    }
-                }
-
-
-
-
 
             }
         }).start();
@@ -479,24 +460,28 @@ public class Client {
      * @param playerId the id of the user
      */
     public void updateGameStart(int numPlayers, int playerId){
+
         this.board= new LightBoard(numPlayers);
 
         board.addObserver(clientUI);
-        clientUI.updateGameStart(numPlayers,playerId);
+
         board.setMyPlayerId(playerId);
 
         synchronized (lockStatus){
             userStatus=UserStatus.PLAYING;
             lockStatus.notifyAll();
         }
+
         board.setPrivObj(clientConn.getPrivateObject());
+
         board.setDraftedSchemas(clientConn.getSchemaDraft());
+
+        clientUI.updateGameStart(numPlayers,playerId);
+
         clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
 
-        synchronized (lockState) {
-            this.turnState = ClientFSMState.CHOOSE_SCHEMA;
-            lockState.notifyAll();
-        }
+
+
     }
 
     public void updateGameEnd(){
@@ -506,10 +491,12 @@ public class Client {
     public void updateGameRoundStart(int numRound){
 
         if(numRound==0){
+
             synchronized (lockState){
                 assert(turnState.equals(ClientFSMState.CHOOSE_SCHEMA));
                 turnState = turnState.nextState(true,false,false,false);
             }
+
             //get players
             List<LightPlayer> players= clientConn.getPlayers();
             for(int i=0; i<board.getNumPlayers();i++){
@@ -522,8 +509,6 @@ public class Client {
                 //set favor tokens
                 board.getPlayerByIndex(i).setFavorTokens(clientConn.getFavorTokens(i));
             }
-            players=null;
-
             //get tools
             board.addTools(clientConn.getTools());
 

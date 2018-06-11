@@ -83,7 +83,11 @@ public class CLIView {
 
 
     public String printLastScreen(){
-        return lastScreen;
+        return resetScreenPosition()+lastScreen;
+    }
+
+    public void setLastScreen(String msg) {
+        lastScreen=msg;
     }
 
     public String printMainView(ClientFSMState state){
@@ -110,7 +114,7 @@ public class CLIView {
 
     public String printSchemaChoiceView(){
         StringBuilder builder=new StringBuilder();
-        builder.append(resetScreenPosition());
+        //builder.append(resetScreenPosition());
         List<String> priv = new ArrayList<>(privObj);
         List<String> drafted = new ArrayList<>(buildDraftedSchemas());
         priv.add(0,boldify(uiMsg.getMessage("priv-obj")));

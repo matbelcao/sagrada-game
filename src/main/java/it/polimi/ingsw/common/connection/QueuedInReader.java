@@ -15,6 +15,13 @@ public class QueuedInReader {
         this.inReader= inReader;
     }
 
+    public void clear() {
+        synchronized (lockQueue){
+            queue.clear();
+            lockQueue.notifyAll();
+        }
+    }
+
     public void add() throws IOException {
         try {
             synchronized (lockReader) {
@@ -22,7 +29,6 @@ public class QueuedInReader {
                     lockReader.wait(100);
                 }
 
-                lockReader.notifyAll();
                 //debug
                 System.out.println("\t\t\t\t\t"+temp);
             }
@@ -39,20 +45,15 @@ public class QueuedInReader {
             queue.add(temp);
             lockQueue.notifyAll();
         }
-            temp=null;
+        temp=null;
     }
 
     public String readln(){
-        if(isEmpty()){
-            return "";
-        }
         return queue.get(0);
     }
 
     public String getln(){
-
         synchronized(lockQueue) {
-            assert(!queue.isEmpty());
             String line = queue.get(0);
             queue.remove(0);
             lockQueue.notifyAll();
