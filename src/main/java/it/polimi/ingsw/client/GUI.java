@@ -149,6 +149,11 @@ public class GUI extends Application implements ClientUI {
     }
 
     @Override
+    public void showLastScreen() {
+
+    }
+
+    @Override
     public void updateLobby(int numUsers) {
         Platform.runLater(() -> {
             messageToUser.setFill(Color.GREEN);
@@ -370,6 +375,11 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void showOptions(List<Commands> optionsList) {
+
+    }
+
+    @Override
+    public void showWaitingForGameStartScreen() {
 
     }
 

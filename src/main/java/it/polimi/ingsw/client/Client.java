@@ -35,8 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static it.polimi.ingsw.client.ClientFSMState.CHOOSE_PLACEMENT;
-
 /**
  * This class represents a client that can connect to the server and participate to a match of the game.
  * Every client has some preferences that can be set via command line options (-h to see them)
@@ -66,7 +64,7 @@ public class Client {
     private ClientFSMState turnState;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
     private final Object lockCredentials=new Object();
-    private final Object lockCommandQueue= new Object();
+   // private final Object lockCommandQueue= new Object();
     private QueuedInReader commandQueue;
 
 
@@ -187,13 +185,23 @@ public class Client {
      * this sets the username of the client
      * @param username the username to be set
      */
-    public void setUsername(String username){ this.username = username; }
+    public void setUsername(String username){
+        synchronized (lockCredentials){
+            this.username = username;
+            lockCredentials.notifyAll();
+        }
+    }
 
     /**
      * this sets the password of the client (this will be used to try and login and may differ from the one in the server)
      * @param password the password to be set
      */
-    public void setPassword(char[] password) { this.password = password; }
+    public void setPassword(char[] password) {
+        synchronized (lockCredentials) {
+            this.password = password;
+            lockCredentials.notifyAll();
+        }
+    }
 
     /**
      * @return the set username
@@ -264,11 +272,13 @@ public class Client {
             if (connMode.equals(ConnectionMode.SOCKET)) {
                 clientConn = new SocketClient(this, serverIP, port);
             }
-            do {
+            while(!logged){
+
 
                 synchronized (lockCredentials) {
                     while (username == null || password == null) {
                         lockCredentials.wait();
+                        System.out.println("here");
                     }
                     lockCredentials.notifyAll();
                 }
@@ -279,12 +289,8 @@ public class Client {
                     logged = clientConn.login(username, password);
                 }
 
-                synchronized (lockCredentials) {
-                    Arrays.fill(this.password, ' ');
-                    lockCredentials.notifyAll();
-                }
 
-                if(!logged){
+                if(!logged) {
                     synchronized (lockCredentials) {
                         username = null;
                         password = null;
@@ -292,7 +298,9 @@ public class Client {
                     }
                 }
 
-            } while (!logged);
+                clientUI.updateLogin(logged);
+
+            }
 
             //start collecting commands from ui
             commandFilter();
@@ -317,17 +325,13 @@ public class Client {
         new Thread(() -> {
             while(isLogged()){
                 try {
-                    synchronized (lockCommandQueue) {
-                        while (commandQueue.isEmpty()) {
-                            commandQueue.waitForLine();
-                            commandQueue.add();
+                    commandQueue.waitForLine();
+                    commandQueue.add();
 
-                            if (!commandQueue.readln().matches(INDEX + "|" + SINGLE_CHAR)) {
-                                commandQueue.pop();
-                            }
-                        }
-                        lockCommandQueue.notifyAll();
+                    if (!commandQueue.readln().matches(INDEX + "|" + SINGLE_CHAR)) {
+                        commandQueue.pop();
                     }
+
                 } catch (IOException e) {
                     System.err.println("ERR: couldn't read from the console");
                     System.exit(1);
@@ -343,11 +347,11 @@ public class Client {
             String command="";
             while(isLogged()){
                 try {
-                    synchronized (lockCommandQueue) {
+
                         commandQueue.waitForLine();
                         command=commandQueue.getln();
-                        lockCommandQueue.notifyAll();
-                    }
+
+
                 } catch (IOException e) {
                     System.err.println("ERR: io error");
                     System.exit(1);
@@ -355,12 +359,17 @@ public class Client {
 
                 boolean isOk=false;
                 printDebug(command);
+                clientUI.printmsg(turnState.toString());
                 if(command.matches(INDEX)){
+
                     switch(turnState){
 
                         case CHOOSE_SCHEMA:
-                            if(!clientConn.choose(Integer.parseInt(command))) {
-                                clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
+                            if(clientConn.choose(Integer.parseInt(command))) {
+                                printDebug("sonwqa"); // TODO: 11/06/2018  
+                                clientUI.showWaitingForGameStartScreen();
+                            }else{
+                                clientUI.showLastScreen();
                             }
                             break;
 
@@ -370,7 +379,14 @@ public class Client {
 
                                 clientConn.choose(0);
                                 synchronized (lockState){
-                                    turnState=turnState.nextState(board.getOptionsList().get(0).equals(Commands.PLACE_DIE),false,false,false);
+                                    turnState=turnState.nextState(false,false,false,false);
+
+                                    turnState=turnState.nextState(
+                                            board.getOptionsList().get(0).equals(Commands.PLACE_DIE),
+                                            false,
+                                            false,
+                                            false);
+                                    lockState.notifyAll();
                                 }
                             }else{
                                 clientUI.showOptions(board.getOptionsList());
@@ -381,10 +397,17 @@ public class Client {
 
                         case CHOOSE_OPTION:
                             if(clientConn.choose(Integer.parseInt(command))){
-
+                                synchronized (lockState){
+                                    turnState=turnState.nextState(
+                                            board.getOptionsList().get(Integer.parseInt(command)).equals(Commands.PLACE_DIE),
+                                            false,
+                                            false,
+                                            false);
+                                    lockState.notifyAll();
+                                }
+                            }else{
+                                clientUI.showLastScreen();
                             }
-
-
 
                             break;
 
@@ -404,7 +427,7 @@ public class Client {
 
                     }
 
-                    if(turnState==CHOOSE_PLACEMENT) {
+                    if(turnState.equals(ClientFSMState.CHOOSE_PLACEMENT)) {
                         if (command.equals(DISCARD)) {
                             turnState = turnState.nextState(false, false, false, true);
                         }
@@ -457,6 +480,7 @@ public class Client {
      */
     public void updateGameStart(int numPlayers, int playerId){
         this.board= new LightBoard(numPlayers);
+
         board.addObserver(clientUI);
         clientUI.updateGameStart(numPlayers,playerId);
         board.setMyPlayerId(playerId);
@@ -508,7 +532,8 @@ public class Client {
             for(int i=0; i< LightBoard.NUM_PUB_OBJ;i++){
                 board.addPubObj(pubObj.get(i));
             }
-            clientUI.showTurnInitScreen();
+
+            clientUI.showNotYourTurnScreen();
         }
 
         board.notifyObservers();
@@ -522,7 +547,6 @@ public class Client {
     }
 
     public void updateGameTurnStart(int playerId, boolean isFirstTurn){
-
         board.setDraftPool(clientConn.getDraftPool());
         board.setNowPlaying(playerId);
         board.setIsFirstTurn(isFirstTurn);

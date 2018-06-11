@@ -16,13 +16,13 @@ import static it.polimi.ingsw.client.uielements.CLIViewUtils.*;
 
 public class CLIView {
 
-    private String bottomInfo;
-    private String options;
-    private String turnRoundinfo;
+    private String bottomInfo="";
+    private String options="";
+    private String turnRoundinfo="";
     private final HashMap<Integer,List<String>> schemas= new HashMap<>();
-    private List<String> objectives;
+    private List<String> objectives= new ArrayList<>();
     private final List<String> tools = new ArrayList<>();
-    private List<String> privObj;
+    private List<String> privObj= new ArrayList<>();
     private List<String> roundTrack = new ArrayList<>();
     private List<String> draftPool = new ArrayList<>();
     private List<String> menuList = new ArrayList<>();
@@ -32,7 +32,7 @@ public class CLIView {
     private int playerId;
     private int turnNumber;
     private int nowPlaying;
-    private String lastScreen;
+    private String lastScreen="";
 
     public CLIView(UILanguage lang) {
         this.uiMsg=new UIMessages(lang);
@@ -453,11 +453,13 @@ public class CLIView {
     private List<String> buildDraftPool(){
 
         List<String> result = new ArrayList<>(draftPool);
-        result.set(CELL_HEIGHT-1,
-                result.get(CELL_HEIGHT-1)+
-                        boldify(String.format(cliElems.getElem("point-left"),uiMsg.getMessage("draftpool"))));
-        result.set(CELL_HEIGHT-1,result.get(CELL_HEIGHT-1)+alignRight(bottomInfo, SCREEN_WIDTH - printableLength(result.get(CELL_HEIGHT-1))));
-        result= appendRows(buildSeparator(draftPool.size()),result);
+        if(result.size()>=CELL_HEIGHT) {
+            result.set(CELL_HEIGHT - 1,
+                    result.get(CELL_HEIGHT - 1) +
+                            boldify(String.format(cliElems.getElem("point-left"), uiMsg.getMessage("draftpool"))));
+            result.set(CELL_HEIGHT - 1, result.get(CELL_HEIGHT - 1) + alignRight(bottomInfo, SCREEN_WIDTH - printableLength(result.get(CELL_HEIGHT - 1))));
+            result = appendRows(buildSeparator(draftPool.size()), result);
+        }
         return result;
     }
 
