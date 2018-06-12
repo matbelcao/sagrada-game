@@ -2,15 +2,8 @@ package it.polimi.ingsw.common.immutables;
 
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Face;
-import it.polimi.ingsw.common.enums.GameStatus;
 import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.model.Die;
-import it.polimi.ingsw.server.model.SchemaCard;
-import it.polimi.ingsw.server.model.iterators.FullCellIterator;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class IndexedCellContent {
     private Place place;

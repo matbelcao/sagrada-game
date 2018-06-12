@@ -1,7 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.common.immutables.*;
-import it.polimi.ingsw.server.connection.User;
+import it.polimi.ingsw.server.model.User;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 

@@ -1,6 +1,5 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
@@ -16,6 +15,7 @@ public class  Player {
     private int finalPosition;
     private int score;
     private boolean skipsNextTurn;// true when the player has used a particular tool card on his first turn of the round
+    private boolean quitted;
 
 
 
@@ -31,6 +31,7 @@ public class  Player {
         this.schema=null;
         this.favorTokens=0;
         this.skipsNextTurn=false;
+        this.quitted=false;
     }
 
     /**
@@ -181,7 +182,13 @@ public class  Player {
      */
     public void setFinalPosition(int finalPosition) { this.finalPosition=finalPosition; }
 
+    public void quitMatch(){
+        quitted=true;
+    }
 
+    public boolean hasQuitted(){
+        return quitted;
+    }
 
 
 

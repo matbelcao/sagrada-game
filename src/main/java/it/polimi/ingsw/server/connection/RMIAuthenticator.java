@@ -3,6 +3,7 @@ package it.polimi.ingsw.server.connection;
 import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.client.connection.RMIClientObject;
 import it.polimi.ingsw.common.enums.ConnectionMode;
+import it.polimi.ingsw.server.model.User;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
