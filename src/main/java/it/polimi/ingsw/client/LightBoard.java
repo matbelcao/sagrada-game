@@ -75,7 +75,6 @@ public class LightBoard extends Observable {
 
     public void addTools(List<LightTool> tool){
         this.tools=tool;
-        notifyObservers();
     }
 
     public void setNumPlayers(int numPlayers) {

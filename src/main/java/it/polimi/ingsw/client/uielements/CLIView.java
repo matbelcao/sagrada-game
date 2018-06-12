@@ -122,7 +122,7 @@ public class CLIView {
         builder.append("%n%n%n%n");
         builder.append(printList(appendRows(appendRows(buildWall(' ',drafted.size(),SCHEMA_WIDTH+10),drafted),priv))).append("%n%n%n");
         builder.append(uiMsg.getMessage("choose-schema")).append("%n%n");
-        builder.append(buildOptions(ClientFSMState.CHOOSE_SCHEMA));
+        builder.append(getPrompt(ClientFSMState.CHOOSE_SCHEMA));
         lastScreen=builder.toString();
         return lastScreen;
     }
@@ -234,7 +234,7 @@ public class CLIView {
                 break;
         }
 
-        return String.format(cliElems.getElem("prompt"),defaultMenu.toString());
+        return defaultMenu.toString();
     }
 
     private String backOption(){ return uiMsg.getMessage("back-option")+" | ";}

@@ -65,7 +65,10 @@ public class Client {
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
     private final Object lockCredentials=new Object();
    // private final Object lockCommandQueue= new Object();
+   // TODO: 12/06/2018 clean
     private QueuedInReader commandQueue;
+    private boolean ready;
+    private final Object lockReady = new Object();
 
 
     public static boolean isWindows()
@@ -89,6 +92,7 @@ public class Client {
         this.port = port;
         this.lang = lang;
         this.userStatus = UserStatus.DISCONNECTED;
+        this.ready=false;
 
     }
 
@@ -386,6 +390,7 @@ public class Client {
                             break;
 
                         default:
+                            clientUI.showLastScreen();
                             break;
                     }
                 }else if (command.matches(SINGLE_CHAR)) {
@@ -417,6 +422,8 @@ public class Client {
                         lockState.notifyAll();
                     }
 
+                }else{
+                    clientUI.showLastScreen();
                 }
 
             }
@@ -464,6 +471,11 @@ public class Client {
         this.board= new LightBoard(numPlayers);
 
         board.addObserver(clientUI);
+        List<LightPlayer> players = clientConn.getPlayers();
+        for (int i = 0; i < board.getNumPlayers(); i++) {
+
+            board.addPlayer(players.get(i));
+        }
 
         board.setMyPlayerId(playerId);
 
@@ -490,38 +502,38 @@ public class Client {
 
     public void updateGameRoundStart(int numRound){
 
-        if(numRound==0){
+        if(numRound==0) {
+            synchronized (lockReady) {
 
-            synchronized (lockState){
-                assert(turnState.equals(ClientFSMState.CHOOSE_SCHEMA));
-                turnState = turnState.nextState(true,false,false,false);
+                synchronized (lockState) {
+                    assert (turnState.equals(ClientFSMState.CHOOSE_SCHEMA));
+                    turnState = turnState.nextState(true, false, false, false);
+                }
+                //get players
+
+                for (int i = 0; i < board.getNumPlayers(); i++) {
+
+                    //get players schema
+                    board.updateSchema(i, clientConn.getSchema(i));
+
+                    //set favor tokens
+                    board.getPlayerByIndex(i).setFavorTokens(clientConn.getFavorTokens(i));
+                }
+                //get tools
+                board.addTools(clientConn.getTools());
+
+                List<LightCard> pubObj = clientConn.getPublicObjects();
+                //get public objectives
+                for (int i = 0; i < LightBoard.NUM_PUB_OBJ; i++) {
+                    board.addPubObj(pubObj.get(i));
+                }
+
+
+                ready = true;
+                lockReady.notifyAll();
             }
-
-            //get players
-            List<LightPlayer> players= clientConn.getPlayers();
-            for(int i=0; i<board.getNumPlayers();i++){
-
-                board.addPlayer(players.get(i));
-
-                //get players schema
-                board.updateSchema(i,clientConn.getSchema(i));
-
-                //set favor tokens
-                board.getPlayerByIndex(i).setFavorTokens(clientConn.getFavorTokens(i));
-            }
-            //get tools
-            board.addTools(clientConn.getTools());
-
-            List<LightCard> pubObj= clientConn.getPublicObjects();
-            //get public objectives
-            for(int i=0; i< LightBoard.NUM_PUB_OBJ;i++){
-                board.addPubObj(pubObj.get(i));
-            }
-
-            clientUI.showNotYourTurnScreen();
         }
-
-        board.notifyObservers();
+        clientUI.update(board,null);
 
     }
 
@@ -532,11 +544,21 @@ public class Client {
     }
 
     public void updateGameTurnStart(int playerId, boolean isFirstTurn){
-        board.setDraftPool(clientConn.getDraftPool());
-        board.setNowPlaying(playerId);
-        board.setIsFirstTurn(isFirstTurn);
-        board.setRoundTrack(clientConn.getRoundtrack(),board.getRoundNumber());
+        synchronized (lockReady) {
+            while (!ready) {
+                try {
+                    lockReady.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 
+                board.setDraftPool(clientConn.getDraftPool());
+                board.setNowPlaying(playerId);
+                board.setIsFirstTurn(isFirstTurn);
+                board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
+
+        }
         synchronized (lockState) {
             turnState=turnState.nextState(playerId == board.getMyPlayerId(), false, false, false);
             lockState.notifyAll();
@@ -544,6 +566,7 @@ public class Client {
 
 
         board.notifyObservers();
+        clientUI.showNotYourTurnScreen();
     }
 
     public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
@@ -584,6 +607,7 @@ public class Client {
             lockStatus.notifyAll();
         }
         clientUI.updateConnectionClosed();
+        System.exit(0);
     }
 
     public void disconnect(){
@@ -592,6 +616,7 @@ public class Client {
             lockStatus.notifyAll();
         }
         clientUI.updateConnectionBroken();
+        System.exit(0);
     }
 
     public static void main(String[] args){

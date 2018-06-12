@@ -12,7 +12,6 @@ import java.util.NoSuchElementException;
  * This class implements an iterator on the players following Sagrada's rules for round management
  */
 public class RoundIterator implements Iterator<User> {
-    private final Integer numUsers;
     private int turnNumberInRound;
     private ArrayList<User> users;
     private User next;
@@ -24,7 +23,7 @@ public class RoundIterator implements Iterator<User> {
      */
     public RoundIterator(List<User> users){
         this.users=(ArrayList<User>) users;
-        this.numUsers=users.size();
+
         this.next=null;
         this.turnNumberInRound =0;
         this.round=-1;
@@ -59,11 +58,11 @@ public class RoundIterator implements Iterator<User> {
     @Override
     public boolean hasNext() {
         if(this.round==-1){this.nextRound();}
-        if(turnNumberInRound <2*numUsers){
-            if(turnNumberInRound <numUsers){
-                next=users.get((round + turnNumberInRound)%numUsers);
+        if(turnNumberInRound <2*users.size()){
+            if(turnNumberInRound <users.size()){
+                next=users.get((round + turnNumberInRound)%users.size());
             }else{
-                next=users.get((numUsers - 1 + round - turnNumberInRound %numUsers)%numUsers);
+                next=users.get((users.size() - 1 + round - turnNumberInRound %users.size())%users.size());
             }
             return true;
         }
@@ -82,7 +81,7 @@ public class RoundIterator implements Iterator<User> {
      * Checks whether the u are playing the first or the second turn of the round
      * @return true iff there's at least one player that
      */
-    public boolean isFirstTurn(){ return turnNumberInRound <=numUsers;}
+    public boolean isFirstTurn(){ return turnNumberInRound <=users.size();}
 
 
     /**
