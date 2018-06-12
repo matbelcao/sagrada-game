@@ -56,4 +56,19 @@ public class RoundTrack{
         track.get(round).add(dieToPut);
         return track.get(round).remove(pickedDiePosition);
     }
+
+    public void removeDie(int index){
+        int i=0;
+        for(List<Die> dieList: track) {
+            int dieNum=0;
+            for (Die d : dieList) {
+                if(i==index){
+                    dieList.remove(dieNum);
+                    return;
+                }
+                dieNum++;
+                i++;
+            }
+    }
+    }
 }

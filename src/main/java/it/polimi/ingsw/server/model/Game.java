@@ -364,12 +364,14 @@ public class Game extends Thread implements Iterable  {
                 constraint=board.getToolCard(selectedTool).getColorConstraint();
             }
             selectedDie = board.selectDie(user, fsm.getPlaceFrom(), dieIndex,constraint);
+            oldIndex=board.getDiePosition(user,fsm.getPlaceFrom(),selectedDie);
         }else{
             selectedDie=new Die(diceList.get(dieIndex).getContent().getShade(),diceList.get(dieIndex).getContent().getColor());
+            oldIndex=diceList.get(dieIndex).getPosition();
         }
 
         if(fsm.isToolActive()){
-            board.getToolCard(selectedTool).selectDie(selectedDie);
+            board.getToolCard(selectedTool).selectDie(selectedDie,oldIndex);
             commandsList = board.getToolCard(selectedTool).getActions();
         }else{
             commandsList=new ArrayList<>();
@@ -401,11 +403,11 @@ public class Game extends Thread implements Iterable  {
             if(placements.size()<index || !selectedCommand.equals(Commands.PLACE_DIE) || selectedDie==null){return false;}
                 if(fsm.isToolActive()){
                     response=board.getToolCard(selectedTool).placeDie(index);
-                    if(board.getToolCard(selectedTool).isExternalSchemaPlacement()){
+                    if(!board.getToolCard(selectedTool).isInternalSchemaPlacement()){
                         diePlaced=true;
                     }
                 }else{
-                    response=board.schemaPlacement(user,index,selectedDie);
+                    response=board.schemaPlacement(user,index,oldIndex,selectedDie);
                     diePlaced=true;
                 }
         }else{
@@ -497,7 +499,7 @@ public class Game extends Thread implements Iterable  {
         if(!status.equals(ServerState.MAIN)){ throw new IllegalActionException(); }
 
         if(index<0||index>2){return false;}
-        if(board.getToolCard(index).isExternalSchemaPlacement() && diePlaced){return false;}
+        if(board.getToolCard(index).isExternalPlacement() && diePlaced){return false;}
 
         toolEnabled=board.getToolCard(index).enableToolCard(board.getPlayer(user),round.isFirstTurn()?0:1,board.getPlayer(user).getSchema());
         if(toolEnabled){
@@ -514,6 +516,8 @@ public class Game extends Thread implements Iterable  {
         System.out.println("TOOL_STATUS: "+status);
         if(!status.equals(ServerState.TOOL_CAN_CONTINUE)){throw new IllegalActionException();}
         if(!board.getToolCard(selectedTool).toolCanContinue(board.getPlayer(user))){
+            List<Integer> oldIndexes=board.getToolCard(selectedTool).getOldIndexes();
+
             selectedTool=-1;
             status=fsm.exit();
         }else{

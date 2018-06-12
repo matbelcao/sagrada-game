@@ -230,11 +230,12 @@ public class Board {
         return null;
     }
 
-    public boolean schemaPlacement(User user, int die_index, Die selectedDie){
+    public boolean schemaPlacement(User user, int newIndex,int oldIndex, Die selectedDie){
         SchemaCard schemaCard=getPlayer(user).getSchema();
         List<Integer> placerments= schemaCard.listPossiblePlacements(selectedDie);
         try {
-            schemaCard.putDie(placerments.get(die_index),selectedDie);
+            schemaCard.putDie(placerments.get(newIndex),selectedDie);
+            getDraftPool().chooseDie(oldIndex);
             return true;
         } catch (IllegalDieException e) {
             return false;
@@ -244,6 +245,55 @@ public class Board {
     public List<Integer> listSchemaPlacements(User user, Die selectedDie){
         SchemaCard schema =getPlayer(user).getSchema();
         return schema.listPossiblePlacements(selectedDie);
+    }
+
+    public int getDiePosition(User user , Place from, Die die){
+        switch (from){
+            case SCHEMA:
+                FullCellIterator diceIterator=(FullCellIterator)getPlayer(user).getSchema().iterator();
+                while(diceIterator.hasNext()) {
+                    Die d = diceIterator.next().getDie();
+                    if(die.equals(d)){
+                        return diceIterator.getIndex();
+                    }
+                }
+                break;
+            case DRAFTPOOL:
+                return getDraftPool().getDraftedDice().indexOf(die);
+            case ROUNDTRACK:
+                List<List<Die>> trackList = getDraftPool().getRoundTrack().getTrack();
+                int index=0;
+                for(List<Die> dieList: trackList) {
+                    for (Die d : dieList) {
+                        if(die.equals(d)){
+                            return index;
+                        }
+                        index++;
+                    }
+                }
+                break;
+            default:
+                return -1;
+        }
+        return -1;
+    }
+
+    public void removeOldDice(User user, Place from, List<Integer> oldIndexes){
+        for (Integer index: oldIndexes){
+            switch (from){
+                case SCHEMA:
+                    getPlayer(user).getSchema().removeDie(index);
+                    break;
+                case DRAFTPOOL:
+                    getDraftPool().chooseDie(index);
+                    break;
+                case ROUNDTRACK:
+                    getDraftPool().getRoundTrack().removeDie(index);
+                    break;
+                default:
+                    return;
+            }
+        }
     }
 
     public Player getPlayer(User user) {

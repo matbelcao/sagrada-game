@@ -43,6 +43,7 @@ public class ToolCard extends Card {
     private SchemaCard schemaTemp;
     private List<Die> selectedDice;
     private List<Integer> selectedIndex;
+    private List<Integer> oldIndexList;
 
 
     /**
@@ -139,6 +140,7 @@ public class ToolCard extends Card {
             selectedDice=new ArrayList<>();
             selectedIndex=new ArrayList<>();
             schemaTemp=schema.cloneSchema();
+            oldIndexList=new ArrayList<>();
             constraint=Color.NONE;
         } catch (NegativeTokensException e) {
             return false;
@@ -241,8 +243,11 @@ public class ToolCard extends Card {
         return true;
     }
 
-    public void selectDie(Die die){
+    public void selectDie(Die die,int oldIndex){
         selectedDice.add(die);
+        if(isExternalPlacement()){
+            oldIndexList.add(oldIndex);
+        }
         return;
     }
 
@@ -271,10 +276,13 @@ public class ToolCard extends Card {
         return true;
     }
 
+    public List<Integer> getOldIndexes(){
+        return oldIndexList;
+    }
 
-    //only for tool that place two die in the same turn
-    public boolean isExternalSchemaPlacement(){
-        if(!from.equals(Place.SCHEMA) && to.equals(Place.SCHEMA)){
+
+    public boolean isExternalPlacement(){
+        if(!from.equals(to)){
             return true;
         }
         return false;
