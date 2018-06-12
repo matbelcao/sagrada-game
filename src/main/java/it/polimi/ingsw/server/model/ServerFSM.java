@@ -49,7 +49,7 @@ public class ServerFSM {
     }
 
     public ServerState newToolUsage(ToolCard toolCard){
-        curState=ServerState.MAIN;
+        curState=ServerState.GET_DICE_LIST;
         toolActive=true;
         placeFrom=toolCard.getPlaceFrom();
         placeTo=toolCard.getPlaceTo();

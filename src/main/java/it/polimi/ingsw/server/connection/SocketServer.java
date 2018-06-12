@@ -280,9 +280,9 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void sendUserSchemaCard(int playerId) throws IllegalActionException {
         Cell cell;
-        SchemaCard schemaCard = user.getGame().getUserSchemaCard(user);
+        SchemaCard schemaCard = user.getGame().getUserSchemaCard(playerId);
 
-        outSocket.print("SEND schema "+schemaCard.getName());
+        outSocket.print("SEND schema "+schemaCard.getName().replaceAll(" ","_")+" "+schemaCard.getFavorTokens());
         for (int index=0; index < SchemaCard.NUM_ROWS*SchemaCard.NUM_COLS ; index++) {
             cell = schemaCard.getCell(index);
             if (cell.hasDie()) {

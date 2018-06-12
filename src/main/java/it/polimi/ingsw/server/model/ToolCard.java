@@ -40,7 +40,6 @@ public class ToolCard extends Card {
 
 
     Color constraint; //only for 12
-    private int numSelectedDice;
     private SchemaCard schemaTemp;
     private List<Die> selectedDice;
     private List<Integer> selectedIndex;
@@ -124,23 +123,23 @@ public class ToolCard extends Card {
     public boolean enableToolCard(Player player, int turnFirstOrSecond, SchemaCard schema) {
         try {
             if (!used) {
-                used = true;
                 player.decreaseFavorTokens(1);
+                used = true;
             } else {
                 player.decreaseFavorTokens(2);
             }
-            if (this.getId() == 8) {
-                if (turnFirstOrSecond == 1) {
+            if (!turn.equals(Turn.NONE)) {
+                if(turn.equals(Turn.FIRST_TURN) && turnFirstOrSecond == 1){
                     return false;
                 }
-                player.setSkipsNextTurn(true);
+                if(turn.equals(Turn.SECOND_TURN) && turnFirstOrSecond == 0){
+                    return false;
+                }
             }
-
             selectedDice=new ArrayList<>();
             selectedIndex=new ArrayList<>();
             schemaTemp=schema.cloneSchema();
             constraint=Color.NONE;
-            numSelectedDice=0;
         } catch (NegativeTokensException e) {
             return false;
         }
@@ -183,7 +182,6 @@ public class ToolCard extends Card {
     }
 
     public boolean swapDie() {
-        //if(!actions.contains(Commands.SWAP) || !canModify2()){return false;}
         if(selectedDice.size()==1){return true;}// the swap will take effect on the next iteration
         else if(selectedDice.size()==2){
             Color tmpColor = selectedDice.get(0).getColor();
@@ -199,9 +197,7 @@ public class ToolCard extends Card {
 
     public List<IndexedCellContent> rerollDie(){
         List<Die> dieList= new ArrayList<>();
-        Random randomGen = new Random();
-        int face=randomGen.nextInt(7);
-        selectedDice.get(0).setShade(face);
+        selectedDice.get(0).reroll();
         dieList.add(selectedDice.get(0));
         return toIndexedDieList(dieList);
     }
@@ -237,7 +233,6 @@ public class ToolCard extends Card {
 
     public boolean placeDie(int index){
         List<Integer> placerments= schemaTemp.listPossiblePlacements(selectedDice.get(0),ignored_constraint);
-
         try {
             schemaTemp.putDie(placerments.get(index),selectedDice.get(0),ignored_constraint);
         } catch (IllegalDieException e) {
@@ -341,7 +336,14 @@ public class ToolCard extends Card {
     }
 
     public List<Commands> getActions(){
-        return actions;
+        List<Commands> commands=new ArrayList<>();
+        if(quantity.contains(DieQuantity.ONE) && quantity.contains(DieQuantity.TWO)){
+            if(commands.get(0).equals(Commands.PLACE_DIE) && commands.size()==1){
+                commands.add(Commands.NONE);
+            }
+        }
+        commands.add(actions.get(0));
+        return commands;
     }
 
     public IgnoredConstraint getIgnoredConstraint(){

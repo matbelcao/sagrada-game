@@ -33,7 +33,7 @@
         <from>draftpool</from>
         <to>roundtrack</to>
         <command>swap</command>
-        <command>none</command>
+        <command>swap</command>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="6">

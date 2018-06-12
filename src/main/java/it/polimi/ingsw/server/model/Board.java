@@ -230,38 +230,19 @@ public class Board {
         return null;
     }
 
-    public boolean schemaPlacement(User user,int selectedTool, int die_index, Die selectedDie){
+    public boolean schemaPlacement(User user, int die_index, Die selectedDie){
         SchemaCard schemaCard=getPlayer(user).getSchema();
-        List<Integer> placerments = new ArrayList<>();
-        IgnoredConstraint ignored_constraint=null;
-        if(selectedTool!=-1){
-            ignored_constraint=toolCards[selectedTool].getIgnoredConstraint();
-            placerments= schemaCard.listPossiblePlacements(selectedDie,ignored_constraint);
-        }else{
-            placerments= schemaCard.listPossiblePlacements(selectedDie);
-        }
-
+        List<Integer> placerments= schemaCard.listPossiblePlacements(selectedDie);
         try {
-                if(selectedTool!=-1){
-                    schemaCard.putDie(placerments.get(die_index),selectedDie,ignored_constraint);
-                }else{
-                    schemaCard.putDie(placerments.get(die_index),selectedDie);
-                }
-                return true;
+            schemaCard.putDie(placerments.get(die_index),selectedDie);
+            return true;
         } catch (IllegalDieException e) {
             return false;
         }
     }
 
-
-
-    //To continue.....
-    public List<Integer> listSchemaPlacements(User user,int selectedTool, Die selectedDie){
-        SchemaCard schema=getPlayer(user).getSchema();
-        if(selectedTool!=-1){
-            IgnoredConstraint ignored_constraint=toolCards[selectedTool].getIgnoredConstraint();
-            return schema.listPossiblePlacements(selectedDie,ignored_constraint);
-        }
+    public List<Integer> listSchemaPlacements(User user, Die selectedDie){
+        SchemaCard schema =getPlayer(user).getSchema();
         return schema.listPossiblePlacements(selectedDie);
     }
 
