@@ -196,8 +196,11 @@ public class ClientParser {
             return checkSendSchema(parsedResult);
         }
         if(parsedResult.get(1).equals("favor_tokens") && parsedResult.size()==3){return true;}
-        if(parsedResult.get(1).equals("priv")||parsedResult.get(1).equals("pub")||parsedResult.get(1).equals("tool")){
-            return parsedResult.size() == 6;
+        if(parsedResult.get(1).equals("priv")||parsedResult.get(1).equals("tool")){
+            return parsedResult.size() == 6 ;
+        }
+        if(parsedResult.get(1).equals("pub")){
+            return parsedResult.size() == 5 ;
         }
         if(parsedResult.get(1).equals("draftpool")||parsedResult.get(1).equals("roundtrack")||parsedResult.get(1).equals("roundtrack_update")){
             return checkCommaParametersLength(3,parsedResult);
