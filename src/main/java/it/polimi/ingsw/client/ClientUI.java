@@ -80,9 +80,6 @@ public interface ClientUI extends Observer {
 
     void showSchemaDiceList(List<IndexedCellContent> schema);
 
-    void showTurnInitScreen();
-
-    void showNotYourTurnScreen();
 
     //void showPossibleChangesToDie(List<ModifyDie> changes);
     // TODO: 31/05/2018  
@@ -121,4 +118,6 @@ public interface ClientUI extends Observer {
     void showOptions(List<Commands> optionsList);
 
     void showWaitingForGameStartScreen();
+
+    void showMainScreen(ClientFSMState turnState);
 }

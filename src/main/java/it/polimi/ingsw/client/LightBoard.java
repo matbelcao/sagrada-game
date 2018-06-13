@@ -23,7 +23,9 @@ public class LightBoard extends Observable {
     private int myPlayerId;
     private List<LightSchemaCard> draftedSchemas;
     private List<Commands> optionsList;
-
+    private List<IndexedCellContent> lastDiceList;
+    private List<Integer> placementsList;
+    private LightDie lastSelectedDie;
 
 
     public LightBoard(int numPlayers) {
@@ -133,7 +135,7 @@ public class LightBoard extends Observable {
 
     public void updateSchema(int playerId, LightSchemaCard schema){
         players.get(playerId).setSchema(schema);
-
+        notifyObservers();
     }
 
     public LightTool getToolByIndex(int index){
@@ -170,5 +172,29 @@ public class LightBoard extends Observable {
 
     public List<Commands> getOptionsList() {
         return optionsList;
+    }
+
+    public List<IndexedCellContent> getDiceList() {
+        return lastDiceList;
+    }
+
+    public void setLastDiceList(List<IndexedCellContent> lastDiceList) {
+        this.lastDiceList = lastDiceList;
+    }
+
+    public void setPlacementsList(List<Integer> placementsList) {
+        this.placementsList = placementsList;
+    }
+
+    public List<Integer> getPlacementsList() {
+        return placementsList;
+    }
+
+    public void setLastSelectedDie(LightDie lastSelectedDie) {
+        this.lastSelectedDie = lastSelectedDie;
+    }
+
+    public LightDie getSelectedDie() {
+        return lastSelectedDie;
     }
 }

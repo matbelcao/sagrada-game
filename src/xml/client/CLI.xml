@@ -8,7 +8,7 @@
     <SIX> _____ ::|●   ●|::|●   ●|::|●___●|</SIX>
     <FILLED> _____ ::|█████|::|█████|::|█████|</FILLED>
     <EMPTI> _____ ::|     |::|     |::|_____|</EMPTI>
-    <player-info>User: %s | %s %s | %s %d</player-info>
+    <player-info>User: %s | %s %s</player-info>
     <username-id>%s%s</username-id>
     <tokens-info> %s %s</tokens-info>
     <tool-index>%s %d</tool-index>
@@ -17,7 +17,7 @@
     <index>‹%s %d›</index>
     <li>  #%d %s</li>
     <point-left> ‹‹‹ %s</point-left>
-    <prompt>%s ›››</prompt>
+    <prompt>%s ››› </prompt>
     <schema-cols>     0      1      2      3      4   </schema-cols>
     <sagrada-wall>
         ██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████::

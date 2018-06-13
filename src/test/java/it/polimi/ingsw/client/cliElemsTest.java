@@ -110,7 +110,7 @@ class cliElemsTest {
         list.add(13);
         list.add(15);
         list.add(16);
-        cliview.updateMenuListPlacements(list,Place.SCHEMA,new LightDie("FOUR","GREEN"));
+        cliview.updateMenuListPlacements(list,new LightDie("FOUR","GREEN"));
 
         roundtrack= new ArrayList<>();
         roundtrack.add(new ArrayList<>());

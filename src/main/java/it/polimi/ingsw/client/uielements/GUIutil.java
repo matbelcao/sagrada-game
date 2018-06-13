@@ -11,12 +11,15 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class GUIutil {
@@ -175,33 +178,93 @@ public class GUIutil {
         }
     }*/
 
-    public void drawDraftedSchemas(List<LightSchemaCard> lightSchemaCard, LightPrivObj privObj, GraphicsContext gc, double sceneWidth, double sceneHeight) {
-        double x = 0;
-        double y = 0;
-        double drawingWidth;
-        double drawingHeight;
-        double sceneRatio = sceneWidth/sceneHeight;
-        double schemaWidth;
-        double schemaHeight;
-        double extPadding;
-        double intPadding;
-        if(sceneRatio >= DRAFTED_CANVAS_SCENE_RATIO){
-            drawingHeight = sceneHeight;
-            drawingWidth = getDraftedSchemasWidth(drawingHeight);
-            x = (sceneWidth-drawingWidth)/2;
-        }else{
-            drawingWidth = sceneWidth;
-            drawingHeight = getDraftedSchemasHeight(drawingWidth);
-            y = (sceneHeight - drawingHeight)/2;
-        }
-        schemaWidth = drawingWidth*SCHEMA_W_TO_DRAFTED_W;
-        schemaHeight = schemaWidth/COMPLETE_SCHEMA_RATIO;
-        extPadding = schemaWidth/SCHEMA_W_TO_EXTERNAL_PADDING;
-        intPadding = schemaWidth/SCHEMA_W_TO_INTERNAL_PADDING;
+   //just a class to avoid having repeated code
+   private class DraftedSchemasWindowDim {
+       double sceneWidth;
+       double sceneHeight;
+       double drawingHeight;
+       double drawingWidth;
+       double x;
+       double y;
+
+       private DraftedSchemasWindowDim(double sceneWidth, double sceneHeight){
+           double sceneRatio = sceneWidth/sceneHeight;
+           if(sceneRatio >= DRAFTED_CANVAS_SCENE_RATIO){
+               drawingHeight = sceneHeight;
+               drawingWidth = getDraftedSchemasWidth(drawingHeight);
+               x = (sceneWidth-drawingWidth)/2;
+           }else{
+               drawingWidth = sceneWidth;
+               drawingHeight = getDraftedSchemasHeight(drawingWidth);
+               y = (sceneHeight - drawingHeight)/2;
+           }
+       }
+
+       double getX(){return x;}
+       double getY(){return y;}
+       double getDrawingWidth(){return drawingWidth;}
+       double getDrawingHeight(){return drawingHeight;}
+
+   }
+
+    public Collection<Rectangle> draftedMouseActionAreas(double sceneWidth, double sceneHeight) {
+       DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth,sceneHeight);
+       double x = sizes.getX();
+       double y = sizes.getY();
+       double drawingWidth = sizes.getDrawingWidth();
+       double drawingHeight;
+       double schemaWidth = drawingWidth*SCHEMA_W_TO_DRAFTED_W;
+       double schemaHeight = schemaWidth/COMPLETE_SCHEMA_RATIO;
+       double extPadding = schemaWidth/SCHEMA_W_TO_EXTERNAL_PADDING;
+       double intPadding = schemaWidth/SCHEMA_W_TO_INTERNAL_PADDING;
+
+       Rectangle r0 = new Rectangle(x+extPadding,y+extPadding,schemaWidth,schemaHeight);
+       Rectangle r1 = new Rectangle(x+extPadding+schemaWidth+intPadding,y+extPadding,schemaWidth,schemaHeight);
+       Rectangle r2 = new Rectangle(x+extPadding,y+extPadding+schemaHeight+intPadding,schemaWidth,schemaHeight);
+       Rectangle r3 = new Rectangle(x+extPadding+schemaWidth+intPadding,y+extPadding+intPadding+schemaHeight,schemaWidth,schemaHeight);
+
+       ArrayList<Rectangle> rects = new ArrayList<>();
+       rects.add(r0);
+       rects.add(r1);
+       rects.add(r2);
+       rects.add(r3);
+
+       for (Rectangle r :rects) {
+           r.setFill(Color.TRANSPARENT);
+           r.setOnMouseEntered(e->r.setFill(Color.rgb(0,0,0,0.4)));
+           r.setOnMouseExited(e->r.setFill(Color.TRANSPARENT));
+           r.setOnMouseClicked(e->{
+               System.out.println("Selected schema " + rects.indexOf(r));
+               r.setStroke(Color.BLUE);
+               r.setStrokeWidth(LINE_TO_CELL*CELL_TO_SCHEMA_W*schemaWidth);
+           });
+       }
+
+       return rects;
+
+   }
+
+
+
+    public void drawDraftedSchemas(List<LightSchemaCard> lightSchemaCard, LightPrivObj privObj, Canvas canvas, double sceneWidth, double sceneHeight) {
+        DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth,sceneHeight);
+        double x = sizes.getX();
+        double y = sizes.getY();
+        double drawingWidth = sizes.getDrawingWidth();
+        double drawingHeight = sizes.getDrawingHeight();
+        double schemaWidth = drawingWidth*SCHEMA_W_TO_DRAFTED_W;
+        double schemaHeight = schemaWidth/COMPLETE_SCHEMA_RATIO;
+        double extPadding = schemaWidth/SCHEMA_W_TO_EXTERNAL_PADDING;
+        double intPadding = schemaWidth/SCHEMA_W_TO_INTERNAL_PADDING;
+
         double privObjX = x+extPadding+schemaWidth+ intPadding+ schemaWidth+ extPadding;
         double privObjY = y + extPadding;
         double privObjWidth = schemaWidth/SCHEMA_W_TO_PRIVOBJ_W;
         double privObjHeight =privObjWidth/PRIVATE_OBJ_RATIO;
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        //clean the canvas
+        gc.clearRect(0, 0, sceneWidth, sceneHeight);
 
         drawPrivObj(privObj,gc,privObjX,privObjY,privObjWidth,privObjHeight);
         drawCompleteSchema(gc,lightSchemaCard.get(0),x+extPadding,y+extPadding,schemaWidth,schemaHeight);
@@ -209,9 +272,12 @@ public class GUIutil {
         drawCompleteSchema(gc,lightSchemaCard.get(2),x+extPadding,y+extPadding+schemaHeight+intPadding,schemaWidth,schemaHeight);
         drawCompleteSchema(gc,lightSchemaCard.get(3),x+extPadding+schemaWidth+intPadding,y+extPadding+intPadding+schemaHeight,schemaWidth,schemaHeight);
 
+        //todo delete
         gc.setLineWidth(1);
         gc.setStroke(Color.RED);
-        gc.strokeRect(x,y,drawingWidth,drawingHeight);//to delete
+        gc.strokeRect(x,y,drawingWidth,drawingHeight);
+        gc.strokeLine(0, 0, sceneWidth, sceneHeight);
+        gc.strokeLine(0, sceneHeight, sceneWidth, 0);
 
     }
 
@@ -416,5 +482,6 @@ public class GUIutil {
         gc.setFill(Color.BLACK);
         gc.fillOval(xAxisDiePosition +(x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
     }
+
 
 }

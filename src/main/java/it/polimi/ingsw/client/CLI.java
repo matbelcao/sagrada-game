@@ -32,6 +32,7 @@ public class CLI implements ClientUI {
         this.uimsg=new UIMessages(lang);
         this.client = client;
         this.view=new CLIView(lang);
+
         resetScreen();
     }
 
@@ -70,6 +71,7 @@ public class CLI implements ClientUI {
         resetScreen();
         if (logged) {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ok")), client.getUsername());
+            view.setClientInfo(client.getConnMode(),client.getUsername());
 
         } else {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ko")));
@@ -83,10 +85,6 @@ public class CLI implements ClientUI {
         console.printf(view.printLastScreen());
     }
 
-    public void showPlacementsList(List<Integer> placements,LightDie die){
-        view.updateMenuListPlacements(placements,Place.SCHEMA,die);
-    }
-
     @Override
     public void updateConnectionOk() {
         resetScreen();
@@ -97,8 +95,6 @@ public class CLI implements ClientUI {
     @Override
     public void updateLobby(int numUsers){
 
-        view.setClientInfo(client.getConnMode(),client.getUsername());
-
         console.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
 
     }
@@ -108,7 +104,7 @@ public class CLI implements ClientUI {
 
         resetScreen();
         console.printf(String.format("%s%n", uimsg.getMessage("game-start")),numUsers,playerId);
-        this.view.setMatchInfo(client.getPlayerId(),client.getBoard().getNumPlayers());
+        this.view.setMatchInfo(playerId,client.getBoard().getNumPlayers());
 
     }
 
@@ -125,11 +121,38 @@ public class CLI implements ClientUI {
         view.updateTools(board.getTools());
         view.updatePrivObj(board.getPrivObj());
         view.updateObjectives(board.getPubObjs(),board.getPrivObj());
-        view.updateMenuListDefault();
 
         for(int i=0;i<board.getNumPlayers();i++){
             view.updateSchema(board.getPlayerByIndex(i));
         }
+        view.updateRoundTrack(board.getRoundTrack());
+        view.updateDraftPool(board.getDraftPool());
+
+        switch (client.getTurnState()){
+            case CHOOSE_SCHEMA:
+                break;
+            case NOT_MY_TURN:
+
+                break;
+            case MAIN:
+                view.updateMenuMain();
+                break;
+            case SELECT_DIE:
+                view.updateMenuDiceList(board.getDiceList());
+                break;
+            case CHOOSE_OPTION:
+                if(board.getOptionsList().size()>1){
+                    view.updateMenuListOptions(board.getOptionsList());
+                }
+                break;
+
+            case CHOOSE_PLACEMENT:
+                view.updateMenuListPlacements(board.getPlacementsList(),board.getSelectedDie());
+                break;
+            case TOOL_CAN_CONTINUE:
+                break;
+        }
+
         console.printf(view.printMainView(client.getTurnState()));
     }
 
@@ -153,30 +176,18 @@ public class CLI implements ClientUI {
 
     @Override
     public void showRoundtrackDiceList(List<IndexedCellContent> roundtrack) {
-        view.updateMenuDiceList(roundtrack,Place.ROUNDTRACK);
+        view.updateMenuDiceList(roundtrack);
     }
 
     @Override
     public void showDraftPoolDiceList(List<IndexedCellContent> draftpool) {
-        view.updateMenuDiceList(draftpool,Place.DRAFTPOOL);
+        view.updateMenuDiceList(draftpool);
     }
 
     @Override
     public void showSchemaDiceList(List<IndexedCellContent> schema) {
-        view.updateMenuDiceList(schema,Place.SCHEMA);
+        view.updateMenuDiceList(schema);
     }
-
-    @Override
-    public void showTurnInitScreen() {
-
-    }
-
-    @Override
-    public void showNotYourTurnScreen() {
-        console.printf(view.printMainView(ClientFSMState.NOT_MY_TURN));
-
-    }
-
 
 
     @Override
@@ -186,7 +197,7 @@ public class CLI implements ClientUI {
 
     @Override
     public void showPlacementsList(List<Integer> placements, Place to, LightDie die) {
-        view.updateMenuListPlacements(placements,to,die);
+        view.updateMenuListPlacements(placements,die);
     }
 
     @Override
@@ -229,27 +240,14 @@ public class CLI implements ClientUI {
         console.printf(msg);
     }
 
+    @Override
+    public void showMainScreen(ClientFSMState turnState) {
+        console.printf(view.printMainView(turnState));
+    }
+
 
     @Override
     public void update(Observable o, Object arg) {
-        LightBoard board= (LightBoard) o;
-        view.updateTools(board.getTools());
-        view.updatePrivObj(board.getPrivObj());
-        view.updateObjectives(board.getPubObjs(),board.getPrivObj());
-        view.updateNewRound(board.getRoundNumber());
-
-        for(int i=0;i<board.getNumPlayers();i++){
-            view.updateSchema(board.getPlayerByIndex(i));
-        }
-        console.printf(view.printMainView(client.getTurnState()));
-
-        if(board.getNowPlaying()==board.getMyPlayerId()){
-            showTurnInitScreen();
-        } else{
-            showNotYourTurnScreen();
-        }
-
+        updateBoard((LightBoard)o);
     }
 }
-
-

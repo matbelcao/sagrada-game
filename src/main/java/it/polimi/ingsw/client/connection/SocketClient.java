@@ -52,8 +52,9 @@ public class SocketClient implements ClientConn {
     public void startListening(){
 
         new Thread(() -> {
-            ArrayList<String> result= new ArrayList<>();
+
             while(!socket.isClosed()) {
+                ArrayList<String> result= new ArrayList<>();
                 try {
 
                     synchronized (lockin) {
@@ -78,7 +79,8 @@ public class SocketClient implements ClientConn {
                                 updateLobby(result.get(1));
                             } else if (ClientParser.isGame(inSocket.readln())) {
                                 inSocket.pop();
-                                (new Thread(() -> updateMessages(result))).start();
+
+                                (new Thread(() -> updateMessages( result))).start();
 
                             } else if (ClientParser.isPing(inSocket.readln())) {
                                 inSocket.pop();

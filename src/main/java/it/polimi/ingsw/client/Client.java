@@ -12,6 +12,7 @@ import it.polimi.ingsw.common.enums.UIMode;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.immutables.LightCard;
 import it.polimi.ingsw.common.immutables.LightPlayer;
+import it.polimi.ingsw.common.immutables.LightTool;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 import it.polimi.ingsw.server.connection.RMIServerObject;
@@ -20,7 +21,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,8 +64,6 @@ public class Client {
     private ClientFSMState turnState;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
     private final Object lockCredentials=new Object();
-   // private final Object lockCommandQueue= new Object();
-   // TODO: 12/06/2018 clean
     private QueuedInReader commandQueue;
     private boolean ready;
     private final Object lockReady = new Object();
@@ -140,9 +138,6 @@ public class Client {
         return newClient;
     }
 
-    public int getPlayerId() {
-        return board.getMyPlayerId();
-    }
 
 
 
@@ -503,14 +498,15 @@ public class Client {
     public void updateGameRoundStart(int numRound){
 
         if(numRound==0) {
+
+
+            synchronized (lockState) {
+                assert (turnState.equals(ClientFSMState.CHOOSE_SCHEMA));
+                turnState = turnState.nextState(true, false, false, false);
+            }
+            //get players
+
             synchronized (lockReady) {
-
-                synchronized (lockState) {
-                    assert (turnState.equals(ClientFSMState.CHOOSE_SCHEMA));
-                    turnState = turnState.nextState(true, false, false, false);
-                }
-                //get players
-
                 for (int i = 0; i < board.getNumPlayers(); i++) {
 
                     //get players schema
@@ -527,13 +523,13 @@ public class Client {
                 for (int i = 0; i < LightBoard.NUM_PUB_OBJ; i++) {
                     board.addPubObj(pubObj.get(i));
                 }
-
-
-                ready = true;
+                clientUI.updateBoard(board);
+                ready=true;
                 lockReady.notifyAll();
             }
+
         }
-        clientUI.update(board,null);
+
 
     }
 
@@ -544,6 +540,7 @@ public class Client {
     }
 
     public void updateGameTurnStart(int playerId, boolean isFirstTurn){
+
         synchronized (lockReady) {
             while (!ready) {
                 try {
@@ -552,33 +549,35 @@ public class Client {
                     e.printStackTrace();
                 }
             }
-
-                board.setDraftPool(clientConn.getDraftPool());
-                board.setNowPlaying(playerId);
-                board.setIsFirstTurn(isFirstTurn);
-                board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
-
         }
+        board.setDraftPool(clientConn.getDraftPool());
+        board.setNowPlaying(playerId);
+        board.setIsFirstTurn(isFirstTurn);
+        board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
+
         synchronized (lockState) {
             turnState=turnState.nextState(playerId == board.getMyPlayerId(), false, false, false);
             lockState.notifyAll();
         }
 
 
-        board.notifyObservers();
-        clientUI.showNotYourTurnScreen();
+        clientUI.updateBoard(board);
+        clientUI.showMainScreen(turnState);
+
     }
 
     public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
         board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
         board.getPlayerByIndex(playerTurnId).setFavorTokens(clientConn.getFavorTokens(playerTurnId));
-        for (int i=0; i<LightBoard.NUM_TOOLS; i++) {
-            if(!board.getTools().get(i).isUsed()){
-                board.getTools().set(i,clientConn.getTools().get(i));
+        List<LightTool> tools=clientConn.getTools();
+        for(int i=0;i<LightBoard.NUM_TOOLS;i++) {
+            if (!board.getTools().get(i).isUsed()) {
+                board.getTools().set(i, tools.get(i));
             }
         }
+
         synchronized (lockState) {
-            turnState=turnState.nextState(false,false,playerTurnId==getPlayerId(),false);
+            turnState=turnState.nextState(false,false,playerTurnId==board.getMyPlayerId(),false);
             lockState.notifyAll();
         }
 
