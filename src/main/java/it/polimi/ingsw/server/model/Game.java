@@ -347,6 +347,12 @@ public class Game extends Thread implements Iterable  {
 
         if(fsm.isToolActive()){
             constraint=board.getToolCard(selectedTool).getColorConstraint();
+            if(diceList.isEmpty()){//skip if it's not required to select a die (ALL option)
+                while(!status.equals(ServerState.TOOL_CAN_CONTINUE)){
+                    status=fsm.nextState(Commands.NONE);
+                }
+                return diceList;
+            }
         }
 
         if(!enableToolList){
@@ -525,6 +531,23 @@ public class Game extends Thread implements Iterable  {
         if(toolEnabled){
             selectedTool=index;
             status=fsm.newToolUsage(board.getToolCard(selectedTool));
+            ToolCard tool= board.getToolCard(selectedTool);
+            if(tool.isRerollAllDiceCard()){
+                List<Die> dielist;
+                switch (tool.getFrom()){
+                    case DRAFTPOOL:
+                        dielist=board.getDraftPool().getDraftedDice();
+                        break;
+                    case ROUNDTRACK:
+                        dielist=board.getDraftPool().getRoundTrack().getTrackList();
+                        break;
+                    default:
+                        throw new IllegalActionException();
+                }
+                tool.rerollAll(dielist);
+                diceList.clear();
+                enableToolList=true;
+            }
         }else{
             discard();
             status=fsm.exit();

@@ -265,6 +265,10 @@ public class ToolCard extends Card {
         return indexedList;
     }
 
+    public boolean isRerollAllDiceCard(){
+        return actions.get(actionIndex).equals(Commands.REROLL) && quantity.contains(DieQuantity.ALL);
+    }
+
     public boolean toolCanContinue(Player player){
         if(actions.get(actionIndex)!=Commands.SWAP){
             selectedDice.remove(0);

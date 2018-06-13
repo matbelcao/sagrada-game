@@ -208,20 +208,8 @@ public class Board {
             case DRAFTPOOL:
                 return getDraftPool().getDraftedDice().get(die_index);
             case ROUNDTRACK:
-                List<List<Die>> trackList = getDraftPool().getRoundTrack().getTrack();
-                List<Die> dieList;
-                int roundN = 0;
-
-                while (tempIndex <= die_index) {
-                    dieList = trackList.get(roundN);
-                    for (Die d : dieList) {
-                        if (tempIndex == die_index) {
-                            return d;
-                        }
-                        tempIndex++;
-                    }
-                    roundN++;
-                }
+                List<Die> trackList = getDraftPool().getRoundTrack().getTrackList();
+                return trackList.get(die_index);
         }
         return null;
     }
@@ -257,17 +245,7 @@ public class Board {
             case DRAFTPOOL:
                 return getDraftPool().getDraftedDice().indexOf(die);
             case ROUNDTRACK:
-                List<List<Die>> trackList = getDraftPool().getRoundTrack().getTrack();
-                int index=0;
-                for(List<Die> dieList: trackList) {
-                    for (Die d : dieList) {
-                        if(die.equals(d)){
-                            return index;
-                        }
-                        index++;
-                    }
-                }
-                break;
+                return getDraftPool().getRoundTrack().getTrackList().indexOf(die);
             default:
                 return -1;
         }

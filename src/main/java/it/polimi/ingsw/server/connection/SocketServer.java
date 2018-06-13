@@ -400,8 +400,7 @@ public class SocketServer extends Thread implements ServerConn  {
                         +"," +dice.get(index).getContent().getColor().toString());
             }
         }else{
-            System.out.println("errore dicelist vuota");
-            //throw new IllegalActionException();
+            outSocket.print("LIST_DICE");
         }
         outSocket.println("");
         outSocket.flush();

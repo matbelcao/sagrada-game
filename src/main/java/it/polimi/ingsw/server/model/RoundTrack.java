@@ -26,6 +26,17 @@ public class RoundTrack{
         return  this.copy();
     }
 
+    public List<Die> getTrackList(){
+        List<Die> list= new ArrayList<>();
+
+        for(List<Die> dieList: track) {
+            for (Die d : dieList) {
+                list.add(d);
+            }
+        }
+        return list;
+    }
+
     private List<List<Die>> copy(){
         List<List<Die>> clone= new ArrayList<>();
         for (int round=0; round <track.size();round++ ){
