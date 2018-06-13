@@ -25,7 +25,7 @@ public class IndexedCellContent {
 
     public IndexedCellContent(int position,String place, String face, String color){
         this.content=new LightDie(face,color);
-        this.place=Place.valueOf(place);
+        this.place=Place.valueOf(place.toUpperCase());
         this.position=position;
     }
 

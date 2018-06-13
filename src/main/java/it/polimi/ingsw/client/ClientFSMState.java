@@ -48,7 +48,7 @@ public enum ClientFSMState {
                     //tool is useless
                     toolEnabled=false;
                 }
-                return MAIN;
+                return TOOL_CAN_CONTINUE;
             }
             return CHOOSE_OPTION;
         }

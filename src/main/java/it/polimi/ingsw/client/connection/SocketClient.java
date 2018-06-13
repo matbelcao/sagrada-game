@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.immutables.*;
 
@@ -528,7 +529,7 @@ public class SocketClient implements ClientConn {
         IndexedCellContent indexedDie;
         String[] args;
 
-        outSocket.println("SELECT_DIE");
+        outSocket.println("GET_DICE_LIST");
         outSocket.flush();
         synchronized (lockin) {
             try {
@@ -544,9 +545,10 @@ public class SocketClient implements ClientConn {
             inSocket.pop();
             lockin.notifyAll();
         }
-        for(int i=LIST_START;i<result.size();i++) {
+
+        for(int i=LIST_START+1;i<result.size();i++) {
             args= result.get(i).split(",");
-            indexedDie=new IndexedCellContent(Integer.parseInt(args[0]),args[1],args[2],args[3]);
+            indexedDie=new IndexedCellContent(Integer.parseInt(args[0]),result.get(1),args[1],args[2]);
             diceList.add(indexedDie);
         }
 
@@ -554,15 +556,15 @@ public class SocketClient implements ClientConn {
     }
 
     /**
-     * This function can be invoked to select one die of a previolsly SELECT_DIE command and obtain
+     * This function can be invoked to select one die of a previolsly GET_DICE_LIST command and obtain
      * a list of to options to manipulate it
      * @return and immutable and indexed list containing the dice
      */
-    public List<Commands> select(int die_index){
+    public List<Commands> select(int dieIndex){
         ArrayList<String> result= new ArrayList<>();
         List<Commands> options=new ArrayList<>();
 
-        outSocket.println("SELECT "+die_index);
+        outSocket.println("SELECT "+dieIndex);
         outSocket.flush();
         synchronized (lockin) {
             try {

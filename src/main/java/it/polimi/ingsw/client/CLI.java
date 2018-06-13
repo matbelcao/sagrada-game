@@ -5,10 +5,12 @@ import it.polimi.ingsw.client.uielements.CLIViewUtils;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
+import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 
+import java.io.BufferedReader;
 import java.io.Console;
 import java.util.List;
 import java.util.Observable;
@@ -243,6 +245,11 @@ public class CLI implements ClientUI {
     @Override
     public void showMainScreen(ClientFSMState turnState) {
         console.printf(view.printMainView(turnState));
+    }
+
+    @Override
+    public QueuedInReader getCommandQueue() {
+        return new QueuedInReader(new BufferedReader(System.console().reader()));
     }
 
 

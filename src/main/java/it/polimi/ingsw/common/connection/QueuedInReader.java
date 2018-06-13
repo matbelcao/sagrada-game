@@ -1,7 +1,6 @@
 package it.polimi.ingsw.common.connection;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 public class QueuedInReader {
@@ -15,11 +14,15 @@ public class QueuedInReader {
         this.inReader= inReader;
     }
 
+
+
     public void clear() {
         synchronized (lockQueue){
             queue.clear();
             lockQueue.notifyAll();
         }
+
+
     }
 
     public void add() throws IOException {
