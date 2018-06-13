@@ -40,6 +40,7 @@ public class ToolCard extends Card {
 
 
     Color constraint; //only for 12
+    private int actionIndex;
     private SchemaCard schemaTemp;
     private List<Die> selectedDice;
     private List<Integer> selectedIndex;
@@ -57,7 +58,6 @@ public class ToolCard extends Card {
         this.used = false;
         actions = new ArrayList<>();
         quantity = new ArrayList<>();
-
         toolReader(super.getId());
     }
 
@@ -142,6 +142,7 @@ public class ToolCard extends Card {
             schemaTemp=schema.cloneSchema();
             oldIndexList=new ArrayList<>();
             constraint=Color.NONE;
+            actionIndex=0;
         } catch (NegativeTokensException e) {
             return false;
         }
@@ -156,7 +157,7 @@ public class ToolCard extends Card {
         return to;
     }
 
-    public Commands getAction(){return actions.get(0);}
+    public Commands getAction(){return actions.get(actionIndex);}
 
 
 
@@ -265,11 +266,11 @@ public class ToolCard extends Card {
     }
 
     public boolean toolCanContinue(Player player){
-        if(actions.get(0)!=Commands.SWAP){
+        if(actions.get(actionIndex)!=Commands.SWAP){
             selectedDice.remove(0);
         }
-        actions.remove(0);
-        if(actions.isEmpty()){
+        actionIndex++;
+        if(actions.size()==actionIndex){
             player.replaceSchema(schemaTemp);
             return false;
         }
@@ -346,11 +347,11 @@ public class ToolCard extends Card {
     public List<Commands> getActions(){
         List<Commands> commands=new ArrayList<>();
         if(quantity.contains(DieQuantity.ONE) && quantity.contains(DieQuantity.TWO)){
-            if(commands.get(0).equals(Commands.PLACE_DIE) && commands.size()==1){
+            if(commands.get(actionIndex).equals(Commands.PLACE_DIE) && commands.get(actionIndex-1).equals(Commands.PLACE_DIE)){
                 commands.add(Commands.NONE);
             }
         }
-        commands.add(actions.get(0));
+        commands.add(actions.get(actionIndex));
         return commands;
     }
 
