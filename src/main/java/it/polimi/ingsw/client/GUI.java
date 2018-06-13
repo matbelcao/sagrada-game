@@ -13,10 +13,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -27,7 +27,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.scene.transform.Scale;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -188,19 +187,61 @@ public class GUI extends Application implements ClientUI {
         Platform.runLater(() -> {
             primaryStage.setTitle("Sagrada");
             primaryStage.setResizable(true);
-            ResizableCanvas canvas = new ResizableCanvas(draftedSchemas,privObj);
-            StackPane stackPane = new StackPane(canvas);
-            // Bind canvas size to stack pane size.
-            canvas.widthProperty().bind(stackPane.widthProperty());
-            canvas.heightProperty().bind(stackPane.heightProperty());
+            Canvas canvas = new Canvas();
+            Pane  mouseActionPane = new Pane();
+            Group group = new Group(canvas,mouseActionPane);
+            StackPane stackPane = new StackPane(group);
             Scene scene = new Scene(stackPane);
+            DraftedSchemasRecord draftedSchemasRecord = new DraftedSchemasRecord(canvas,mouseActionPane,draftedSchemas,privObj);
+            SceneSizeChangeListener sceneSizeChangeListener = new SceneSizeChangeListener(scene,draftedSchemasRecord);
+            scene.widthProperty().addListener(sceneSizeChangeListener);
+            scene.heightProperty().addListener(sceneSizeChangeListener);
             primaryStage.setScene(scene);
             primaryStage.setMinHeight(elementSize.getDraftedSchemasMinHeight());
             primaryStage.setMinWidth(elementSize.getDraftedSchemasMinWidth());
 
         });
     }
-    class ResizableCanvas extends Canvas {
+    private static class SceneSizeChangeListener implements ChangeListener<Number> {
+        private final Scene scene;
+        private DraftedSchemasRecord draftedSchemasRecord;
+
+        SceneSizeChangeListener(Scene scene, DraftedSchemasRecord draftedSchemasRecord) {
+            this.scene = scene;
+            this.draftedSchemasRecord = draftedSchemasRecord;
+        }
+        @Override
+        public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+            double newWidth = scene.getWidth();
+            double newHeight = scene.getHeight();
+            draftedSchemasRecord.updateScene(newWidth,newHeight);
+        }
+    }
+
+    class DraftedSchemasRecord {
+        Canvas canvas;
+        Pane mouseActionPane;
+        List<LightSchemaCard> draftedSchemas;
+        LightPrivObj privObj;
+
+        public DraftedSchemasRecord(Canvas canvas,Pane mouseActionPane, List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
+            this.canvas = canvas;
+            this.mouseActionPane = mouseActionPane;
+            this.draftedSchemas = draftedSchemas;
+            this.privObj = privObj;
+        }
+
+        public void updateScene(double width, double height){
+            //update the width and height properties
+            canvas.setWidth(width);
+            canvas.setHeight(height);
+            elementSize.drawDraftedSchemas(draftedSchemas,privObj,canvas,width,height);
+            mouseActionPane.getChildren().setAll(elementSize.draftedMouseActionAreas(width,height));
+        }
+
+    }
+
+    /*class ResizableCanvas extends Canvas {
         List<LightSchemaCard> draftedSchemas;
         LightPrivObj privObj;
 
@@ -208,13 +249,13 @@ public class GUI extends Application implements ClientUI {
             this.draftedSchemas = draftedSchemas;
             this.privObj = privObj;
             // Redraw canvas when size changes.
-            widthProperty().addListener(evt -> draw());
-            heightProperty().addListener(evt -> draw());
+
         }
 
-        private void draw() {
-            double width = getWidth();
-            double height = getHeight();
+        public void draw(double width, double height) {
+            //update the width and height properties
+            setWidth(width);
+            setHeight(height);
 
             GraphicsContext gc = getGraphicsContext2D();
             gc.clearRect(0, 0, width, height);
@@ -240,9 +281,9 @@ public class GUI extends Application implements ClientUI {
         public double prefHeight(double width) {
             return getHeight();
         }
-    }
+    }*/
 
-    private void letterbox(final Scene scene, final Pane contentPane) {
+   /* private void letterbox(final Scene scene, final Pane contentPane) {
         final double initWidth  = scene.getWidth();
         final double initHeight = scene.getHeight();
         final double ratio      = initWidth / initHeight;
@@ -291,7 +332,7 @@ public class GUI extends Application implements ClientUI {
                 contentPane.setPrefHeight(Math.max(initHeight, newHeight));
             }
         }
-    }
+    }*/
 
 
     @Override
