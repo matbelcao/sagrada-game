@@ -133,7 +133,7 @@ public class LightBoard extends Observable {
 
     public void updateSchema(int playerId, LightSchemaCard schema){
         players.get(playerId).setSchema(schema);
-
+        notifyObservers();
     }
 
     public LightTool getToolByIndex(int index){

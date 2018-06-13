@@ -36,6 +36,7 @@ public class CLIView {
 
     public CLIView(UILanguage lang) {
         this.uiMsg=new UIMessages(lang);
+        updateRoundTrack(new ArrayList<>());
     }
 
 
@@ -114,7 +115,6 @@ public class CLIView {
 
     public String printSchemaChoiceView(){
         StringBuilder builder=new StringBuilder();
-        //builder.append(resetScreenPosition());
         List<String> priv = new ArrayList<>(privObj);
         List<String> drafted = new ArrayList<>(buildDraftedSchemas());
         priv.add(0,boldify(uiMsg.getMessage("priv-obj")));
@@ -124,6 +124,7 @@ public class CLIView {
         builder.append(uiMsg.getMessage("choose-schema")).append("%n%n");
         builder.append(getPrompt(ClientFSMState.CHOOSE_SCHEMA));
         lastScreen=builder.toString();
+        schemas.clear();
         return lastScreen;
     }
 
@@ -177,8 +178,12 @@ public class CLIView {
      */
     private List<String> buildBottomSection() {
 
-        if(menuList.size()>schemas.get(playerId).size() ) {
-            schemas.get(playerId).addAll(buildWall(' ', menuList.size() - schemas.get(playerId).size(), SCHEMA_WIDTH + 8));
+        fillMenu();
+        if(schemas.get(playerId).size()<menuList.size()){
+            schemas.get(playerId).addAll(
+                    buildWall(' ',
+                            menuList.size()-schemas.get(playerId).size(),
+                            schemas.get(playerId).get(0).length()));
         }
 
         List<String> result=appendRows(schemas.get(playerId),menuList);
@@ -210,6 +215,7 @@ public class CLIView {
 
     public void updateMenuListDefault() {
         menuList.clear();
+        fillMenu();
     }
 
     private String buildOptions(ClientFSMState state) {
@@ -369,6 +375,7 @@ public class CLIView {
      * @param tools the list of the match tools
      */
     public void updateTools(List<LightTool> tools){
+        this.tools.clear();
         for(int i=0;i < Board.NUM_TOOLS;i++){
             this.tools.add(padUntil("",OBJ_LENGTH,' '));
             this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),i));
@@ -404,10 +411,22 @@ public class CLIView {
      */
     public void updateDraftPool(List<LightDie> draftPool){
 
-        this.draftPool= buildDiceRow( listToMap(draftPool),0,numPlayers*2+1);
+         updateDraftPool(listToMap(draftPool));
+
+
+    }
+
+    /**
+     * updates the draftpool representation
+     * @param draftPool the new draftpool
+     */
+    public void updateDraftPool(Map<Integer,LightDie> draftPool){
+
+        this.draftPool= buildDiceRow( draftPool,0,numPlayers*2+1);
 
         this.draftPool.add(padUntil("",SCREEN_WIDTH,'–'));
     }
+
 
     private List<String > buildRoundTrack(){
         List<String> result = new ArrayList<>(this.roundTrack);
@@ -515,9 +534,7 @@ public class CLIView {
         bottomInfo = String.format(cliElems.getElem("player-info"),
                 username,
                 uiMsg.getMessage("connected-via"),
-                mode.toString(),
-                uiMsg.getMessage("player-number"),
-                playerId);
+                mode.toString());
 
     }
 
@@ -533,8 +550,12 @@ public class CLIView {
         String info=String.format(cliElems.getElem("username-id"),
                 player.getUsername(),alignRight(uiMsg.getMessage("player-number") +
                         player.getPlayerId(),width - player.getUsername().length()));
-        return info+(String.format(cliElems.getElem("tokens-info"),uiMsg.getMessage("tokens"),replicate(FAVOR,player.getFavorTokens())));
-
+        info=info+(String.format(cliElems.getElem("tokens-info"),
+                uiMsg.getMessage("tokens"),
+                alignRight(
+                        replicate(FAVOR,player.getFavorTokens()),
+                        width-uiMsg.getMessage("tokens").length()-1)));
+        return info;
     }
 
 
@@ -567,6 +588,7 @@ public class CLIView {
     public void setMatchInfo(int playerId, int numPlayers) {
         this.playerId=playerId;
         this.numPlayers=numPlayers;
+        updateDraftPool(new HashMap<>());
     }
 
 

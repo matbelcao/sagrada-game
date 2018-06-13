@@ -330,15 +330,6 @@ public class GUI extends Application implements ClientUI {
     }
 
     @Override
-    public void showTurnInitScreen() {
-
-    }
-
-    @Override
-    public void showNotYourTurnScreen() {
-
-    }
-    @Override
     public void updateToolUsage(List<LightTool> tools) {
 
     }
@@ -380,6 +371,11 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void showWaitingForGameStartScreen() {
+
+    }
+
+    @Override
+    public void showMainScreen(ClientFSMState turnState) {
 
     }
 

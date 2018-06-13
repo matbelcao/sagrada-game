@@ -32,6 +32,7 @@ public class CLI implements ClientUI {
         this.uimsg=new UIMessages(lang);
         this.client = client;
         this.view=new CLIView(lang);
+
         resetScreen();
     }
 
@@ -70,6 +71,7 @@ public class CLI implements ClientUI {
         resetScreen();
         if (logged) {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ok")), client.getUsername());
+            view.setClientInfo(client.getConnMode(),client.getUsername());
 
         } else {
             console.printf(String.format("%s%n", uimsg.getMessage("login-ko")));
@@ -97,8 +99,6 @@ public class CLI implements ClientUI {
     @Override
     public void updateLobby(int numUsers){
 
-        view.setClientInfo(client.getConnMode(),client.getUsername());
-
         console.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
 
     }
@@ -108,7 +108,7 @@ public class CLI implements ClientUI {
 
         resetScreen();
         console.printf(String.format("%s%n", uimsg.getMessage("game-start")),numUsers,playerId);
-        this.view.setMatchInfo(client.getPlayerId(),client.getBoard().getNumPlayers());
+        this.view.setMatchInfo(playerId,client.getBoard().getNumPlayers());
 
     }
 
@@ -130,6 +130,8 @@ public class CLI implements ClientUI {
         for(int i=0;i<board.getNumPlayers();i++){
             view.updateSchema(board.getPlayerByIndex(i));
         }
+        view.updateRoundTrack(board.getRoundTrack());
+        view.updateDraftPool(board.getDraftPool());
         console.printf(view.printMainView(client.getTurnState()));
     }
 
@@ -165,18 +167,6 @@ public class CLI implements ClientUI {
     public void showSchemaDiceList(List<IndexedCellContent> schema) {
         view.updateMenuDiceList(schema,Place.SCHEMA);
     }
-
-    @Override
-    public void showTurnInitScreen() {
-
-    }
-
-    @Override
-    public void showNotYourTurnScreen() {
-        console.printf(view.printMainView(ClientFSMState.NOT_MY_TURN));
-
-    }
-
 
 
     @Override
@@ -229,6 +219,11 @@ public class CLI implements ClientUI {
         console.printf(msg);
     }
 
+    @Override
+    public void showMainScreen(ClientFSMState turnState) {
+        console.printf(view.printMainView(turnState));
+    }
+
 
     @Override
     public void update(Observable o, Object arg) {
@@ -236,20 +231,12 @@ public class CLI implements ClientUI {
         view.updateTools(board.getTools());
         view.updatePrivObj(board.getPrivObj());
         view.updateObjectives(board.getPubObjs(),board.getPrivObj());
-        view.updateNewRound(board.getRoundNumber());
+        view.updateMenuListDefault();
 
         for(int i=0;i<board.getNumPlayers();i++){
             view.updateSchema(board.getPlayerByIndex(i));
         }
-        console.printf(view.printMainView(client.getTurnState()));
 
-        if(board.getNowPlaying()==board.getMyPlayerId()){
-            showTurnInitScreen();
-        } else{
-            showNotYourTurnScreen();
-        }
 
     }
 }
-
-

@@ -20,8 +20,8 @@ public class CLIViewUtils {
     static final int SCHEMA_HEIGHT = 18;
     static final int CELL_HEIGHT = 4;
     static final int CELL_WIDTH = 7;
-    static final int OBJ_LENGTH = 38;
-    static final int SCREEN_WIDTH = 160;
+    static final int OBJ_LENGTH = 40;
+    static final int SCREEN_WIDTH = 164;
     private static final String SCREEN_CLEAR ="\033[H\033[2J";
     static final int MENU_WIDTH = 80;
     static final int MENU_HEIGHT = 21;
@@ -124,7 +124,7 @@ public class CLIViewUtils {
      * @return the wall
      */
     static  List<String> buildWall(char filler,int height, int width){
-        if(height<0||width<0){ throw new IllegalArgumentException();}
+        if(height<0||width<0){ return new ArrayList<>();}
 
         List<String> result=new ArrayList<>();
         for(int row=0;row<height;row++){
@@ -447,7 +447,7 @@ public class CLIViewUtils {
      */
     static List<String> appendRows(List<String> a, List<String> b){
         if(a==null || b==null || (!a.isEmpty() && a.size()<b.size())){
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("a: "+a+",b: "+b);
         }
 
         List<String> result= new ArrayList<>();
