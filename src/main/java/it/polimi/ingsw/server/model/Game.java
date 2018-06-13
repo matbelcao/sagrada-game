@@ -376,7 +376,7 @@ public class Game extends Thread implements Iterable  {
         System.out.println("select: "+status+" "+diceList.size()+" "+dieIndex);
 
         Color constraint = Color.NONE;
-        if(!status.equals(ServerState.SELECT) || diceList.size()<dieIndex){throw new IllegalActionException();}
+        if(!status.equals(ServerState.SELECT) || diceList.size()<=dieIndex){throw new IllegalActionException();}
         if(fsm.getPlaceFrom()!=Place.DICEBAG && fsm.getPlaceFrom()!=Place.NONE) {
             if(fsm.isToolActive()){
                 constraint=board.getToolCard(selectedTool).getColorConstraint();
@@ -396,7 +396,7 @@ public class Game extends Thread implements Iterable  {
             commandsList.add(Commands.PLACE_DIE);
         }
         status=fsm.nextState(Commands.NONE);
-
+        enableToolList=false;
         return commandsList;
     }
 
@@ -444,6 +444,7 @@ public class Game extends Thread implements Iterable  {
         switch (action){
             case INCREASE_DECREASE:
                 diceList=toolCard.shadeIncreaseDecrease(selectedDie);
+                enableToolList=true;
                 break;
             case SWAP:
                 return toolCard.swapDie();
@@ -453,6 +454,7 @@ public class Game extends Thread implements Iterable  {
                     return true;
                 }else{
                     diceList=toolCard.rerollDie();
+                    enableToolList=true;
                 }
                 break;
             case FLIP:
@@ -460,6 +462,7 @@ public class Game extends Thread implements Iterable  {
                 break;
             case SET_SHADE:
                 diceList=toolCard.chooseShade();
+                enableToolList=true;
                 break;
             case SET_COLOR:
                 toolCard.setColor();
@@ -471,7 +474,6 @@ public class Game extends Thread implements Iterable  {
             default:
                 return false;
         }
-        enableToolList=true;
         if(diceList!=null){
             return true;
         }else{
