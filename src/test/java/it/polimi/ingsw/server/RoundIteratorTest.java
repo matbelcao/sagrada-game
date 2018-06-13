@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.server.connection.User;
+import it.polimi.ingsw.server.model.User;
 import it.polimi.ingsw.server.model.Game;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import org.junit.jupiter.api.Assertions;

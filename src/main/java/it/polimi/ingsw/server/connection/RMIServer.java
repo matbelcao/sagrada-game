@@ -1,13 +1,14 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.server.model.Player;
+import it.polimi.ingsw.server.model.User;
 
 import java.rmi.RemoteException;
 import java.util.List;
 
 public class RMIServer implements ServerConn {
         private RMIServerInt remoteObj; //client
-        private  User user;
+        private User user;
 
 
     public RMIServer(RMIServerInt remoteObj,User user){

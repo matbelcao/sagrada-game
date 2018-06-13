@@ -1,13 +1,9 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.enums.GameStatus;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.connection.MasterServer;
-import it.polimi.ingsw.server.connection.User;
-import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
-import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 

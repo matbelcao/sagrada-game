@@ -3,6 +3,7 @@ package it.polimi.ingsw.server.connection;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.ServerOptions;
 import it.polimi.ingsw.server.model.Game;
+import it.polimi.ingsw.server.model.User;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -329,7 +330,7 @@ public class MasterServer{
     private boolean hasGameToReconnect(User user) {
         for(Game game: this.games){
             for(User u: game.getUsers()){
-                if(u.equals(user)){
+                if(u.equals(user) && game.canUserReconnect(u)){
                     return true;
                 }
             }
@@ -346,7 +347,7 @@ public class MasterServer{
         assert hasGameToReconnect(user);
         for(Game game: this.games){
             for(User u: game.getUsers()){
-                if(u.equals(user)){
+                if(u.equals(user) && game.canUserReconnect(u)){
                     return game;
                 }
             }

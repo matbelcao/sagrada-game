@@ -1,8 +1,10 @@
-package it.polimi.ingsw.server.connection;
+package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.UserStatus;
+import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.connection.ServerConn;
 import it.polimi.ingsw.server.model.Game;
 import it.polimi.ingsw.server.model.Player;
 

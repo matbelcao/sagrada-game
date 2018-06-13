@@ -4,7 +4,6 @@ package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.connection.MasterServer;
-import it.polimi.ingsw.server.connection.User;
 import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
@@ -164,38 +163,57 @@ public class Game extends Thread implements Iterable  {
 
             //Notify to all the users the starting of the round
             for(User u:users){
-                u.getServerConn().notifyRoundEvent("start",round.getRoundNumber());
+                if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                    u.getServerConn().notifyRoundEvent("start", round.getRoundNumber());
+                }
             }
 
             while(round.hasNext()){
                 userPlaying = round.next();
-                status=fsm.newTurn(round.isFirstTurn());
-                enableToolList=false;
-                diePlaced=false;
-                exit();
-                System.out.println(status+"  "+fsm.getPlaceFrom());
-                endLock=false;
-
-                //Notify to all the users the starting of the turn
-                for(User u:users){
-                    u.getServerConn().notifyTurnEvent("start",board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
+                if(userPlaying.getStatus().equals(UserStatus.PLAYING) && userPlaying.getGame().equals(this)){
+                    roundFlow();
+                }else if (getUsersActive()<=1){
+                    //todo go to the last round
+                    System.out.println("La partita sarebbe finita!");
                 }
 
-                timer = new Timer();
-                timer.schedule(new PlayerTurn(), MasterServer.getMasterServer().getTurnTime() * 1000);
-                stopFlow();
-
-                //Notify to all the users the ending of the turn
-                for(User u:users){
-                    u.getServerConn().notifyTurnEvent("end",board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
-                }
             }
 
             //Notify to all the users the ending of the round
             for(User u:users){
-                u.getServerConn().notifyRoundEvent("end",round.getRoundNumber());
+                if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                    u.getServerConn().notifyRoundEvent("end", round.getRoundNumber());
+                }
             }
             board.getDraftPool().clearDraftPool(round.getRoundNumber());
+        }
+        /*for(User u:users){
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                u.getServerConn().notifyGameEnd(board.getPlayers);
+            }
+        }*/
+    }
+
+    private void roundFlow() {
+        status=fsm.newTurn(round.isFirstTurn());
+        enableToolList=false;
+        diePlaced=false;
+        exit();
+        System.out.println(status+"  "+fsm.getPlaceFrom());
+        endLock=false;
+
+        //Notify to all the users the starting of the turn
+        for(User u:users){
+            u.getServerConn().notifyTurnEvent("start",board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
+        }
+
+        timer = new Timer();
+        timer.schedule(new PlayerTurn(), MasterServer.getMasterServer().getTurnTime() * 1000);
+        stopFlow();
+
+        //Notify to all the users the ending of the turn
+        for(User u:users){
+            u.getServerConn().notifyTurnEvent("end",board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
         }
     }
 
@@ -543,13 +561,20 @@ public class Game extends Thread implements Iterable  {
     }
 
 
+    public boolean canUserReconnect(User user){
+        if(users.contains(user)){
+            return !board.getPlayer(user).hasQuitted();
+        }
+        return false;
+    }
+
     /**
      * Notify to the active users that an user has been reconnected to the game
      * @param user the user to notify
      */
     public void reconnectUser(User user){
         for(User u : users){
-            if(u.getStatus()==UserStatus.PLAYING){
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)){
                 u.getServerConn().notifyStatusUpdate("reconnect",users.indexOf(user));
             }
         }
@@ -563,9 +588,12 @@ public class Game extends Thread implements Iterable  {
     public void disconnectUser(User user){
         user.setStatus(UserStatus.DISCONNECTED);
         for(User u : users){
-            if(u.getStatus()==UserStatus.PLAYING){
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)){
                 u.getServerConn().notifyStatusUpdate("disconnect",users.indexOf(user));
             }
+        }
+        if((userPlaying!=null && userPlaying.equals(user))||getUsersActive()<=1){
+            startFlow();
         }
     }
 
@@ -577,11 +605,24 @@ public class Game extends Thread implements Iterable  {
         user.setStatus(UserStatus.DISCONNECTED);
         // add control for number of players still in the game...
         for(User u : users){
-            if(u.getStatus()==UserStatus.PLAYING){
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)){
                 u.getServerConn().notifyStatusUpdate("quit",users.indexOf(user));
             }
         }
-        users.remove(user);
+        board.getPlayer(user).quitMatch();
+        if((userPlaying!=null && userPlaying.equals(user))||getUsersActive()<=1){
+            startFlow();
+        }
+    }
+
+    public int getUsersActive(){
+        int num=0;
+        for(User u : users){
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)){
+                num++;
+            }
+        }
+        return num;
     }
 
     public boolean gameStarted() {

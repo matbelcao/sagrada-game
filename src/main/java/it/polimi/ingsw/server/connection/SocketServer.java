@@ -2,11 +2,9 @@ package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.enums.Commands;
-import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
-import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
 import java.io.IOException;
 import java.io.PrintWriter;

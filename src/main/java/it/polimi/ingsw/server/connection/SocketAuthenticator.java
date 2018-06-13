@@ -1,10 +1,10 @@
 package it.polimi.ingsw.server.connection;
 import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.enums.ConnectionMode;
+import it.polimi.ingsw.server.model.User;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 
 /**
