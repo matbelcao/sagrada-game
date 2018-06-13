@@ -26,16 +26,32 @@ public enum ClientFSMState {
 
     MAIN{ //it is the player's turn, he/she is choosing what to do (tool/placement)
         @Override
-        public ClientFSMState nextState(boolean enabledTool, boolean back, boolean endTurn, boolean discard){
+        public ClientFSMState nextState(boolean chooseTool, boolean back, boolean endTurn, boolean discard){
             if(back){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
-            if(enabledTool){
-                toolEnabled=true;
+            if(chooseTool){
+                return CHOOSE_TOOL;
             }
             return SELECT_DIE;
 
         }
+    },
+
+    CHOOSE_TOOL{
+        @Override
+        public ClientFSMState nextState(boolean enabledTool, boolean back, boolean endTurn, boolean discard){
+            if(back){ return MAIN; }
+            if(endTurn){ return NOT_MY_TURN; }
+
+            if(!enabledTool){
+                return MAIN;
+            }
+            toolEnabled=true;
+            return SELECT_DIE;
+
+        }
+
     },
     SELECT_DIE {//the client decided what to do and sent a get_dice_list command, he is being presented with the dice he got from the server
         @Override
@@ -43,12 +59,12 @@ public enum ClientFSMState {
             if(back){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
-            if(isListEmpty){
-                if(toolEnabled){
-                    //tool is useless
-                    toolEnabled=false;
-                }
+            if(isListEmpty && toolEnabled) {
+                //tool is useless
+                toolEnabled = false;
+
                 return TOOL_CAN_CONTINUE;
+
             }
             return CHOOSE_OPTION;
         }

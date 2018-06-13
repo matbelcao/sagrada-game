@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.model.*;
@@ -18,7 +18,7 @@ import java.util.Timer;
  */
 public class SocketServer extends Thread implements ServerConn  {
     private Socket socket;
-    private QueuedInReader inSocket;
+    private QueuedBufferedReader inSocket;
     private PrintWriter outSocket;
     private User user;
     private Timer pingTimer;
@@ -29,7 +29,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * This is the constructor of the class, it starts a thread linked to an open socket
      * @param socket the socket already open used to communicate with the client
      */
-    SocketServer(Socket socket, User user,QueuedInReader inSocket,PrintWriter outSocket){
+    SocketServer(Socket socket, User user, QueuedBufferedReader inSocket, PrintWriter outSocket){
         this.inSocket=inSocket;
         this.outSocket=outSocket;
         this.user = user;

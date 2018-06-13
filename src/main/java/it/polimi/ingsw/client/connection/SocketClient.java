@@ -2,9 +2,8 @@ package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.Credentials;
-import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Commands;
-import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.immutables.*;
 
@@ -23,7 +22,7 @@ public class SocketClient implements ClientConn {
     private static final int NUM_CARDS=3;
 
     private Socket socket;
-    private QueuedInReader inSocket;
+    private QueuedBufferedReader inSocket;
     private PrintWriter outSocket;
     private Client client;
     private final Object lockin=new Object();
@@ -38,7 +37,7 @@ public class SocketClient implements ClientConn {
     public SocketClient(Client client,String address, int port) throws IOException {
         this.client=client;
         socket = new Socket(address, port);
-        inSocket = new QueuedInReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
+        inSocket = new QueuedBufferedReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
         outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
         inSocket.add();
 

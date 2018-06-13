@@ -1,5 +1,5 @@
 package it.polimi.ingsw.server.connection;
-import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.server.model.User;
 
@@ -24,14 +24,14 @@ public class SocketAuthenticator extends Thread {
      */
     @Override
     public void run(){
-        QueuedInReader inSocket=null;
+        QueuedBufferedReader inSocket=null;
         PrintWriter outSocket=null;
         String command = null;
         Boolean logged = false;
         MasterServer master=MasterServer.getMasterServer();
         ArrayList<String> params = new ArrayList<>();
         try {
-            inSocket = new QueuedInReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
+            inSocket = new QueuedBufferedReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
             outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
         } catch (IOException e) {
             e.printStackTrace();
