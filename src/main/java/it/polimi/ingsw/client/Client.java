@@ -42,11 +42,12 @@ import java.util.List;
 public class Client {
 
     private static final String INDEX = "([0-9]|([1-9][0-9]))";
-    private static final String SINGLE_CHAR = "([a-z])";
+    private static final String SINGLE_CHAR = "([qebd])";
     private static final String QUIT = "q";
     private static final String END_TURN = "e";
     private static final String BACK = "b";
     private static final String DISCARD = "d";
+
     private UIMode uiMode;
     private ConnectionMode connMode;
     private String username;
@@ -235,8 +236,6 @@ public class Client {
             }
             clientUI=new CLI(this,lang);
 
-            //commands retreival
-            this.commandQueue = new QueuedInReader(new BufferedReader(System.console().reader()));
 
             clientUI.showLoginScreen();
         }else{
@@ -251,6 +250,8 @@ public class Client {
             }
             clientUI = GUI.getGUI();
         }
+        //commands retreival
+        this.commandQueue = clientUI.getCommandQueue();
     }
 
 

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
@@ -120,4 +121,6 @@ public interface ClientUI extends Observer {
     void showWaitingForGameStartScreen();
 
     void showMainScreen(ClientFSMState turnState);
+
+    QueuedInReader getCommandQueue();
 }

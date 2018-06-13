@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.uielements.GUIutil;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
+import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
@@ -30,6 +31,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -45,7 +47,7 @@ public class GUI extends Application implements ClientUI {
     private Stage primaryStage;
     private static GUI instance;
     private Text messageToUser = new Text();
-
+    private Writer commandWriter;
 
     public GUI() {
         instance = this;
@@ -418,6 +420,21 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void showMainScreen(ClientFSMState turnState) {
 
+    }
+
+
+
+    @Override
+    public QueuedInReader getCommandQueue() {
+        PipedReader reader=new PipedReader();
+        QueuedInReader commandIn= new QueuedInReader(new BufferedReader(reader));
+        try {
+            commandWriter= new BufferedWriter( new PipedWriter(reader));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(2);
+        }
+        return commandIn;
     }
 
 
