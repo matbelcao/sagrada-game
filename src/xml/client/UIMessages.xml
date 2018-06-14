@@ -128,6 +128,10 @@
         <eng>Choose your schema by entering its number</eng>
         <ita>Scegli la tua vetrata digitandone il numero</ita>
     </choose-schema>
+    <choose-tool>
+        <eng>Choose the Tool by entering its number</eng>
+        <ita>Scegli l'Utensile digitandone il numero</ita>
+    </choose-tool>
     <waiting-game-start>
         <eng>Please, wait for the first round to begin</eng>
         <ita>Per favore, attendi l'inizio del primo round</ita>

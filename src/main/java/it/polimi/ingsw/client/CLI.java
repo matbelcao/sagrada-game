@@ -143,12 +143,14 @@ public class CLI implements ClientUI {
                 break;
             case SELECT_DIE:
                 view.updateMenuDiceList(board.getDiceList());
-
                 break;
             case CHOOSE_OPTION:
                 if(board.getOptionsList().size()>1){
                     view.updateMenuListOptions(board.getOptionsList());
                 }
+                break;
+            case CHOOSE_TOOL:
+                view.updateMenuListTools(board.getTools());
                 break;
             case CHOOSE_PLACEMENT:
                 view.updateMenuListPlacements(board.getPlacementsList(),board.getSelectedDie());

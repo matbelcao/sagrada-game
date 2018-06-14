@@ -275,6 +275,16 @@ public class CLIView {
         // TODO: 13/06/2018
 
     }
+    public void updateMenuListTools(List<LightTool> tools){
+        menuList.clear();
+        menuList.add(uiMsg.getMessage("choose-tool"));
+        for(int i=0; i<LightBoard.NUM_TOOLS;i++) {
+            menuList.add(String.format(cliElems.getElem("li"),i, tools.get(i).getName()));
+        }
+        padMenu();
+        fillMenu();
+    }
+
 
     public void updateMenuMain(){
         menuList.clear();
