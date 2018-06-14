@@ -1,10 +1,12 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.Face;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
+import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -361,11 +363,15 @@ public class SchemaCard implements Iterable<Cell>  {
     /**
      * Removes the die in the cell in the position indicated by index and returns it to the caller
      * @param index the index of the cell containing the die to be removed
-     * @return the removed die
      */
-    public Die removeDie(int index) {
+    public void removeDie(int index) {
+        assert index>=0 && index<NUM_ROWS*NUM_COLS;
         if (this.getCell(index).hasDie()) {
-            return this.getCell(index).removeDie();
+            this.getCell(index).removeDie();
+            if(((FullCellIterator)this.iterator()).numOfDice()==0){
+                isFirstDie=true;
+            }
+            return;
         }
         throw new NoSuchElementException("there's no die to remove in this cell(index:"+index+")");
     }
@@ -374,11 +380,15 @@ public class SchemaCard implements Iterable<Cell>  {
      * Removes the die in the cell in the position indicated by row and column and returns it to the caller
      * @param row the row of the cell containing the die
      * @param column the column of the cell containing the die
-     * @return the removed die
      */
-    public Die removeDie(int row,int column) {
+    public void removeDie(int row,int column) {
+        assert row>=0 && column>=0 && row<NUM_ROWS && column<NUM_COLS;
         if (this.getCell(row, column).hasDie()) {
-            return this.getCell(row, column).removeDie();
+            this.getCell(row, column).removeDie();
+            if(((FullCellIterator)this.iterator()).numOfDice()==0){
+                isFirstDie=true;
+            }
+            return;
         }
         throw new NoSuchElementException("there's no die to remove in this cell(row,column:" +row +","+column +")");
     }
@@ -446,6 +456,35 @@ public class SchemaCard implements Iterable<Cell>  {
         return diff;
     }
 
+    public List<Die> getSchemaDiceList(Color constraint){
+        List<Die> dieList=new ArrayList<>();
+        Die die;
+        FullCellIterator diceIterator=(FullCellIterator)this.iterator();
+        while(diceIterator.hasNext()) {
+            die=diceIterator.next().getDie();
+            if(!constraint.equals(Color.NONE)){
+                if(die.getColor().equals(constraint)){
+                    dieList.add(die);
+                }
+            }else{
+                dieList.add(die);
+            }
 
+        }
+        return dieList;
+    }
+
+    public int getDiePosition(Die die){
+        assert getSchemaDiceList(Color.NONE).contains(die);
+        FullCellIterator diceIterator=(FullCellIterator)this.iterator();
+        while(diceIterator.hasNext()) {
+            Die dieTemp=diceIterator.next().getDie();
+            if(die.equals(dieTemp)){
+                    return diceIterator.getIndex();
+
+            }
+        }
+        return -1;
+    }
 
 }

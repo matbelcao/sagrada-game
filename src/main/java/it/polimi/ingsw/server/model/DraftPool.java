@@ -39,17 +39,20 @@ public class DraftPool {
     /**
      * This method returns the die selected through the index and removes it from the draft area
      * @param index the index of the selected die
-     * @return the Die
      */
-    public Die chooseDie(int index){
-        Die die;
+    public void removeDie(int index){
         assert index>=0 && index<this.drafted.size();
-        die = this.drafted.get(index);
         this.drafted.remove(index);
-        return die;
+        return;
     }
 
-    public List<Die> getDraftedDice(){ return this.drafted; }
+    public List<Die> getDraftedDice(){
+        List<Die> diceList=new ArrayList<>();
+        for(Die d:drafted){
+            diceList.add(d);
+        }
+        return diceList;
+    }
 
     public List<Integer> getDicePoolList(){
         List<Integer> positions=new ArrayList<>();
@@ -72,6 +75,10 @@ public class DraftPool {
     public void clearDraftPool(int round){
         roundTrack.putDice(round, drafted);
         drafted=new ArrayList<>();
+    }
+
+    public Die putInBagAndExtract(Die die){
+        return diceBag.substituteDie(die);
     }
     
 }

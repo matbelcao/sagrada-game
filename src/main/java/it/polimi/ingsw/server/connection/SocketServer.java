@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
+import com.sun.xml.internal.bind.v2.TODO;
 import it.polimi.ingsw.common.connection.QueuedInReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
@@ -410,12 +411,12 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends to the client a text list of possible placements in his schema card (with an unique INDEX)
      */
     private void sendPlacementList() throws IllegalActionException {
-        System.out.println("QUIXXXXX");
+        System.out.println("QUIXXXXX");// TODO: 13/06/2018 delete
         List<Integer> placements=user.getGame().getPlacements(user);
 
         outSocket.print("LIST_PLACEMENTS");
-        for(Integer position:placements){
-            outSocket.print(" "+position);
+        for(int i=0;i<placements.size();i++){
+            outSocket.print(" "+placements.get(i));
         }
         outSocket.println("");
         outSocket.flush();

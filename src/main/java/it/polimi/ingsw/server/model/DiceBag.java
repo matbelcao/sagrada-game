@@ -59,11 +59,17 @@ public class DiceBag {
 
     /**
      * Puts a die in the DiceBag, to be used by tool card #11
-     * @param die to be rerolled
      */
-    /*public void putDie(Die die){
-        Die.reroll(die);
-        toDraft.add(die);
-    }*/
+    public Die substituteDie(Die oldDie){
+        try {
+            Die newDie=draftDie();
+            oldDie.setShade(newDie.getShade().toInt());
+            oldDie.setColor(newDie.getColor().toString());
+            toDraft.add(newDie);
+        } catch (EmptyDiceBagException e) {
+            return oldDie;
+        }
+        return oldDie;
+    }
 
 }

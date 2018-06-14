@@ -179,7 +179,49 @@ class SchemaCardTest {
             e.printStackTrace();
         }
         assertEquals(die2,schema1.getCell(8).getDie());
+    }
 
+    @Test
+    void testListGenerator(){
+        SchemaCard schema1 = new SchemaCard(1);
+        Die die1= new Die("FOUR","RED");
+        Die die2= new Die("TWO","GREEN");
+        Die die3= new Die("FOUR","RED");
+        Die die4= new Die("ONE","YELLOW");
+
+        //legal placement
+        try {
+            schema1.putDie(9,die1);
+            schema1.putDie(3,die3);
+            schema1.putDie(4,die4);
+            schema1.putDie(8,die2);
+        } catch (IllegalDieException e) {
+            e.printStackTrace();
+        }
+
+        List<Die> schemaContent1=schema1.getSchemaDiceList(Color.NONE);
+        assertEquals(4,schemaContent1.size());
+
+        assertEquals(die1.toString(),schemaContent1.get(0).toString());
+        assertEquals(die4.toString(),schemaContent1.get(1).toString());
+        assertEquals(die2.toString(),schemaContent1.get(2).toString());
+        assertEquals(die3.toString(),schemaContent1.get(3).toString());
+
+
+        List<Die> schemaContent2=schema1.getSchemaDiceList(Color.RED);
+        assertEquals(2,schemaContent2.size());
+
+        assertEquals(die1,schemaContent2.get(1));
+        assertEquals(die3,schemaContent2.get(0));
+        assertEquals(9,schema1.getDiePosition(die1));
+        assertEquals(8,schema1.getDiePosition(die2));
+
+
+
+        schema1.removeDie(9);
+        List<Die> schemaContent3=schema1.getSchemaDiceList(Color.RED);
+        assertEquals(1,schemaContent3.size());
+        assertEquals(die3.toString(),schemaContent3.get(0).toString());
 
     }
 }

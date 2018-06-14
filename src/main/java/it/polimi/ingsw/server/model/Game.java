@@ -4,6 +4,7 @@ package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
@@ -158,15 +159,11 @@ public class Game extends Thread implements Iterable  {
 
         while (round.hasNextRound()){
             round.nextRound();
-            enableToolList=false;
+            enableToolList =false;
             board.getDraftPool().draftDice(users.size());
 
             //Notify to all the users the starting of the round
-            for(User u:users){
-                if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
-                    u.getServerConn().notifyRoundEvent("start", round.getRoundNumber());
-                }
-            }
+            notifyRoundStart();
 
             while(round.hasNext()){
                 userPlaying = round.next();
@@ -180,11 +177,7 @@ public class Game extends Thread implements Iterable  {
             }
 
             //Notify to all the users the ending of the round
-            for(User u:users){
-                if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
-                    u.getServerConn().notifyRoundEvent("end", round.getRoundNumber());
-                }
-            }
+            notifyRoundEnd();
             board.getDraftPool().clearDraftPool(round.getRoundNumber());
         }
         /*for(User u:users){
@@ -194,10 +187,26 @@ public class Game extends Thread implements Iterable  {
         }*/
     }
 
+    private void notifyRoundStart() {
+        for(User u:users){
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                u.getServerConn().notifyRoundEvent("start", round.getRoundNumber());
+            }
+        }
+    }
+
+    private void notifyRoundEnd() {
+        for(User u:users){
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                u.getServerConn().notifyRoundEvent("end", round.getRoundNumber());
+            }
+        }
+    }
+
     private void roundFlow() {
         status=fsm.newTurn(round.isFirstTurn());
-        enableToolList=false;
         diePlaced=false;
+
         exit();
         System.out.println(status+"  "+fsm.getPlaceFrom());
         endLock=false;
@@ -347,11 +356,15 @@ public class Game extends Thread implements Iterable  {
 
         if(fsm.isToolActive()){
             constraint=board.getToolCard(selectedTool).getColorConstraint();
-            if(diceList.isEmpty()){//skip if it's not required to select a die (ALL option)
+            if(enableToolList && diceList.isEmpty()){//skip if it's not required to select a die (ALL option)
                 while(!status.equals(ServerState.TOOL_CAN_CONTINUE)){
                     status=fsm.nextState(Commands.NONE);
                 }
                 return diceList;
+            }
+            if(board.getToolCard(selectedTool).isInternalSchemaPlacement()){
+                diceList=board.getToolCard(selectedTool).internalIndexedSchemaDiceList();
+                enableToolList=false;
             }
         }
 
@@ -366,9 +379,6 @@ public class Game extends Thread implements Iterable  {
                 case ROUNDTRACK:
                     diceList = board.indexedRoundTrackDiceList();
                     break;
-                case DICEBAG:
-                    //to define better.....
-                    return new ArrayList<>();
             }
         }
         if(status.equals(ServerState.MAIN)){
@@ -380,33 +390,37 @@ public class Game extends Thread implements Iterable  {
 
     public List<Commands> selectDie(User user, int dieIndex) throws IllegalActionException {
         System.out.println("select: "+status+" "+diceList.size()+" "+dieIndex);
-
         Color constraint = Color.NONE;
         if(!status.equals(ServerState.SELECT) || diceList.size()<=dieIndex){throw new IllegalActionException();}
-        if(fsm.getPlaceFrom()!=Place.DICEBAG && fsm.getPlaceFrom()!=Place.NONE) {
-            if(fsm.isToolActive()){
-                constraint=board.getToolCard(selectedTool).getColorConstraint();
-            }
-            selectedDie = board.selectDie(user, fsm.getPlaceFrom(), dieIndex,constraint);
-            oldIndex=board.getDiePosition(user,fsm.getPlaceFrom(),selectedDie);
-        }else{
-            selectedDie=new Die(diceList.get(dieIndex).getContent().getShade(),diceList.get(dieIndex).getContent().getColor());
-            oldIndex=diceList.get(dieIndex).getPosition();
-        }
 
-        if(fsm.isToolActive()){
-            board.getToolCard(selectedTool).selectDie(selectedDie,oldIndex);
-            commandsList = board.getToolCard(selectedTool).getActions();
-        }else{
+        if(fsm.isToolActive()) {    //toolcard enabled
+            ToolCard tool = board.getToolCard(selectedTool);
+            constraint = tool.getColorConstraint();
+            if(tool.isInternalSchemaPlacement()){
+                selectedDie=tool.internalSelectDie(dieIndex);
+            }else if (enableToolList && (selectedCommand.equals(Commands.INCREASE_DECREASE) || selectedCommand.equals(Commands.SET_SHADE))) {
+                selectedDie.setColor(diceList.get(dieIndex).getContent().getColor().toString());
+                selectedDie.setShade(diceList.get(dieIndex).getContent().getShade().toInt());
+            } else{
+                selectedDie = board.selectDie(user, fsm.getPlaceFrom(), dieIndex, constraint);
+                oldIndex = board.getDiePosition(user, fsm.getPlaceFrom(), selectedDie, constraint);
+                tool.selectDie(selectedDie, oldIndex);
+            }
+            commandsList = tool.getActions();
+        }else { //Toolcard disabled
+            selectedDie = board.selectDie(user, fsm.getPlaceFrom(), dieIndex, constraint);
+            oldIndex = board.getDiePosition(user, fsm.getPlaceFrom(), selectedDie, constraint);
             commandsList=new ArrayList<>();
             commandsList.add(Commands.PLACE_DIE);
         }
+        System.out.println("1"+selectedDie.getShade().toString());
+
         status=fsm.nextState(Commands.NONE);
-        enableToolList=false;
+        enableToolList =false;
         return commandsList;
     }
 
-    //to define better, either choosing a placement or an action
+
     public boolean choose(User user,int index) throws IllegalActionException {
         Boolean response;
         if(status.equals(ServerState.INIT)){
@@ -424,10 +438,13 @@ public class Game extends Thread implements Iterable  {
             }
         }else if(status.equals(ServerState.CHOOSE_PLACEMENT)){
             System.out.println("CHOOSE_PLACEMENTS: "+placements.size()+" "+selectedCommand+" "+selectedDie);
-            if(placements.size()<index || !selectedCommand.equals(Commands.PLACE_DIE) || selectedDie==null){return false;}
+            if(placements.size()<=index || !selectedCommand.equals(Commands.PLACE_DIE) || selectedDie==null){return false;}
                 if(fsm.isToolActive()){
-                    response=board.getToolCard(selectedTool).placeDie(index);
-                    if(!board.getToolCard(selectedTool).isInternalSchemaPlacement()){
+                    ToolCard tool=board.getToolCard(selectedTool);
+                    if(tool.isInternalSchemaPlacement()){
+                        response=tool.internalDiePlacement(index);
+                    }else{
+                        response=board.schemaPlacement(user,index,oldIndex,selectedDie);
                         diePlaced=true;
                     }
                 }else{
@@ -442,6 +459,7 @@ public class Game extends Thread implements Iterable  {
             status=fsm.nextState(selectedCommand);
             System.out.println("CHOOSE_end: "+status+" "+index);
         }
+        System.out.println(selectedDie.getShade().toString());
         return response;
     }
 
@@ -450,25 +468,22 @@ public class Game extends Thread implements Iterable  {
         switch (action){
             case INCREASE_DECREASE:
                 diceList=toolCard.shadeIncreaseDecrease(selectedDie);
-                enableToolList=true;
+                enableToolList =true;
                 break;
             case SWAP:
                 return toolCard.swapDie();
             case REROLL:
-                if(toolCard.getQuantity().get(0).equals(DieQuantity.ALL)){
-                    toolCard.rerollAll(board.getDraftPool().getDraftedDice());
-                    return true;
-                }else{
-                    diceList=toolCard.rerollDie();
-                    enableToolList=true;
-                }
+                diceList=toolCard.rerollDie();
+                enableToolList =true;
                 break;
             case FLIP:
                 diceList=toolCard.flipDie();
                 break;
             case SET_SHADE:
+                selectedDie=board.getDraftPool().putInBagAndExtract(selectedDie);
                 diceList=toolCard.chooseShade();
-                enableToolList=true;
+                enableToolList =true;
+                fsm.setPlaceFrom(Place.DICEBAG);
                 break;
             case SET_COLOR:
                 toolCard.setColor();
@@ -476,6 +491,7 @@ public class Game extends Thread implements Iterable  {
             case PLACE_DIE:
                 return true;
             case NONE:
+                System.out.println(selectedDie.getShade().toString());
                 return true;
             default:
                 return false;
@@ -509,8 +525,27 @@ public class Game extends Thread implements Iterable  {
 
     public List<Integer> getPlacements(User user) throws IllegalActionException {
         System.out.println("GET_PLACEMENTS: "+status);
+        SchemaCard schema;
+
         if(status.equals(ServerState.GET_PLACEMENTS)) {
-            placements = board.listSchemaPlacements(user, selectedDie);
+            IgnoredConstraint constraint=IgnoredConstraint.NONE;
+            if(fsm.isToolActive()) {
+                ToolCard tool=board.getToolCard(selectedTool);
+                if(tool.isInternalSchemaPlacement()){
+                    placements=tool.internalListPlacements();
+                }else{
+                    schema=board.getPlayer(user).getSchema();// TODO: 14/06/2018  inserire in toolcard
+                    constraint = tool.getIgnoredConstraint();
+                    placements = board.listSchemaPlacements(schema, selectedDie,constraint);
+                }
+
+            }else{
+                constraint=IgnoredConstraint.NONE;// TODO: 14/06/2018
+                schema=board.getPlayer(user).getSchema();
+                placements = board.listSchemaPlacements(schema, selectedDie,constraint);
+            }
+
+
             status=fsm.nextState(selectedCommand);
             return placements;
         }
@@ -523,15 +558,16 @@ public class Game extends Thread implements Iterable  {
         System.out.println("TOOL_ENABLE: "+status);
         Boolean toolEnabled;
         if(!status.equals(ServerState.MAIN)){ throw new IllegalActionException(); }
-
         if(index<0||index>2){return false;}
-        if(board.getToolCard(index).isExternalPlacement() && diePlaced){return false;}
 
-        toolEnabled=board.getToolCard(index).enableToolCard(board.getPlayer(user),round.isFirstTurn()?0:1,board.getPlayer(user).getSchema());
+        ToolCard tool= board.getToolCard(index);
+        if(tool.isExternalPlacement() && tool.getTo().equals(Place.SCHEMA) && diePlaced){return false;}
+
+        toolEnabled=tool.enableToolCard(board.getPlayer(user),round.isFirstTurn()?Turn.FIRST_TURN:Turn.SECOND_TURN,board.getPlayer(user).getSchema());
         if(toolEnabled){
             selectedTool=index;
             status=fsm.newToolUsage(board.getToolCard(selectedTool));
-            ToolCard tool= board.getToolCard(selectedTool);
+
             if(tool.isRerollAllDiceCard()){
                 List<Die> dielist;
                 switch (tool.getFrom()){
@@ -545,8 +581,8 @@ public class Game extends Thread implements Iterable  {
                         throw new IllegalActionException();
                 }
                 tool.rerollAll(dielist);
-                diceList.clear();
-                enableToolList=true;
+                diceList=new ArrayList<>();
+                enableToolList =true;
             }
         }else{
             discard();
@@ -556,13 +592,17 @@ public class Game extends Thread implements Iterable  {
     }
 
     public boolean toolStatus(User user) throws IllegalActionException {
+        System.out.println(selectedDie.getShade().toString());
         System.out.println("TOOL_STATUS: "+status);
         if(!status.equals(ServerState.TOOL_CAN_CONTINUE)){throw new IllegalActionException();}
         if(!board.getToolCard(selectedTool).toolCanContinue(board.getPlayer(user))){
             List<Integer> oldIndexes=board.getToolCard(selectedTool).getOldIndexes();
-
+            board.removeOldDice(user,board.getToolCard(selectedTool).getFrom(),oldIndexes);
             selectedTool=-1;
             status=fsm.exit();
+            enableToolList=false;
+            diceList.clear();
+            selectedCommand=Commands.NONE;
         }else{
             status=fsm.nextState(selectedCommand);
         }
@@ -579,10 +619,11 @@ public class Game extends Thread implements Iterable  {
     }
 
     public void exit(){
-        enableToolList=false;
+        enableToolList =false;
         status=fsm.exit();
         selectedTool=-1;
         selectedDie=null;
+        selectedCommand=Commands.NONE;
     }
 
 

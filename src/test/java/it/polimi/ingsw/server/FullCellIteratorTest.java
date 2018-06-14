@@ -1,4 +1,5 @@
 package it.polimi.ingsw.server;
+import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.Die;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
@@ -64,7 +65,7 @@ public class FullCellIteratorTest {
         assertEquals(17,iter.numOfDice());
 
         Executable codeToTest=() ->{schema.getCell(15).setDie(null);};
-        assertThrows(AssertionError.class,codeToTest);
+        assertThrows(IllegalArgumentException.class,codeToTest);
 
         schema.removeDie(15);
 

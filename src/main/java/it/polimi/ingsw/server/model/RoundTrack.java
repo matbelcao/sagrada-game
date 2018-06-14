@@ -1,5 +1,7 @@
 package it.polimi.ingsw.server.model;
 
+import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +71,7 @@ public class RoundTrack{
     }
 
     public void removeDie(int index){
+        assert index>=0 && index<getTrackList().size();
         int i=0;
         for(List<Die> dieList: track) {
             int dieNum=0;
@@ -80,6 +83,6 @@ public class RoundTrack{
                 dieNum++;
                 i++;
             }
-    }
+        }
     }
 }

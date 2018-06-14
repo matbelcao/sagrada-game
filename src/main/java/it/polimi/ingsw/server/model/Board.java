@@ -4,6 +4,7 @@ import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
@@ -46,7 +47,7 @@ public class Board {
      */
     private ToolCard[] draftToolCards() {
         toolCards= new ToolCard[Board.NUM_TOOLS];
-        Random randomGen = new Random();
+        /*Random randomGen = new Random();
         List<Integer> draftedTools= new ArrayList<>();
         Integer id;
         for(int i =0; i<Board.NUM_TOOLS;i++){
@@ -55,7 +56,10 @@ public class Board {
             }while (draftedTools.contains(id));
             draftedTools.add(id);
             toolCards[i]=new ToolCard(id);
-        }
+        }*/
+        toolCards[0]=new ToolCard(4);
+        toolCards[1]=new ToolCard(5);
+        toolCards[2]=new ToolCard(6);
         return toolCards;
     }
 
@@ -141,8 +145,6 @@ public class Board {
                 indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
                 indexedList.add(indexedCell);
             }
-            indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
-            indexedList.add(indexedCell);
         }
         return indexedList;
     }
@@ -182,29 +184,10 @@ public class Board {
      * @return the list of possible placements in the user's schema card
      */
     public Die selectDie(User user,Place place, int die_index,Color constraint) {
-        Die die;
-        int tempIndex=0;
 
         switch (place){
             case SCHEMA:
-                FullCellIterator diceIterator=(FullCellIterator)getPlayer(user).getSchema().iterator();
-                while(diceIterator.hasNext()) {
-                    die = diceIterator.next().getDie();
-                    if(!constraint.equals(Color.NONE)){
-                        if(die.getColor().equals(constraint)){
-                            if (tempIndex == die_index) {
-                                return die;
-                            }
-                            tempIndex++;
-                        }
-                    }else{
-                        if (tempIndex == die_index) {
-                            return die;
-                        }
-                        tempIndex++;
-                    }
-                }
-                break;
+                return getPlayer(user).getSchema().getSchemaDiceList(constraint).get(die_index);
             case DRAFTPOOL:
                 return getDraftPool().getDraftedDice().get(die_index);
             case ROUNDTRACK:
@@ -214,34 +197,10 @@ public class Board {
         return null;
     }
 
-    public boolean schemaPlacement(User user, int newIndex,int oldIndex, Die selectedDie){
-        SchemaCard schemaCard=getPlayer(user).getSchema();
-        List<Integer> placerments= schemaCard.listPossiblePlacements(selectedDie);
-        try {
-            schemaCard.putDie(placerments.get(newIndex),selectedDie);
-            getDraftPool().chooseDie(oldIndex);
-            return true;
-        } catch (IllegalDieException e) {
-            return false;
-        }
-    }
-
-    public List<Integer> listSchemaPlacements(User user, Die selectedDie){
-        SchemaCard schema =getPlayer(user).getSchema();
-        return schema.listPossiblePlacements(selectedDie);
-    }
-
-    public int getDiePosition(User user , Place from, Die die){
+    public int getDiePosition(User user , Place from, Die die, Color constraint){
         switch (from){
             case SCHEMA:
-                FullCellIterator diceIterator=(FullCellIterator)getPlayer(user).getSchema().iterator();
-                while(diceIterator.hasNext()) {
-                    Die d = diceIterator.next().getDie();
-                    if(die.equals(d)){
-                        return diceIterator.getIndex();
-                    }
-                }
-                break;
+                return getPlayer(user).getSchema().getDiePosition(die);
             case DRAFTPOOL:
                 return getDraftPool().getDraftedDice().indexOf(die);
             case ROUNDTRACK:
@@ -249,8 +208,25 @@ public class Board {
             default:
                 return -1;
         }
-        return -1;
     }
+
+    //only for
+    public boolean schemaPlacement(User user,int newIndex,int oldIndex, Die selectedDie){
+        SchemaCard schemaCard=getPlayer(user).getSchema();
+        List<Integer> placerments= schemaCard.listPossiblePlacements(selectedDie);
+        try {
+            schemaCard.putDie(placerments.get(newIndex),selectedDie);
+            getDraftPool().removeDie(oldIndex);
+            return true;
+        } catch (IllegalDieException e) {
+            return false;
+        }
+    }
+
+    public List<Integer> listSchemaPlacements(SchemaCard selectedSchema, Die selectedDie, IgnoredConstraint constraint){
+        return selectedSchema.listPossiblePlacements(selectedDie,constraint);
+    }
+
 
     public void removeOldDice(User user, Place from, List<Integer> oldIndexes){
         for (Integer index: oldIndexes){
@@ -259,7 +235,7 @@ public class Board {
                     getPlayer(user).getSchema().removeDie(index);
                     break;
                 case DRAFTPOOL:
-                    getDraftPool().chooseDie(index);
+                    getDraftPool().removeDie(index);
                     break;
                 case ROUNDTRACK:
                     getDraftPool().getRoundTrack().removeDie(index);

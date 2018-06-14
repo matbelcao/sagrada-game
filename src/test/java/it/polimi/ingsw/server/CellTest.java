@@ -32,7 +32,7 @@ class CellTest {
         assertEquals(testDie,emptyConstraintCell.getDie());
         Die nulldie=null;
 
-        assertThrows(AssertionError.class,() -> emptyConstraintCell.setDie(nulldie));
+        assertThrows(IllegalArgumentException.class,() -> emptyConstraintCell.setDie(nulldie));
     }
 
     @Test
