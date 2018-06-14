@@ -137,7 +137,7 @@
         <ita>Scegli la tua prossima mossa:</ita>
     </main-choice>
     <not-my-turn>
-        <eng>%s is playing at the moment...%nPlease, wait for your turn!</eng>
-        <ita>%s sta giocando al momento...%nAttendi il tuo turno!</ita>
+        <eng>%s is playing at the moment... Please, wait for your turn!</eng>
+        <ita>%s sta giocando al momento... Attendi il tuo turno!</ita>
     </not-my-turn>
 </messages>
