@@ -23,8 +23,8 @@ class ToolCardTest {
         assertEquals("Dopo aver scelto un dado, aumenta o dominuisci il valore del dado scelto di 1 (Non puoi cambiare un 6 in 1 o un 1 in 6)",tool1.getDescription());
 
         assertFalse(tool1.isAlreadyUsed());
-        assertEquals(Place.DRAFTPOOL,tool1.getFrom());
-        assertEquals(Place.DRAFTPOOL,tool1.getTo());
+        assertEquals(Place.DRAFTPOOL,tool1.getPlaceFrom());
+        assertEquals(Place.DRAFTPOOL,tool1.getPlaceTo());
         assertEquals(DieQuantity.ONE,tool1.getQuantity().get(0));
         assertEquals(Commands.INCREASE_DECREASE,tool1.getActions().get(0));
         //assertEquals(Commands.NONE,tool1.getActions().get(0));

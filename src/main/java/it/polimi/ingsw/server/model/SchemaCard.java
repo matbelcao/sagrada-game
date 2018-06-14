@@ -43,7 +43,6 @@ public class SchemaCard implements Iterable<Cell>  {
      * @param id ToolCard id
      */
     public SchemaCard(Cell [] [] cells,int id, String name,int favorTokens){
-
         cell = cells;
         this.id=id;
         this.name=name;
@@ -52,11 +51,12 @@ public class SchemaCard implements Iterable<Cell>  {
 
     }
 
+    /**
+     * The SchemaCard's class constructor. Retrieves the SchemaCard(id) data from the xml file and instantiates it
+     * @param id the ID of the schema card to instantiate
+     */
     public SchemaCard(int id){
-
-
         SchemaCard temp= parser(id);
-
         assert temp != null;
         cell = temp.cell;
         this.id=id;
@@ -65,7 +65,11 @@ public class SchemaCard implements Iterable<Cell>  {
         isFirstDie=true;
     }
 
-
+    /**
+     * Retrieve the SchemaCard's data from the xml file ant initilizes the related parameters
+     * @param id the ScheCard's id
+     * @return
+     */
     public static SchemaCard parser(int id){
         File xmlFile= new File(xmlSource);
         String name="";
@@ -110,8 +114,6 @@ public class SchemaCard implements Iterable<Cell>  {
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             System.err.println("ERR: couldn't load schema card");
         }
-
-
         return null;
     }
 
@@ -414,11 +416,10 @@ public class SchemaCard implements Iterable<Cell>  {
         throw new UnsupportedOperationException();
     }
 
-
-
-
-
-
+    /**
+     * Cretes a copy of the SchemaCard instantiated
+     * @return the copy reference
+     */
     public SchemaCard cloneSchema(){
         SchemaCard temp= new SchemaCard(this.id);
         FullCellIterator iter= (FullCellIterator) iterator();
@@ -456,6 +457,11 @@ public class SchemaCard implements Iterable<Cell>  {
         return diff;
     }
 
+    /**
+     * Returns a list of the dice placed in the schema card.
+     * @param constraint the color restriction
+     * @return a list of die
+     */
     public List<Die> getSchemaDiceList(Color constraint){
         List<Die> dieList=new ArrayList<>();
         Die die;

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * This class implements the Cards named "Tools" and their score calculating algorithms
+ * This class implements the Cards named "Tools" and their calculating algorithms
  */
 public class ToolCard extends Card {
     private static final String xmlTool = MasterServer.XML_SOURCE + "ToolCard.xml";
@@ -48,11 +48,6 @@ public class ToolCard extends Card {
     private List<Integer> oldIndexList;
 
 
-    /**
-     * Constructs the card setting its id, name, description and use calculating algorithm
-     *
-     * @param id the id of the card
-     */
     public ToolCard(int id) {
         super();
         super.xmlReader(id, xmlTool, "ToolCard");
@@ -122,16 +117,18 @@ public class ToolCard extends Card {
         return player.getFavorTokens() >= cost;
     }
 
-    public boolean enableToolCard(Player player, Turn turnFirstOrSecond, SchemaCard schema) {
+    public boolean enableToolCard(Player player,int roundNumber,Turn turnFirstOrSecond, boolean diePlaced , SchemaCard schema) {
         try {
+            if(isExternalPlacement() && to.equals(Place.SCHEMA) && diePlaced){return false;}
+            if(actions.contains(Commands.SWAP) && roundNumber==0){return false;}
             if (!turn.equals(Turn.NONE)) {
                 if(!turn.equals(turnFirstOrSecond)){
                     return false;
                 }
             }
-            FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
             if(isInternalSchemaPlacement()){
-                if((diceIterator.numOfDice()<1 && quantity.get(0).equals(DieQuantity.ONE))||(diceIterator.numOfDice()<2 && quantity.get(0).equals(DieQuantity.TWO))) {
+                FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+                if((diceIterator.numOfDice()<1 && quantity.contains(DieQuantity.ONE))||(diceIterator.numOfDice()<2 && quantity.contains(DieQuantity.TWO))) {
                     return false;
                 }
             }
@@ -153,18 +150,6 @@ public class ToolCard extends Card {
         return true;
     }
 
-    public Place getPlaceFrom(){
-        return from;
-    }
-
-    public Place getPlaceTo(){
-        return to;
-    }
-
-    public Commands getAction(){return actions.get(actionIndex);}
-
-
-
     public List<IndexedCellContent> shadeIncreaseDecrease(Die die){
         Die tmpDie;
         List <Die> modifiedDie=new ArrayList<>();
@@ -173,17 +158,13 @@ public class ToolCard extends Card {
             tmpDie=new Die(die.getShade(),die.getColor());
             tmpDie.increaseShade();
             modifiedDie.add(tmpDie);
-        } catch (IllegalShadeException e) {
-            e.printStackTrace();
-        }
+        } catch (IllegalShadeException ignored) { }
 
         try {
             tmpDie=new Die(die.getShade(),die.getColor());
             tmpDie.decreaseShade();
             modifiedDie.add(tmpDie);
-        } catch (IllegalShadeException e) {
-            e.printStackTrace();
-        }
+        } catch (IllegalShadeException ignored) { }
 
         return toIndexedDieList(modifiedDie);
     }
@@ -269,11 +250,9 @@ public class ToolCard extends Card {
 
     public List<Integer> internalListPlacements() {
         System.out.println("Internal_placement_list: "+selectedDice.get(0).toString()+" "+ignored_constraint+" "+oldIndexList.get(0));
-
         System.out.println("Before: "+ schemaTemp.getSchemaDiceList(Color.NONE));
 
         schemaTemp.removeDie(oldIndexList.get(0));
-
         System.out.println("After: "+ schemaTemp.getSchemaDiceList(Color.NONE));
 
         List<Integer> placements=schemaTemp.listPossiblePlacements(selectedDice.get(0),ignored_constraint);
@@ -345,7 +324,6 @@ public class ToolCard extends Card {
     }
 
     public List<Integer> getOldIndexes(){
-
         return oldIndexList;
     }
 
@@ -364,33 +342,13 @@ public class ToolCard extends Card {
         return false;
     }
 
-
-    public SchemaCard getNewSchema(){
-        return schemaTemp;
+    public Place getPlaceFrom(){
+        return from;
     }
 
-    public List<Die> getToolDice(){
-        return selectedDice;
+    public Place getPlaceTo(){
+        return to;
     }
-
-    public List<Integer> getDiceIndexes(){
-        return selectedIndex;
-    }
-
-
-    //for other to schema
-    public boolean externalVirtualPlacement(int index){
-
-        return false;
-    }
-
-
-
-
-
-
-
-
 
     /**
      * This method provide the information about if the card has been yet used
@@ -398,14 +356,6 @@ public class ToolCard extends Card {
      */
     public boolean isAlreadyUsed(){
         return this.used;
-    }
-
-    public Place getFrom(){
-        return from;
-    }
-
-    public Place getTo(){
-        return to;
     }
 
     public List<DieQuantity> getQuantity(){

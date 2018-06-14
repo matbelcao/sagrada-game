@@ -57,9 +57,9 @@ public class Board {
             draftedTools.add(id);
             toolCards[i]=new ToolCard(id);
         }*/
-        toolCards[0]=new ToolCard(4);
-        toolCards[1]=new ToolCard(5);
-        toolCards[2]=new ToolCard(6);
+        toolCards[0]=new ToolCard(1);
+        toolCards[1]=new ToolCard(2);
+        toolCards[2]=new ToolCard(4);
         return toolCards;
     }
 
@@ -126,10 +126,23 @@ public class Board {
         return schemaChoices;
     }
 
-    public  List<IndexedCellContent> indexedSchemaDiceList(User user, Color constraint){
+    public List<IndexedCellContent> indexedDiceList(int playerId,Place from, Color constraint){
+        switch(from) {
+            case SCHEMA:
+                return indexedSchemaDiceList(playerId,constraint);
+            case DRAFTPOOL:
+                return indexedDraftpoolDiceList();
+            case ROUNDTRACK:
+                return indexedRoundTrackDiceList();
+            default:
+                throw  new IllegalArgumentException();
+        }
+    }
+
+    private  List<IndexedCellContent> indexedSchemaDiceList(int playerId, Color constraint){
         List<IndexedCellContent> indexedList=new ArrayList<>();
         IndexedCellContent indexedCell;
-        SchemaCard schema= getPlayer(user).getSchema();
+        SchemaCard schema= getPlayerById(playerId).getSchema();
         Die die;
 
         FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
@@ -149,7 +162,7 @@ public class Board {
         return indexedList;
     }
 
-    public List<IndexedCellContent> indexedDraftpoolDiceList(){
+    private List<IndexedCellContent> indexedDraftpoolDiceList(){
         List<Die> draftedDice=getDraftPool().getDraftedDice();
         List<IndexedCellContent> indexedList=new ArrayList<>();
         IndexedCellContent indexedCell;
@@ -163,7 +176,7 @@ public class Board {
         return indexedList;
     }
 
-    public List<IndexedCellContent> indexedRoundTrackDiceList(){
+    private List<IndexedCellContent> indexedRoundTrackDiceList(){
         List<List<Die>> dieTrack=getDraftPool().getRoundTrack().getTrack();
         List<IndexedCellContent> indexedList=new ArrayList<>();
         IndexedCellContent indexedCell;
@@ -183,11 +196,11 @@ public class Board {
      * @param user the user who made the request
      * @return the list of possible placements in the user's schema card
      */
-    public Die selectDie(User user,Place place, int die_index,Color constraint) {
+    public Die selectDie(int playerId,Place from, int die_index,Color constraint) {
 
-        switch (place){
+        switch (from){
             case SCHEMA:
-                return getPlayer(user).getSchema().getSchemaDiceList(constraint).get(die_index);
+                return getPlayerById(playerId).getSchema().getSchemaDiceList(constraint).get(die_index);
             case DRAFTPOOL:
                 return getDraftPool().getDraftedDice().get(die_index);
             case ROUNDTRACK:
@@ -197,10 +210,10 @@ public class Board {
         return null;
     }
 
-    public int getDiePosition(User user , Place from, Die die, Color constraint){
+    public int getDiePosition(int playerId, Place from, Die die){
         switch (from){
             case SCHEMA:
-                return getPlayer(user).getSchema().getDiePosition(die);
+                return getPlayerById(playerId).getSchema().getDiePosition(die);
             case DRAFTPOOL:
                 return getDraftPool().getDraftedDice().indexOf(die);
             case ROUNDTRACK:
@@ -211,8 +224,8 @@ public class Board {
     }
 
     //only for
-    public boolean schemaPlacement(User user,int newIndex,int oldIndex, Die selectedDie){
-        SchemaCard schemaCard=getPlayer(user).getSchema();
+    public boolean schemaPlacement(int playerId,int newIndex,int oldIndex, Die selectedDie){
+        SchemaCard schemaCard=getPlayerById(playerId).getSchema();
         List<Integer> placerments= schemaCard.listPossiblePlacements(selectedDie);
         try {
             schemaCard.putDie(placerments.get(newIndex),selectedDie);

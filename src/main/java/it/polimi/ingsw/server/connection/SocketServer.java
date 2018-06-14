@@ -391,7 +391,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends to the client a text list of the dice contained in the selected area (with an unique INDEX)
      */
     private void sendDiceList() throws IllegalActionException {
-        List<IndexedCellContent> dice=user.getGame().getDiceList(user);
+        List<IndexedCellContent> dice=user.getGame().getDiceList();
 
         if(dice.size()>0){
             outSocket.print("LIST_DICE "+dice.get(0).getPlace().toString().toLowerCase());
@@ -426,7 +426,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param index the index of the die previously received by the client
      */
     private void selectDie(int index) throws IllegalActionException {
-        List<Commands> options = user.getGame().selectDie(user, index);
+        List<Commands> options = user.getGame().selectDie(index);
 
         outSocket.print("LIST_OPTIONS");
         for(int i=0;i<options.size();i++){
@@ -452,7 +452,7 @@ public class SocketServer extends Thread implements ServerConn  {
 
     private void toolEnable(int index) throws IllegalActionException {
         Boolean used;
-        used=user.getGame().activeTool(user,index);
+        used=user.getGame().activeTool(index);
         if(used){
             outSocket.println("TOOL ok");
         }else{
