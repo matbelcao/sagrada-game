@@ -9,7 +9,8 @@ public class ServerFSM {
     private boolean diePlaced;
     private boolean isFirstTurn;
 
-    Place placeFrom,placeTo;
+    private Place placeFrom;
+    private Place placeTo;
     private ServerState curState;
 
 

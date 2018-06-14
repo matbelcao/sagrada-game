@@ -482,6 +482,7 @@ public class Game extends Thread implements Iterable  {
                     enableToolList =true;
                     break;
                 case SWAP:
+                    fsm.setPlaceFrom(selectedTool.getPlaceTo());
                     return selectedTool.swapDie();
                 case REROLL:
                     diceList=selectedTool.rerollDie();

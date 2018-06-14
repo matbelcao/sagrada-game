@@ -447,7 +447,7 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void choose(int index) throws IllegalActionException {
         if(user.getGame()==null){throw new IllegalActionException();}
-        
+
         Boolean result=user.getGame().choose(user,index);
         if(result){
             outSocket.println("CHOICE ok");

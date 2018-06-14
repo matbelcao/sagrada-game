@@ -82,4 +82,17 @@ class DieTest {
         assertThrows(IllegalArgumentException.class,() ->test.setShade(0));
     }
 
+    @Test
+    void testSwap(){
+        Die die1=new Die("ONE","RED");
+        Die die2=new Die("SIX","GREEN");
+
+        die1.swap(die2);
+
+        assertEquals("SIX",die1.getShade().toString());
+        assertEquals("GREEN",die1.getColor().toString());
+        assertEquals("ONE",die2.getShade().toString());
+        assertEquals("RED",die2.getColor().toString());
+    }
+
 }
