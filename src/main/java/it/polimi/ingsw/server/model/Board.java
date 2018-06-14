@@ -57,9 +57,9 @@ public class Board {
             draftedTools.add(id);
             toolCards[i]=new ToolCard(id);
         }*/
-        toolCards[0]=new ToolCard(1);
-        toolCards[1]=new ToolCard(2);
-        toolCards[2]=new ToolCard(4);
+        toolCards[0]=new ToolCard(5);
+        toolCards[1]=new ToolCard(6);
+        toolCards[2]=new ToolCard(7);
         return toolCards;
     }
 

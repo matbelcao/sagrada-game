@@ -93,6 +93,14 @@ public class Die {
         this.setShade(randomGen.nextInt(6)+1);
     }
 
+    public void swap(Die die){
+        String tmpColor = this.getColor().toString();
+        int tmpFace = this.getShade().toInt();
+        this.lightDie=new LightDie(die.getShade(),die.getColor());
+        die.setShade(tmpFace);
+        die.setColor(tmpColor);
+    }
+
     /**
      * Sets a new shade to the die
      * @param shade the new shade to be set

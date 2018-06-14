@@ -44,7 +44,6 @@ public class ToolCard extends Card {
     private int actionIndex;
     private SchemaCard schemaTemp;
     private List<Die> selectedDice;
-    private List<Integer> selectedIndex;
     private List<Integer> oldIndexList;
 
 
@@ -139,7 +138,6 @@ public class ToolCard extends Card {
                 player.decreaseFavorTokens(2);
             }
             selectedDice=new ArrayList<>();
-            selectedIndex=new ArrayList<>();
             oldIndexList=new ArrayList<>();
             constraint=Color.NONE;
             actionIndex=0;
@@ -170,14 +168,12 @@ public class ToolCard extends Card {
     }
 
     public boolean swapDie() {
+        System.out.println("swap: "+selectedDice.size());
         if(selectedDice.size()==1){return true;}// the swap will take effect on the next iteration
         else if(selectedDice.size()==2){
-            Color tmpColor = selectedDice.get(0).getColor();
-            Face tmpFace = selectedDice.get(0).getShade();
-            selectedDice.get(0).setShade(selectedDice.get(1).getShade().toInt());
-            selectedDice.get(0).setColor(selectedDice.get(1).toString());
-            selectedDice.get(1).setShade(tmpFace.toInt());
-            selectedDice.get(1).setColor(tmpColor.toString());
+            System.out.println(selectedDice.get(0).toString()+" "+selectedDice.get(1).toString());
+            selectedDice.get(0).swap(selectedDice.get(1));
+            System.out.println(selectedDice.get(0).toString()+" "+selectedDice.get(1).toString());
             return true;
         }
         return false;
@@ -285,7 +281,7 @@ public class ToolCard extends Card {
 
     public void selectDie(Die die,int oldIndex){
         selectedDice.add(die);
-        if(isExternalPlacement() || isInternalSchemaPlacement()){
+        if(isExternalPlacement()){
             oldIndexList.add(oldIndex);
         }
         return;
@@ -311,10 +307,11 @@ public class ToolCard extends Card {
     public boolean toolCanContinue(Player player){
         if(actions.get(actionIndex)!=Commands.SWAP && actions.get(actionIndex)!=Commands.INCREASE_DECREASE){//DA RIVEDERE, SI MANGIA I DADI
             selectedDice.remove(0);
-            if(isInternalSchemaPlacement()){
-                oldIndexList.remove(0);
-            }
         }
+        if(isInternalSchemaPlacement() && !actions.get(actionIndex).equals(Commands.SWAP)){
+            oldIndexList.remove(0);
+        }
+
         actionIndex++;
         if(actions.size()==actionIndex){
             player.replaceSchema(schemaTemp);
