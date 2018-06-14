@@ -6,10 +6,12 @@ import it.polimi.ingsw.common.immutables.LightPrivObj;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -160,6 +162,15 @@ public class GUIutil {
         GraphicsContext gc = dieCanvas.getGraphicsContext2D();
         drawConstraint(constraint,dieCanvas.getGraphicsContext2D(),0,0,dieDim);
         return dieCanvas;
+    }
+
+    public Scene gameScene() {
+        Canvas c = new Canvas(300,400);
+        GraphicsContext gc = c.getGraphicsContext2D();
+        gc.setFill(Color.BLACK);
+        gc.strokeRect(0,0,25,300);
+        StackPane p = new StackPane(c);
+        return new Scene(p);
     }
 
 

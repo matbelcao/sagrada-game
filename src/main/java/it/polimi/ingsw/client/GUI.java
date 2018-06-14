@@ -2,7 +2,6 @@ package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.uielements.*;
 import it.polimi.ingsw.common.connection.Credentials;
-import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
@@ -22,7 +21,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -31,7 +33,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -68,17 +69,18 @@ public class GUI extends Application implements ClientUI {
     public void start(Stage primaryStage) {
         //get the dimensions of the screen
         elementSize = new GUIutil(Screen.getPrimary().getVisualBounds());
-        primaryStage.setTitle("Login");
         this.primaryStage = primaryStage;
-        primaryStage.setScene(logInScene());
-        primaryStage.setResizable(false);
-        primaryStage.setOnCloseRequest(e->client.quit());
-        primaryStage.sizeToScene();
-        primaryStage.show();
+    }
+
+
+    @Override
+    public void updateConnectionOk() {
 
     }
 
-    private Scene logInScene() {
+    @Override
+    public void showLoginScreen() {
+        Platform.runLater(() -> {
         GridPane grid = new GridPane();
         grid.setAlignment(CENTER);
         grid.setHgap(10);
@@ -121,17 +123,14 @@ public class GUI extends Application implements ClientUI {
             }
         });
         usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //delete
-        return loginScene;
-    }
 
-
-    @Override
-    public void updateConnectionOk() {
-
-    }
-
-    @Override
-    public void showLoginScreen() {
+        primaryStage.setTitle("Login");
+        primaryStage.setScene(loginScene);
+        primaryStage.setResizable(false);
+        primaryStage.setOnCloseRequest(e->client.quit());
+        primaryStage.sizeToScene();
+        primaryStage.show();
+        });
     }
 
     @Override
@@ -154,6 +153,7 @@ public class GUI extends Application implements ClientUI {
 
     }
 
+
     @Override
     public void updateLobby(int numUsers) {
         Platform.runLater(() -> {
@@ -162,13 +162,6 @@ public class GUI extends Application implements ClientUI {
             messageToUser.setText("lobby "+numUsers);
         });
 
-    }
-
-    private Scene gameScene(){
-        VBox layout = new VBox();
-        layout.getChildren().add(draftPool(client.getBoard().getDraftPool()));
-        Scene scene2 = new Scene(layout);
-        return scene2;
     }
 
     private Node draftPool(Map<Integer, LightDie> draftPool) {
@@ -181,7 +174,6 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void updateGameStart(int numUsers, int playerId) {
-        //Platform.runLater(() -> primaryStage.setScene(gameScene()));
     }
 
     @Override
@@ -204,6 +196,92 @@ public class GUI extends Application implements ClientUI {
 
         });
     }
+
+    @Override
+    public void updateBoard(LightBoard board) {
+
+    }
+
+    @Override
+    public void updateDraftPool(List<LightDie> draftpool) {
+
+    }
+
+    @Override
+    public void updateSchema(LightPlayer player) {
+
+    }
+
+    @Override
+    public void updateRoundTrack(List<List<LightDie>> roundtrack) {
+
+    }
+
+    @Override
+    public void showRoundtrackDiceList(List<IndexedCellContent> roundtrack) {
+
+    }
+
+    @Override
+    public void showDraftPoolDiceList(List<IndexedCellContent> draftpool) {
+
+    }
+
+    @Override
+    public void showSchemaDiceList(List<IndexedCellContent> schema) {
+
+    }
+
+    @Override
+    public void updateToolUsage(List<LightTool> tools) {
+
+    }
+
+    @Override
+    public void showPlacementsList(List<Integer> placements, Place to, LightDie die) {
+
+    }
+
+    @Override
+    public void updateStatusMessage(String statusChange, int playerId) {
+
+    }
+
+    @Override
+    public void updateConnectionClosed() {
+
+    }
+
+    @Override
+    public void updateConnectionBroken() {
+
+    }
+
+    @Override
+    public void printmsg(String msg) {
+
+    }
+
+    @Override
+    public String getCommand() {
+        return null;
+    }
+
+    @Override
+    public void showOptions(List<Commands> optionsList) {
+
+    }
+
+    @Override
+    public void showWaitingForGameStartScreen() {
+
+    }
+
+    @Override
+    public void showMainScreen(ClientFSMState turnState) {
+
+    }
+
     private static class SceneSizeChangeListener implements ChangeListener<Number> {
         private final Scene scene;
         private DraftedSchemasRecord draftedSchemasRecord;
@@ -252,15 +330,21 @@ public class GUI extends Application implements ClientUI {
                 r.setOnMouseClicked(e->{
                     System.out.println("Selected schema " + actionRects.indexOf(r));
                     cmdWrite.write(actionRects.indexOf(r)+"");
-
-
                     r.setStroke(Color.BLUE);
                     r.setStrokeWidth(borderLineWidth);
+                    showGameStage();
                 });
             }
         }
 
     }
+
+    private void showGameStage() {
+        Platform.runLater(() -> {
+                primaryStage.setScene(elementSize.gameScene());
+        });
+    }
+
 
     /*class ResizableCanvas extends Canvas {
         List<LightSchemaCard> draftedSchemas;
@@ -356,98 +440,13 @@ public class GUI extends Application implements ClientUI {
     }*/
 
 
-    @Override
-    public void updateBoard(LightBoard board) {
 
-    }
-
-    @Override
-    public void updateDraftPool(List<LightDie> draftpool) {
-
-    }
-
-    @Override
-    public void updateSchema(LightPlayer player) {
-
-    }
-
-    @Override
-    public void updateRoundTrack(List<List<LightDie>> roundtrack) {
-
-    }
-
-    @Override
-    public void showRoundtrackDiceList(List<IndexedCellContent> roundtrack) {
-
-    }
-
-    @Override
-    public void showDraftPoolDiceList(List<IndexedCellContent> draftpool) {
-
-    }
-
-    @Override
-    public void showSchemaDiceList(List<IndexedCellContent> schema) {
-
-    }
-
-    @Override
-    public void updateToolUsage(List<LightTool> tools) {
-
-    }
-
-    @Override
-    public void showPlacementsList(List<Integer> placements, Place to, LightDie die) {
-
-    }
-
-    @Override
-    public void updateStatusMessage(String statusChange, int playerId) {
-
-    }
-
-    @Override
-    public void updateConnectionClosed() {
-
-    }
-
-    @Override
-    public void updateConnectionBroken() {
-
-    }
-
-    @Override
-    public void printmsg(String msg) {
-
-    }
-
-    @Override
-    public String getCommand() {
-        return null;
-    }
-
-    @Override
-    public void showOptions(List<Commands> optionsList) {
-
-    }
-
-    @Override
-    public void showWaitingForGameStartScreen() {
-
-    }
-
-    @Override
-    public void showMainScreen(ClientFSMState turnState) {
-
-    }
 
 
 
     @Override
     public QueuedReader getCommandQueue() {
-
-
-            cmdWrite = new QueuedCmdReader();
+        cmdWrite = new QueuedCmdReader();
         return (QueuedReader) cmdWrite;
     }
 

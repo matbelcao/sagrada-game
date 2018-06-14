@@ -228,9 +228,6 @@ public class Client {
                 AnsiConsole.systemInstall();
             }
             clientUI=new CLI(this,lang);
-
-
-            clientUI.showLoginScreen();
         }else{
             System.out.println("Launching GUI (still not implemented....");
             new Thread(() -> GUI.launch(this,lang)).start();
@@ -243,6 +240,7 @@ public class Client {
             }
             clientUI = GUI.getGUI();
         }
+        clientUI.showLoginScreen();
 
     }
 
