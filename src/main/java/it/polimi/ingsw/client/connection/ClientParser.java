@@ -42,7 +42,7 @@ public class ClientParser {
                 return checkDiceList(parsedResult);
             case "LIST_OPTIONS":
                 return parsedResult.size()>=2;
-            case "CHOOSE_PLACEMENT":
+            case "LIST_PLACEMENTS":
                 return true;
             case "CHOICE":
                 return checkChoice(parsedResult);
@@ -102,7 +102,7 @@ public class ClientParser {
 
     public static boolean isPlacementList(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("CHOOSE_PLACEMENT");
+        return message.trim().split("\\s+",2)[0].equals("LIST_PLACEMENTS");
 
     }
 
@@ -252,7 +252,7 @@ public class ClientParser {
      */
     private static boolean checkDiceList(List<String> parsedResult){
         if(!parsedResult.get(0).equals("LIST_DICE")) {return false;}
-        for (int i = 1; i < parsedResult.size(); i++) {
+        for (int i = 2; i < parsedResult.size(); i++) {
             if (parsedResult.get(i).split(",").length != 3) {
                 return false;
             }

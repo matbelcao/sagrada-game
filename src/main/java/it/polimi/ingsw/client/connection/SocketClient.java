@@ -580,7 +580,8 @@ public class SocketClient implements ClientConn {
             lockin.notifyAll();
         }
         for(int i=LIST_START;i<result.size();i++) {
-            options.add(Commands.valueOf(result.get(i)));
+            String [] opt=result.get(i).split(",");
+            options.add(Commands.valueOf(opt[1]));
         }
 
         return options;
@@ -605,13 +606,13 @@ public class SocketClient implements ClientConn {
                 e.printStackTrace();
             }
 
-            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isPlacementList(inSocket.readln()) && result.get(1).equals("placements"))) {
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isPlacementList(inSocket.readln()) && result.get(0).equals("LIST_PLACEMENTS"))) {
                 waitForTheRightOne();
             }
             inSocket.pop();
             lockin.notifyAll();
         }
-        for(int i=LIST_START;i<result.size();i++) {
+        for(int i=1;i<result.size();i++) {
             positions.add(Integer.parseInt(result.get(i)));
         }
 

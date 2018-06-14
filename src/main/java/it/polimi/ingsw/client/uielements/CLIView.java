@@ -258,6 +258,14 @@ public class CLIView {
         return result;
     }
 
+    public void updateMenuNotMyTurn(String nowPlaying) {
+        menuList.clear();
+        menuList.add(" ");
+        menuList.add(String.format(uiMsg.getMessage("not-my-turn"),nowPlaying));
+        padMenu();
+        fillMenu();
+    }
+
     public void updateMenuListOptions(List<Commands> options){
         // TODO: 13/06/2018
 
@@ -265,9 +273,11 @@ public class CLIView {
 
     public void updateMenuMain(){
         menuList.clear();
-
-        menuList.add(String.format(cliElems.getElem("li"),0,uiMsg.getMessage("place-die")));
+        menuList.add(" ");
+        menuList.add(uiMsg.getMessage("main-choice"));
+        menuList.add(" ");
         menuList.add(String.format(cliElems.getElem("li"),0,uiMsg.getMessage("use-tool")));
+        if(!ClientFSMState.isPlacedDie())menuList.add(String.format(cliElems.getElem("li"),1,uiMsg.getMessage("place-die")));
 
         padMenu();
         fillMenu();
@@ -275,7 +285,8 @@ public class CLIView {
 
     public void updateMenuDiceList(List<IndexedCellContent> dice){
         menuList.clear();
-        menuList.add(String.format(uiMsg.getMessage("dice-list"),uiMsg.getMessage(dice.get(0).toString().toLowerCase())));
+        menuList.add(" ");
+        menuList.add(String.format(uiMsg.getMessage("dice-list"),uiMsg.getMessage(dice.get(0).getPlace().toString().toLowerCase())));
         menuList.addAll(buildDiceList(dice));
 
         padMenu();
@@ -293,6 +304,7 @@ public class CLIView {
         msg.add(boldify(uiMsg.getMessage("can-be-placed")));
 
         menuList.clear();
+        menuList.add(" ");
         menuList.addAll(appendRows(buildCell(die),msg));
         menuList.add(" ");
         menuList.addAll(buildCoordinatesList(placements));
@@ -610,6 +622,7 @@ public class CLIView {
 
         return result;
     }
+
 
 
 }

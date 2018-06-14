@@ -20,7 +20,7 @@ public class CLIViewUtils {
     static final int SCHEMA_HEIGHT = 18;
     static final int CELL_HEIGHT = 4;
     static final int CELL_WIDTH = 7;
-    static final int OBJ_LENGTH = 40;
+    static final int OBJ_LENGTH = 44;
     static final int SCREEN_WIDTH = 164;
     private static final String SCREEN_CLEAR ="\033[H\033[2J";
     static final int MENU_WIDTH = 80;

@@ -5,6 +5,8 @@ public enum ClientFSMState {
     CHOOSE_SCHEMA {//the game start message was just received and the client is choosing the schema among the drafted ones
         @Override
         public ClientFSMState nextState(boolean hasChosen, boolean back, boolean endTurn, boolean discard){
+
+
             if(hasChosen){
                 return NOT_MY_TURN;
             }
@@ -15,6 +17,8 @@ public enum ClientFSMState {
     NOT_MY_TURN{//the match is being played, schemas were selected but it' is not this user's turn
         @Override
         public ClientFSMState nextState(boolean isMyTurn, boolean back, boolean endTurn, boolean discard){
+            toolEnabled=false;
+            placedDie=false;
             if(back){ return NOT_MY_TURN; }
             if(endTurn){ return NOT_MY_TURN; }
             if(isMyTurn){
@@ -86,20 +90,24 @@ public enum ClientFSMState {
     },
     CHOOSE_PLACEMENT {// the client has received a list of placements
         @Override
-        public ClientFSMState nextState(boolean placedDie, boolean back, boolean endTurn, boolean discard){
+        public ClientFSMState nextState(boolean placedDieFromOutside, boolean back, boolean endTurn, boolean discard){
             if(back){ return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
             if(discard){
                 return SELECT_DIE;
             }
-            if(toolEnabled){
-                return TOOL_CAN_CONTINUE;
+
+            if(placedDieFromOutside) {
+                placedDie = true;
+
+                if (toolEnabled) {
+                    return TOOL_CAN_CONTINUE;
+                }else{
+                    return MAIN;
+                }
             }
 
-            if(placedDie){
-                return MAIN;
-            }
             //this should never happen
             return CHOOSE_PLACEMENT;
         }
@@ -121,7 +129,11 @@ public enum ClientFSMState {
     };
 
     private static boolean toolEnabled;
+    private static boolean placedDie;
 
     public abstract ClientFSMState nextState(boolean stateSpecific, boolean back, boolean endTurn, boolean discard);
 
+    public static boolean isPlacedDie() {
+        return placedDie;
+    }
 }

@@ -132,4 +132,12 @@
         <eng>Please, wait for the first round to begin</eng>
         <ita>Per favore, attendi l'inizio del primo round</ita>
     </waiting-game-start>
+    <main-choice>
+        <eng>Choose your next move:</eng>
+        <ita>Scegli la tua prossima mossa:</ita>
+    </main-choice>
+    <not-my-turn>
+        <eng>%s is playing at the moment...%nPlease, wait for your turn!</eng>
+        <ita>%s sta giocando al momento...%nAttendi il tuo turno!</ita>
+    </not-my-turn>
 </messages>

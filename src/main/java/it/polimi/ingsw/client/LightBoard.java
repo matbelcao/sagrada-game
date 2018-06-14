@@ -39,6 +39,7 @@ public class LightBoard extends Observable {
         placementsList= new ArrayList<>();
         lastDiceList=new ArrayList<>();
         nowPlaying=-1;
+        roundNumber=-1;
     }
 
     public List<LightSchemaCard> getDraftedSchemas() {
@@ -78,7 +79,7 @@ public class LightBoard extends Observable {
         this.privObj = privObj;
     }
 
-    public void addTools(List<LightTool> tool){
+    public void setTools(List<LightTool> tool){
         this.tools=tool;
     }
 

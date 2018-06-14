@@ -386,13 +386,13 @@ public class Client {
     }
 
     public void updateGameRoundStart(int numRound){
-
+        board.setRoundTrack(clientConn.getRoundtrack(),numRound);
         if(numRound==0) {
 
 
             synchronized (lockState) {
-                assert (turnState.equals(ClientFSMState.CHOOSE_SCHEMA));
-                turnState = turnState.nextState(true, false, false, false);
+                turnState=ClientFSMState.NOT_MY_TURN;
+                lockState.notifyAll();
             }
             //get players
 
@@ -406,14 +406,14 @@ public class Client {
                     board.getPlayerByIndex(i).setFavorTokens(clientConn.getFavorTokens(i));
                 }
                 //get tools
-                board.addTools(clientConn.getTools());
+                board.setTools(clientConn.getTools());
 
                 List<LightCard> pubObj = clientConn.getPublicObjects();
                 //get public objectives
                 for (int i = 0; i < LightBoard.NUM_PUB_OBJ; i++) {
                     board.addPubObj(pubObj.get(i));
                 }
-                clientUI.updateBoard(board);
+
                 ready=true;
                 lockReady.notifyAll();
             }
@@ -424,9 +424,7 @@ public class Client {
     }
 
     public void updateGameRoundEnd(int numRound){
-        board.setRoundTrack(clientConn.getRoundtrack(),numRound+1);
 
-        board.notifyObservers();
     }
 
     public void updateGameTurnStart(int playerId, boolean isFirstTurn){
@@ -452,7 +450,6 @@ public class Client {
 
 
         clientUI.updateBoard(board);
-        clientUI.showMainScreen(turnState);
 
     }
 
@@ -467,8 +464,10 @@ public class Client {
         }
 
         synchronized (lockState) {
-            turnState=turnState.nextState(false,false,playerTurnId==board.getMyPlayerId(),false);
-            lockState.notifyAll();
+            if(playerTurnId==board.getMyPlayerId()) {
+                turnState = turnState.nextState(false, false, true, false);
+                lockState.notifyAll();
+            }
         }
 
         board.notifyObservers();
@@ -479,6 +478,13 @@ public class Client {
 
     }
 
+    public void getUpdates(){
+        board.setDraftPool(clientConn.getDraftPool());
+        board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
+        board.getPlayerByIndex(board.getNowPlaying()).setSchema(clientConn.getSchema(board.getNowPlaying()));
+        board.setTools(clientConn.getTools());
+        board.getPlayerByIndex(board.getNowPlaying()).setFavorTokens(clientConn.getFavorTokens(board.getNowPlaying()));
+    }
 
 
     //ONLY FOR DEBUG PURPOSES

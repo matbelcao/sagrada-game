@@ -124,9 +124,11 @@ public class CLI implements ClientUI {
         view.updatePrivObj(board.getPrivObj());
         view.updateObjectives(board.getPubObjs(),board.getPrivObj());
 
+
         for(int i=0;i<board.getNumPlayers();i++){
             view.updateSchema(board.getPlayerByIndex(i));
         }
+        if(board.getNowPlaying()!=-1){ view.updateRoundTurn(board.getRoundNumber(),board.getNowPlaying());}
         view.updateRoundTrack(board.getRoundTrack());
         view.updateDraftPool(board.getDraftPool());
 
@@ -134,20 +136,20 @@ public class CLI implements ClientUI {
             case CHOOSE_SCHEMA:
                 break;
             case NOT_MY_TURN:
-
+                view.updateMenuNotMyTurn(board.getPlayerByIndex(board.getNowPlaying()).getUsername());
                 break;
             case MAIN:
                 view.updateMenuMain();
                 break;
             case SELECT_DIE:
                 view.updateMenuDiceList(board.getDiceList());
+
                 break;
             case CHOOSE_OPTION:
                 if(board.getOptionsList().size()>1){
                     view.updateMenuListOptions(board.getOptionsList());
                 }
                 break;
-
             case CHOOSE_PLACEMENT:
                 view.updateMenuListPlacements(board.getPlacementsList(),board.getSelectedDie());
                 break;
