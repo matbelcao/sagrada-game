@@ -19,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class GUIutil {
@@ -101,6 +100,13 @@ public class GUIutil {
     }
     private double getDraftedSchemasHeight(double drawingWidth){
         return drawingWidth/ DRAFTED_CANVAS_SCENE_RATIO;
+    }
+
+    public double getSelectedSchemaLineWidth(double sceneWidth, double sceneHeight){
+        DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth,sceneHeight);
+        double drawingWidth = sizes.getDrawingWidth();
+        double schemaWidth = drawingWidth*SCHEMA_W_TO_DRAFTED_W;
+        return LINE_TO_CELL*CELL_TO_SCHEMA_W*schemaWidth;
     }
 
     public int getLineWidth(){
@@ -207,7 +213,7 @@ public class GUIutil {
 
    }
 
-    public Collection<Rectangle> draftedMouseActionAreas(double sceneWidth, double sceneHeight) {
+    public List<Rectangle> draftedMouseActionAreas(double sceneWidth, double sceneHeight) {
        DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth,sceneHeight);
        double x = sizes.getX();
        double y = sizes.getY();
@@ -228,20 +234,7 @@ public class GUIutil {
        rects.add(r1);
        rects.add(r2);
        rects.add(r3);
-
-       for (Rectangle r :rects) {
-           r.setFill(Color.TRANSPARENT);
-           r.setOnMouseEntered(e->r.setFill(Color.rgb(0,0,0,0.4)));
-           r.setOnMouseExited(e->r.setFill(Color.TRANSPARENT));
-           r.setOnMouseClicked(e->{
-               System.out.println("Selected schema " + rects.indexOf(r));
-               r.setStroke(Color.BLUE);
-               r.setStrokeWidth(LINE_TO_CELL*CELL_TO_SCHEMA_W*schemaWidth);
-           });
-       }
-
        return rects;
-
    }
 
 

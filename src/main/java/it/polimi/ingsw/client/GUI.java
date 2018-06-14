@@ -1,10 +1,9 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.uielements.GUIutil;
-import it.polimi.ingsw.client.uielements.UILanguage;
-import it.polimi.ingsw.client.uielements.UIMessages;
+import it.polimi.ingsw.client.uielements.*;
 import it.polimi.ingsw.common.connection.Credentials;
-import it.polimi.ingsw.common.connection.QueuedInReader;
+import it.polimi.ingsw.common.connection.QueuedBufferedReader;
+import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
@@ -25,6 +24,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -47,7 +47,7 @@ public class GUI extends Application implements ClientUI {
     private Stage primaryStage;
     private static GUI instance;
     private Text messageToUser = new Text();
-    private Writer commandWriter;
+    private CmdWriter cmdWrite;
 
     public GUI() {
         instance = this;
@@ -237,8 +237,27 @@ public class GUI extends Application implements ClientUI {
             //update the width and height properties
             canvas.setWidth(width);
             canvas.setHeight(height);
+            double borderLineWidth = elementSize.getSelectedSchemaLineWidth(width,height);
             elementSize.drawDraftedSchemas(draftedSchemas,privObj,canvas,width,height);
-            mouseActionPane.getChildren().setAll(elementSize.draftedMouseActionAreas(width,height));
+            List<Rectangle> actionRects = elementSize.draftedMouseActionAreas(width,height);
+            setDraftedSchemasAction(actionRects,borderLineWidth);
+            mouseActionPane.getChildren().setAll(actionRects);
+        }
+
+        private void setDraftedSchemasAction(List<Rectangle> actionRects, double borderLineWidth){
+            for (Rectangle r : actionRects) {
+                r.setFill(Color.TRANSPARENT);
+                r.setOnMouseEntered(e->r.setFill(Color.rgb(0,0,0,0.4)));
+                r.setOnMouseExited(e->r.setFill(Color.TRANSPARENT));
+                r.setOnMouseClicked(e->{
+                    System.out.println("Selected schema " + actionRects.indexOf(r));
+                    cmdWrite.write(actionRects.indexOf(r)+"");
+
+
+                    r.setStroke(Color.BLUE);
+                    r.setStrokeWidth(borderLineWidth);
+                });
+            }
         }
 
     }
@@ -425,16 +444,11 @@ public class GUI extends Application implements ClientUI {
 
 
     @Override
-    public QueuedInReader getCommandQueue() {
-        PipedReader reader=new PipedReader();
-        QueuedInReader commandIn= new QueuedInReader(new BufferedReader(reader));
-        try {
-            commandWriter= new BufferedWriter( new PipedWriter(reader));
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(2);
-        }
-        return commandIn;
+    public QueuedReader getCommandQueue() {
+
+
+            cmdWrite = new QueuedCmdReader();
+        return (QueuedReader) cmdWrite;
     }
 
 

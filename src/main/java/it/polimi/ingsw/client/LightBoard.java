@@ -35,6 +35,9 @@ public class LightBoard extends Observable {
         players=new HashMap<>();
         draftPool=new HashMap<>();
         roundTrack= new ArrayList<>();
+        optionsList=new ArrayList<>();
+        placementsList= new ArrayList<>();
+        lastDiceList=new ArrayList<>();
         nowPlaying=-1;
     }
 

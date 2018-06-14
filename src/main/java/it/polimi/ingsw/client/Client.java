@@ -4,9 +4,8 @@ import it.polimi.ingsw.client.connection.ClientConn;
 import it.polimi.ingsw.client.connection.RMIClient;
 import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.client.connection.SocketClient;
+import it.polimi.ingsw.client.uielements.UICommandManager;
 import it.polimi.ingsw.client.uielements.UILanguage;
-import it.polimi.ingsw.common.connection.QueuedInReader;
-import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UIMode;
 import it.polimi.ingsw.common.enums.UserStatus;
@@ -24,7 +23,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -41,12 +39,7 @@ import java.util.List;
  */
 public class Client {
 
-    private static final String INDEX = "([0-9]|([1-9][0-9]))";
-    private static final String SINGLE_CHAR = "([qebd])";
-    private static final String QUIT = "q";
-    private static final String END_TURN = "e";
-    private static final String BACK = "b";
-    private static final String DISCARD = "d";
+
 
     private UIMode uiMode;
     private ConnectionMode connMode;
@@ -65,7 +58,7 @@ public class Client {
     private ClientFSMState turnState;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
     private final Object lockCredentials=new Object();
-    private QueuedInReader commandQueue;
+
     private boolean ready;
     private final Object lockReady = new Object();
 
@@ -250,8 +243,7 @@ public class Client {
             }
             clientUI = GUI.getGUI();
         }
-        //commands retreival
-        this.commandQueue = clientUI.getCommandQueue();
+
     }
 
 
@@ -319,111 +311,8 @@ public class Client {
 
     private void commandManager(){
 
-        new Thread(() -> {
-            String command="";
-            synchronized (lockState){
-                turnState=ClientFSMState.CHOOSE_SCHEMA;
-            }
+        new UICommandManager(this).start();
 
-            while(isLogged()) {
-
-                try {
-                    commandQueue.waitForLine();
-                } catch (IOException e) {
-                    System.err.println("ERR: couldn't read from console");
-                    System.exit(2);
-                }
-
-                command = commandQueue.readln();
-                commandQueue.pop();
-                if (command.matches(INDEX)) {
-                    switch (turnState) {
-
-                        case CHOOSE_SCHEMA:
-                            if (clientConn.choose(Integer.parseInt(command))) {
-
-                                clientUI.showWaitingForGameStartScreen();
-                            } else {
-                                clientUI.showLastScreen();
-                            }
-                            break;
-
-                        case SELECT_DIE:
-                            board.setOptionsList(clientConn.select(Integer.parseInt(command)));
-                            if (board.getOptionsList().size() == 1) {
-
-                                clientConn.choose(0);
-                                synchronized (lockState) {
-                                    turnState = turnState.nextState(false, false, false, false);
-
-                                    turnState = turnState.nextState(
-                                            board.getOptionsList().get(0).equals(Commands.PLACE_DIE),
-                                            false,
-                                            false,
-                                            false);
-                                    lockState.notifyAll();
-                                }
-                            } else {
-                                clientUI.showOptions(board.getOptionsList());
-                            }
-                            break;
-                        case CHOOSE_PLACEMENT:
-                            break;
-                        case CHOOSE_OPTION:
-                            if (clientConn.choose(Integer.parseInt(command))) {
-                                synchronized (lockState) {
-                                    turnState = turnState.nextState(
-                                            board.getOptionsList().get(Integer.parseInt(command)).equals(Commands.PLACE_DIE),
-                                            false,
-                                            false,
-                                            false);
-                                    lockState.notifyAll();
-                                }
-                            } else {
-                                clientUI.showLastScreen();
-                            }
-
-                            break;
-
-                        default:
-                            clientUI.showLastScreen();
-                            break;
-                    }
-                }else if (command.matches(SINGLE_CHAR)) {
-
-                    switch (command) {
-
-                        case QUIT:
-                            quit();
-                            break;
-                        case END_TURN:
-                            clientConn.endTurn();
-                            break;
-                        case BACK:
-                            clientConn.exit();
-                            break;
-                        case DISCARD:
-                            if (turnState.equals(ClientFSMState.CHOOSE_PLACEMENT)) {
-                                clientConn.discard();
-                            }
-                            break;
-
-                        default:
-                            clientUI.showLastScreen();
-                            break;
-                    }
-
-                    synchronized (lockState) {
-                        turnState = turnState.nextState(false, command.equals(BACK), command.equals(END_TURN), command.equals(DISCARD));
-                        lockState.notifyAll();
-                    }
-
-                }else{
-                    clientUI.showLastScreen();
-                }
-
-            }
-        }).start();
     }
 
 
@@ -647,4 +536,13 @@ public class Client {
         }
 
     }
+
+    public void setTurnState(ClientFSMState clientFSMState) {
+        turnState=clientFSMState;
+    }
+
+    public Object getLockState() {
+        return lockState;
+    }
+
 }

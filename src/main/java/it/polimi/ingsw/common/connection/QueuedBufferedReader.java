@@ -1,21 +1,24 @@
 package it.polimi.ingsw.common.connection;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
-public class QueuedInReader {
-    private BufferedReader inReader;
+public class QueuedBufferedReader implements QueuedReader {
+    private final BufferedReader inReader;
     private final Object lockReader = new Object();
     private final Object lockQueue = new Object();
     private String temp;
-    private ArrayList<String> queue = new ArrayList<>();
+    private List<String> queue = new ArrayList<>();
 
-    public QueuedInReader(BufferedReader inReader) {
+    public QueuedBufferedReader(BufferedReader inReader) {
         this.inReader= inReader;
     }
 
 
 
+    @Override
     public void clear() {
         synchronized (lockQueue){
             queue.clear();
@@ -25,6 +28,7 @@ public class QueuedInReader {
 
     }
 
+    @Override
     public void add() throws IOException {
         try {
             synchronized (lockReader) {
@@ -43,6 +47,7 @@ public class QueuedInReader {
         put();
     }
 
+
     private void put(){
         synchronized(lockQueue) {
             queue.add(temp);
@@ -51,10 +56,12 @@ public class QueuedInReader {
         temp=null;
     }
 
+    @Override
     public String readln(){
         return queue.get(0);
     }
 
+    @Override
     public String getln(){
         synchronized(lockQueue) {
             String line = queue.get(0);
@@ -64,6 +71,7 @@ public class QueuedInReader {
         }
     }
 
+    @Override
     public void pop(){
         synchronized(lockQueue) {
             assert(!queue.isEmpty());
@@ -72,12 +80,14 @@ public class QueuedInReader {
         }
     }
 
+    @Override
     public boolean isEmpty(){
         synchronized (lockQueue) {
             lockQueue.notifyAll();
             return queue.isEmpty();
         }
     }
+    @Override
     public void waitForLine() throws IOException {
         if (isEmpty()){
             add();
