@@ -127,6 +127,7 @@ public class User{
 
 
     public boolean isMyTurn(){
+        if(game==null){return false;}
         if(!game.gameStarted()){
             return false;
         }

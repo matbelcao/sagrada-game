@@ -85,42 +85,47 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private boolean execute(String command,ArrayList<String> parsedResult) {
         try {
-        switch (parsedResult.get(0)) {
-            case "GAME":
-                gameCommand(parsedResult);
-                break;
-            case "GET":
-                getCommands(parsedResult);
-                break;
-            case "GET_DICE_LIST":
-                sendDiceList();
-                break;
-            case "SELECT":
-                selectDie(Integer.parseInt(parsedResult.get(1)));
-                break;
-            case "CHOOSE":
-                choose(Integer.parseInt(parsedResult.get(1)));
-                break;
-            case "GET_PLACEMENTS_LIST":
-                sendPlacementList();
-                break;
-            case "TOOL":
-                toolCommand(parsedResult);
-                break;
-            case "DISCARD":
-                user.getGame().discard();
-                break;
-            case "EXIT":
-                user.getGame().exit();
-                break;
-            case "QUIT":
-                user.quit();
-                return false;
-            case "PONG":
-                break;
-            default:
-                return true;
-        }
+            switch (parsedResult.get(0)) {
+                case "GAME":
+                    gameCommand(parsedResult);
+                    break;
+                case "GET":
+                    getCommands(parsedResult);
+                    break;
+                case "GET_DICE_LIST":
+                    if (!user.isMyTurn()) { throw new IllegalActionException(); }
+                    sendDiceList();
+                    break;
+                case "SELECT":
+                    if (!user.isMyTurn()) { throw new IllegalActionException(); }
+                    selectDie(Integer.parseInt(parsedResult.get(1)));
+                    break;
+                case "CHOOSE":
+                    choose(Integer.parseInt(parsedResult.get(1)));
+                    break;
+                case "GET_PLACEMENTS_LIST":
+                    if (!user.isMyTurn()) { throw new IllegalActionException(); }
+                    sendPlacementList();
+                    break;
+                case "TOOL":
+                    toolCommand(parsedResult);
+                    break;
+                case "DISCARD":
+                    if (!user.isMyTurn()) { throw new IllegalActionException(); }
+                    user.getGame().discard();
+                    break;
+                case "EXIT":
+                    if (!user.isMyTurn()) { throw new IllegalActionException(); }
+                    user.getGame().exit();
+                    break;
+                case "QUIT":
+                    user.quit();
+                    return false;
+                case "PONG":
+                    break;
+                default:
+                    return true;
+            }
         } catch (IllegalActionException e) {
             outSocket.println("ILLEGAL ACTION!!");
             outSocket.flush();
@@ -441,6 +446,8 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param index the index of the die previously selected
      */
     private void choose(int index) throws IllegalActionException {
+        if(user.getGame()==null){throw new IllegalActionException();}
+        
         Boolean result=user.getGame().choose(user,index);
         if(result){
             outSocket.println("CHOICE ok");
