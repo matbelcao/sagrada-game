@@ -44,6 +44,10 @@
         <eng>Private objective:</eng>
         <ita>Obiettivo privato:</ita>
     </priv-obj>
+    <tools>
+        <eng>Tools:</eng>
+        <ita>Utensili:</ita>
+    </tools>
     <tokens>
         <eng>Remaining tokens:</eng>
         <ita>Gettoni rimanenti:</ita>
@@ -124,6 +128,7 @@
         <eng>Use a Tool</eng>
         <ita>Usa un Utensile</ita>
     </use-tool>
+
     <choose-schema>
         <eng>Choose your schema by entering its number</eng>
         <ita>Scegli la tua vetrata digitandone il numero</ita>

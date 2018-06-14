@@ -12,6 +12,9 @@ public enum ClientFSMState {
             }
             return CHOOSE_SCHEMA;
         }
+        public ClientFSMState nextState(boolean hasChosen){
+            return nextState(hasChosen,false,false,false);
+        }
     },
 
     NOT_MY_TURN{//the match is being played, schemas were selected but it' is not this user's turn
@@ -25,6 +28,9 @@ public enum ClientFSMState {
                 return MAIN;
             }
             return NOT_MY_TURN;
+        }
+        public ClientFSMState nextState(boolean isMyTurn){
+            return nextState(isMyTurn,false,false,false);
         }
     },
 
@@ -40,6 +46,9 @@ public enum ClientFSMState {
             return SELECT_DIE;
 
         }
+        public ClientFSMState nextState(boolean chooseTool){
+            return nextState(chooseTool,false,false,false);
+        }
     },
 
     CHOOSE_TOOL{
@@ -53,7 +62,10 @@ public enum ClientFSMState {
             }
             toolEnabled=true;
             return SELECT_DIE;
+        }
 
+        public ClientFSMState nextState(boolean enabledTool){
+            return nextState(enabledTool,false,false,false);
         }
 
     },
@@ -72,6 +84,9 @@ public enum ClientFSMState {
             }
             return CHOOSE_OPTION;
         }
+        public ClientFSMState nextState(boolean isListEmpty){
+            return nextState(isListEmpty,false,false,false);
+        }
     },
     CHOOSE_OPTION { // the user has selected a die and was sent a list of options
         @Override
@@ -86,6 +101,9 @@ public enum ClientFSMState {
                 return TOOL_CAN_CONTINUE;
             }
             return MAIN;
+        }
+        public ClientFSMState nextState(boolean isPlaceDie){
+            return nextState(isPlaceDie,false,false,false);
         }
     },
     CHOOSE_PLACEMENT {// the client has received a list of placements
@@ -111,6 +129,10 @@ public enum ClientFSMState {
             //this should never happen
             return CHOOSE_PLACEMENT;
         }
+
+        public ClientFSMState nextState(boolean placedDieFromOutside){
+            return nextState(placedDieFromOutside,false,false,false);
+        }
     },
 
     TOOL_CAN_CONTINUE{ //the client has requested and received the tool can continue response
@@ -126,12 +148,16 @@ public enum ClientFSMState {
             //this should never happen
             return MAIN;
         }
+        public ClientFSMState nextState(boolean canContinue){
+            return nextState(canContinue,false,false,false);
+        }
     };
 
     private static boolean toolEnabled;
     private static boolean placedDie;
 
     public abstract ClientFSMState nextState(boolean stateSpecific, boolean back, boolean endTurn, boolean discard);
+    public abstract ClientFSMState nextState(boolean stateSpecific);
 
     public static boolean isPlacedDie() {
         return placedDie;

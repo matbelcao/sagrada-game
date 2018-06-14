@@ -191,7 +191,7 @@ public class CLIView {
      */
     public void updateTools(List<LightTool> tools){
         this.tools.clear();
-
+        this.tools.add(String.format(uiMsg.getMessage("tools")));
         this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),0));
         this.tools.addAll(buildTool(tools.get(0)));
         this.tools.add(padUntil("",OBJ_LENGTH,' '));
@@ -319,7 +319,6 @@ public class CLIView {
         msg.add(boldify(uiMsg.getMessage("can-be-placed")));
 
         menuList.clear();
-        menuList.add(" ");
         menuList.addAll(appendRows(buildCell(die),msg));
         menuList.add(" ");
         menuList.addAll(buildCoordinatesList(placements));
