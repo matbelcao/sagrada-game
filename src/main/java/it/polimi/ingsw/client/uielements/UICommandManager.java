@@ -231,6 +231,7 @@ public class UICommandManager extends Thread {
                     client.setTurnState( client.getTurnState().nextState(true, false, false, false));
                     client.getLockState().notifyAll();
                 }
+
                 break;
             default:
                 client.getClientUI().showLastScreen();
