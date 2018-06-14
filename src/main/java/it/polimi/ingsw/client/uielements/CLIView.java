@@ -191,11 +191,16 @@ public class CLIView {
      */
     public void updateTools(List<LightTool> tools){
         this.tools.clear();
-        for(int i=0;i < Board.NUM_TOOLS;i++){
-            this.tools.add(padUntil("",OBJ_LENGTH,' '));
-            this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),i));
-            this.tools.addAll(buildTool(tools.get(i)));
-        }
+
+        this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),0));
+        this.tools.addAll(buildTool(tools.get(0)));
+        this.tools.add(padUntil("",OBJ_LENGTH,' '));
+        this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),1));
+        this.tools.addAll(buildTool(tools.get(1)));
+        this.tools.add(padUntil("",OBJ_LENGTH,' '));
+        this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),2));
+        this.tools.addAll(buildTool(tools.get(2)));
+
     }
 
 
