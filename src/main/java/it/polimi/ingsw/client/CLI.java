@@ -128,7 +128,7 @@ public class CLI implements ClientUI {
         for(int i=0;i<board.getNumPlayers();i++){
             view.updateSchema(board.getPlayerByIndex(i));
         }
-        if(board.getNowPlaying()!=-1){ view.updateRoundTurn(board.getRoundNumber(),board.getNowPlaying());}
+        if(board.getNowPlaying()!=-1){ view.updateRoundTurn(board.getRoundNumber(),board.getIsFirstTurn(),board.getNowPlaying() );}
         view.updateRoundTrack(board.getRoundTrack());
         view.updateDraftPool(board.getDraftPool());
 

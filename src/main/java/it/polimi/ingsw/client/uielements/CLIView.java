@@ -7,7 +7,6 @@ import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
-import it.polimi.ingsw.server.model.Board;
 import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.io.IOException;
@@ -169,14 +168,17 @@ public class CLIView {
     /**
      * updates the information abuot the round, turn and who's playing this turn
      * @param roundNumber the number of the round
+     * @param isFirstTurn wheter it is or not the first turn in the round
      * @param nowPlaying the user playing the turn
      */
-    public void updateRoundTurn(int roundNumber,int nowPlaying){
+    public void updateRoundTurn(int roundNumber, boolean isFirstTurn, int nowPlaying){
         turnRoundinfo= String.format(cliElems.getElem("round-turn"),
                 uiMsg.getMessage("round"),
                 roundNumber,
-                uiMsg.getMessage("turn"),
-                nowPlaying);
+                isFirstTurn?
+                        uiMsg.getMessage("first-turn"):
+                        uiMsg.getMessage("second-turn")
+        );
         List<String> updateSchema;
 
 
@@ -192,14 +194,12 @@ public class CLIView {
     public void updateTools(List<LightTool> tools){
         this.tools.clear();
         this.tools.add(String.format(uiMsg.getMessage("tools")));
-        this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),0));
-        this.tools.addAll(buildTool(tools.get(0)));
-        this.tools.add(padUntil("",OBJ_LENGTH,' '));
-        this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),1));
-        this.tools.addAll(buildTool(tools.get(1)));
-        this.tools.add(padUntil("",OBJ_LENGTH,' '));
-        this.tools.add(String.format(cliElems.getElem("tool-index"),uiMsg.getMessage("tool-number"),2));
-        this.tools.addAll(buildTool(tools.get(2)));
+        for(int i=0;i<LightBoard.NUM_TOOLS;i++) {
+
+            this.tools.addAll(buildTool(tools.get(i), i));
+            this.tools.add(" ");
+        }
+        this.tools.remove(this.tools.size()-1);
 
     }
 
@@ -264,7 +264,7 @@ public class CLIView {
     }
 
     public void updateMenuNotMyTurn(String nowPlaying) {
-        menuList.clear();
+        clearMenu();
         menuList.add(" ");
         menuList.add(String.format(uiMsg.getMessage("not-my-turn"),nowPlaying));
         padMenu();
@@ -276,7 +276,7 @@ public class CLIView {
 
     }
     public void updateMenuListTools(List<LightTool> tools){
-        menuList.clear();
+        clearMenu();
         menuList.add(uiMsg.getMessage("choose-tool"));
         for(int i=0; i<LightBoard.NUM_TOOLS;i++) {
             menuList.add(String.format(cliElems.getElem("li"),i, tools.get(i).getName()));
@@ -287,7 +287,7 @@ public class CLIView {
 
 
     public void updateMenuMain(){
-        menuList.clear();
+        clearMenu();
         menuList.add(" ");
         menuList.add(uiMsg.getMessage("main-choice"));
         menuList.add(" ");
@@ -299,7 +299,7 @@ public class CLIView {
     }
 
     public void updateMenuDiceList(List<IndexedCellContent> dice){
-        menuList.clear();
+        clearMenu();
         menuList.add(" ");
         menuList.add(String.format(uiMsg.getMessage("dice-list"),uiMsg.getMessage(dice.get(0).getPlace().toString().toLowerCase())));
         menuList.addAll(buildDiceList(dice));
@@ -318,13 +318,17 @@ public class CLIView {
         List<String> msg = new ArrayList<>(buildWall(' ', CELL_HEIGHT - 1, 1));
         msg.add(boldify(uiMsg.getMessage("can-be-placed")));
 
-        menuList.clear();
+        clearMenu();
         menuList.addAll(appendRows(buildCell(die),msg));
         menuList.add(" ");
         menuList.addAll(buildCoordinatesList(placements));
 
         padMenu();
         fillMenu();
+    }
+
+    private void clearMenu() {
+        menuList.clear();
     }
 
     /**
@@ -361,6 +365,10 @@ public class CLIView {
 
         List<String> result=appendRows(schemas.get(playerId),menuList);
 
+
+        if(tools.size()>result.size()){
+            result.addAll(buildWall(' ',tools.size()-result.size(),printableLength(result.get(0))));
+        }
         result= appendRows(result,buildSeparator(result.size()));
         result= appendRows(result,tools);
 
@@ -554,8 +562,8 @@ public class CLIView {
         if(result.size()>=CELL_HEIGHT) {
             result.set(CELL_HEIGHT - 1,
                     result.get(CELL_HEIGHT - 1) +
-                            boldify(String.format(cliElems.getElem("point-left"), uiMsg.getMessage("draftpool"))));
-            result.set(CELL_HEIGHT - 1, result.get(CELL_HEIGHT - 1) + alignRight(bottomInfo, SCREEN_WIDTH - printableLength(result.get(CELL_HEIGHT - 1))));
+                            boldify(String.format(cliElems.getElem("point-left"), uiMsg.getMessage("draftpool")))+"         "+ boldify(turnRoundinfo));
+            result.set(CELL_HEIGHT - 1, result.get(CELL_HEIGHT - 1)  + alignRight(boldify(bottomInfo), SCREEN_WIDTH - printableLength(result.get(CELL_HEIGHT - 1))));
             result = appendRows(buildSeparator(draftPool.size()), result);
         }
         return result;
@@ -622,7 +630,6 @@ public class CLIView {
      */
     private List<String> buildObjectives(List<LightCard> pubObj, LightPrivObj privObj){
         List<String> result=new ArrayList<>();
-        result.add(" ");
         result.add(boldify(uiMsg.getMessage("pub-obj")));
         result.add(" ");
         for(LightCard card : pubObj){

@@ -6,11 +6,11 @@ package it.polimi.ingsw.common.enums;
  * it also contains the ansi code to apply color to text in the CLI
  */
 public enum Color { //need to add png address combined with Shade's ones
-    RED("\u001B[31m" ),
-    GREEN("\u001B[32m"),
-    YELLOW("\u001B[33m"),
-    BLUE("\u001B[34m"),
-    PURPLE("\u001B[35m"),
+    RED("\u001B[91m" ),
+    GREEN("\u001B[92m"),
+    YELLOW("\u001B[93m"),
+    BLUE("\u001B[94m"),
+    PURPLE("\u001B[95m"),
     NONE ("\u001B[0m"); //to be used (also) in shade restrictions
 
     private final String utf;

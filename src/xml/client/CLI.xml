@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <cli-components>
     <ONE> _____ ::|     |::|  ●  |::|_____|</ONE>
-    <TWO> _____ ::|●    |::|     |::|____●|</TWO>
-    <THREE> _____ ::|●    |::|  ●  |::|____●|</THREE>
+    <TWO> _____ ::|    ●|::|     |::|●____|</TWO>
+    <THREE> _____ ::|    ●|::|  ●  |::|●____|</THREE>
     <FOUR> _____ ::|●   ●|::|     |::|●___●|</FOUR>
     <FIVE> _____ ::|●   ●|::|  ●  |::|●___●|</FIVE>
     <SIX> _____ ::|●   ●|::|●   ●|::|●___●|</SIX>
@@ -12,10 +12,10 @@
     <username-id>%s%s</username-id>
     <tokens-info> %s %s</tokens-info>
     <tool-index>%s %d</tool-index>
-    <round-turn>%s %d %s %d</round-turn>
+    <round-turn>%s #%d - %s</round-turn>
     <row-col>‹%s %d %s %d› </row-col>
     <index>‹%s %d›</index>
-    <li>  #%d %s</li>
+    <li> #%d %s</li>
     <point-left> ‹‹‹ %s</point-left>
     <prompt>%s ››› </prompt>
     <schema-cols>     0      1      2      3      4   </schema-cols>

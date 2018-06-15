@@ -57,8 +57,8 @@
         <ita>Utensile numero:</ita>
     </tool-number>
     <round>
-        <eng>Round number:</eng>
-        <ita>Round numero:</ita>
+        <eng>Round</eng>
+        <ita>Round</ita>
     </round>
     <turn>
         <eng>Turn of the player number:%d</eng>
@@ -149,4 +149,12 @@
         <eng>%s is playing at the moment... Please, wait for your turn!</eng>
         <ita>%s sta giocando al momento... Attendi il tuo turno!</ita>
     </not-my-turn>
+    <first-turn>
+        <eng>first turn</eng>
+        <ita>primo turno</ita>
+    </first-turn>
+    <second-turn>
+        <eng>secondo turn</eng>
+        <ita>secondo turno</ita>
+    </second-turn>
 </messages>
