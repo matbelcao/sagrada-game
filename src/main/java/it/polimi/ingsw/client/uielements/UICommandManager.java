@@ -11,6 +11,10 @@ import java.io.IOException;
 
 import static it.polimi.ingsw.client.ClientFSMState.*;
 
+/**
+ * this class implements the thread that manages the commands coming from the uis to perform changes on the client
+ * status and view
+ */
 public class UICommandManager extends Thread {
     private static final String INDEX = "([0-9]|([1-9][0-9]))";
     private static final String SINGLE_CHAR = "([qebd])";
@@ -22,11 +26,18 @@ public class UICommandManager extends Thread {
     private final Client client;
     private final QueuedReader commandQueue;
 
+    /**
+     * this sets the needed parameters for the manager to work properly
+     * @param client the client object
+     */
     public UICommandManager(Client client){
         this.client = client;
         this.commandQueue=client.getClientUI().getCommandQueue();
     }
 
+    /**
+     * this is the task that the thread has to perform, it simply waits for a new command and then elaborate on that
+     */
     @Override
     public void run() {
         String command = "";
@@ -62,37 +73,48 @@ public class UICommandManager extends Thread {
 
     }
 
+    /**
+     * this method manages a command that is not an index but some letter, those letters have a particular meaning and can
+     * trigger different actions
+     * @param command the command received from the ui (SINGLE_CHAR)
+     */
     private void manageOption(String command) {
-        switch (command) {
-
-            case QUIT:
-                client.quit();
-                break;
-            case END_TURN:
-                client.getClientConn().endTurn();
-                break;
-            case BACK:
-                client.getClientConn().exit();
-                client.getUpdates();
-                break;
-            case DISCARD:
-                if (client.getTurnState().equals(CHOOSE_PLACEMENT)) {
-                    client.getClientConn().discard();
-                }
-                break;
-
-            default:
-                client.getClientUI().showLastScreen();
-                return;
-        }
-
         synchronized (client.getLockState()) {
+            switch (command) {
+
+                case QUIT:
+                    client.quit();
+                    break;
+                case END_TURN:
+                    client.getClientConn().endTurn();
+                    break;
+                case BACK:
+                    client.getClientConn().exit();
+                    client.getUpdates();
+                    break;
+                case DISCARD:
+                    if (client.getTurnState().equals(CHOOSE_PLACEMENT)) {
+                        client.getClientConn().discard();
+                    }
+                    break;
+
+                default:
+                    client.getClientUI().showLastScreen();
+                    return;
+            }
+            //state update
+
             client.setTurnState(client.getTurnState().nextState(false, command.equals(BACK), command.equals(END_TURN), command.equals(DISCARD)));
             client.getLockState().notifyAll();
         }
         client.getClientUI().updateBoard(client.getBoard());
     }
 
+    /**
+     * this manages the indexes received from the ui that have a different meaning and trigger different procedures
+     * according to the state of the client
+     * @param command
+     */
     private void manageIndex(String command) {
         int index = Integer.parseInt(command);
         switch (client.getTurnState()) {
@@ -103,6 +125,7 @@ public class UICommandManager extends Thread {
 
             case NOT_MY_TURN:
                 break;
+
             case MAIN:
                 mainChoiceAction(index);
                 break;
@@ -110,15 +133,19 @@ public class UICommandManager extends Thread {
             case CHOOSE_TOOL:
                 chooseToolAction(index);
                 break;
+
             case SELECT_DIE:
                 selectDieAction(index);
                 break;
-            case CHOOSE_PLACEMENT:
-                choosePlacementAction(index);
-                break;
+
             case CHOOSE_OPTION:
                 chooseOptionAction(index);
                 break;
+
+            case CHOOSE_PLACEMENT:
+                choosePlacementAction(index);
+                break;
+
 
             case TOOL_CAN_CONTINUE:
                 break;
@@ -129,28 +156,35 @@ public class UICommandManager extends Thread {
     }
 
 
-
+    /**
+     * this manages a choice by index of an option
+     * @param index the index of the chosen option
+     */
     private void chooseOptionAction(int index) {
-        client.getClientConn().choose(index);
+        if(client.getClientConn().choose(index)) {
 
 
-        if (client.getBoard().getOptionsList().get(index).equals(Commands.PLACE_DIE)) {
-            synchronized (client.getLockState()) {
-                client.setTurnState(CHOOSE_OPTION.nextState(true));
-                client.getLockState().notifyAll();
-                client.getLockState().notifyAll();
+            if (client.getBoard().getOptionsList().get(index).equals(Commands.PLACE_DIE)) {
+                synchronized (client.getLockState()) {
+                    client.setTurnState(CHOOSE_OPTION.nextState(true));
+                    client.getLockState().notifyAll();
+                    client.getLockState().notifyAll();
+                }
+
+                client.getBoard().setPlacementsList(client.getClientConn().getPlacementsList());
+
+            } else {
+                synchronized (client.getLockState()) {
+                    client.setTurnState(CHOOSE_OPTION.nextState(false));
+                }
+                toolContinue();
             }
-
-            client.getBoard().setPlacementsList(client.getClientConn().getPlacementsList());
-
-        } else {
-            synchronized (client.getLockState()) {
-                client.setTurnState(CHOOSE_OPTION.nextState(false));
-            }
-            toolContinue();
-        }
+        }else {client.getClientUI().showLastScreen();}
     }
 
+    /**
+     * this method manages the TOOL_CAN_CONTINUE state without requiring interaction with the user
+     */
     private void toolContinue() {
 
         boolean canContinue = client.getClientConn().toolCanContinue();
@@ -163,6 +197,11 @@ public class UICommandManager extends Thread {
         }
     }
 
+    /**
+     * this implements the actions needed after selecting a die (if the options received are one or less, this requires no
+     * interaction with the user)
+     * @param index the index of the selected die
+     */
     private void selectDieAction(int index) {
         if (client.getBoard().getDiceList().size() > index && index >= 0) {
 
@@ -186,6 +225,10 @@ public class UICommandManager extends Thread {
         }
     }
 
+    /**
+     * this is called in the rare case there are more than one options, it will display a list of possible choices to the
+     * and set the state to CHOOSE_OPTION
+     */
     private void multipleOptions() {
 
         synchronized (client.getLockState()) {
@@ -195,6 +238,9 @@ public class UICommandManager extends Thread {
         client.getClientUI().showOptions(client.getBoard().getOptionsList());
     }
 
+    /**
+     * this is called in case the options received sum to one and simply makes an automatic choice for that option
+     */
     private void singleOption() {
         client.getClientConn().choose(0);
         synchronized (client.getLockState()) {
@@ -205,11 +251,17 @@ public class UICommandManager extends Thread {
     }
 
 
-
+    /**
+     * @return true iff the last dice list was from something other than the schema
+     */
     private boolean isPlacedDieFromOutside(){
         return !client.getBoard().getDiceList().get(0).getPlace().equals(Place.SCHEMA);
     }
 
+    /**
+     * this method implements the choice of a placement based on the passed index
+     * @param index the chosen index
+     */
     private void choosePlacementAction(int index) {
 
         if(client.getClientConn().choose(index)) {
@@ -226,7 +278,10 @@ public class UICommandManager extends Thread {
     }
 
 
-
+    /**
+     * this implements the choice of a tool to be enabled
+     * @param index the index of said tool
+     */
     private void chooseToolAction(int index) {
         if (index < LightBoard.NUM_TOOLS && index >= 0) {
             if (client.getClientConn().enableTool(index)) {
@@ -247,6 +302,10 @@ public class UICommandManager extends Thread {
         }
     }
 
+    /**
+     * this implements the choice of either placing a die or activating a tool
+     * @param index the choice made by the player
+     */
     private void mainChoiceAction(int index) {
         switch (index) {
             case 1:
@@ -275,6 +334,10 @@ public class UICommandManager extends Thread {
         client.getClientUI().updateBoard(client.getBoard());
     }
 
+    /**
+     * this allows the user to choose the schema to play with at the beginning of the match
+     * @param index the index of the desired schema
+     */
     private void chooseSchemaAction(int index) {
         if (client.getClientConn().choose(index)) {
             synchronized (client.getLockState()) {
