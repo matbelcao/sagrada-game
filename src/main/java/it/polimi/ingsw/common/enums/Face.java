@@ -11,6 +11,7 @@ public enum Face { // need to add address for png of the face
     FOUR(4,"\u2683"),
     FIVE(5,"\u2684"),
     SIX(6,"\u2685");
+    //NONE(-1,"\u25a0");
 
     private final int shade;
     private final String utf;

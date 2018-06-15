@@ -26,8 +26,8 @@ import java.util.Random;
  * This class implements the Cards named "Tools" and their calculating algorithms
  */
 public class ToolCard extends Card {
-    private static final String xmlTool = MasterServer.XML_SOURCE + "ToolCard.xml";
-    private static final String xmlLogic = MasterServer.XML_SOURCE + "ToolLogic.xml";
+    private static final String XML_DESCRIPTION = MasterServer.XML_SOURCE + "ToolCard.xml";
+    private static final String XML_LOGIC = MasterServer.XML_SOURCE + "ToolLogic.xml";
 
     private boolean used;
     public static final int NUM_TOOL_CARDS = 12;
@@ -49,7 +49,7 @@ public class ToolCard extends Card {
 
     public ToolCard(int id) {
         super();
-        super.xmlReader(id, xmlTool, "ToolCard");
+        super.xmlReader(id, XML_DESCRIPTION, "ToolCard");
         this.used = false;
         actions = new ArrayList<>();
         quantity = new ArrayList<>();
@@ -57,7 +57,7 @@ public class ToolCard extends Card {
     }
 
     protected void toolReader(int id) {
-        File xmlFile = new File(xmlLogic);
+        File xmlFile = new File(XML_LOGIC);
         String text;
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -116,15 +116,14 @@ public class ToolCard extends Card {
         return player.getFavorTokens() >= cost;
     }
 
-    public boolean enableToolCard(Player player,int roundNumber,Turn turnFirstOrSecond, boolean diePlaced , SchemaCard schema) {
+    public boolean enableToolCard(Player player,int roundNumber,Turn turnFirstOrSecond, int numDiePlaced , SchemaCard schema) {
         try {
-            if(isExternalPlacement() && to.equals(Place.SCHEMA) && diePlaced){return false;}
+            if(isExternalPlacement() && to.equals(Place.SCHEMA) && numDiePlaced>=1 && !turn.equals(Turn.FIRST_TURN)){return false;}
             if(actions.contains(Commands.SWAP) && roundNumber==0){return false;}
-            if (!turn.equals(Turn.NONE)) {
-                if(!turn.equals(turnFirstOrSecond)){
-                    return false;
-                }
-            }
+            if (!turn.equals(Turn.NONE) && !turn.equals(turnFirstOrSecond)) {return false;}
+            if(turn.equals(Turn.SECOND_TURN) && numDiePlaced>=1){return false;}
+            if(turn.equals(Turn.FIRST_TURN) && numDiePlaced!=1){return false;}
+
             if(isInternalSchemaPlacement()){
                 FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
                 if((diceIterator.numOfDice()<1 && quantity.contains(DieQuantity.ONE))||(diceIterator.numOfDice()<2 && quantity.contains(DieQuantity.TWO))) {
@@ -137,6 +136,11 @@ public class ToolCard extends Card {
             } else {
                 player.decreaseFavorTokens(2);
             }
+
+            if(turn.equals(Turn.FIRST_TURN)){
+                player.setSkipsNextTurn(true);
+            }
+
             selectedDice=new ArrayList<>();
             oldIndexList=new ArrayList<>();
             constraint=Color.NONE;
@@ -279,11 +283,11 @@ public class ToolCard extends Card {
         return true;
     }
 
-    public void selectDie(Die die,int oldIndex){
+    public void selectDie(Die die,int oldIndex){// TODO: 15/06/2018
         selectedDice.add(die);
-        if(isExternalPlacement()){
+        /*if(isExternalPlacement()){
             oldIndexList.add(oldIndex);
-        }
+        }*/
         return;
     }
 
@@ -305,16 +309,19 @@ public class ToolCard extends Card {
     }
 
     public boolean toolCanContinue(Player player){
+        System.out.println(selectedDice+"  "+oldIndexList);
         if(actions.get(actionIndex)!=Commands.SWAP && actions.get(actionIndex)!=Commands.INCREASE_DECREASE){//DA RIVEDERE, SI MANGIA I DADI
-            selectedDice.remove(0);
+            if(selectedDice.size()>0){selectedDice.remove(0);}
         }
-        if(isInternalSchemaPlacement() && !actions.get(actionIndex).equals(Commands.SWAP)){
-            oldIndexList.remove(0);
+        if(isInternalSchemaPlacement()){// || actions.get(actionIndex).equals(Commands.SWAP)){
+            if(oldIndexList.size()>0){oldIndexList.remove(0);}
         }
 
         actionIndex++;
         if(actions.size()==actionIndex){
-            player.replaceSchema(schemaTemp);
+            if(isInternalSchemaPlacement()){
+                player.replaceSchema(schemaTemp);
+            }
             return false;
         }
         return true;
