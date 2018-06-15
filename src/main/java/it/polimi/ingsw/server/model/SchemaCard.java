@@ -16,10 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -194,6 +191,7 @@ public class SchemaCard implements Iterable<Cell>  {
                 }
             }
         }
+        Collections.sort(list);
         return list;
     }
 
@@ -236,7 +234,7 @@ public class SchemaCard implements Iterable<Cell>  {
             }
         }
 
-
+        Collections.sort(list);
         return list;
     }
 
@@ -287,8 +285,9 @@ public class SchemaCard implements Iterable<Cell>  {
                 list.add((row+NUM_ROWS-1) * NUM_COLS + column);
             }
         }
+
         //first and last columns
-        for(row=0,column=0; row<NUM_ROWS-1;row++){
+        for(row=1,column=0; row<NUM_ROWS-1;row++){
             if(this.cell[row][column].canAcceptDie(die,ignoreConstraint)){
                 list.add(row * NUM_COLS );
             }
