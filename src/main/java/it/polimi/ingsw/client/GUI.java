@@ -40,7 +40,7 @@ import java.util.Observable;
 import static javafx.geometry.Pos.CENTER;
 
 public class GUI extends Application implements ClientUI {
-    private GUIutil elementSize;
+    private GUIutil sceneCreator;
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
     private static Client client;
@@ -49,6 +49,7 @@ public class GUI extends Application implements ClientUI {
     private static GUI instance;
     private Text messageToUser = new Text();
     private CmdWriter cmdWrite;
+    private int playerId;
 
     public GUI() {
         instance = this;
@@ -68,7 +69,7 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void start(Stage primaryStage) {
         //get the dimensions of the screen
-        elementSize = new GUIutil(Screen.getPrimary().getVisualBounds());
+        sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds());
         this.primaryStage = primaryStage;
     }
 
@@ -87,7 +88,7 @@ public class GUI extends Application implements ClientUI {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Scene loginScene = new Scene(grid, elementSize.getLoginWidth(), elementSize.getLoginWidth());
+        Scene loginScene = new Scene(grid, sceneCreator.getLoginWidth(), sceneCreator.getLoginWidth());
 
         Text scenetitle = new Text("Sagrada");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
@@ -167,13 +168,14 @@ public class GUI extends Application implements ClientUI {
     private Node draftPool(Map<Integer, LightDie> draftPool) {
         HBox layout = new HBox();
         for(LightDie l : draftPool.values()){
-            layout.getChildren().add(elementSize.lightDieToCanvas(l,200));
+            layout.getChildren().add(sceneCreator.lightDieToCanvas(l,200));
         }
         return layout;
     }
 
     @Override
     public void updateGameStart(int numUsers, int playerId) {
+        this.playerId = playerId;
     }
 
     @Override
@@ -191,15 +193,21 @@ public class GUI extends Application implements ClientUI {
             scene.widthProperty().addListener(sceneSizeChangeListener);
             scene.heightProperty().addListener(sceneSizeChangeListener);
             primaryStage.setScene(scene);
-            primaryStage.setMinHeight(elementSize.getDraftedSchemasMinHeight());
-            primaryStage.setMinWidth(elementSize.getDraftedSchemasMinWidth());
+            primaryStage.setMinHeight(sceneCreator.getDraftedSchemasMinHeight());
+            primaryStage.setMinWidth(sceneCreator.getDraftedSchemasMinWidth());
 
         });
     }
 
     @Override
     public void updateBoard(LightBoard board) {
-
+        Platform.runLater(() -> {
+            if (board == null) {
+                throw new IllegalArgumentException();
+            }
+            GridPane g = sceneCreator.schemaToGrid(board.getPlayerByIndex(playerId).getSchema(), 300, 250);
+            primaryStage.setScene(new Scene(g));
+        });
     }
 
     @Override
@@ -274,6 +282,9 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void showWaitingForGameStartScreen() {
+        Platform.runLater(() -> {
+            primaryStage.setScene(sceneCreator.waitingForGameStartScene());
+        });
 
     }
 
@@ -315,9 +326,9 @@ public class GUI extends Application implements ClientUI {
             //update the width and height properties
             canvas.setWidth(width);
             canvas.setHeight(height);
-            double borderLineWidth = elementSize.getSelectedSchemaLineWidth(width,height);
-            elementSize.drawDraftedSchemas(draftedSchemas,privObj,canvas,width,height);
-            List<Rectangle> actionRects = elementSize.draftedMouseActionAreas(width,height);
+            double borderLineWidth = sceneCreator.getSelectedSchemaLineWidth(width,height);
+            sceneCreator.drawDraftedSchemas(draftedSchemas,privObj,canvas,width,height);
+            List<Rectangle> actionRects = sceneCreator.draftedMouseActionAreas(width,height);
             setDraftedSchemasAction(actionRects,borderLineWidth);
             mouseActionPane.getChildren().setAll(actionRects);
         }
@@ -332,17 +343,11 @@ public class GUI extends Application implements ClientUI {
                     cmdWrite.write(actionRects.indexOf(r)+"");
                     r.setStroke(Color.BLUE);
                     r.setStrokeWidth(borderLineWidth);
-                    showGameStage();
+                    showWaitingForGameStartScreen();
                 });
             }
         }
 
-    }
-
-    private void showGameStage() {
-        Platform.runLater(() -> {
-                primaryStage.setScene(elementSize.gameScene());
-        });
     }
 
 
@@ -364,7 +369,7 @@ public class GUI extends Application implements ClientUI {
 
             GraphicsContext gc = getGraphicsContext2D();
             gc.clearRect(0, 0, width, height);
-            elementSize.drawDraftedSchemas(draftedSchemas,privObj,gc,width,height);
+            sceneCreator.drawDraftedSchemas(draftedSchemas,privObj,gc,width,height);
 
             gc.setStroke(Color.RED);//to delete
             gc.strokeLine(0, 0, width, height);

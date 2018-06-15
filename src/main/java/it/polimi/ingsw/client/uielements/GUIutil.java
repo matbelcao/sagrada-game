@@ -15,6 +15,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 import java.io.FileInputStream;
@@ -120,7 +121,7 @@ public class GUIutil {
         }
     }
 
-    private GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth){
+    public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth){
         GridPane grid = new GridPane();
         double dieDim = getDieDimension();
         for(int i = 0; i < NUM_ROWS; i++){
@@ -164,12 +165,9 @@ public class GUIutil {
         return dieCanvas;
     }
 
-    public Scene gameScene() {
-        Canvas c = new Canvas(300,400);
-        GraphicsContext gc = c.getGraphicsContext2D();
-        gc.setFill(Color.BLACK);
-        gc.strokeRect(0,0,25,300);
-        StackPane p = new StackPane(c);
+    public Scene waitingForGameStartScene() {
+        Text waitingText = new Text("waiting for game start");
+        StackPane p = new StackPane(waitingText);
         return new Scene(p);
     }
 
