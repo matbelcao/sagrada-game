@@ -10,6 +10,7 @@ import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import org.jetbrains.annotations.NotNull;
 
+import javax.xml.stream.FactoryConfigurationError;
 import java.util.*;
 
 /**
@@ -40,7 +41,7 @@ public class Game extends Thread implements Iterable  {
     private int oldIndex;
 
     private Commands selectedCommand;
-    private boolean diePlaced;
+    private int numDiePlaced;
     private Boolean enableToolList;
     List<IndexedCellContent> diceList;
     List<Commands> commandsList;
@@ -170,13 +171,14 @@ public class Game extends Thread implements Iterable  {
             while(round.hasNext()){
                 userPlaying = round.next();
                 userPlayingId = board.getPlayer(userPlaying).getGameId();
-                if(userPlaying.getStatus().equals(UserStatus.PLAYING) && userPlaying.getGame().equals(this)){
+                Player curPlayer= board.getPlayerById(userPlayingId);
+                System.out.println();
+                if(userPlaying.getStatus().equals(UserStatus.PLAYING) && userPlaying.getGame().equals(this) && !curPlayer.isSkippingTurn()){
                     roundFlow();
                 }else if (getUsersActive()<=1){
                     //todo go to the last round
                     System.out.println("La partita sarebbe finita!");
                 }
-
             }
 
             //Notify to all the users the ending of the round
@@ -208,7 +210,7 @@ public class Game extends Thread implements Iterable  {
 
     private void roundFlow() {
         status=fsm.newTurn(round.isFirstTurn());
-        diePlaced=false;
+        numDiePlaced=0;
 
         exit();
         System.out.println(status+"  "+fsm.getPlaceFrom());
@@ -360,7 +362,7 @@ public class Game extends Thread implements Iterable  {
     public List<IndexedCellContent> getDiceList() throws IllegalActionException {
         System.out.println("dice_list: "+status);
         if(!(status.equals(ServerState.MAIN)||status.equals(ServerState.GET_DICE_LIST))){throw new IllegalActionException();}
-        if(!fsm.isToolActive() && diePlaced){throw new IllegalActionException();}
+        if(!fsm.isToolActive() && numDiePlaced>=1){throw new IllegalActionException();}
 
         Color constraint = Color.NONE;
 
@@ -521,11 +523,11 @@ public class Game extends Thread implements Iterable  {
                 response=selectedTool.internalDiePlacement(index);
             }else{
                 response=board.schemaPlacement(userPlayingId,index,oldIndex,selectedDie);
-                diePlaced=true;
+                numDiePlaced++;
             }
         }else{
             response=board.schemaPlacement(userPlayingId,index,oldIndex,selectedDie);
-            diePlaced=true;
+            numDiePlaced++;
         }
         return response;
     }
@@ -568,7 +570,7 @@ public class Game extends Thread implements Iterable  {
         Turn turn = round.isFirstTurn()?Turn.FIRST_TURN:Turn.SECOND_TURN;
         int roundNumber = round.getRoundNumber();
 
-        Boolean toolEnabled=board.getToolCard(index).enableToolCard(player,roundNumber,turn,diePlaced,player.getSchema());
+        Boolean toolEnabled=board.getToolCard(index).enableToolCard(player,roundNumber,turn,numDiePlaced,player.getSchema());
         if(toolEnabled){
             selectedTool=board.getToolCard(index);
             status=fsm.newToolUsage(selectedTool);
