@@ -16,6 +16,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -69,7 +70,7 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void start(Stage primaryStage) {
         //get the dimensions of the screen
-        sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds());
+        sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(),this);
         this.primaryStage = primaryStage;
     }
 
@@ -183,13 +184,10 @@ public class GUI extends Application implements ClientUI {
         Platform.runLater(() -> {
             primaryStage.setTitle("Sagrada");
             primaryStage.setResizable(true);
-            Canvas canvas = new Canvas();
-            Pane  mouseActionPane = new Pane();
-            Group group = new Group(canvas,mouseActionPane);
-            StackPane stackPane = new StackPane(group);
+            DraftedSchemasGroup draftedSchemasGroup = new DraftedSchemasGroup(draftedSchemas,privObj);
+            StackPane stackPane = new StackPane(draftedSchemasGroup);
             Scene scene = new Scene(stackPane);
-            DraftedSchemasRecord draftedSchemasRecord = new DraftedSchemasRecord(canvas,mouseActionPane,draftedSchemas,privObj);
-            SceneSizeChangeListener sceneSizeChangeListener = new SceneSizeChangeListener(scene,draftedSchemasRecord);
+            SceneSizeChangeListener sceneSizeChangeListener = new SceneSizeChangeListener(scene, draftedSchemasGroup);
             scene.widthProperty().addListener(sceneSizeChangeListener);
             scene.heightProperty().addListener(sceneSizeChangeListener);
             primaryStage.setScene(scene);
@@ -199,14 +197,30 @@ public class GUI extends Application implements ClientUI {
         });
     }
 
+    public class cellProva extends Group{
+        Pane rect = new Pane();
+        Canvas c = new Canvas(100,100);
+        cellProva(){
+            draw(100,100);
+            this.getChildren().addAll(c,rect);
+        }
+
+        void draw(double w, double h){
+            GraphicsContext gc = c.getGraphicsContext2D();
+            gc.setFill(Color.OLIVEDRAB);
+            gc.fillRect(0,0,w,h);
+        }
+    }
+
     @Override
     public void updateBoard(LightBoard board) {
         Platform.runLater(() -> {
             if (board == null) {
                 throw new IllegalArgumentException();
             }
-            GridPane g = sceneCreator.schemaToGrid(board.getPlayerByIndex(playerId).getSchema(), 300, 250);
-            primaryStage.setScene(new Scene(g));
+            Group g = new cellProva();
+            Scene s = new Scene(g);
+            primaryStage.setScene(s);
         });
     }
 
@@ -295,31 +309,32 @@ public class GUI extends Application implements ClientUI {
 
     private static class SceneSizeChangeListener implements ChangeListener<Number> {
         private final Scene scene;
-        private DraftedSchemasRecord draftedSchemasRecord;
+        private DraftedSchemasGroup draftedSchemasGroup;
 
-        SceneSizeChangeListener(Scene scene, DraftedSchemasRecord draftedSchemasRecord) {
+        SceneSizeChangeListener(Scene scene, DraftedSchemasGroup draftedSchemasGroup) {
             this.scene = scene;
-            this.draftedSchemasRecord = draftedSchemasRecord;
+            this.draftedSchemasGroup = draftedSchemasGroup;
         }
         @Override
         public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
             double newWidth = scene.getWidth();
             double newHeight = scene.getHeight();
-            draftedSchemasRecord.updateScene(newWidth,newHeight);
+            draftedSchemasGroup.updateScene(newWidth,newHeight);
         }
     }
 
-    class DraftedSchemasRecord {
+    class DraftedSchemasGroup extends Group{
         Canvas canvas;
         Pane mouseActionPane;
         List<LightSchemaCard> draftedSchemas;
         LightPrivObj privObj;
 
-        public DraftedSchemasRecord(Canvas canvas,Pane mouseActionPane, List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
-            this.canvas = canvas;
-            this.mouseActionPane = mouseActionPane;
+        public DraftedSchemasGroup(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
+            this.canvas = new Canvas();
+            this.mouseActionPane = new Pane();
             this.draftedSchemas = draftedSchemas;
             this.privObj = privObj;
+            this.getChildren().addAll(canvas,mouseActionPane);
         }
 
         public void updateScene(double width, double height){

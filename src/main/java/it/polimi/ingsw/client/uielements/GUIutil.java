@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.uielements;
 
+import it.polimi.ingsw.client.GUI;
 import it.polimi.ingsw.common.immutables.LightConstraint;
 import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightPrivObj;
@@ -25,8 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GUIutil {
+    GUI gui;
     //ratio is width/height
-
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
     private final double SCREEN_WIDTH;
@@ -65,9 +66,10 @@ public class GUIutil {
 
 
 
-    public GUIutil(Rectangle2D visualBounds) {
+    public GUIutil(Rectangle2D visualBounds, GUI gui) {
         SCREEN_WIDTH = visualBounds.getWidth();
         SCREEN_HEIGHT = visualBounds.getHeight();
+        this.gui = gui;
     }
 
     public double getLoginWidth(){
@@ -121,6 +123,8 @@ public class GUIutil {
         }
     }
 
+
+
     public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth){
         GridPane grid = new GridPane();
         double dieDim = getDieDimension();
@@ -166,7 +170,7 @@ public class GUIutil {
     }
 
     public Scene waitingForGameStartScene() {
-        Text waitingText = new Text("waiting for game start");
+        Text waitingText = new Text("waiting for game to start");
         StackPane p = new StackPane(waitingText);
         return new Scene(p);
     }
