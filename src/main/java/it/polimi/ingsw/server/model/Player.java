@@ -65,11 +65,13 @@ public class  Player {
     public PrivObjectiveCard getPrivObjective(){return this.privObjective;}
 
     /**
-     * Checks if the player has to skip this turn or not
+     * Checks if the player has to skip this turn or not, then reset the variable to false
      * @return
      */
     public boolean isSkippingTurn() {
-        return this.skipsNextTurn;
+        Boolean skip=this.skipsNextTurn;
+        this.skipsNextTurn=false;
+        return skip;
     }
 
     /**

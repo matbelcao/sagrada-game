@@ -9,7 +9,7 @@ public enum Turn {
         if(when.equals("first_turn")){
             return FIRST_TURN;
         }
-        if(when.equals("first_turn")){
+        if(when.equals("second_turn")){
             return SECOND_TURN;
         }
         return NONE;
