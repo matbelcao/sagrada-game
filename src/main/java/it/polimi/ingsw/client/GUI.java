@@ -8,24 +8,17 @@ import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -35,7 +28,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 
 import static javafx.geometry.Pos.CENTER;
@@ -88,29 +80,22 @@ public class GUI extends Application implements ClientUI {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
-
         Scene loginScene = new Scene(grid, sceneCreator.getLoginWidth(), sceneCreator.getLoginWidth());
-
         Text scenetitle = new Text("Sagrada");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
-
         Label username = new Label("User Name:");
         grid.add(username, 0, 1);
-
         TextField usernameField = new TextField();
         usernameField.setPromptText("Username");
         usernameField.setText(textGen.getRandomString()); //TODO delete
         grid.add(usernameField, 1, 1);
-
         Label password = new Label("Password:");
         grid.add(password, 0, 2);
-
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
         passwordField.setText(textGen.getRandomString()); //TODO delete
         grid.add(passwordField, 1, 2);
-
         Button button = new Button("Sign in");
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
@@ -125,7 +110,6 @@ public class GUI extends Application implements ClientUI {
             }
         });
         usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //delete
-
         primaryStage.setTitle("Login");
         primaryStage.setScene(loginScene);
         primaryStage.setResizable(false);
@@ -155,7 +139,6 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-
     @Override
     public void updateLobby(int numUsers) {
         Platform.runLater(() -> {
@@ -164,14 +147,6 @@ public class GUI extends Application implements ClientUI {
             messageToUser.setText("lobby "+numUsers);
         });
 
-    }
-
-    private Node draftPool(Map<Integer, LightDie> draftPool) {
-        HBox layout = new HBox();
-        for(LightDie l : draftPool.values()){
-            layout.getChildren().add(sceneCreator.lightDieToCanvas(l,200));
-        }
-        return layout;
     }
 
     @Override
@@ -184,32 +159,25 @@ public class GUI extends Application implements ClientUI {
         Platform.runLater(() -> {
             primaryStage.setTitle("Sagrada");
             primaryStage.setResizable(true);
-            DraftedSchemasGroup draftedSchemasGroup = new DraftedSchemasGroup(draftedSchemas,privObj);
-            StackPane stackPane = new StackPane(draftedSchemasGroup);
+            StackPane stackPane = new StackPane();
             Scene scene = new Scene(stackPane);
-            SceneSizeChangeListener sceneSizeChangeListener = new SceneSizeChangeListener(scene, draftedSchemasGroup);
-            scene.widthProperty().addListener(sceneSizeChangeListener);
-            scene.heightProperty().addListener(sceneSizeChangeListener);
+            DraftedSchemasGroup draftedSchemasGroup = new DraftedSchemasGroup(draftedSchemas,privObj,scene);
+            stackPane.getChildren().add(draftedSchemasGroup);
+            scene.widthProperty().addListener((SceneSizeListener) (observable, oldValue, newValue) -> {
+                double newWidth = scene.getWidth();
+                double newHeight = scene.getHeight();
+                draftedSchemasGroup.updateScene(newWidth,newHeight);
+            });
+            scene.heightProperty().addListener((SceneSizeListener) (observable, oldValue, newValue) -> {
+                double newWidth = scene.getWidth();
+                double newHeight = scene.getHeight();
+                draftedSchemasGroup.updateScene(newWidth,newHeight);
+            });
             primaryStage.setScene(scene);
             primaryStage.setMinHeight(sceneCreator.getDraftedSchemasMinHeight());
             primaryStage.setMinWidth(sceneCreator.getDraftedSchemasMinWidth());
 
         });
-    }
-
-    public class cellProva extends Group{
-        Pane rect = new Pane();
-        Canvas c = new Canvas(100,100);
-        cellProva(){
-            draw(100,100);
-            this.getChildren().addAll(c,rect);
-        }
-
-        void draw(double w, double h){
-            GraphicsContext gc = c.getGraphicsContext2D();
-            gc.setFill(Color.OLIVEDRAB);
-            gc.fillRect(0,0,w,h);
-        }
     }
 
     @Override
@@ -218,8 +186,14 @@ public class GUI extends Application implements ClientUI {
             if (board == null) {
                 throw new IllegalArgumentException();
             }
-            Group g = new cellProva();
-            Scene s = new Scene(g);
+            BorderPane b = new BorderPane();
+            b.setTop(sceneCreator.getRoundTrack());
+            HBox roundtrack = sceneCreator.getRoundTrack();
+            Group schema = sceneCreator.getSchema(primaryStage);
+            HBox draftpool = sceneCreator.getDraftPool();
+            VBox schemaVbox = new VBox(schema,draftpool);
+            b.setCenter(schemaVbox);
+            Scene s = new Scene(b);
             primaryStage.setScene(s);
         });
     }
@@ -307,29 +281,15 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-    private static class SceneSizeChangeListener implements ChangeListener<Number> {
-        private final Scene scene;
-        private DraftedSchemasGroup draftedSchemasGroup;
-
-        SceneSizeChangeListener(Scene scene, DraftedSchemasGroup draftedSchemasGroup) {
-            this.scene = scene;
-            this.draftedSchemasGroup = draftedSchemasGroup;
-        }
-        @Override
-        public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
-            double newWidth = scene.getWidth();
-            double newHeight = scene.getHeight();
-            draftedSchemasGroup.updateScene(newWidth,newHeight);
-        }
-    }
-
     class DraftedSchemasGroup extends Group{
+        Scene scene;
         Canvas canvas;
         Pane mouseActionPane;
         List<LightSchemaCard> draftedSchemas;
         LightPrivObj privObj;
 
-        public DraftedSchemasGroup(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
+        public DraftedSchemasGroup(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj, Scene scene) {
+            this.scene = scene;
             this.canvas = new Canvas();
             this.mouseActionPane = new Pane();
             this.draftedSchemas = draftedSchemas;
@@ -362,108 +322,8 @@ public class GUI extends Application implements ClientUI {
                 });
             }
         }
-
     }
-
-
-    /*class ResizableCanvas extends Canvas {
-        List<LightSchemaCard> draftedSchemas;
-        LightPrivObj privObj;
-
-        public ResizableCanvas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
-            this.draftedSchemas = draftedSchemas;
-            this.privObj = privObj;
-            // Redraw canvas when size changes.
-
-        }
-
-        public void draw(double width, double height) {
-            //update the width and height properties
-            setWidth(width);
-            setHeight(height);
-
-            GraphicsContext gc = getGraphicsContext2D();
-            gc.clearRect(0, 0, width, height);
-            sceneCreator.drawDraftedSchemas(draftedSchemas,privObj,gc,width,height);
-
-            gc.setStroke(Color.RED);//to delete
-            gc.strokeLine(0, 0, width, height);
-            gc.strokeLine(0, height, width, 0);
-
-        }
-
-        @Override
-        public boolean isResizable() {
-            return true;
-        }
-
-        @Override
-        public double prefWidth(double height) {
-            return getWidth();
-        }
-
-        @Override
-        public double prefHeight(double width) {
-            return getHeight();
-        }
-    }*/
-
-   /* private void letterbox(final Scene scene, final Pane contentPane) {
-        final double initWidth  = scene.getWidth();
-        final double initHeight = scene.getHeight();
-        final double ratio      = initWidth / initHeight;
-        SceneSizeChangeListener sizeListener = new SceneSizeChangeListener(scene, ratio, initHeight, initWidth, contentPane);
-        scene.widthProperty().addListener(sizeListener);
-        scene.heightProperty().addListener(sizeListener);
-    }
-
-    private static class SceneSizeChangeListener implements ChangeListener<Number> {
-        private final Scene scene;
-        private final double ratio;
-        private final double initHeight;
-        private final double initWidth;
-        private final Pane contentPane;
-
-        public SceneSizeChangeListener(Scene scene, double ratio, double initHeight, double initWidth, Pane contentPane) {
-            this.scene = scene;
-            this.ratio = ratio;
-            this.initHeight = initHeight;
-            this.initWidth = initWidth;
-            this.contentPane = contentPane;
-        }
-
-        @Override
-        public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
-            final double newWidth  = scene.getWidth();
-            final double newHeight = scene.getHeight();
-            double scaleFactor;
-
-            if( newWidth / newHeight > ratio)
-                scaleFactor = newHeight / initHeight;
-            else
-                scaleFactor = newWidth / initWidth;
-
-
-            if (scaleFactor >= 1) {
-                Scale scale = new Scale(scaleFactor, scaleFactor);
-                scale.setPivotX(0);
-                scale.setPivotY(0);
-                scene.getRoot().getTransforms().setAll(scale);
-
-                contentPane.setPrefWidth (newWidth  / scaleFactor);
-                contentPane.setPrefHeight(newHeight / scaleFactor);
-            } else {
-                contentPane.setPrefWidth (Math.max(initWidth,  newWidth));
-                contentPane.setPrefHeight(Math.max(initHeight, newHeight));
-            }
-        }
-    }*/
-
-
-
-
-
-
+    
     @Override
     public QueuedReader getCommandQueue() {
         cmdWrite = new QueuedCmdReader();

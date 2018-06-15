@@ -5,19 +5,23 @@ import it.polimi.ingsw.common.immutables.LightConstraint;
 import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightPrivObj;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -174,6 +178,78 @@ public class GUIutil {
         StackPane p = new StackPane(waitingText);
         return new Scene(p);
     }
+
+    public class cellProva extends Group implements ChangeListener<Number>{
+        Pane rect = new Pane();
+        Canvas c = new Canvas(100,100);
+        cellProva(){
+            draw(100,100);
+            this.getChildren().addAll(c,rect);
+        }
+
+        void draw(double w, double h){
+            GraphicsContext gc = c.getGraphicsContext2D();
+            gc.setFill(Color.OLIVEDRAB);
+            gc.fillRect(0,0,w,h);
+        }
+        public Canvas getCanvas(){
+            return c;
+        }
+
+        @Override
+        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+            double width = 300;
+            double heigth = 100;
+            c.setWidth(width);
+            c.setHeight(heigth);
+            GraphicsContext gc = c.getGraphicsContext2D();
+            gc.setFill(Color.RED);
+            gc.fillRect(0,0,width,heigth);
+        }
+    }
+
+    public HBox getRoundTrack() {
+        HBox roudtrack = new HBox();
+        for(int i = 0 ; i<9 ; i++){
+            roudtrack.getChildren().add(new cellProva());
+        }
+        roudtrack.setSpacing(20);
+        return roudtrack;
+    }
+
+    public Group getSchema(Stage primary) {
+        /*Canvas c = new Canvas(300, 350);
+        GraphicsContext gc = c.getGraphicsContext2D();
+        gc.setFill(Color.PINK);
+        gc.fillRect(0,0,300,350);
+        gc.setFill(Color.BLACK);
+        gc.fillText("schema",50,50);*/
+        GridPane g = new GridPane();
+        cellProva d= new cellProva();
+        cellProva c= new cellProva();
+        cellProva b= new cellProva();
+        cellProva a= new cellProva();
+        g.setHgap(20);
+        g.setVgap(30);
+        Insets in = new Insets(10,10,10,10);
+        g.setPadding(in);
+        g.add(a,0,0);
+        g.add(b,0,1);
+        g.add(c,1,0);
+        g.add(d,1,1);
+        primary.widthProperty().addListener((ChangeListener<? super Number>) a);
+
+       return  new Group(g);
+    }
+
+    public HBox getDraftPool() {
+        HBox roudtrack = new HBox();
+        for(int i =0 ; i<5 ; i++){
+            roudtrack.getChildren().add(new cellProva());
+        }
+        roudtrack.setSpacing(20);
+        return roudtrack;
+        }
 
 
 
