@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.model.scorecalculator;
+import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.Die;
-import it.polimi.ingsw.common.enums.Face;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 import it.polimi.ingsw.server.model.SchemaCard;
 
@@ -16,7 +16,7 @@ public class ScoreCalculator8 implements ScoreCalculator{
      */
     @Override
     public int calculateScore(SchemaCard schema) {
-        int[] count = new int[Face.values().length];
+        int[] count = new int[Shade.values().length];
         int min;
         Die die;
         FullCellIterator diceIterator = (FullCellIterator) schema.iterator();

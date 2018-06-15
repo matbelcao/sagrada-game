@@ -175,15 +175,15 @@ public class ClientParserTest {
         assertEquals("PUT_DIE",parsedResult.get(1));
         assertEquals("NULL",parsedResult.get(2));
 
-        assertFalse(ClientParser.parse("CHOOSE_PLACEMENT 5", parsedResult));
-        assertFalse(ClientParser.parse("CHOOSE_PLACEMENT 1 5 15", parsedResult));
+        assertTrue(ClientParser.parse("CHOICE ok", parsedResult));
+        assertFalse(ClientParser.parse("CHOICE wdsb", parsedResult));
 
         assertTrue(ClientParser.parse("LIST_DICE", parsedResult));
         assertFalse(ClientParser.parse("LIST_OPTIONS", parsedResult));
-        assertFalse(ClientParser.parse("CHOOSE", parsedResult));
+
         assertFalse(ClientParser.parse("LIST 2,RED", parsedResult));
-        assertTrue(ClientParser.parse("LIST_DICE 1,RED,TWO 2,GREEN,SIX", parsedResult));
-        assertTrue(ClientParser.parse("LIST_DICE", parsedResult));
+        assertFalse(ClientParser.parse("LIST_DICE schema 1,2", parsedResult));
+        assertFalse(ClientParser.parse("LIST_DICE draftpool 1,2,greeN,TWO,SIX", parsedResult));
     }
 
     @Test

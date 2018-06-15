@@ -442,7 +442,8 @@ public class Client {
         board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
 
         synchronized (lockState) {
-            turnState=turnState.nextState(playerId == board.getMyPlayerId(), false, false, false);
+
+            turnState=ClientFSMState.NOT_MY_TURN.nextState(playerId == board.getMyPlayerId());
             lockState.notifyAll();
         }
 
@@ -458,13 +459,6 @@ public class Client {
         for(int i=0;i<LightBoard.NUM_TOOLS;i++) {
             if (!board.getTools().get(i).isUsed()) {
                 board.getTools().set(i, tools.get(i));
-            }
-        }
-
-        synchronized (lockState) {
-            if(playerTurnId==board.getMyPlayerId()) {
-                turnState = turnState.nextState(false, false, true, false);
-                lockState.notifyAll();
             }
         }
 

@@ -5,7 +5,6 @@ import it.polimi.ingsw.client.uielements.CLIView;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
-import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.PrivObjectiveCard;
@@ -77,7 +76,7 @@ class cliElemsTest {
         draftpool.add(new LightDie("ONE","YELLOW"));
 
         player0= new LightPlayer("aaaaaaaaaaaaaaaa",0);
-        player1= new LightPlayer("bubba",1);
+        player1= new LightPlayer("bubba354627yhdge",1);
         player2= new LightPlayer("boby",2);
         player3= new LightPlayer("cocco",3);
 
@@ -97,7 +96,7 @@ class cliElemsTest {
         cliview.updateSchema(player2);
         cliview.updateSchema(player3);
 
-        cliview.updateRoundTurn(5,0);
+        cliview.updateRoundTurn(5,true, 0);
 
         cliview.updateDraftPool(draftpool);
 

@@ -155,148 +155,17 @@ public class UICommandManager extends Thread {
         }
     }
 
-
     /**
-     * this manages a choice by index of an option
-     * @param index the index of the chosen option
+     * this allows the user to choose the schema to play with at the beginning of the match
+     * @param index the index of the desired schema
      */
-    private void chooseOptionAction(int index) {
-        if(client.getClientConn().choose(index)) {
-
-
-            if (client.getBoard().getOptionsList().get(index).equals(Commands.PLACE_DIE)) {
-                synchronized (client.getLockState()) {
-                    client.setTurnState(CHOOSE_OPTION.nextState(true));
-                    client.getLockState().notifyAll();
-                    client.getLockState().notifyAll();
-                }
-
-                client.getBoard().setPlacementsList(client.getClientConn().getPlacementsList());
-
-            } else {
-                synchronized (client.getLockState()) {
-                    client.setTurnState(CHOOSE_OPTION.nextState(false));
-                }
-                toolContinue();
-            }
-        }else {client.getClientUI().showLastScreen();}
-    }
-
-    /**
-     * this method manages the TOOL_CAN_CONTINUE state without requiring interaction with the user
-     */
-    private void toolContinue() {
-
-        boolean canContinue = client.getClientConn().toolCanContinue();
-        synchronized (client.getLockState()) {
-            client.setTurnState(TOOL_CAN_CONTINUE.nextState(canContinue));
-            client.getLockState().notifyAll();
-        }
-        if(canContinue){
-            client.getBoard().setLastDiceList(client.getClientConn().getDiceList());
-        }
-    }
-
-    /**
-     * this implements the actions needed after selecting a die (if the options received are one or less, this requires no
-     * interaction with the user)
-     * @param index the index of the selected die
-     */
-    private void selectDieAction(int index) {
-        if (client.getBoard().getDiceList().size() > index && index >= 0) {
-
-            client.getBoard().setLastSelectedDie((LightDie) client.getBoard().getDiceList().get(index).getContent());
-            client.getBoard().setOptionsList(client.getClientConn().select(index));
-
-            if(client.getBoard().getOptionsList().isEmpty()){
-                synchronized (client.getLockState()) {
-                    client.setTurnState(SELECT_DIE.nextState(false,true,false,false));
-                    client.getLockState().notifyAll();
-                }
-
-            } else if (client.getBoard().getOptionsList().size() == 1) {
-                singleOption();
-            } else {
-                multipleOptions();
-            }
-            client.getClientUI().updateBoard(client.getBoard());
-        } else {
-            client.getClientUI().showLastScreen();
-        }
-    }
-
-    /**
-     * this is called in the rare case there are more than one options, it will display a list of possible choices to the
-     * and set the state to CHOOSE_OPTION
-     */
-    private void multipleOptions() {
-
-        synchronized (client.getLockState()) {
-            client.setTurnState(SELECT_DIE.nextState(false));
-            client.getLockState().notifyAll();
-        }
-        client.getClientUI().showOptions(client.getBoard().getOptionsList());
-    }
-
-    /**
-     * this is called in case the options received sum to one and simply makes an automatic choice for that option
-     */
-    private void singleOption() {
-        client.getClientConn().choose(0);
-        synchronized (client.getLockState()) {
-            client.setTurnState(SELECT_DIE.nextState(false));
-
-            chooseOptionAction(0);
-        }
-    }
-
-
-    /**
-     * @return true iff the last dice list was from something other than the schema
-     */
-    private boolean isPlacedDieFromOutside(){
-        return !client.getBoard().getDiceList().get(0).getPlace().equals(Place.SCHEMA);
-    }
-
-    /**
-     * this method implements the choice of a placement based on the passed index
-     * @param index the chosen index
-     */
-    private void choosePlacementAction(int index) {
-
-        if(client.getClientConn().choose(index)) {
-
+    private void chooseSchemaAction(int index) {
+        if (client.getClientConn().choose(index)) {
             synchronized (client.getLockState()) {
-                client.setTurnState(CHOOSE_PLACEMENT.nextState( isPlacedDieFromOutside()));
+                client.setTurnState( CHOOSE_SCHEMA.nextState(true));
                 client.getLockState().notifyAll();
             }
-            client.getUpdates();
-            client.getClientUI().updateBoard(client.getBoard());
-        }else{
-            client.getClientUI().showLastScreen();
-        }
-    }
-
-
-    /**
-     * this implements the choice of a tool to be enabled
-     * @param index the index of said tool
-     */
-    private void chooseToolAction(int index) {
-        if (index < LightBoard.NUM_TOOLS && index >= 0) {
-            if (client.getClientConn().enableTool(index)) {
-                synchronized (client.getLockState()) {
-                    client.setTurnState(CHOOSE_TOOL.nextState(true));
-                    client.getLockState().notifyAll();
-                }
-                client.getBoard().setLastDiceList(client.getClientConn().getDiceList());
-            } else {
-                synchronized (client.getLockState()) {
-                    client.setTurnState( CHOOSE_TOOL.nextState(false));
-                    client.getLockState().notifyAll();
-                }
-            }
-            client.getClientUI().updateBoard(client.getBoard());
+            client.getClientUI().showWaitingForGameStartScreen();
         } else {
             client.getClientUI().showLastScreen();
         }
@@ -334,19 +203,152 @@ public class UICommandManager extends Thread {
         client.getClientUI().updateBoard(client.getBoard());
     }
 
+
     /**
-     * this allows the user to choose the schema to play with at the beginning of the match
-     * @param index the index of the desired schema
+     * this implements the choice of a tool to be enabled
+     * @param index the index of said tool
      */
-    private void chooseSchemaAction(int index) {
-        if (client.getClientConn().choose(index)) {
-            synchronized (client.getLockState()) {
-                client.setTurnState( CHOOSE_SCHEMA.nextState(true));
-                client.getLockState().notifyAll();
+    private void chooseToolAction(int index) {
+        if (index < LightBoard.NUM_TOOLS && index >= 0) {
+            if (client.getClientConn().enableTool(index)) {
+                synchronized (client.getLockState()) {
+                    client.setTurnState(CHOOSE_TOOL.nextState(true));
+                    client.getLockState().notifyAll();
+                }
+                client.getBoard().setLastDiceList(client.getClientConn().getDiceList());
+            } else {
+                synchronized (client.getLockState()) {
+                    client.setTurnState( CHOOSE_TOOL.nextState(false));//back to MAIN
+                    client.getLockState().notifyAll();
+                }
             }
-            client.getClientUI().showWaitingForGameStartScreen();
+            client.getClientUI().updateBoard(client.getBoard());
         } else {
             client.getClientUI().showLastScreen();
         }
     }
+
+    /**
+     * this implements the actions needed after selecting a die (if the options received are one or less, this requires no
+     * interaction with the user)
+     * @param index the index of the selected die
+     */
+    private void selectDieAction(int index) {
+        if (client.getBoard().getDiceList().size() > index && index >= 0) {
+
+            client.getBoard().setLastSelectedDie((LightDie) client.getBoard().getDiceList().get(index).getContent());
+            client.getBoard().setOptionsList(client.getClientConn().select(index));
+
+            if(client.getBoard().getOptionsList().isEmpty()){
+                synchronized (client.getLockState()) {
+                    client.setTurnState(SELECT_DIE.nextState(true));
+                    client.getLockState().notifyAll();
+                }
+
+            } else if (client.getBoard().getOptionsList().size() == 1) {
+                singleOption();
+            } else {
+                multipleOptions();
+            }
+            client.getClientUI().updateBoard(client.getBoard());
+        } else {
+            client.getClientUI().showLastScreen();
+        }
+    }
+
+    /**
+     * this is called in case the options received sum to one and simply makes an automatic choice for that option
+     */
+    private void singleOption() {
+        synchronized (client.getLockState()) {
+            client.setTurnState(SELECT_DIE.nextState(false));
+
+            chooseOptionAction(0);
+        }
+    }
+
+    /**
+     * this is called in the rare case there are more than one options, it will display a list of possible choices to the
+     * and set the state to CHOOSE_OPTION
+     */
+    private void multipleOptions() {
+
+        synchronized (client.getLockState()) {
+            client.setTurnState(SELECT_DIE.nextState(false));
+            client.getLockState().notifyAll();
+        }
+        client.getClientUI().showOptions(client.getBoard().getOptionsList());
+    }
+
+
+    /**
+     * this manages a choice by index of an option
+     * @param index the index of the chosen option
+     */
+    private void chooseOptionAction(int index) {
+        if(client.getClientConn().choose(index)) {
+
+            if (client.getBoard().getOptionsList().get(index).equals(Commands.PLACE_DIE)) {
+                synchronized (client.getLockState()) {
+                    client.setTurnState(CHOOSE_OPTION.nextState(true));
+                    client.getLockState().notifyAll();
+                    client.getLockState().notifyAll();
+                }
+
+                client.getBoard().setPlacementsList(client.getClientConn().getPlacementsList());
+
+            } else {
+                synchronized (client.getLockState()) {
+                    client.setTurnState(CHOOSE_OPTION.nextState(false));
+                }
+                toolContinue();
+            }
+        }else {client.getClientUI().showLastScreen();}
+    }
+
+    /**
+     * this method manages the TOOL_CAN_CONTINUE state without requiring interaction with the user
+     */
+    private void toolContinue() {
+
+        boolean canContinue = client.getClientConn().toolCanContinue();
+        synchronized (client.getLockState()) {
+            client.setTurnState(TOOL_CAN_CONTINUE.nextState(canContinue));
+            client.getLockState().notifyAll();
+        }
+        if(canContinue){
+            client.getBoard().setLastDiceList(client.getClientConn().getDiceList());
+        }
+        client.getUpdates();
+        client.getClientUI().updateBoard(client.getBoard());
+    }
+
+
+
+    /**
+     * @return true iff the last dice list was from something other than the schema
+     */
+    private boolean isPlacedDieFromOutside(){
+        return !client.getBoard().getDiceList().get(0).getPlace().equals(Place.SCHEMA);
+    }
+
+    /**
+     * this method implements the choice of a placement based on the passed index
+     * @param index the chosen index
+     */
+    private void choosePlacementAction(int index) {
+
+        if(client.getClientConn().choose(index)) {
+
+            synchronized (client.getLockState()) {
+                client.setTurnState(CHOOSE_PLACEMENT.nextState( isPlacedDieFromOutside()));
+                client.getLockState().notifyAll();
+            }
+            client.getUpdates();
+            client.getClientUI().updateBoard(client.getBoard());
+        }else{
+            client.getClientUI().showLastScreen();
+        }
+    }
+
 }

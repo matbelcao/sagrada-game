@@ -1,7 +1,7 @@
 package it.polimi.ingsw.common.immutables;
 
 import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.server.model.Die;
 
@@ -11,8 +11,8 @@ public class IndexedCellContent {
     private CellContent content;
 
 
-    public IndexedCellContent(int position,Place place, Face face, Color color){
-        this.content=new LightDie(face,color);
+    public IndexedCellContent(int position, Place place, Shade shade, Color color){
+        this.content=new LightDie(shade,color);
         this.place=place;
         this.position=position;
     }
@@ -34,7 +34,7 @@ public class IndexedCellContent {
         this.place=Place.valueOf(place);
         this.position=position;
     }
-    public IndexedCellContent(int position,Place place, Face shade){
+    public IndexedCellContent(int position,Place place, Shade shade){
         this.content=new LightConstraint(shade);
         this.place=place;
         this.position=position;

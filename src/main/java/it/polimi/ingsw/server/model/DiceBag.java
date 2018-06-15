@@ -1,7 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.exceptions.EmptyDiceBagException;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class DiceBag {
         for (int color=0;color<5;color ++) {
             for (int i = 0; i < 18; i++) {
                 randomShade = randomGen.nextInt(6) ;
-                    toDraft.add(new Die(Face.values()[randomShade],Color.values()[color]));
+                    toDraft.add(new Die(Shade.values()[randomShade],Color.values()[color]));
             }
         }
     }

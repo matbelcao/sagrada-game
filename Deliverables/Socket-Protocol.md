@@ -336,8 +336,8 @@ This is the reply of the server to a `CHOOSE` message previously received from t
 This message can only be sent within the usage of tool cards that require to choose a die from the draftpool, the schema or the roundtrack. A `GET_DICE_LIST ...` is required before using it. This has to be used by toolcards with id in {1,5,6,10,11}
 In toolcard #5 the chosen die is the one in the roundtrack, while the one in the draftpool is selected.
 
-##### `CHOOSE face <shade>`
-This is used in toolcard #11 to set the new face of the die that he has drafted from the dice bag. The die can then be selected with a `SELECT modified_die` after receiving a `CHOICE ok`.
+##### `CHOOSE shade <shade>`
+This is used in toolcard #11 to set the new shade of the die that he has drafted from the dice bag. The die can then be selected with a `SELECT modified_die` after receiving a `CHOICE ok`.
 
 ### Server-side
 ##### `CHOICE ko|ok`

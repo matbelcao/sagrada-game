@@ -44,6 +44,9 @@ class ClientFSMStateTest {
 
 
         state=state.nextState(true,false,false,false);
+        assertEquals(ClientFSMState.CHOOSE_TOOL,state);
+
+        state=state.nextState(true,false,false,false);
         assertEquals(ClientFSMState.SELECT_DIE,state);
 
         state=state.nextState(false,false,false,false);

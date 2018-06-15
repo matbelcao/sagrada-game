@@ -1,7 +1,7 @@
 package it.polimi.ingsw.common.immutables;
 
 import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.Die;
 
 /**
@@ -9,25 +9,25 @@ import it.polimi.ingsw.server.model.Die;
  */
 public class LightDie implements CellContent {
     private Color color;
-    private Face shade;
+    private Shade shade;
 
     /**
      * Constructs the object setting its shade and color
-     * @param shade the Face of the die
+     * @param shade the Shade of the die
      * @param color the Color of the die
      */
-    public LightDie(Face shade, Color color){
+    public LightDie(Shade shade, Color color){
         this.shade= shade;
         this.color=color;
     }
 
     /**
      * Constructs the object setting its shade and color
-     * @param shade the Face of the die
+     * @param shade the Shade of the die
      * @param color the Color of the die
      */
     public LightDie(String shade, String color){
-        this.shade = Face.valueOf(shade);
+        this.shade = Shade.valueOf(shade);
         this.color = Color.valueOf(color);
     }
 
@@ -44,7 +44,7 @@ public class LightDie implements CellContent {
      * Returns the shade of the lightDie
      * @return the shade
      */
-    public Face getShade(){ return this.shade; }
+    public Shade getShade(){ return this.shade; }
 
     /**
      * Returns the color of the lightDie

@@ -1,12 +1,12 @@
 package it.polimi.ingsw.common.immutables;
 
 import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.common.enums.Shade;
 
 public interface CellContent{
     boolean isDie();
     boolean hasColor();
-    Face getShade();
+    Shade getShade();
     Color getColor();
 
 }
