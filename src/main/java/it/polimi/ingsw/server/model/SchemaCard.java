@@ -341,7 +341,6 @@ public class SchemaCard implements Iterable<Cell>  {
      * @throws IllegalDieException iff the die can't be placed there
      */
     public void putDie (int index,Die die) throws IllegalDieException{
-
         putDie(index,die,IgnoredConstraint.NONE);
     }
 

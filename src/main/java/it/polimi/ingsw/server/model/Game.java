@@ -8,9 +8,7 @@ import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
-import org.jetbrains.annotations.NotNull;
 
-import javax.xml.stream.FactoryConfigurationError;
 import java.util.*;
 
 /**
@@ -401,7 +399,7 @@ public class Game extends Thread implements Iterable  {
             constraint = selectedTool.getColorConstraint();
             if(selectedTool.isInternalSchemaPlacement()){
                 selectedDie=selectedTool.internalSelectDie(dieIndex);
-            }else if (selectedCommand.equals(Commands.INCREASE_DECREASE) || selectedCommand.equals(Commands.SET_SHADE)) {
+            }else if (selectedCommand.equals(Commands.INCREASE_DECREASE) || selectedCommand.equals(Commands.SET_SHADE)){
                 selectedDie.setColor(diceList.get(dieIndex).getContent().getColor().toString());
                 selectedDie.setShade(diceList.get(dieIndex).getContent().getShade().toInt());
             } else{
@@ -501,6 +499,7 @@ public class Game extends Thread implements Iterable  {
                     break;
                 case SET_COLOR:
                     selectedTool.setColor();
+                    fsm.setPlaceFrom(selectedTool.getPlaceFrom());
                     return true;
                 case PLACE_DIE:
                     return true;
@@ -516,17 +515,22 @@ public class Game extends Thread implements Iterable  {
     }
 
     private boolean choosePlacement(int index){
-        boolean response;
         if(placements.size()<=index || !selectedCommand.equals(Commands.PLACE_DIE) || selectedDie==null){return false;}
+        boolean response;
+        IgnoredConstraint constraint;
+
         if(fsm.isToolActive()){
             if(selectedTool.isInternalSchemaPlacement()){
                 response=selectedTool.internalDiePlacement(index);
             }else{
-                response=board.schemaPlacement(userPlayingId,index,oldIndex,selectedDie);
+                constraint = selectedTool.getIgnoredConstraint();
+                System.out.println(constraint);
+                response=board.schemaPlacement(userPlayingId,index,oldIndex,selectedDie,constraint);
                 numDiePlaced++;
             }
         }else{
-            response=board.schemaPlacement(userPlayingId,index,oldIndex,selectedDie);
+            constraint=IgnoredConstraint.NONE;
+            response=board.schemaPlacement(userPlayingId,index,oldIndex,selectedDie,constraint);
             numDiePlaced++;
         }
         return response;
@@ -534,23 +538,21 @@ public class Game extends Thread implements Iterable  {
 
     public List<Integer> getPlacements(User user) throws IllegalActionException {
         System.out.println("GET_PLACEMENTS: "+status);
-        SchemaCard schema;
+        IgnoredConstraint constraint;
 
         if(status.equals(ServerState.GET_PLACEMENTS)) {
-            IgnoredConstraint constraint=IgnoredConstraint.NONE;
             if(fsm.isToolActive()) {
                 if(selectedTool.isInternalSchemaPlacement()){
                     placements=selectedTool.internalListPlacements();
                 }else{
-                    schema=board.getPlayer(user).getSchema();// TODO: 14/06/2018  inserire in toolcard
                     constraint = selectedTool.getIgnoredConstraint();
-                    placements = board.listSchemaPlacements(schema, selectedDie,constraint);
+                    System.out.println(constraint);
+                    placements = board.listSchemaPlacements(userPlayingId, selectedDie,constraint);
                 }
 
             }else{
-                constraint=IgnoredConstraint.NONE;// TODO: 14/06/2018
-                schema=board.getPlayer(user).getSchema();
-                placements = board.listSchemaPlacements(schema, selectedDie,constraint);
+                constraint=IgnoredConstraint.NONE;
+                placements = board.listSchemaPlacements(userPlayingId, selectedDie,constraint);
             }
 
 
@@ -589,6 +591,8 @@ public class Game extends Thread implements Iterable  {
                 selectedTool.rerollAll(dielist);
                 diceList=new ArrayList<>();
                 enableToolList =true;
+            }else if(selectedTool.isSetColorFromRountrackCard()){
+                    fsm.setPlaceFrom(Place.ROUNDTRACK);
             }
         }else{
             discard();
@@ -717,7 +721,6 @@ public class Game extends Thread implements Iterable  {
      * This method creates an iterator that implements the round's turns management system
      * @return an iterator on the players of this game
      */
-    @NotNull
     @Override
     public Iterator iterator() {
         return new RoundIterator(users);

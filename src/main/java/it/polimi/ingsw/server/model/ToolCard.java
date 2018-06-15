@@ -118,18 +118,25 @@ public class ToolCard extends Card {
 
     public boolean enableToolCard(Player player,int roundNumber,Turn turnFirstOrSecond, int numDiePlaced , SchemaCard schema) {
         try {
-            if(isExternalPlacement() && to.equals(Place.SCHEMA) && numDiePlaced>=1 && !turn.equals(Turn.FIRST_TURN)){return false;}
-            if(actions.contains(Commands.SWAP) && roundNumber==0){return false;}
+            if(actions.contains(Commands.SWAP) || actions.contains(Commands.SET_COLOR) && roundNumber==0){return false;}
             if (!turn.equals(Turn.NONE) && !turn.equals(turnFirstOrSecond)) {return false;}
             if(turn.equals(Turn.SECOND_TURN) && numDiePlaced>=1){return false;}
             if(turn.equals(Turn.FIRST_TURN) && numDiePlaced!=1){return false;}
 
-            if(isInternalSchemaPlacement()){
-                FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
-                if((diceIterator.numOfDice()<1 && quantity.contains(DieQuantity.ONE))||(diceIterator.numOfDice()<2 && quantity.contains(DieQuantity.TWO))) {
+            if(isExternalPlacement() &&  numDiePlaced>=1 && !turn.equals(Turn.FIRST_TURN)) {
+                if (to.equals(Place.SCHEMA) || to.equals(Place.DICEBAG)) {
                     return false;
                 }
             }
+            if(isInternalSchemaPlacement()){
+                FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+                if(diceIterator.numOfDice()<1 && quantity.contains(DieQuantity.ONE)){
+                    return false;
+                }else if(diceIterator.numOfDice()<2 && quantity.contains(DieQuantity.TWO)) {
+                    return false;
+                }
+            }
+
             if (!used) {
                 player.decreaseFavorTokens(1);
                 used = true;
@@ -306,6 +313,10 @@ public class ToolCard extends Card {
 
     public boolean isRerollAllDiceCard(){
         return actions.get(actionIndex).equals(Commands.REROLL) && quantity.contains(DieQuantity.ALL);
+    }
+
+    public boolean isSetColorFromRountrackCard(){
+        return actions.get(actionIndex).equals(Commands.SET_COLOR);
     }
 
     public boolean toolCanContinue(Player player){

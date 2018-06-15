@@ -7,6 +7,7 @@ import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
+import sun.net.www.content.text.plain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,9 +58,9 @@ public class Board {
             draftedTools.add(id);
             toolCards[i]=new ToolCard(id);
         }*/
-        toolCards[0]=new ToolCard(9);
-        toolCards[1]=new ToolCard(10);
-        toolCards[2]=new ToolCard(11);
+        toolCards[0]=new ToolCard(10);
+        toolCards[1]=new ToolCard(11);
+        toolCards[2]=new ToolCard(12);
         return toolCards;
     }
 
@@ -224,11 +225,11 @@ public class Board {
     }
 
     //only for
-    public boolean schemaPlacement(int playerId,int newIndex,int oldIndex, Die selectedDie){
+    public boolean schemaPlacement(int playerId,int newIndex,int oldIndex, Die selectedDie, IgnoredConstraint constraint){
         SchemaCard schemaCard=getPlayerById(playerId).getSchema();
-        List<Integer> placerments= schemaCard.listPossiblePlacements(selectedDie);
+        List<Integer> placements= schemaCard.listPossiblePlacements(selectedDie,constraint);
         try {
-            schemaCard.putDie(placerments.get(newIndex),selectedDie);
+            schemaCard.putDie(placements.get(newIndex),selectedDie,constraint);
             getDraftPool().removeDie(oldIndex);
             return true;
         } catch (IllegalDieException e) {
@@ -236,8 +237,9 @@ public class Board {
         }
     }
 
-    public List<Integer> listSchemaPlacements(SchemaCard selectedSchema, Die selectedDie, IgnoredConstraint constraint){
-        return selectedSchema.listPossiblePlacements(selectedDie,constraint);
+    public List<Integer> listSchemaPlacements(int playerId, Die selectedDie, IgnoredConstraint constraint){
+        SchemaCard schema = getPlayerById(playerId).getSchema();
+        return schema.listPossiblePlacements(selectedDie,constraint);
     }
 
 
