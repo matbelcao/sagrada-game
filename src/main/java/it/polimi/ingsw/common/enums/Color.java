@@ -5,7 +5,7 @@ package it.polimi.ingsw.common.enums;
  * This enum offers the set of colors (RED, GREEN, YELLOW, BLUE, PURPLE) needed to build the dice,
  * it also contains the ansi code to apply color to text in the CLI
  */
-public enum Color { //need to add png address combined with Face's ones
+public enum Color { //need to add png address combined with Shade's ones
     RED("\u001B[31m" ),
     GREEN("\u001B[32m"),
     YELLOW("\u001B[33m"),

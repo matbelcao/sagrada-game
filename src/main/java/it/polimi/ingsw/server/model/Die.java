@@ -1,7 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 import it.polimi.ingsw.common.immutables.LightDie;
 
@@ -16,16 +16,16 @@ public class Die {
 
     /**
      * Constructs the object setting its shade and color
-     * @param shade the Face of the die
+     * @param shade the Shade of the die
      * @param color the Color of the die
      */
-    public Die(Face shade, Color color){
+    public Die(Shade shade, Color color){
         this.lightDie =new LightDie(shade,color);
     }
 
     /**
      * Constructs the object setting its shade and color
-     * @param shade the Face of the die
+     * @param shade the Shade of the die
      * @param color the Color of the die
      */
     public Die(String shade, String color){
@@ -34,11 +34,11 @@ public class Die {
 
     /**
      * Constructs the object setting its shade and color
-     * @param shade the Face of the die
+     * @param shade the Shade of the die
      * @param color the Color of the die
      */
     Die(int shade, String color ){
-        this.lightDie =new LightDie(Face.valueOf(shade),Color.valueOf(color));
+        this.lightDie =new LightDie(Shade.valueOf(shade),Color.valueOf(color));
     }
 
     /**
@@ -51,9 +51,9 @@ public class Die {
 
     /**
      * Gets the Shade of the die
-     * @return  the Face of the die
+     * @return  the Shade of the die
      */
-    public Face getShade(){
+    public Shade getShade(){
         return this.lightDie.getShade();
     }
 
@@ -106,7 +106,7 @@ public class Die {
      * @param shade the new shade to be set
      */
     public void setShade(int shade){
-        this.lightDie = new LightDie(Face.valueOf(shade),this.lightDie.getColor());
+        this.lightDie = new LightDie(Shade.valueOf(shade),this.lightDie.getColor());
     }
 
     public void setColor(String color){this.lightDie=new LightDie(this.lightDie.getShade(),Color.valueOf(color));}

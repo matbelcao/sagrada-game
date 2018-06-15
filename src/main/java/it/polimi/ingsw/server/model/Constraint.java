@@ -2,7 +2,7 @@ package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.immutables.LightConstraint;
 import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.common.enums.Shade;
 
 /**
  * This class represents a constraint set for a single cell of the Schema Card of the game
@@ -23,7 +23,7 @@ public class Constraint {
      * Creates the object setting the correct type of constraint
      * @param shade a shade constraint
      */
-    public Constraint(Face shade) {
+    public Constraint(Shade shade) {
         this.constraint= new LightConstraint(shade);
 
     }
@@ -37,10 +37,10 @@ public class Constraint {
     }
 
     /**
-     * Get the Face of the constraint if it is a shade constraint
+     * Get the Shade of the constraint if it is a shade constraint
      * @return the shade of the constraint
      */
-    public Face getShade(){
+    public Shade getShade(){
         return this.constraint.getShade();
     }
 
@@ -73,7 +73,7 @@ public class Constraint {
      */
     public String toUtf(){
         if(isColorConstraint()){
-            return this.constraint.getColor().getUtf()+Face.EMPTY+Color.NONE.getUtf();
+            return this.constraint.getColor().getUtf()+Shade.EMPTY+Color.NONE.getUtf();
         }else{
             return Color.NONE.getUtf() +this.constraint.getShade().getUtf();
         }

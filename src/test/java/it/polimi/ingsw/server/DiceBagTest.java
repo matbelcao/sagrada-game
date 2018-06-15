@@ -1,9 +1,9 @@
 package it.polimi.ingsw.server;
 
+import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.exceptions.EmptyDiceBagException;
 import it.polimi.ingsw.server.model.DiceBag;
 import it.polimi.ingsw.server.model.Die;
-import it.polimi.ingsw.common.enums.Face;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +23,7 @@ public class DiceBagTest {
         int purple = 18;
         for(int i = 0; i<90; i++){
             testDie = testBag.draftDie();
-            assertTrue(Face.contains(testDie.getShade().toString())); //all the shades of the created dice are valid
+            assertTrue(Shade.contains(testDie.getShade().toString())); //all the shades of the created dice are valid
             switch (testDie.getColor().toString()){
                 case "RED":
                     red--;

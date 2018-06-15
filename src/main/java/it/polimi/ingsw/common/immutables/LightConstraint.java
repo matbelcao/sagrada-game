@@ -1,17 +1,17 @@
 package it.polimi.ingsw.common.immutables;
 
 import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.enums.Face;
+import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.Constraint;
 
 public class LightConstraint implements CellContent {
     private Color color;
-    private Face shade;
+    private Shade shade;
     private boolean isColorConstraint;
 
     public LightConstraint(String constraint){
-        if(Face.contains(constraint)){
-            shade = Face.valueOf(constraint);
+        if(Shade.contains(constraint)){
+            shade = Shade.valueOf(constraint);
             isColorConstraint= false;
         }else{
             color = Color.valueOf(constraint);
@@ -22,7 +22,7 @@ public class LightConstraint implements CellContent {
      * Creates the object setting the correct type of constraint
      * @param shade a shade constraint
      */
-    public LightConstraint(Face shade) {
+    public LightConstraint(Shade shade) {
         this.shade = shade;
         isColorConstraint = false;
     }
@@ -62,7 +62,7 @@ public class LightConstraint implements CellContent {
     }
 
     @Override
-    public Face getShade() {
+    public Shade getShade() {
         return this.shade;
     }
 

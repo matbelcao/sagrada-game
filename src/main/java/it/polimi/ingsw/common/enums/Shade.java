@@ -4,7 +4,7 @@ package it.polimi.ingsw.common.enums;
 /**
  * This enum represents the possible faces (shades) of the game dice. The elements are immutable.
  */
-public enum Face { // need to add address for png of the face
+public enum Shade { // need to add address for png of the face
     ONE(1,"\u2680"),
     TWO(2,"\u2681"),
     THREE(3,"\u2682"),
@@ -21,7 +21,7 @@ public enum Face { // need to add address for png of the face
      * @param shade the shade of the die
      * @param utf the utf code that renders the corresponding die face
      */
-    Face(final int shade, final String utf){
+    Shade(final int shade, final String utf){
         this.shade=shade;
         this.utf=utf;
     }
@@ -29,12 +29,12 @@ public enum Face { // need to add address for png of the face
     /**
      * Gets a die face through its int value instead of its string name
      * @param shade the number corresponding to the wanted face of the die
-     * @return the instance of Face corresponding to the number
+     * @return the instance of Shade corresponding to the number
      */
 
-    public static Face valueOf(int shade) {
+    public static Shade valueOf(int shade) {
 
-        for (Face face : Face.values()) {
+        for (Shade face : Shade.values()) {
             if (face.ordinal() == (shade - 1)) {
                 return face;
             }
@@ -44,7 +44,7 @@ public enum Face { // need to add address for png of the face
 
     /**
      * Gets the integer value of the face of the die
-     * @return the integer number between 1 and 6 corresponding to the Face
+     * @return the integer number between 1 and 6 corresponding to the Shade
      */
 
     public int toInt(){
@@ -61,12 +61,12 @@ public enum Face { // need to add address for png of the face
 
 
     /**
-     * Checks whether a string is a valid Face name
+     * Checks whether a string is a valid Shade name
      * @param shade the string to be checked
      * @return true iff the string equals the name of one of the listed shades
      */
     public static Boolean contains(String shade) {
-        for (Face c : Face.values()) {
+        for (Shade c : Shade.values()) {
             if (c.toString().equals(shade)) {
                 return true;
             }
