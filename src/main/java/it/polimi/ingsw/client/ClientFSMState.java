@@ -226,8 +226,8 @@ public enum ClientFSMState {
                 }
             }
 
-            //this should never happen
-            return CHOOSE_PLACEMENT;
+
+            return MAIN;
         }
 
         @Override

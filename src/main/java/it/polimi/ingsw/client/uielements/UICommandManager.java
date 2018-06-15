@@ -260,7 +260,6 @@ public class UICommandManager extends Thread {
      * this is called in case the options received sum to one and simply makes an automatic choice for that option
      */
     private void singleOption() {
-        client.getClientConn().choose(0);
         synchronized (client.getLockState()) {
             client.setTurnState(SELECT_DIE.nextState(false));
 
@@ -288,7 +287,6 @@ public class UICommandManager extends Thread {
      */
     private void chooseOptionAction(int index) {
         if(client.getClientConn().choose(index)) {
-
 
             if (client.getBoard().getOptionsList().get(index).equals(Commands.PLACE_DIE)) {
                 synchronized (client.getLockState()) {
@@ -321,6 +319,8 @@ public class UICommandManager extends Thread {
         if(canContinue){
             client.getBoard().setLastDiceList(client.getClientConn().getDiceList());
         }
+        client.getUpdates();
+        client.getClientUI().updateBoard(client.getBoard());
     }
 
 
