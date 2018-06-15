@@ -5,7 +5,6 @@ import it.polimi.ingsw.client.LightBoard;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.immutables.LightDie;
 
 import java.io.IOException;
 
@@ -113,7 +112,7 @@ public class UICommandManager extends Thread {
     /**
      * this manages the indexes received from the ui that have a different meaning and trigger different procedures
      * according to the state of the client
-     * @param command
+     * @param command the index to be elaborated
      */
     private void manageIndex(String command) {
         int index = Integer.parseInt(command);
@@ -183,7 +182,7 @@ public class UICommandManager extends Thread {
                     return;
 
                 }
-                client.getBoard().setLastDiceList(client.getClientConn().getDiceList());
+                client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
 
                 synchronized (client.getLockState()) {
                     client.setTurnState(MAIN.nextState(false));
@@ -215,7 +214,7 @@ public class UICommandManager extends Thread {
                     client.setTurnState(CHOOSE_TOOL.nextState(true));
                     client.getLockState().notifyAll();
                 }
-                client.getBoard().setLastDiceList(client.getClientConn().getDiceList());
+                client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
             } else {
                 synchronized (client.getLockState()) {
                     client.setTurnState( CHOOSE_TOOL.nextState(false));//back to MAIN
@@ -234,18 +233,18 @@ public class UICommandManager extends Thread {
      * @param index the index of the selected die
      */
     private void selectDieAction(int index) {
-        if (client.getBoard().getDiceList().size() > index && index >= 0) {
+        if (client.getBoard().getLatestDiceList().size() > index && index >= 0) {
 
-            client.getBoard().setLastSelectedDie((LightDie) client.getBoard().getDiceList().get(index).getContent());
-            client.getBoard().setOptionsList(client.getClientConn().select(index));
+            client.getBoard().setLatestSelectedDie( client.getBoard().getLatestDiceList().get(index));
+            client.getBoard().setLatestOptionsList(client.getClientConn().select(index));
 
-            if(client.getBoard().getOptionsList().isEmpty()){
+            if(client.getBoard().getLatestOptionsList().isEmpty()){
                 synchronized (client.getLockState()) {
                     client.setTurnState(SELECT_DIE.nextState(true));
                     client.getLockState().notifyAll();
                 }
 
-            } else if (client.getBoard().getOptionsList().size() == 1) {
+            } else if (client.getBoard().getLatestOptionsList().size() == 1) {
                 singleOption();
             } else {
                 multipleOptions();
@@ -277,7 +276,7 @@ public class UICommandManager extends Thread {
             client.setTurnState(SELECT_DIE.nextState(false));
             client.getLockState().notifyAll();
         }
-        client.getClientUI().showOptions(client.getBoard().getOptionsList());
+        client.getClientUI().showOptions(client.getBoard().getLatestOptionsList());
     }
 
 
@@ -288,14 +287,14 @@ public class UICommandManager extends Thread {
     private void chooseOptionAction(int index) {
         if(client.getClientConn().choose(index)) {
 
-            if (client.getBoard().getOptionsList().get(index).equals(Commands.PLACE_DIE)) {
+            if (client.getBoard().getLatestOptionsList().get(index).equals(Commands.PLACE_DIE)) {
                 synchronized (client.getLockState()) {
                     client.setTurnState(CHOOSE_OPTION.nextState(true));
                     client.getLockState().notifyAll();
                     client.getLockState().notifyAll();
                 }
 
-                client.getBoard().setPlacementsList(client.getClientConn().getPlacementsList());
+                client.getBoard().setLatestPlacementsList(client.getClientConn().getPlacementsList());
 
             } else {
                 synchronized (client.getLockState()) {
@@ -317,7 +316,7 @@ public class UICommandManager extends Thread {
             client.getLockState().notifyAll();
         }
         if(canContinue){
-            client.getBoard().setLastDiceList(client.getClientConn().getDiceList());
+            client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
         }
         client.getUpdates();
         client.getClientUI().updateBoard(client.getBoard());
@@ -329,7 +328,7 @@ public class UICommandManager extends Thread {
      * @return true iff the last dice list was from something other than the schema
      */
     private boolean isPlacedDieFromOutside(){
-        return !client.getBoard().getDiceList().get(0).getPlace().equals(Place.SCHEMA);
+        return !client.getBoard().getLatestSelectedDie().getPlace().equals(Place.SCHEMA);
     }
 
     /**

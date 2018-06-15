@@ -9,7 +9,6 @@ import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UIMode;
 import it.polimi.ingsw.common.enums.UserStatus;
-import it.polimi.ingsw.common.immutables.LightCard;
 import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.common.immutables.LightTool;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
@@ -401,16 +400,13 @@ public class Client {
                     board.updateSchema(i, clientConn.getSchema(i));
 
                     //set favor tokens
-                    board.getPlayerByIndex(i).setFavorTokens(clientConn.getFavorTokens(i));
+                    board.getPlayerById(i).setFavorTokens(clientConn.getFavorTokens(i));
                 }
                 //get tools
                 board.setTools(clientConn.getTools());
 
-                List<LightCard> pubObj = clientConn.getPublicObjects();
-                //get public objectives
-                for (int i = 0; i < LightBoard.NUM_PUB_OBJ; i++) {
-                    board.addPubObj(pubObj.get(i));
-                }
+                 board.setPubObjs(clientConn.getPublicObjects());
+
 
                 ready=true;
                 lockReady.notifyAll();
@@ -454,7 +450,7 @@ public class Client {
 
     public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
         board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
-        board.getPlayerByIndex(playerTurnId).setFavorTokens(clientConn.getFavorTokens(playerTurnId));
+        board.getPlayerById(playerTurnId).setFavorTokens(clientConn.getFavorTokens(playerTurnId));
         List<LightTool> tools=clientConn.getTools();
         for(int i=0;i<LightBoard.NUM_TOOLS;i++) {
             if (!board.getTools().get(i).isUsed()) {
@@ -473,9 +469,9 @@ public class Client {
     public void getUpdates(){
         board.setDraftPool(clientConn.getDraftPool());
         board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
-        board.getPlayerByIndex(board.getNowPlaying()).setSchema(clientConn.getSchema(board.getNowPlaying()));
+        board.getPlayerById(board.getNowPlaying()).setSchema(clientConn.getSchema(board.getNowPlaying()));
         board.setTools(clientConn.getTools());
-        board.getPlayerByIndex(board.getNowPlaying()).setFavorTokens(clientConn.getFavorTokens(board.getNowPlaying()));
+        board.getPlayerById(board.getNowPlaying()).setFavorTokens(clientConn.getFavorTokens(board.getNowPlaying()));
     }
 
 

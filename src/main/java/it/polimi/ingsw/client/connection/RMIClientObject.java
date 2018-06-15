@@ -82,7 +82,7 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
 
     @Override
     public List<LightDie> getDraftPool() throws IllegalActionException {
-         //List<Die> draftPool = user.getGame().getDiceList(false);
+         //List<Die> draftPool = user.getGame().getLatestDiceList(false);
          List<LightDie> lightDraftPool = new ArrayList<>();
          /*for(Die d : draftPool){
              lightDraftPool.add(new LightDie(d.getShade(),d.getColor()));

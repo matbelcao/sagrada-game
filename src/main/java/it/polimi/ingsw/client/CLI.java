@@ -126,7 +126,7 @@ public class CLI implements ClientUI {
 
 
         for(int i=0;i<board.getNumPlayers();i++){
-            view.updateSchema(board.getPlayerByIndex(i));
+            view.updateSchema(board.getPlayerById(i));
         }
         if(board.getNowPlaying()!=-1){ view.updateRoundTurn(board.getRoundNumber(),board.getIsFirstTurn(),board.getNowPlaying() );}
         view.updateRoundTrack(board.getRoundTrack());
@@ -136,24 +136,24 @@ public class CLI implements ClientUI {
             case CHOOSE_SCHEMA:
                 break;
             case NOT_MY_TURN:
-                view.updateMenuNotMyTurn(board.getPlayerByIndex(board.getNowPlaying()).getUsername());
+                view.updateMenuNotMyTurn(board.getPlayerById(board.getNowPlaying()).getUsername());
                 break;
             case MAIN:
                 view.updateMenuMain();
                 break;
             case SELECT_DIE:
-                view.updateMenuDiceList(board.getDiceList());
+                view.updateMenuDiceList(board.getLatestDiceList());
                 break;
             case CHOOSE_OPTION:
-                if(board.getOptionsList().size()>1){
-                    view.updateMenuListOptions(board.getOptionsList());
+                if(board.getLatestOptionsList().size()>1){
+                    view.updateMenuListOptions(board.getLatestOptionsList());
                 }
                 break;
             case CHOOSE_TOOL:
                 view.updateMenuListTools(board.getTools());
                 break;
             case CHOOSE_PLACEMENT:
-                view.updateMenuListPlacements(board.getPlacementsList(),board.getSelectedDie());
+                view.updateMenuListPlacements(board.getLatestPlacementsList(),board.getLatestSelectedDie().getContent());
                 break;
             case TOOL_CAN_CONTINUE:
                 break;

@@ -165,7 +165,7 @@ public class SocketClient implements ClientConn {
             case "end":
                 for(i=COMMA_PARAMS_START; i<outcomes.size();i++){
                     param=outcomes.get(i).split(",");
-                    LightPlayer player=client.getBoard().getPlayerByIndex(Integer.parseInt(param[0]));
+                    LightPlayer player=client.getBoard().getPlayerById(Integer.parseInt(param[0]));
                     if (player.getPlayerId()==Integer.parseInt(param[0])){
                         player.setPoints(Integer.parseInt(param[1]));
                         player.setFinalPosition(Integer.parseInt(param[2]));

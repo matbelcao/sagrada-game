@@ -313,7 +313,7 @@ public class CLIView {
      * @param placements the list of placements
      * @param die the die to be placed
      */
-    public void updateMenuListPlacements(List<Integer> placements, LightDie die){
+    public void updateMenuListPlacements(List<Integer> placements, CellContent die){
 
         List<String> msg = new ArrayList<>(buildWall(' ', CELL_HEIGHT - 1, 1));
         msg.add(boldify(uiMsg.getMessage("can-be-placed")));
@@ -391,6 +391,7 @@ public class CLIView {
                 promptLine.append(quitOption());
                 break;
 
+            case CHOOSE_TOOL:
             case SELECT_DIE:
             case CHOOSE_OPTION:
                 promptLine.append(backOption());
@@ -402,6 +403,8 @@ public class CLIView {
                 promptLine.append(endTurnOption());
                 promptLine.append(quitOption());
                 break;
+
+
 
             case NOT_MY_TURN:
             case CHOOSE_SCHEMA:
