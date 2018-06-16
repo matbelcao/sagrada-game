@@ -222,6 +222,13 @@ public class UICommandManager extends Thread {
                     client.getLockState().notifyAll();
                 }
                 client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
+                if(client.getBoard().getLatestDiceList().isEmpty()){
+                    synchronized (client.getLockState()) {
+                        client.setTurnState(SELECT_DIE.nextState(true));
+                        client.getLockState().notifyAll();
+                    }
+                    toolContinue();
+                }
             } else {
                 synchronized (client.getLockState()) {
                     client.setTurnState( CHOOSE_TOOL.nextState(false));//back to MAIN

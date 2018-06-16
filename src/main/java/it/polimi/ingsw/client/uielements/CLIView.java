@@ -16,6 +16,7 @@ import static it.polimi.ingsw.client.uielements.CLIViewUtils.*;
 
 public class CLIView {
 
+    private static final int MAX_MENULIST_COLUMNS = 4;
     private String bottomInfo="";
     private String turnRoundinfo="";
     private final HashMap<Integer,List<String>> schemas= new HashMap<>();
@@ -224,7 +225,7 @@ public class CLIView {
         builder.append(printList(buildRoundTrack())).append(" |%n");
 
 
-        builder.append(printList(buildTopSection())).append(" |%n");
+        builder.append(printList(buildTopSection()));
 
 
         builder.append(printList(buildDraftPool())).append(" |%n");
@@ -300,8 +301,18 @@ public class CLIView {
 
     public void updateMenuDiceList(List<IndexedCellContent> dice){
         clearMenu();
-        menuList.add(" ");
-        menuList.add(String.format(uiMsg.getMessage("dice-list"),uiMsg.getMessage(dice.get(0).getPlace().toString().toLowerCase())));
+        if(dice.size()>1 && !dice.get(0).getPlace().equals(dice.get(1).getPlace())){
+            menuList.addAll(buildCell(dice.get(0).getContent()));
+            dice.remove(0);
+            String desc=String.format(uiMsg.getMessage("dice-list"), uiMsg.getMessage(dice.get(0).getPlace().toString().toLowerCase()));
+            menuList.set(CELL_HEIGHT-1,
+                    menuList.get(CELL_HEIGHT-1)+" "+ desc);
+            menuList.add(" ");
+        }else {
+            menuList.add(" ");
+            menuList.add(String.format(uiMsg.getMessage("dice-list"), uiMsg.getMessage(dice.get(0).getPlace().toString().toLowerCase())));
+            menuList.add(" ");
+        }
         menuList.addAll(buildDiceList(dice));
 
         padMenu();
@@ -490,10 +501,19 @@ public class CLIView {
      * @return the representation of the list
      */
     private List<String> buildDiceList(List<IndexedCellContent> dice){
+        int numAddedDice=0;
         List<String> list = new ArrayList<>();
-        for(int i=0; i<dice.size();i++){
-            list.add(String.format(cliElems.getElem("li"),i,buildDiceListEntry(dice.get(i))));
+        for(int i=0;i<Math.min(dice.size(),SCHEMA_HEIGHT - 1);i++){
+            list.add("");
         }
+        for(int column=0;column<MAX_MENULIST_COLUMNS && numAddedDice<dice.size();column++) {
+            for (int i = 0; i <  Math.min(dice.size(), (SCHEMA_HEIGHT - 2)) && numAddedDice<dice.size(); i++) {
+                list.set(i,list.get(i) + " "+String.format(cliElems.getElem("li"), numAddedDice, buildDiceListEntry(dice.get(numAddedDice))));
+                numAddedDice++;
+            }
+        }
+
+
         return list;
     }
 
@@ -523,9 +543,17 @@ public class CLIView {
      */
     private List<String> buildCoordinatesList(List<Integer> indexes) {
         List<String> list= new ArrayList<>();
-        for(int i=0; i<indexes.size();i++){
-            list.add(String.format(cliElems.getElem("li"), i, rowColmumn(indexes.get(i))));
+        for(int i=0;i<Math.min(indexes.size(),SCHEMA_HEIGHT - 1);i++){
+            list.add("");
         }
+        int numAddedIndexes=0;
+        for(int column=0;column<MAX_MENULIST_COLUMNS && numAddedIndexes<indexes.size();column++) {
+            for (int i = 0; i <  Math.min(indexes.size(), (SCHEMA_HEIGHT - 2)) && numAddedIndexes<indexes.size(); i++) {
+                list.set(i,list.get(i) + "  "+String.format(cliElems.getElem("li"), numAddedIndexes, rowColmumn(indexes.get(numAddedIndexes))));
+                numAddedIndexes++;
+            }
+        }
+
         return list;
     }
 

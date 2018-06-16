@@ -1,5 +1,7 @@
 package it.polimi.ingsw.client;
 
+import java.util.TooManyListenersException;
+
 /**
  * this class contains the information needed to know which state the FSM of the client is in, and retrieve the next one
  * based on a series of conditions and the current state itself
@@ -161,12 +163,14 @@ public enum ClientFSMState {
          */
         @Override
         public synchronized ClientFSMState nextState(boolean isListEmpty, boolean back, boolean endTurn, boolean discard){
-            if(back||isListEmpty){
+            if(back){
                 toolEnabled=false;
 
                 return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
-
+            if(isListEmpty){
+                return TOOL_CAN_CONTINUE;
+            }
             return CHOOSE_OPTION;
         }
         /**
