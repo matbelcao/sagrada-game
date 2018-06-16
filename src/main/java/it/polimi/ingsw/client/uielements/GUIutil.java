@@ -137,7 +137,7 @@ public class GUIutil {
                             System.out.println("clicked not my turn");
                             break;
                         case MAIN:
-                            cmdWrite.write("clicked schema");
+                            System.out.println("clicked schema");
                             cmdWrite.write("e");
                             break;
                         case CHOOSE_PLACEMENT:
@@ -190,21 +190,26 @@ public class GUIutil {
         return 50;
     }
 
-    public List<Canvas> drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height) {
-        ArrayList<Canvas> cells = new ArrayList<>();
-        Canvas c = new Canvas(width/2,height/2);
-        c.setWidth(width/2);
-        c.setHeight(height/2);
-        GraphicsContext gc = c.getGraphicsContext2D();
-        gc.clearRect(0,0,width,height);
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0,0,width/2,height/2);
-        cells.add(c);
-        return cells;
+    public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height) {
+        double dieDim = getMainSceneCellDim(width,height);
+        HBox track = new HBox();
+        if(roundTrack.size() == 0){
+            Canvas c = new Canvas(dieDim,dieDim);
+            drawWhiteCell(c.getGraphicsContext2D(),0,0,dieDim);
+            track.getChildren().add(c);
+        }else {
+            for (int i = 0; i < roundTrack.size(); i++) {
+                Canvas c = new Canvas(dieDim, dieDim);
+                GraphicsContext gc = c.getGraphicsContext2D();
+                drawDie(roundTrack.get(i).get(0), gc, dieDim);
+                track.getChildren().add(c);
+            }
+        }
+        return new Group(track);
     }
 
     public Group drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState) {
-        GridPane g = schemaToGrid(schema,dieDim*5,dieDim*4,turnState);
+        GridPane g = schemaToGrid(schema,dieDim*NUM_COLS,dieDim*NUM_ROWS,turnState);
        return new Group(g);
     }
 

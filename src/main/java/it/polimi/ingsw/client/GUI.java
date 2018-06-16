@@ -4,8 +4,8 @@ import it.polimi.ingsw.client.uielements.*;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Commands;
-import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.common.immutables.LightPrivObj;
+import it.polimi.ingsw.common.immutables.LightSchemaCard;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -270,7 +270,7 @@ public class GUI extends Application implements ClientUI {
         void redraw(double newWidth, double newHeight) {
             double cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
             ClientFSMState turnState = client.getTurnState();
-            //roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight));
+            roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight));
             schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState));
             draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim,turnState));
         }
