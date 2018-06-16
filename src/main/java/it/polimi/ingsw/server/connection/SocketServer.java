@@ -476,7 +476,7 @@ public class SocketServer extends Thread implements ServerConn  {
 
     private void toolCanContinue() throws IllegalActionException {
         Boolean isActive=null;
-        isActive=user.getGame().toolStatus(user);
+        isActive=user.getGame().toolStatus();
         if(isActive){
             outSocket.println("TOOL ok");
         }else{

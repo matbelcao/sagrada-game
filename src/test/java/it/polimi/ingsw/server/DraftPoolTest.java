@@ -5,6 +5,7 @@ import it.polimi.ingsw.server.model.DraftPool;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
@@ -29,6 +30,13 @@ public class DraftPoolTest {
         d2=draftPool.getDraftedDice().get(4);
         assertNotEquals(d2,d1);
         assertEquals(3,draftPool.getDraftedDice().indexOf(d1));
+
+        assertNotNull(draftPool.getRoundTrack());
+        draftPool.clearDraftPool(0);
+        assertEquals(0,draftPool.getDraftedDice().size());
+
+        Die die=new Die("ONE","NONE");
+        assertNotEquals(die.getColor().toString(),draftPool.putInBagAndExtract(die));
 
     }
 }

@@ -391,8 +391,6 @@ public class SchemaCard implements Iterable<Cell>  {
         throw new NoSuchElementException("there's no die to remove in this cell(row,column:" +row +","+column +")");
     }
 
-
-
     /**
      * Instantiates an iterator for cells containing a die
      * @return iterator on cells that contain a die
@@ -430,27 +428,6 @@ public class SchemaCard implements Iterable<Cell>  {
 
         }
         return temp;
-    }
-
-    public int diceDiffSize(SchemaCard temp) {
-        FullCellIterator tempIter = (FullCellIterator) temp.iterator();
-        FullCellIterator thisIter = (FullCellIterator) this.iterator();
-
-        return tempIter.numOfDice() - thisIter.numOfDice();
-    }
-
-    public int diceDiffQual(SchemaCard temp) {
-        FullCellIterator tempIter = (FullCellIterator) temp.iterator();
-        int diff=0;
-        assert(diceDiffSize(temp)==0);
-        while (tempIter.hasNext()){
-            Cell tempCell= tempIter.next();
-            if(!this.getCell(tempIter.getIndex()).hasDie()
-                    || !tempCell.getDie().equals(this.getCell(tempIter.getIndex()).getDie())){
-                diff++;
-            }
-        }
-        return diff;
     }
 
     /**

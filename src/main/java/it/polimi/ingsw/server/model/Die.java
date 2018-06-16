@@ -37,7 +37,7 @@ public class Die {
      * @param shade the Shade of the die
      * @param color the Color of the die
      */
-    Die(int shade, String color ){
+    public Die(int shade, String color ){
         this.lightDie =new LightDie(Shade.valueOf(shade),Color.valueOf(color));
     }
 

@@ -243,11 +243,11 @@ public class Board {
     }
 
 
-    public void removeOldDice(User user, Place from, List<Integer> oldIndexes){
+    public void removeOldDice(int playerId, Place from, List<Integer> oldIndexes){
         for (Integer index: oldIndexes){
             switch (from){
                 case SCHEMA:
-                    getPlayer(user).getSchema().removeDie(index);
+                    getPlayerById(playerId).getSchema().removeDie(index);
                     break;
                 case DRAFTPOOL:
                     getDraftPool().removeDie(index);

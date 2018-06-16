@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SchemaCardTest {
     @Test
@@ -103,14 +104,15 @@ class SchemaCardTest {
 
         schema1.putDie(6,new Die("ONE","YELLOW"));
 
-        List<Integer> list = schema1.listPossiblePlacements(new Die("TWO","RED"));
+        List<Integer> list =new ArrayList<>();
         list.add(2);
+        List<Integer> listTemp = schema1.listPossiblePlacements(new Die("TWO","RED"));
+        list.addAll(listTemp);
+
         assertEquals(list,schema1.listPossiblePlacementsSwap(new Die("TWO","RED"), Color.RED));
-        System.out.println(schema1.listPossiblePlacementsSwap(new Die("TWO","RED"), Color.RED));
 
         schema1.putDie(7,new Die("FIVE","RED"),IgnoredConstraint.FORCE);
-        System.out.println(schema1.listPossiblePlacementsSwap(new Die("TWO","RED"), Color.RED));
-        System.out.println(schema1.listPossiblePlacements(new Die("TWO","RED")));
+        assertTrue(schema1.getCell(7).hasDie());
 
     }
     @Test
@@ -222,6 +224,9 @@ class SchemaCardTest {
         List<Die> schemaContent3=schema1.getSchemaDiceList(Color.RED);
         assertEquals(1,schemaContent3.size());
         assertEquals(die3.toString(),schemaContent3.get(0).toString());
+
+        schema1.removeDie(3);
+        assertEquals(2,schema1.getSchemaDiceList(Color.NONE).size());
 
     }
 }

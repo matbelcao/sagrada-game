@@ -19,10 +19,17 @@ class DieTest {
     }
 
     @Test
+    void testAltConstructor(){
+        Die die=new Die(1,"RED");
+        assertEquals("ONE", die.getShade().toString());
+        assertEquals("RED", die.getColor().toString());
+    }
+
+    @Test
     void init() {
         assertEquals("ONE", test.getShade().toString());
         assertEquals("RED", test.getColor().toString());
-        assertEquals("\u001B[31m\u2680\u001B[0m", test.toUtf());
+        assertEquals("\u001B[91m\u2680\u001B[0m", test.toUtf());
     }
 
     @Test

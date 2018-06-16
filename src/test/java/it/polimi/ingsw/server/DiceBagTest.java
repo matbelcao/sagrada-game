@@ -4,11 +4,10 @@ import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.exceptions.EmptyDiceBagException;
 import it.polimi.ingsw.server.model.DiceBag;
 import it.polimi.ingsw.server.model.Die;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DiceBagTest {
 
@@ -49,5 +48,13 @@ public class DiceBagTest {
         assertEquals(0,blue);
         assertEquals(0,purple);
         assertThrows(EmptyDiceBagException.class,()->testBag.draftDie());
+    }
+
+    @Test
+    void testDrafting(){
+        DiceBag testBag = new DiceBag();
+        assertEquals(7,testBag.draftDice(7).size());
+        Die oldDie=new Die("THREE","NONE");
+        assertNotEquals(oldDie.getColor().toString(),testBag.substituteDie(oldDie).getColor().toString());
     }
 }

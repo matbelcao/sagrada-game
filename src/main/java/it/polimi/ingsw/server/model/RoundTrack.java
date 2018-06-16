@@ -1,7 +1,5 @@
 package it.polimi.ingsw.server.model;
 
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,18 +56,6 @@ public class RoundTrack{
      */
     public void putDice(int round, List<Die> toAdd){
         track.add(round, toAdd);
-    }
-
-    /**
-     * Swaps a die from the Board with a die of the Round Track used by tool card #5
-     * @param round the position in the Round Track of the dice to be swapped
-     * @param pickedDiePosition the position in the stack of dice of the dice picked for swapping
-     * @param dieToPut the die to put in the Round Track from the Board
-     * @return the die chosen to be put in the Board from the Round Track
-     */
-    public Die swapDie(int round,int pickedDiePosition, Die dieToPut) {
-        track.get(round).add(dieToPut);
-        return track.get(round).remove(pickedDiePosition);
     }
 
     /**
