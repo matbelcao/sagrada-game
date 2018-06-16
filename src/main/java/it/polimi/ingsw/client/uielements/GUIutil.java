@@ -428,14 +428,15 @@ public class GUIutil {
         graphicsContext2D.setStroke(Color.BLACK);
         graphicsContext2D.setLineWidth(LINE_WIDTH);
         graphicsContext2D.strokeRect(0,0,dieDim, dieDim);
+        drawSpots(graphicsContext2D,dieDim,lightDie.getShade().toInt());
     }
     //to be used when drawing schema to canvas
-    private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double diceDim) {
+    private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double dieDim) {
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
-        gc.fillRect(x,y,diceDim,diceDim);
+        gc.fillRect(x,y,dieDim,dieDim);
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(LINE_WIDTH);
-        gc.strokeRect(x, y, diceDim, diceDim);
+        gc.strokeRect(x, y, dieDim, dieDim);
     }
 
     private void drawSpots(GraphicsContext gc, double dieDim, int count) {

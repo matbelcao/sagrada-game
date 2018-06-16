@@ -223,6 +223,7 @@ public class GUI extends Application implements ClientUI {
             b.setTop(roundTrack);
             b.setCenter(schemaVbox);
             this.getChildren().add(b);
+            redraw(200,200);
         }
 
         void redraw(double newWidth, double newHeight) {
