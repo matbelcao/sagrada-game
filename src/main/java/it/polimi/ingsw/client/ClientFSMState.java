@@ -86,7 +86,9 @@ public enum ClientFSMState {
          */
         @Override
         public synchronized ClientFSMState nextState(boolean chooseTool, boolean back, boolean endTurn, boolean discard){
-            if(back){ return MAIN; }
+            if(back){
+                toolEnabled=false;
+                return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
             if(chooseTool){
@@ -121,7 +123,9 @@ public enum ClientFSMState {
          */
         @Override
         public synchronized ClientFSMState nextState(boolean enabledTool, boolean back, boolean endTurn, boolean discard){
-            if(back){ return MAIN; }
+            if(back){
+                toolEnabled=false;
+                return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
             if(!enabledTool){
@@ -158,9 +162,8 @@ public enum ClientFSMState {
         @Override
         public synchronized ClientFSMState nextState(boolean isListEmpty, boolean back, boolean endTurn, boolean discard){
             if(back||isListEmpty){
-                if(toolEnabled){
-                    toolEnabled=false;
-                }
+                toolEnabled=false;
+
                 return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
@@ -190,7 +193,9 @@ public enum ClientFSMState {
          */
         @Override
         public synchronized ClientFSMState nextState(boolean isPlaceDie, boolean back, boolean endTurn, boolean discard){
-            if(back){ return MAIN; }
+            if(back){
+                toolEnabled=false;
+                return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
             if(isPlaceDie){
@@ -228,21 +233,27 @@ public enum ClientFSMState {
          */
         @Override
         public synchronized ClientFSMState nextState(boolean placedDieFromOutside, boolean back, boolean endTurn, boolean discard){
-            if(back){ return MAIN; }
+            if(back){
+                toolEnabled=false;
+                return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
             if(discard){
                 return SELECT_DIE;
             }
 
+            if (toolEnabled) {
+                if(placedDieFromOutside) {
+                    placedDie = true;
+                }
+
+                return TOOL_CAN_CONTINUE;
+            }
+
             if(placedDieFromOutside) {
                 placedDie = true;
 
-                if (toolEnabled) {
-                    return TOOL_CAN_CONTINUE;
-                }else{
-                    return MAIN;
-                }
+                return MAIN;
             }
 
 
@@ -274,12 +285,15 @@ public enum ClientFSMState {
          */
         @Override
         public synchronized ClientFSMState nextState(boolean canContinue, boolean back, boolean endTurn, boolean discard){
-            if(back){ return MAIN; }
+            if(back){
+                toolEnabled=false;
+                return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
 
             if(canContinue){
                 return SELECT_DIE;
             }
+            toolEnabled=false;
 
             //this should never happen
             return MAIN;

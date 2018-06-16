@@ -162,7 +162,7 @@ public class ClientParser {
      * @return true iff the parameters are valid
      */
     private static boolean checkGame(List<String> parsedResult){
-        if(parsedResult.size()<3){return false;}
+        if(parsedResult.size()<2){return false;}
         switch(parsedResult.get(1)){
             case "start":
                 return parsedResult.size() == 4;

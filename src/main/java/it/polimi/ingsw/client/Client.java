@@ -60,6 +60,7 @@ public class Client {
 
     private boolean ready;
     private final Object lockReady = new Object();
+    private final Object lockUI = new Object();
 
 
     public static boolean isWindows()
@@ -308,6 +309,9 @@ public class Client {
 
     }
 
+    public Object getLockUI() {
+        return lockUI;
+    }
 
     /**
      * This method implements the login to the server via rmi
@@ -463,11 +467,13 @@ public class Client {
     }
 
     public void getUpdates(){
-        board.setDraftPool(clientConn.getDraftPool());
-        board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
-        board.getPlayerById(board.getNowPlaying()).setSchema(clientConn.getSchema(board.getNowPlaying()));
-        board.setTools(clientConn.getTools());
-        board.getPlayerById(board.getNowPlaying()).setFavorTokens(clientConn.getFavorTokens(board.getNowPlaying()));
+
+            board.setDraftPool(clientConn.getDraftPool());
+            board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
+            board.getPlayerById(board.getNowPlaying()).setSchema(clientConn.getSchema(board.getNowPlaying()));
+            board.setTools(clientConn.getTools());
+            board.getPlayerById(board.getNowPlaying()).setFavorTokens(clientConn.getFavorTokens(board.getNowPlaying()));
+            board.notifyObservers();
     }
 
 

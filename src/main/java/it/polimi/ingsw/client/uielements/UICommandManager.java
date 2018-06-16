@@ -353,7 +353,9 @@ public class UICommandManager extends Thread {
                 client.setTurnState(CHOOSE_PLACEMENT.nextState( isPlacedDieFromOutside()));
                 client.getLockState().notifyAll();
             }
-
+            if(client.getTurnState().equals(TOOL_CAN_CONTINUE)){
+                toolContinue();
+            }
             client.getBoard().notifyObservers();
         }else{
             client.getClientUI().showLastScreen();

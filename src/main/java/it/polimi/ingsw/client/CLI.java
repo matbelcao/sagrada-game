@@ -160,7 +160,10 @@ public class CLI implements ClientUI {
                 break;
         }
 
-        console.printf(view.printMainView(client.getTurnState()));
+        synchronized (client.getLockUI()) {
+            console.printf(view.printMainView(client.getTurnState()));
+            client.getLockUI().notifyAll();
+        }
     }
 
 
@@ -173,11 +176,19 @@ public class CLI implements ClientUI {
     @Override
     public void updateConnectionClosed()
     {
-        console.printf("Connection closed!%n");
+        synchronized (client.getLockUI()) {
+            console.printf("Connection closed!%n");
+            client.getLockUI().notifyAll();
+        }
     }
 
     @Override
-    public void updateConnectionBroken() { console.printf("Connection broken!%n");
+    public void updateConnectionBroken() {
+        synchronized (client.getLockUI()) {
+            console.printf("Connection broken!%n");
+            client.getLockUI().notifyAll();
+        }
+
     }
 
     @Override
@@ -191,12 +202,20 @@ public class CLI implements ClientUI {
 
         String msg=String.format("%s%n", uimsg.getMessage("waiting-game-start"));
         view.setLastScreen(msg);
-        console.printf(msg);
+        synchronized (client.getLockUI()) {
+            console.printf(msg);
+            client.getLockUI().notifyAll();
+        }
+
     }
 
     @Override
     public void showMainScreen(ClientFSMState turnState) {
-        console.printf(view.printMainView(turnState));
+        synchronized (client.getLockUI()) {
+            console.printf(view.printMainView(turnState));
+            client.getLockUI().notifyAll();
+        }
+
     }
 
     @Override

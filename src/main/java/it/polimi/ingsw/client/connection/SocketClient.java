@@ -186,8 +186,10 @@ public class SocketClient implements ClientConn {
                 client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
                 break;
             case "board_changed":
+
                 client.getUpdates();
-                client.getBoard().notifyObservers();
+
+
         }
     }
 
