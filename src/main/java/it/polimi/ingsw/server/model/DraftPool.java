@@ -20,21 +20,6 @@ public class DraftPool {
         diceBag=new DiceBag();
         roundTrack=new RoundTrack();
     }
-    /**
-     * Adds a die to the draft area
-     * @param die the die to be added
-     */
-    public void addDie(Die die){drafted.add(die);}
-
-    /**
-     * Adds a group of dice to the draft area, during a game this can happen only after drafting
-     * from the dice bag, when the draft area is empty
-     * @param dice the dice to be added
-     */
-    public void addDice(List<Die> dice){
-        assert(this.drafted.isEmpty());
-        this.drafted.addAll(dice);
-    }
 
     /**
      * This method returns the die selected through the index and removes it from the draft area

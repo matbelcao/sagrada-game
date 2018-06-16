@@ -1,21 +1,59 @@
 package it.polimi.ingsw.server;
 
+import it.polimi.ingsw.common.enums.UserStatus;
+import it.polimi.ingsw.server.model.SchemaCard;
 import it.polimi.ingsw.server.model.User;
 import it.polimi.ingsw.server.model.Game;
+import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
+import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+
 import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTest {
 
     @Test
-    void testGameConstructor(){
+    static void testGetter(){
         ArrayList <User> users= new ArrayList<>();
         users.add(new User("Mario", "1234".toCharArray()));
         users.add(new User("Aldo", "4321".toCharArray()));
         users.add(new User("Giovanni", "5678".toCharArray()));
         users.add(new User("Giacomo", "8765".toCharArray()));
 
-        Game game= new Game(users);
-        users.clear();
+        Game game1 = new Game(users);
+        for (User u:users){
+            u.setGame(game1);
+        }
+        assertEquals(4,game1.getUsersActive());
+
+        users = (ArrayList<User>) game1.getUsers();
+        assertEquals(4,game1.getUsersActive());
+
+        users.get(3).setStatus(UserStatus.DISCONNECTED);
+        assertEquals(3,game1.getUsersActive());
+
+        User user0 = users.get(0);
+        User user1 = users.get(1);
+        try {
+            assertEquals(4,game1.getDraftedSchemaCards(user0).size());
+            game1.choose(user0,2);
+            SchemaCard schema = game1.getUserSchemaCard(user0);
+            assertEquals(schema,game1.getUserSchemaCard(0));
+            assertEquals(3, game1.getPubCards().size());
+            assertEquals(3, game1.getToolCards().size());
+            assertNotEquals(game1.getPrivCard(user1), game1.getPrivCard(user0));
+        } catch (IllegalActionException e) {
+            e.printStackTrace();
+        }
+
+        //The schemacard is still selected
+        Executable codeToTest=() ->{game1.getDraftedSchemaCards(user0);};
+        assertThrows(IllegalActionException.class,codeToTest);
+
     }
 }
