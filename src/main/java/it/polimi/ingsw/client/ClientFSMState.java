@@ -201,12 +201,31 @@ public enum ClientFSMState {
             }
             return MAIN;
         }
+        /**
+         * this is called when the user has made a choice for the option
+         * @param isPlaceDie this is true if the chosen option was a PLACE_DIE
+         * @return the next state
+         */
         @Override
         public ClientFSMState nextState(boolean isPlaceDie){
             return nextState(isPlaceDie,false,false,false);
         }
     },
+
+
+    /**
+     * in this state the user is able to choose a placement in the schema for the die he previously selected
+     */
     CHOOSE_PLACEMENT {// the client has received a list of placements
+
+        /**
+         * this is called when the user has made a choice for the placement of the selected die in the schema
+         * @param placedDieFromOutside this is true if the die that is being placed comes from outside the schema
+         * @param back if true brings the client back to the MAIN state
+         * @param endTurn if true ends the turn and brings the user back to the NOT_MY_TURN state
+         * @param discard this allows the client to select another die to place
+         * @return the next state
+         */
         @Override
         public synchronized ClientFSMState nextState(boolean placedDieFromOutside, boolean back, boolean endTurn, boolean discard){
             if(back){ return MAIN; }
@@ -230,13 +249,29 @@ public enum ClientFSMState {
             return MAIN;
         }
 
+        /**
+         * this is called when the user has made a choice for the placement of the selected die in the schema
+         * @param placedDieFromOutside this is true if the die that is being placed comes from outside the schema
+         * @return the next state
+         */
         @Override
         public ClientFSMState nextState(boolean placedDieFromOutside){
             return nextState(placedDieFromOutside,false,false,false);
         }
     },
 
+    /**
+     * in this state the client asks the server if it needs to/can  make more actions to finish the use of the tool
+     */
     TOOL_CAN_CONTINUE{
+        /**
+         * this is called when the user needs to know if the tool requires more actions to be made
+         * @param canContinue this is true if the tool requires more selections and choices from the user
+         * @param back if true brings the client back to the MAIN state
+         * @param endTurn if true ends the turn and brings the user back to the NOT_MY_TURN state
+         * @param discard has no effect here
+         * @return the next state
+         */
         @Override
         public synchronized ClientFSMState nextState(boolean canContinue, boolean back, boolean endTurn, boolean discard){
             if(back){ return MAIN; }
@@ -249,13 +284,26 @@ public enum ClientFSMState {
             //this should never happen
             return MAIN;
         }
+
+        /**
+         * this is called when the user needs to know if the tool requires more actoins to be made
+         * @param canContinue this is true if the tool requires more selections and choices from the user
+         * @return the next state
+         */
         @Override
         public ClientFSMState nextState(boolean canContinue){
             return nextState(canContinue,false,false,false);
         }
     };
 
+    /**
+     * true iff a tool is enabled
+     */
     private static boolean toolEnabled;
+
+    /**
+     * true iff a die was added to the schema
+     */
     private static boolean placedDie;
 
     public abstract ClientFSMState nextState(boolean stateSpecific, boolean back, boolean endTurn, boolean discard);

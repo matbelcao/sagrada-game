@@ -93,7 +93,6 @@ public class UICommandManager extends Thread {
                     break;
                 case BACK:
                     client.getClientConn().exit();
-                    client.getUpdates();
                     break;
                 case DISCARD:
                     if (client.getTurnState().equals(CHOOSE_PLACEMENT)) {
@@ -190,17 +189,18 @@ public class UICommandManager extends Thread {
 
                 }
                 client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
-
                 synchronized (client.getLockState()) {
                     client.setTurnState(MAIN.nextState(false));
                     client.getLockState().notifyAll();
                 }
                 break;
             case 0:
+
                 synchronized (client.getLockState()) {
-                    client.setTurnState( MAIN.nextState(true));
+                    client.setTurnState(MAIN.nextState(true));
                     client.getLockState().notifyAll();
                 }
+                client.getBoard().stateChanged();
 
                 break;
             default:
@@ -227,6 +227,7 @@ public class UICommandManager extends Thread {
                     client.setTurnState( CHOOSE_TOOL.nextState(false));//back to MAIN
                     client.getLockState().notifyAll();
                 }
+                client.getBoard().stateChanged();
             }
             client.getBoard().notifyObservers();
         } else {
@@ -250,6 +251,7 @@ public class UICommandManager extends Thread {
                     client.setTurnState(SELECT_DIE.nextState(true));
                     client.getLockState().notifyAll();
                 }
+                client.getBoard().stateChanged();
 
             } else if (client.getBoard().getLatestOptionsList().size() == 1) {
                 singleOption();
@@ -298,11 +300,12 @@ public class UICommandManager extends Thread {
                 synchronized (client.getLockState()) {
                     client.setTurnState(CHOOSE_OPTION.nextState(true));
                     client.getLockState().notifyAll();
-                    client.getLockState().notifyAll();
                 }
 
                 client.getBoard().setLatestPlacementsList(client.getClientConn().getPlacementsList());
-
+                if(client.getBoard().getLatestPlacementsList().isEmpty()){
+                    toolContinue();
+                }
             } else {
                 synchronized (client.getLockState()) {
                     client.setTurnState(CHOOSE_OPTION.nextState(false));
@@ -325,7 +328,7 @@ public class UICommandManager extends Thread {
         if(canContinue){
             client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
         }
-        client.getUpdates();
+
         client.getBoard().notifyObservers();
     }
 
@@ -350,7 +353,7 @@ public class UICommandManager extends Thread {
                 client.setTurnState(CHOOSE_PLACEMENT.nextState( isPlacedDieFromOutside()));
                 client.getLockState().notifyAll();
             }
-            client.getUpdates();
+
             client.getBoard().notifyObservers();
         }else{
             client.getClientUI().showLastScreen();

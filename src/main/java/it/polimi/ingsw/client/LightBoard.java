@@ -237,6 +237,10 @@ public class LightBoard extends Observable {
         setChanged();
     }
 
+
+    public void stateChanged(){
+        setChanged();
+    }
     /**
      * @return the isFirstTurn value
      */

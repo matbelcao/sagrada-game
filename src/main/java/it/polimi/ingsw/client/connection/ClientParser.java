@@ -180,6 +180,8 @@ public class ClientParser {
                 return parsedResult.size() == 4;
             case "turn_end":
                 return parsedResult.size() == 4;
+            case"board_changed":
+                return true;
             default:
                 return false;
         }
