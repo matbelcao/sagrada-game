@@ -51,51 +51,6 @@ public interface ClientUI extends Observer {
      */
     void showDraftedSchemas(List<LightSchemaCard> draftedSchemas,LightPrivObj privObj);
 
-    /**
-     * this method updates the player's view with all other components of the board
-     * @param board the newly created board for the game containing all the information needed to start a new match
-     */
-    void updateBoard(LightBoard board);
-
-    /**
-     * this updates the sole draftpool
-     * @param draftpool the new draftpool
-     */
-    void updateDraftPool(List<LightDie> draftpool );
-
-    /**
-     * this updates the schema of a certain player identified by its id
-     * @param player the player with its data and updated schema
-     */
-    void updateSchema(LightPlayer player);
-
-    /**
-     * this updates the roundtrack
-     * @param roundtrack the updated roundtrack
-     */
-    void updateRoundTrack(List<List<LightDie>> roundtrack);
-
-    void showRoundtrackDiceList(List<IndexedCellContent> roundtrack);
-
-    void showDraftPoolDiceList(List<IndexedCellContent> draftpool);
-
-    void showSchemaDiceList(List<IndexedCellContent> schema);
-
-
-    //void showPossibleChangesToDie(List<ModifyDie> changes);
-    // TODO: 31/05/2018  
-
-
-
-    /**
-     * this method updates the view of the user (broadcast) following the usage of a toolcard
-     * @param tools the list of the three tools
-     */
-    void updateToolUsage(List<LightTool> tools);
-
-
-    void showPlacementsList(List<Integer> placements, Place to,LightDie die);
-
 
     /**
      * this method is used
@@ -112,9 +67,6 @@ public interface ClientUI extends Observer {
      */
     void updateConnectionBroken();
 
-    void printmsg(String msg);
-
-    String getCommand();
 
     void showOptions(List<Commands> optionsList);
 

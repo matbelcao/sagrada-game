@@ -4,8 +4,8 @@ import it.polimi.ingsw.client.uielements.*;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Commands;
-import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.common.immutables.LightPrivObj;
+import it.polimi.ingsw.common.immutables.LightSchemaCard;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -40,6 +40,7 @@ public class GUI extends Application implements ClientUI {
     private static UIMessages uimsg;
     private Stage primaryStage;
     private static GUI instance;
+    private static final Object lock = new Object();
     private Text messageToUser = new Text();
     private CmdWriter cmdWrite;
     private int playerId;
@@ -62,7 +63,10 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void start(Stage primaryStage) {
         //get the dimensions of the screen
-        sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(),this);
+        synchronized (lock) {
+            sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(), this, getCmdWrite());
+            lock.notifyAll();
+        }
         this.primaryStage = primaryStage;
     }
 
@@ -103,8 +107,18 @@ public class GUI extends Application implements ClientUI {
         messageToUser.setFont(new Font(10));
         VBox vbox = new VBox();
         vbox.getChildren().addAll(grid,messageToUser);
-        Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(), sceneCreator.getLoginWidth());
-        button.setOnAction(e -> {
+        synchronized (lock) {
+            while (sceneCreator == null) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+            Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(), sceneCreator.getLoginWidth());
+
+            button.setOnAction(e -> {
             synchronized (client.getLockCredentials()) {
                 client.setUsername(usernameField.getText());
                 client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
@@ -183,11 +197,38 @@ public class GUI extends Application implements ClientUI {
         });
     }
 
-    @Override
     public void updateBoard(LightBoard board) {
         Platform.runLater(() -> {
             if (board == null) {
                 throw new IllegalArgumentException();
+            }
+            switch (client.getTurnState()){
+                case CHOOSE_SCHEMA:
+                    System.out.println("choose----------------------------------------------------------------");
+                    break;
+                case NOT_MY_TURN:
+                    System.out.println("not my-------------------------------------------------------------");
+                    break;
+                case MAIN:
+                    System.out.println("main------------------------------------------------------------");
+                    break;
+                case SELECT_DIE:
+                    System.out.println("select die--------------------------------------------------");
+                    break;
+                case CHOOSE_OPTION:
+                    if(board.getLatestOptionsList().size()>1){
+                        System.out.println("choose option---------------------------------------------------");
+                    }
+                    break;
+                case CHOOSE_TOOL:
+                    System.out.println("choose tool-------------------------------------------------------------");
+                    break;
+                case CHOOSE_PLACEMENT:
+                    System.out.println("choose placement---------------------------------------------------------------");
+                    break;
+                case TOOL_CAN_CONTINUE:
+                    System.out.println("tool can continue------------------------------------------------------------------");
+                    break;
             }
             MainSceneGroup root = new MainSceneGroup(board);
             Scene scene = new Scene(root);
@@ -223,55 +264,20 @@ public class GUI extends Application implements ClientUI {
             b.setTop(roundTrack);
             b.setCenter(schemaVbox);
             this.getChildren().add(b);
+            redraw(200,200);
         }
 
         void redraw(double newWidth, double newHeight) {
             double cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
-            //roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight));
-            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim));
-            draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim));
+            ClientFSMState turnState = client.getTurnState();
+            roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight));
+            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState));
+            draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim,turnState));
         }
     }
 
-    @Override
-    public void updateDraftPool(List<LightDie> draftpool) {
 
-    }
 
-    @Override
-    public void updateSchema(LightPlayer player) {
-
-    }
-
-    @Override
-    public void updateRoundTrack(List<List<LightDie>> roundtrack) {
-
-    }
-
-    @Override
-    public void showRoundtrackDiceList(List<IndexedCellContent> roundtrack) {
-
-    }
-
-    @Override
-    public void showDraftPoolDiceList(List<IndexedCellContent> draftpool) {
-
-    }
-
-    @Override
-    public void showSchemaDiceList(List<IndexedCellContent> schema) {
-
-    }
-
-    @Override
-    public void updateToolUsage(List<LightTool> tools) {
-
-    }
-
-    @Override
-    public void showPlacementsList(List<Integer> placements, Place to, LightDie die) {
-
-    }
 
     @Override
     public void updateStatusMessage(String statusChange, int playerId) {
@@ -288,15 +294,6 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-    @Override
-    public void printmsg(String msg) {
-
-    }
-
-    @Override
-    public String getCommand() {
-        return null;
-    }
 
     @Override
     public void showOptions(List<Commands> optionsList) {
@@ -359,13 +356,22 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public QueuedReader getCommandQueue() {
-        cmdWrite = new QueuedCmdReader();
+        if (cmdWrite == null) {
+            cmdWrite = new QueuedCmdReader();
+        }
         return (QueuedReader) cmdWrite;
+    }
+
+    public CmdWriter getCmdWrite(){
+        if (cmdWrite == null) {
+            cmdWrite = new QueuedCmdReader();
+        }
+        return cmdWrite;
     }
 
 
     @Override
     public void update(Observable o, Object arg) {
-
+        updateBoard((LightBoard) o);
     }
 }

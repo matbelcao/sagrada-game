@@ -7,8 +7,8 @@ import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Commands;
-import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.common.immutables.LightPrivObj;
+import it.polimi.ingsw.common.immutables.LightSchemaCard;
 
 import java.io.BufferedReader;
 import java.io.Console;
@@ -58,9 +58,11 @@ public class CLI implements ClientUI {
 
                 console.printf(view.showLoginPassword());
                 password = Credentials.hash(username, console.readPassword());
-
-                client.setPassword(password);
-                client.setUsername(username);
+                synchronized (client.getLockCredentials()) {
+                    client.setPassword(password);
+                    client.setUsername(username);
+                    client.getLockCredentials().notifyAll();
+                }
             } catch (Exception e) {
                 client.disconnect();
             }
@@ -117,8 +119,7 @@ public class CLI implements ClientUI {
         console.printf(view.printSchemaChoiceView());
     }
 
-    @Override
-    public void updateBoard(LightBoard board) {
+   private void updateBoard(LightBoard board) {
         if(board==null){ throw new IllegalArgumentException();}
         view.updateTools(board.getTools());
         view.updatePrivObj(board.getPrivObj());
@@ -162,49 +163,6 @@ public class CLI implements ClientUI {
         console.printf(view.printMainView(client.getTurnState()));
     }
 
-    @Override
-    public void updateDraftPool(List<LightDie> draftpool) {
-        view.updateDraftPool(draftpool);
-        console.printf(view.printMainView(client.getTurnState()));
-    }
-
-    @Override
-    public void updateSchema(LightPlayer player) {
-        view.updateSchema(player);
-        console.printf(view.printMainView(client.getTurnState()));
-    }
-
-    @Override
-    public void updateRoundTrack(List<List<LightDie>> roundtrack) {
-        view.updateRoundTrack(roundtrack);
-        console.printf(view.printMainView(client.getTurnState()));
-    }
-
-    @Override
-    public void showRoundtrackDiceList(List<IndexedCellContent> roundtrack) {
-        view.updateMenuDiceList(roundtrack);
-    }
-
-    @Override
-    public void showDraftPoolDiceList(List<IndexedCellContent> draftpool) {
-        view.updateMenuDiceList(draftpool);
-    }
-
-    @Override
-    public void showSchemaDiceList(List<IndexedCellContent> schema) {
-        view.updateMenuDiceList(schema);
-    }
-
-
-    @Override
-    public void updateToolUsage(List<LightTool> tools) {
-
-    }
-
-    @Override
-    public void showPlacementsList(List<Integer> placements, Place to, LightDie die) {
-        view.updateMenuListPlacements(placements,die);
-    }
 
     @Override
     public void updateStatusMessage(String statusChange, int playerId) {
@@ -220,16 +178,6 @@ public class CLI implements ClientUI {
 
     @Override
     public void updateConnectionBroken() { console.printf("Connection broken!%n");
-    }
-
-    @Override
-    public void printmsg(String msg){
-        console.printf(msg);
-    }
-
-    @Override
-    public String getCommand() {
-        return console.readLine();
     }
 
     @Override

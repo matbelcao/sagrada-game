@@ -85,7 +85,11 @@ public class UICommandManager extends Thread {
                     client.quit();
                     break;
                 case END_TURN:
-                    client.getClientConn().endTurn();
+                    if(!(client.getTurnState().equals(NOT_MY_TURN)||client.getTurnState().equals(CHOOSE_SCHEMA))) {
+                        client.getClientConn().endTurn();
+                    }else{
+                        client.getClientUI().showLastScreen();
+                    }
                     break;
                 case BACK:
                     client.getClientConn().exit();
@@ -94,6 +98,9 @@ public class UICommandManager extends Thread {
                 case DISCARD:
                     if (client.getTurnState().equals(CHOOSE_PLACEMENT)) {
                         client.getClientConn().discard();
+                        client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
+                    }else{
+                        client.getClientUI().showLastScreen();
                     }
                     break;
 
@@ -106,7 +113,7 @@ public class UICommandManager extends Thread {
             client.setTurnState(client.getTurnState().nextState(false, command.equals(BACK), command.equals(END_TURN), command.equals(DISCARD)));
             client.getLockState().notifyAll();
         }
-        client.getClientUI().updateBoard(client.getBoard());
+        client.getBoard().notifyObservers();
     }
 
     /**
@@ -199,7 +206,7 @@ public class UICommandManager extends Thread {
             default:
                 client.getClientUI().showLastScreen();
         }
-        client.getClientUI().updateBoard(client.getBoard());
+        client.getBoard().notifyObservers();
     }
 
 
@@ -221,7 +228,7 @@ public class UICommandManager extends Thread {
                     client.getLockState().notifyAll();
                 }
             }
-            client.getClientUI().updateBoard(client.getBoard());
+            client.getBoard().notifyObservers();
         } else {
             client.getClientUI().showLastScreen();
         }
@@ -249,7 +256,7 @@ public class UICommandManager extends Thread {
             } else {
                 multipleOptions();
             }
-            client.getClientUI().updateBoard(client.getBoard());
+            client.getBoard().notifyObservers();
         } else {
             client.getClientUI().showLastScreen();
         }
@@ -319,7 +326,7 @@ public class UICommandManager extends Thread {
             client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
         }
         client.getUpdates();
-        client.getClientUI().updateBoard(client.getBoard());
+        client.getBoard().notifyObservers();
     }
 
 
@@ -344,7 +351,7 @@ public class UICommandManager extends Thread {
                 client.getLockState().notifyAll();
             }
             client.getUpdates();
-            client.getClientUI().updateBoard(client.getBoard());
+            client.getBoard().notifyObservers();
         }else{
             client.getClientUI().showLastScreen();
         }
