@@ -301,7 +301,7 @@ public class ToolCard extends Card {
         if(actions.get(actionIndex)!=Commands.SWAP && actions.get(actionIndex)!=Commands.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
             selectedDice.remove(0);
         }
-        if(isInternalSchemaPlacement() && !selectedDice.isEmpty()){
+        if(isInternalSchemaPlacement() && !oldIndexList.isEmpty()){
             oldIndexList.remove(0);
         }
 
@@ -319,7 +319,7 @@ public class ToolCard extends Card {
         if(actions.get(actionIndex)!=Commands.SWAP && actions.get(actionIndex)!=Commands.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
             selectedDice.remove(0);
         }
-        if(isInternalSchemaPlacement() && !selectedDice.isEmpty()){
+        if(isInternalSchemaPlacement() && !oldIndexList.isEmpty()){
             oldIndexList.remove(0);
         }
     }

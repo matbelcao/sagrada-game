@@ -625,6 +625,7 @@ public class Game extends Thread implements Iterable  {
 
         if(!selectedTool.toolCanContinue(board.getPlayer(user))){
             List<Integer> oldIndexes=selectedTool.getOldIndexes();
+            System.out.println(oldIndex);
             board.removeOldDice(user,selectedTool.getPlaceFrom(),oldIndexes);
             exit(false);
         }else{
