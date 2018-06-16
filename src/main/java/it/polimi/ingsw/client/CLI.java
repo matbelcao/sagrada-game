@@ -7,6 +7,7 @@ import it.polimi.ingsw.client.uielements.UIMessages;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.LightPrivObj;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
 
@@ -143,6 +144,9 @@ public class CLI implements ClientUI {
                 view.updateMenuMain();
                 break;
             case SELECT_DIE:
+                if(board.getLatestDiceList().get(0).getPlace().equals(Place.ROUNDTRACK)){
+                    board.getLatestDiceList().add(0,board.getLatestSelectedDie());
+                }
                 view.updateMenuDiceList(board.getLatestDiceList());
                 break;
             case CHOOSE_OPTION:

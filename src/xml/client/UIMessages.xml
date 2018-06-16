@@ -117,8 +117,8 @@
         <ita>b › torna alla scelta tool/piazzamento</ita>
     </back-option>
     <dice-list>
-        <eng>Choose one of the following dice from the %s by entering the index of the row:</eng>
-        <ita>Scegli uno dei seguenti dadi da %s attreverso il numero di riga:</ita>
+        <eng>Choose one of the dice from the %s :</eng>
+        <ita>Scegli uno dei dadi da %s :</ita>
     </dice-list>
     <place-die>
         <eng>Place a die in your window</eng>
