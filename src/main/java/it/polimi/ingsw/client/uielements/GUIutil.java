@@ -5,9 +5,6 @@ import it.polimi.ingsw.common.immutables.LightConstraint;
 import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightPrivObj;
 import it.polimi.ingsw.common.immutables.LightSchemaCard;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
@@ -15,13 +12,14 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -59,6 +57,9 @@ public class GUIutil {
     private static final double SCHEMA_W_TO_EXTERNAL_PADDING = 18;
     private static final double SCHEMA_W_TO_INTERNAL_PADDING = 18;
     private static final double SCHEMA_W_TO_PRIV_OBJ_PADDING = 9;
+    //Main scene
+    private static  final double MAIN_SCENE_RATIO =  1.4286;
+    private static final double MAIN_SCENE_TO_SCREEN = 0.8;
     //die s
     private static final int SCREEN_TO_DIE = 25;
     private static final int DIE_TO_LINE = 10;
@@ -84,18 +85,6 @@ public class GUIutil {
         return getLoginWidth()/LOGIN_RATIO;
     }
 
-    private double getDieDimension(){
-        return SCREEN_WIDTH/SCREEN_TO_DIE;
-    }
-
-    public double getSchemaWidth(){
-        return getDieDimension()*NUM_COLS;
-    }
-
-    public double getSchemaHeigth(){
-        return getDieDimension()*NUM_ROWS;
-    }
-
     public double getDraftedSchemasMinHeight(){
         return  getDraftedSchemasMinWidth()/DRAFTED_CANVAS_SCENE_RATIO;
     }
@@ -107,6 +96,7 @@ public class GUIutil {
     private double getDraftedSchemasWidth(double drawingHeight){
         return drawingHeight* DRAFTED_CANVAS_SCENE_RATIO;
     }
+
     private double getDraftedSchemasHeight(double drawingWidth){
         return drawingWidth/ DRAFTED_CANVAS_SCENE_RATIO;
     }
@@ -118,20 +108,11 @@ public class GUIutil {
         return LINE_TO_CELL*CELL_TO_SCHEMA_W*schemaWidth;
     }
 
-    public int getLineWidth(){
-        int lineDim = (int)getDieDimension()/DIE_TO_LINE;
-        if(lineDim == 0){
-            return 1;
-        }else{
-            return lineDim;
-        }
-    }
-
 
 
     public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth){
         GridPane grid = new GridPane();
-        double dieDim = getDieDimension();
+        double dieDim = width/5;
         for(int i = 0; i < NUM_ROWS; i++){
             for(int j = 0; j < NUM_COLS; j++){
                 if(lightSchemaCard.hasDieAt(i,j)){
@@ -173,82 +154,52 @@ public class GUIutil {
         return dieCanvas;
     }
 
-    public Scene waitingForGameStartScene() {
-        Text waitingText = new Text("waiting for game to start");
+    public Scene waitingForGameStartScene(String message) {
+        Text waitingText = new Text(message);
         StackPane p = new StackPane(waitingText);
         return new Scene(p);
     }
 
-    public class cellProva extends Group implements ChangeListener<Number>{
-        Pane rect = new Pane();
-        Canvas c = new Canvas(100,100);
-        cellProva(){
-            draw(100,100);
-            this.getChildren().addAll(c,rect);
-        }
-
-        void draw(double w, double h){
-            GraphicsContext gc = c.getGraphicsContext2D();
-            gc.setFill(Color.OLIVEDRAB);
-            gc.fillRect(0,0,w,h);
-        }
-        public Canvas getCanvas(){
-            return c;
-        }
-
-        @Override
-        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-            double width = 300;
-            double heigth = 100;
-            c.setWidth(width);
-            c.setHeight(heigth);
-            GraphicsContext gc = c.getGraphicsContext2D();
-            gc.setFill(Color.RED);
-            gc.fillRect(0,0,width,heigth);
-        }
+    public double getMainSceneCellDim(double newWidth, double newHeight) {
+        return 50;
     }
 
-    public HBox getRoundTrack() {
-        HBox roudtrack = new HBox();
-        for(int i = 0 ; i<9 ; i++){
-            roudtrack.getChildren().add(new cellProva());
-        }
-        roudtrack.setSpacing(20);
-        return roudtrack;
-    }
-
-    public Group getSchema(Stage primary) {
-        /*Canvas c = new Canvas(300, 350);
+    public List<Canvas> drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height) {
+        ArrayList<Canvas> cells = new ArrayList<>();
+        Canvas c = new Canvas(width/2,height/2);
+        c.setWidth(width/2);
+        c.setHeight(height/2);
         GraphicsContext gc = c.getGraphicsContext2D();
-        gc.setFill(Color.PINK);
-        gc.fillRect(0,0,300,350);
+        gc.clearRect(0,0,width,height);
         gc.setFill(Color.BLACK);
-        gc.fillText("schema",50,50);*/
-        GridPane g = new GridPane();
-        cellProva d= new cellProva();
-        cellProva c= new cellProva();
-        cellProva b= new cellProva();
-        cellProva a= new cellProva();
-        g.setHgap(20);
-        g.setVgap(30);
-        Insets in = new Insets(10,10,10,10);
-        g.setPadding(in);
-        g.add(a,0,0);
-        g.add(b,0,1);
-        g.add(c,1,0);
-        g.add(d,1,1);
-        primary.widthProperty().addListener((ChangeListener<? super Number>) a);
+        gc.fillRect(0,0,width/2,height/2);
+        cells.add(c);
+        return cells;
 
-       return  new Group(g);
+        /*for (List<LightDie> l: roundTrack ) {
+            if(l.size() == 0){
+                Canvas c = new Canvas(100,100);
+                container.getChildren().add(c);
+            }
+
+        }*/
     }
 
-    public HBox getDraftPool() {
-        HBox roudtrack = new HBox();
-        for(int i =0 ; i<5 ; i++){
-            roudtrack.getChildren().add(new cellProva());
+    public Group drawSchema(LightSchemaCard schema, double dieDim) {
+        GridPane g = schemaToGrid(schema,dieDim*5,dieDim*4);
+       return new Group(g);
+    }
+
+    public Group drawDraftPool(List<LightDie> draftPool, double dieDim) {
+        HBox pool = new HBox();
+        for(LightDie l : draftPool){
+            Canvas c = new Canvas(dieDim,dieDim);
+            drawDie(l,c.getGraphicsContext2D(),dieDim);
+            pool.getChildren().add(c);
+            c.setOnMouseClicked(e->System.out.println("clicked"));
         }
-        roudtrack.setSpacing(20);
-        return roudtrack;
+        return  new Group(pool);
+
         }
 
 
@@ -272,35 +223,35 @@ public class GUIutil {
             y += dieDim;
         }
     }*/
+   //todo delete class
+    //just a class to avoid having repeated code
+    private class DraftedSchemasWindowDim {
+        double sceneWidth;
+        double sceneHeight;
+        double drawingHeight;
+        double drawingWidth;
+        double x;
+        double y;
 
-   //just a class to avoid having repeated code
-   private class DraftedSchemasWindowDim {
-       double sceneWidth;
-       double sceneHeight;
-       double drawingHeight;
-       double drawingWidth;
-       double x;
-       double y;
+        private DraftedSchemasWindowDim(double sceneWidth, double sceneHeight){
+            double sceneRatio = sceneWidth/sceneHeight;
+            if(sceneRatio >= DRAFTED_CANVAS_SCENE_RATIO){
+                drawingHeight = sceneHeight;
+                drawingWidth = getDraftedSchemasWidth(drawingHeight);
+                x = (sceneWidth-drawingWidth)/2;
+            }else{
+                drawingWidth = sceneWidth;
+                drawingHeight = getDraftedSchemasHeight(drawingWidth);
+                y = (sceneHeight - drawingHeight)/2;
+            }
+        }
 
-       private DraftedSchemasWindowDim(double sceneWidth, double sceneHeight){
-           double sceneRatio = sceneWidth/sceneHeight;
-           if(sceneRatio >= DRAFTED_CANVAS_SCENE_RATIO){
-               drawingHeight = sceneHeight;
-               drawingWidth = getDraftedSchemasWidth(drawingHeight);
-               x = (sceneWidth-drawingWidth)/2;
-           }else{
-               drawingWidth = sceneWidth;
-               drawingHeight = getDraftedSchemasHeight(drawingWidth);
-               y = (sceneHeight - drawingHeight)/2;
-           }
-       }
+        double getX(){return x;}
+        double getY(){return y;}
+        double getDrawingWidth(){return drawingWidth;}
+        double getDrawingHeight(){return drawingHeight;}
 
-       double getX(){return x;}
-       double getY(){return y;}
-       double getDrawingWidth(){return drawingWidth;}
-       double getDrawingHeight(){return drawingHeight;}
-
-   }
+    }
 
     public List<Rectangle> draftedMouseActionAreas(double sceneWidth, double sceneHeight) {
        DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth,sceneHeight);

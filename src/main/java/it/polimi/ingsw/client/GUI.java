@@ -80,11 +80,10 @@ public class GUI extends Application implements ClientUI {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
-        Scene loginScene = new Scene(grid, sceneCreator.getLoginWidth(), sceneCreator.getLoginWidth());
         Text scenetitle = new Text("Sagrada");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
-        Label username = new Label("User Name:");
+        Label username = new Label("Username:");
         grid.add(username, 0, 1);
         TextField usernameField = new TextField();
         usernameField.setPromptText("Username");
@@ -101,7 +100,10 @@ public class GUI extends Application implements ClientUI {
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(button);
         grid.add(hbBtn, 1, 4);
-        grid.add(messageToUser, 1, 6);
+        messageToUser.setFont(new Font(10));
+        VBox vbox = new VBox();
+        vbox.getChildren().addAll(grid,messageToUser);
+        Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(), sceneCreator.getLoginWidth());
         button.setOnAction(e -> {
             synchronized (client.getLockCredentials()) {
                 client.setUsername(usernameField.getText());
@@ -144,7 +146,8 @@ public class GUI extends Application implements ClientUI {
         Platform.runLater(() -> {
             messageToUser.setFill(Color.GREEN);
             /* TODO add other text field */
-            messageToUser.setText("lobby "+numUsers);
+           // messageToUser.setText("lobby "+numUsers);
+            messageToUser.setText(String.format(uimsg.getMessage("lobby-update"),numUsers));
         });
 
     }
@@ -157,22 +160,22 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
         Platform.runLater(() -> {
-            primaryStage.setTitle("Sagrada");
-            primaryStage.setResizable(true);
             StackPane stackPane = new StackPane();
             Scene scene = new Scene(stackPane);
-            DraftedSchemasGroup draftedSchemasGroup = new DraftedSchemasGroup(draftedSchemas,privObj,scene);
+            DraftedSchemasGroup draftedSchemasGroup = new DraftedSchemasGroup(draftedSchemas,privObj);
             stackPane.getChildren().add(draftedSchemasGroup);
-            scene.widthProperty().addListener((SceneSizeListener) (observable, oldValue, newValue) -> {
+            scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
                 draftedSchemasGroup.updateScene(newWidth,newHeight);
             });
-            scene.heightProperty().addListener((SceneSizeListener) (observable, oldValue, newValue) -> {
+            scene.heightProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
                 draftedSchemasGroup.updateScene(newWidth,newHeight);
             });
+            primaryStage.setTitle("Sagrada");
+            primaryStage.setResizable(true);
             primaryStage.setScene(scene);
             primaryStage.setMinHeight(sceneCreator.getDraftedSchemasMinHeight());
             primaryStage.setMinWidth(sceneCreator.getDraftedSchemasMinWidth());
@@ -186,16 +189,48 @@ public class GUI extends Application implements ClientUI {
             if (board == null) {
                 throw new IllegalArgumentException();
             }
-            BorderPane b = new BorderPane();
-            b.setTop(sceneCreator.getRoundTrack());
-            HBox roundtrack = sceneCreator.getRoundTrack();
-            Group schema = sceneCreator.getSchema(primaryStage);
-            HBox draftpool = sceneCreator.getDraftPool();
-            VBox schemaVbox = new VBox(schema,draftpool);
-            b.setCenter(schemaVbox);
-            Scene s = new Scene(b);
-            primaryStage.setScene(s);
+            MainSceneGroup root = new MainSceneGroup(board);
+            Scene scene = new Scene(root);
+            primaryStage.setScene(scene);
+            primaryStage.sizeToScene();
+            scene.widthProperty().addListener((observable, oldValue, newValue) -> {
+                double newWidth = scene.getWidth();
+                double newHeight = scene.getHeight();
+                root.redraw(newWidth,newHeight);
+            });
+            scene.heightProperty().addListener((observable, oldValue, newValue) -> {
+                double newWidth = scene.getWidth();
+                double newHeight = scene.getHeight();
+                root.redraw(newWidth,newHeight);
+            });
         });
+    }
+
+    class MainSceneGroup extends Group{
+        LightBoard board;
+        BorderPane b;
+        HBox roundTrack;
+        GridPane schema;
+        HBox draftpool;
+        VBox schemaVbox;
+        MainSceneGroup(LightBoard board){
+            this.board = board;
+            this.b = new BorderPane();
+            this.roundTrack = new HBox();
+            this.schema = new GridPane();
+            this.draftpool = new HBox();
+            this.schemaVbox = new VBox(schema,draftpool);
+            b.setTop(roundTrack);
+            b.setCenter(schemaVbox);
+            this.getChildren().add(b);
+        }
+
+        void redraw(double newWidth, double newHeight) {
+            double cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
+            //roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight));
+            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim));
+            draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim));
+        }
     }
 
     @Override
@@ -271,25 +306,24 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void showWaitingForGameStartScreen() {
         Platform.runLater(() -> {
-            primaryStage.setScene(sceneCreator.waitingForGameStartScene());
+            String message = String.format("%s%n", uimsg.getMessage("waiting-game-start"));
+            primaryStage.setScene(sceneCreator.waitingForGameStartScene(message));
         });
 
     }
 
     @Override
     public void showMainScreen(ClientFSMState turnState) {
-
+        //no usage
     }
 
     class DraftedSchemasGroup extends Group{
-        Scene scene;
         Canvas canvas;
         Pane mouseActionPane;
         List<LightSchemaCard> draftedSchemas;
         LightPrivObj privObj;
 
-        public DraftedSchemasGroup(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj, Scene scene) {
-            this.scene = scene;
+        public DraftedSchemasGroup(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
             this.canvas = new Canvas();
             this.mouseActionPane = new Pane();
             this.draftedSchemas = draftedSchemas;
@@ -297,7 +331,7 @@ public class GUI extends Application implements ClientUI {
             this.getChildren().addAll(canvas,mouseActionPane);
         }
 
-        public void updateScene(double width, double height){
+        private void updateScene(double width, double height){
             //update the width and height properties
             canvas.setWidth(width);
             canvas.setHeight(height);
@@ -314,7 +348,6 @@ public class GUI extends Application implements ClientUI {
                 r.setOnMouseEntered(e->r.setFill(Color.rgb(0,0,0,0.4)));
                 r.setOnMouseExited(e->r.setFill(Color.TRANSPARENT));
                 r.setOnMouseClicked(e->{
-                    System.out.println("Selected schema " + actionRects.indexOf(r));
                     cmdWrite.write(actionRects.indexOf(r)+"");
                     r.setStroke(Color.BLUE);
                     r.setStrokeWidth(borderLineWidth);
@@ -323,7 +356,7 @@ public class GUI extends Application implements ClientUI {
             }
         }
     }
-    
+
     @Override
     public QueuedReader getCommandQueue() {
         cmdWrite = new QueuedCmdReader();
