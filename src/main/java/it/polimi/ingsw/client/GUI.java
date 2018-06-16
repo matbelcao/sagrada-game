@@ -62,7 +62,7 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void start(Stage primaryStage) {
         //get the dimensions of the screen
-        sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(),this);
+        sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(),this,getCmdWrite());
         this.primaryStage = primaryStage;
     }
 
@@ -189,6 +189,34 @@ public class GUI extends Application implements ClientUI {
             if (board == null) {
                 throw new IllegalArgumentException();
             }
+            switch (client.getTurnState()){
+                case CHOOSE_SCHEMA:
+                    System.out.println("choose----------------------------------------------------------------");
+                    break;
+                case NOT_MY_TURN:
+                    System.out.println("not my-------------------------------------------------------------");
+                    break;
+                case MAIN:
+                    System.out.println("main------------------------------------------------------------");
+                    break;
+                case SELECT_DIE:
+                    System.out.println("select die--------------------------------------------------");
+                    break;
+                case CHOOSE_OPTION:
+                    if(board.getLatestOptionsList().size()>1){
+                        System.out.println("choose option---------------------------------------------------");
+                    }
+                    break;
+                case CHOOSE_TOOL:
+                    System.out.println("choose tool-------------------------------------------------------------");
+                    break;
+                case CHOOSE_PLACEMENT:
+                    System.out.println("choose placement---------------------------------------------------------------");
+                    break;
+                case TOOL_CAN_CONTINUE:
+                    System.out.println("tool can continue------------------------------------------------------------------");
+                    break;
+            }
             MainSceneGroup root = new MainSceneGroup(board);
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
@@ -228,9 +256,10 @@ public class GUI extends Application implements ClientUI {
 
         void redraw(double newWidth, double newHeight) {
             double cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
+            ClientFSMState turnState = client.getTurnState();
             //roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight));
-            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim));
-            draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim));
+            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState));
+            draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim,turnState));
         }
     }
 
@@ -360,8 +389,17 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public QueuedReader getCommandQueue() {
-        cmdWrite = new QueuedCmdReader();
+        if (cmdWrite == null) {
+            cmdWrite = new QueuedCmdReader();
+        }
         return (QueuedReader) cmdWrite;
+    }
+
+    public CmdWriter getCmdWrite(){
+        if (cmdWrite == null) {
+            cmdWrite = new QueuedCmdReader();
+        }
+        return cmdWrite;
     }
 
 
