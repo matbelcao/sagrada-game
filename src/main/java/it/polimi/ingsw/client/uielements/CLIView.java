@@ -225,7 +225,7 @@ public class CLIView {
         builder.append(printList(buildRoundTrack())).append(" |%n");
 
 
-        builder.append(printList(buildTopSection())).append(" |%n");
+        builder.append(printList(buildTopSection()));
 
 
         builder.append(printList(buildDraftPool())).append(" |%n");
@@ -543,9 +543,17 @@ public class CLIView {
      */
     private List<String> buildCoordinatesList(List<Integer> indexes) {
         List<String> list= new ArrayList<>();
-        for(int i=0; i<indexes.size();i++){
-            list.add(String.format(cliElems.getElem("li"), i, rowColmumn(indexes.get(i))));
+        for(int i=0;i<Math.min(indexes.size(),SCHEMA_HEIGHT - 1);i++){
+            list.add("");
         }
+        int numAddedIndexes=0;
+        for(int column=0;column<MAX_MENULIST_COLUMNS && numAddedIndexes<indexes.size();column++) {
+            for (int i = 0; i <  Math.min(indexes.size(), (SCHEMA_HEIGHT - 2)) && numAddedIndexes<indexes.size(); i++) {
+                list.set(i,list.get(i) + "  "+String.format(cliElems.getElem("li"), numAddedIndexes, rowColmumn(indexes.get(numAddedIndexes))));
+                numAddedIndexes++;
+            }
+        }
+
         return list;
     }
 
