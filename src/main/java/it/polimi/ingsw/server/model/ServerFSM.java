@@ -22,14 +22,14 @@ public class ServerFSM {
         placeTo=Place.SCHEMA;
     }
 
-    public ServerState discard(){
+    public ServerState fsmDiscard(){
         if (curState.equals(ServerState.CHOOSE_PLACEMENT)){
             curState=ServerState.GET_DICE_LIST;
         }
         return curState;
     }
 
-    public ServerState exit(){
+    public ServerState fsmExit(){
         if(!curState.equals(ServerState.INIT)){
             curState=ServerState.MAIN;
             toolActive=false;
@@ -54,6 +54,13 @@ public class ServerFSM {
         toolActive=true;
         placeFrom=toolCard.getPlaceFrom();
         placeTo=toolCard.getPlaceTo();
+        return curState;
+    }
+
+    public ServerState endTool(){
+        while(!curState.equals(ServerState.TOOL_CAN_CONTINUE)){
+            curState=nextState(Commands.NONE);
+        }
         return curState;
     }
 

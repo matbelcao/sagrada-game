@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * This class implements the Cards named "Tools" and their calculating algorithms
@@ -30,17 +29,15 @@ public class ToolCard extends Card {
     private static final String XML_LOGIC = MasterServer.XML_SOURCE + "ToolLogic.xml";
 
     private boolean used;
-    public static final int NUM_TOOL_CARDS = 12;
     private Place from;
     private Place to;
     private List<Commands> actions;
-    private IgnoredConstraint ignored_constraint;
+    private IgnoredConstraint ignoredConstraint;
     private List<DieQuantity> quantity;
     private Turn turn;
-    //states
 
-
-    Color constraint; //only for 12
+    private Color constraint; //only for 12
+    private int numDiePlaced;
     private int actionIndex;
     private SchemaCard schemaTemp;
     private List<Die> selectedDice;
@@ -81,9 +78,9 @@ public class ToolCard extends Card {
                     }
 
                     if(to.equals(Place.SCHEMA)){
-                        ignored_constraint = IgnoredConstraint.toIgnoredConstraint(eElement.getElementsByTagName("ignored-constraint").item(0).getTextContent());
+                        ignoredConstraint = IgnoredConstraint.toIgnoredConstraint(eElement.getElementsByTagName("ignored-constraint").item(0).getTextContent());
                     }else{
-                        ignored_constraint = IgnoredConstraint.NONE;
+                        ignoredConstraint = IgnoredConstraint.NONE;
                     }
 
                     for (int temp2 = 0; temp2 < eElement.getElementsByTagName("quantity").getLength(); temp2++) {
@@ -118,24 +115,11 @@ public class ToolCard extends Card {
 
     public boolean enableToolCard(Player player,int roundNumber,Turn turnFirstOrSecond, int numDiePlaced , SchemaCard schema) {
         try {
-            if(actions.contains(Commands.SWAP) || actions.contains(Commands.SET_COLOR) && roundNumber==0){return false;}
+            if((actions.contains(Commands.SWAP) || actions.contains(Commands.SET_COLOR)) && roundNumber==0){return false;}
             if (!turn.equals(Turn.NONE) && !turn.equals(turnFirstOrSecond)) {return false;}
             if(turn.equals(Turn.SECOND_TURN) && numDiePlaced>=1){return false;}
             if(turn.equals(Turn.FIRST_TURN) && numDiePlaced!=1){return false;}
-
-            if(isExternalPlacement() &&  numDiePlaced>=1 && !turn.equals(Turn.FIRST_TURN)) {
-                if (to.equals(Place.SCHEMA) || to.equals(Place.DICEBAG)) {
-                    return false;
-                }
-            }
-            if(isInternalSchemaPlacement()){
-                FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
-                if(diceIterator.numOfDice()<1 && quantity.contains(DieQuantity.ONE)){
-                    return false;
-                }else if(diceIterator.numOfDice()<2 && quantity.contains(DieQuantity.TWO)) {
-                    return false;
-                }
-            }
+            if (checkPlacementConditions(numDiePlaced, schema)) {return false;}
 
             if (!used) {
                 player.decreaseFavorTokens(1);
@@ -153,10 +137,26 @@ public class ToolCard extends Card {
             constraint=Color.NONE;
             actionIndex=0;
             schemaTemp=schema.cloneSchema();
+            numDiePlaced=0;
         } catch (NegativeTokensException e) {
             return false;
         }
         return true;
+    }
+
+    private boolean checkPlacementConditions(int numDiePlaced, SchemaCard schema) {
+        if(isExternalPlacement() &&  numDiePlaced>=1 && !turn.equals(Turn.FIRST_TURN) && (to.equals(Place.SCHEMA) || to.equals(Place.DICEBAG))) {
+            return true;
+        }
+        if(isInternalSchemaPlacement()){
+            FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
+            if(diceIterator.numOfDice()<1 && quantity.contains(DieQuantity.ONE)){
+                return true;
+            }else {
+                return diceIterator.numOfDice() < 2 && quantity.contains(DieQuantity.TWO) && !quantity.contains(DieQuantity.ONE);
+            }
+        }
+        return false;
     }
 
     public List<IndexedCellContent> shadeIncreaseDecrease(Die die){
@@ -167,7 +167,7 @@ public class ToolCard extends Card {
             tmpDie=new Die(die.getShade(),die.getColor());
             tmpDie.increaseShade();
             modifiedDie.add(tmpDie);
-        } catch (IllegalShadeException ignored) { }
+        } catch (IllegalShadeException ignored){ }
 
         try {
             tmpDie=new Die(die.getShade(),die.getColor());
@@ -179,12 +179,9 @@ public class ToolCard extends Card {
     }
 
     public boolean swapDie() {
-        System.out.println("swap: "+selectedDice.size());
         if(selectedDice.size()==1){return true;}// the swap will take effect on the next iteration
         else if(selectedDice.size()==2){
-            System.out.println(selectedDice.get(0).toString()+" "+selectedDice.get(1).toString());
             selectedDice.get(0).swap(selectedDice.get(1));
-            System.out.println(selectedDice.get(0).toString()+" "+selectedDice.get(1).toString());
             return true;
         }
         return false;
@@ -210,7 +207,7 @@ public class ToolCard extends Card {
         return toIndexedDieList(dieList);
     }
 
-    public List<IndexedCellContent> chooseShade(){// TODO: 13/06/2018 modify method 
+    public List<IndexedCellContent> chooseShade(){
         List <Die> modifiedDie=new ArrayList<>();
         for(int i=1;i<=6;i++){
             modifiedDie.add(new Die(i,selectedDice.get(0).getColor().toString()));
@@ -220,10 +217,6 @@ public class ToolCard extends Card {
 
     public void setColor(){
         constraint=selectedDice.get(0).getColor();
-    }
-
-    public Color getColorConstraint(){
-        return constraint;
     }
 
     public List<IndexedCellContent> internalIndexedSchemaDiceList(){
@@ -248,26 +241,25 @@ public class ToolCard extends Card {
         return indexedList;
     }
 
-    public Die internalSelectDie(int list_index){
-        selectedDice.add(0,schemaTemp.getSchemaDiceList(constraint).get(list_index));
+    public void selectDie(Die die){
+        selectedDice.add(die);
+        return;
+    }
+
+    public Die internalSelectDie(int listIndex){
+        selectedDice.add(0,schemaTemp.getSchemaDiceList(constraint).get(listIndex));
         oldIndexList.add(0,schemaTemp.getDiePosition(selectedDice.get(0)));
         return selectedDice.get(0);
     }
 
 
     public List<Integer> internalListPlacements() {
-        System.out.println("Internal_placement_list: "+selectedDice.get(0).toString()+" "+ignored_constraint+" "+oldIndexList.get(0));
-        System.out.println("Before: "+ schemaTemp.getSchemaDiceList(Color.NONE));
-
         schemaTemp.removeDie(oldIndexList.get(0));
-        System.out.println("After: "+ schemaTemp.getSchemaDiceList(Color.NONE));
+        List<Integer> placements=schemaTemp.listPossiblePlacements(selectedDice.get(0),ignoredConstraint);
 
-        List<Integer> placements=schemaTemp.listPossiblePlacements(selectedDice.get(0),ignored_constraint);
-        System.out.println(schemaTemp.listPossiblePlacements(selectedDice.get(0),ignored_constraint));
         try {
             schemaTemp.putDie(oldIndexList.get(0),selectedDice.get(0),IgnoredConstraint.FORCE);
         } catch (IllegalDieException e) {
-            e.printStackTrace();
             System.out.println("Something gone wrong....");
         }
         return placements;
@@ -276,11 +268,11 @@ public class ToolCard extends Card {
     public boolean internalDiePlacement(int index){
         List<Integer> placerments= internalListPlacements();
         try {
-            System.out.println("Internal_placement: "+selectedDice.get(0).toString()+" "+ignored_constraint+" "+oldIndexList.get(0));
+            //System.out.println("Internal_placement: "+selectedDice.get(0).toString()+" "+ignoredConstraint+" "+oldIndexList.get(0));
             schemaTemp.removeDie(oldIndexList.get(0));
-            schemaTemp.putDie(placerments.get(index),selectedDice.get(0),ignored_constraint);
+            schemaTemp.putDie(placerments.get(index),selectedDice.get(0),ignoredConstraint);
+            numDiePlaced++;
         } catch (IllegalDieException e) {
-            e.printStackTrace();
             try {
                 schemaTemp.putDie(oldIndexList.get(0),selectedDice.get(0),IgnoredConstraint.FORCE);
             } catch (IllegalDieException e1) {
@@ -288,14 +280,6 @@ public class ToolCard extends Card {
             }
         }
         return true;
-    }
-
-    public void selectDie(Die die,int oldIndex){// TODO: 15/06/2018
-        selectedDice.add(die);
-        /*if(isExternalPlacement()){
-            oldIndexList.add(oldIndex);
-        }*/
-        return;
     }
 
     private List<IndexedCellContent> toIndexedDieList(List<Die> dieList){
@@ -311,21 +295,13 @@ public class ToolCard extends Card {
         return indexedList;
     }
 
-    public boolean isRerollAllDiceCard(){
-        return actions.get(actionIndex).equals(Commands.REROLL) && quantity.contains(DieQuantity.ALL);
-    }
-
-    public boolean isSetColorFromRountrackCard(){
-        return actions.get(actionIndex).equals(Commands.SET_COLOR);
-    }
-
     public boolean toolCanContinue(Player player){
-        System.out.println(selectedDice+"  "+oldIndexList);
-        if(actions.get(actionIndex)!=Commands.SWAP && actions.get(actionIndex)!=Commands.INCREASE_DECREASE){//DA RIVEDERE, SI MANGIA I DADI
-            if(selectedDice.size()>0){selectedDice.remove(0);}
+        //System.out.println(selectedDice+"  "+oldIndexList);
+        if(actions.get(actionIndex)!=Commands.SWAP && actions.get(actionIndex)!=Commands.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
+            selectedDice.remove(0);
         }
-        if(isInternalSchemaPlacement()){// || actions.get(actionIndex).equals(Commands.SWAP)){
-            if(oldIndexList.size()>0){oldIndexList.remove(0);}
+        if(isInternalSchemaPlacement() && !selectedDice.isEmpty()){
+            oldIndexList.remove(0);
         }
 
         actionIndex++;
@@ -338,23 +314,46 @@ public class ToolCard extends Card {
         return true;
     }
 
+    public void toolDiscard(){
+        if(actions.get(actionIndex)!=Commands.SWAP && actions.get(actionIndex)!=Commands.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
+            selectedDice.remove(0);
+        }
+        if(isInternalSchemaPlacement() && !selectedDice.isEmpty()){
+            oldIndexList.remove(0);
+        }
+    }
+
+    public void toolExit(Player player){
+        if(isInternalSchemaPlacement()) {
+            if (quantity.contains(DieQuantity.TWO) && numDiePlaced== 2) {
+                player.replaceSchema(schemaTemp);
+                return;
+            }
+            if (quantity.contains(DieQuantity.ONE) && numDiePlaced== 1) {
+                player.replaceSchema(schemaTemp);
+            }
+        }
+    }
+
     public List<Integer> getOldIndexes(){
         return oldIndexList;
     }
 
 
     public boolean isExternalPlacement(){
-        if(!from.equals(to)){
-            return true;
-        }
-        return false;
+        return !from.equals(to);
     }
 
     public boolean isInternalSchemaPlacement() {
-        if(from.equals(Place.SCHEMA) && to.equals(Place.SCHEMA)){
-            return true;
-        }
-        return false;
+        return from.equals(Place.SCHEMA) && to.equals(Place.SCHEMA);
+    }
+
+    public boolean isRerollAllDiceCard(){
+        return actions.get(actionIndex).equals(Commands.REROLL) && quantity.contains(DieQuantity.ALL);
+    }
+
+    public boolean isSetColorFromRountrackCard(){
+        return actions.get(actionIndex).equals(Commands.SET_COLOR);
     }
 
     public Place getPlaceFrom(){
@@ -365,6 +364,10 @@ public class ToolCard extends Card {
         return to;
     }
 
+    public Color getColorConstraint(){
+        return constraint;
+    }
+
     /**
      * This method provide the information about if the card has been yet used
      * @return true iff has been used yet
@@ -373,27 +376,15 @@ public class ToolCard extends Card {
         return this.used;
     }
 
-    public List<DieQuantity> getQuantity(){
-        return quantity;
-    }
-
     public List<Commands> getActions(){
         List<Commands> commands=new ArrayList<>();
-        if(quantity.contains(DieQuantity.ONE) && quantity.contains(DieQuantity.TWO)){
-            if(commands.get(actionIndex).equals(Commands.PLACE_DIE) && commands.get(actionIndex-1).equals(Commands.PLACE_DIE)){
-                commands.add(Commands.NONE);
-            }
-        }
         commands.add(actions.get(actionIndex));
         return commands;
     }
 
     public IgnoredConstraint getIgnoredConstraint(){
-        return ignored_constraint;
+        return ignoredConstraint;
     }
 
-    public Turn getTurn(){
-        return turn;
-    }
 
 }

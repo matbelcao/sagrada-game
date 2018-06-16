@@ -12,6 +12,7 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ToolCardTest {
     @Test
@@ -25,11 +26,11 @@ class ToolCardTest {
         assertFalse(tool1.isAlreadyUsed());
         assertEquals(Place.DRAFTPOOL,tool1.getPlaceFrom());
         assertEquals(Place.DRAFTPOOL,tool1.getPlaceTo());
-        assertEquals(DieQuantity.ONE,tool1.getQuantity().get(0));
+        //assertEquals(DieQuantity.ONE,tool1.getQuantity().get(0));
         assertEquals(Commands.INCREASE_DECREASE,tool1.getActions().get(0));
         //assertEquals(Commands.NONE,tool1.getActions().get(0));
         assertEquals(IgnoredConstraint.NONE,tool1.getIgnoredConstraint());
-        assertEquals(Turn.NONE,tool1.getTurn());
+        //assertEquals(Turn.NONE,tool1.getTurn());
 
 
 
@@ -44,6 +45,7 @@ class ToolCardTest {
         assertEquals("Taglierina Manuale",tool3.getName());
         assertEquals("src"+File.separator+"img"+File.separator+"ToolCard"+File.separator+"12.png",tool3.getImgSrc());
         assertEquals("Muovi fino a due dadi dello stesso colore di un solo dado sul Tracciato dei Round (Devi rispettare tutte le restrizioni di piazzamento)",tool3.getDescription());
+        assertTrue(tool3.isSetColorFromRountrackCard());
     }
 /*
     @Test
