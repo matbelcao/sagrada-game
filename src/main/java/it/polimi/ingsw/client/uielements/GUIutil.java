@@ -138,10 +138,12 @@ public class GUIutil {
                             break;
                         case MAIN:
                             cmdWrite.write("clicked schema");
+                            cmdWrite.write("e");
                             break;
                         case CHOOSE_PLACEMENT:
-                            System.out.println("selected placement " + finalI*5+finalJ);
-                            cmdWrite.write(finalI*5+finalJ +"");
+                            int index = finalI*NUM_COLS+finalJ;
+                            System.out.println("selected placement " + index);
+                            cmdWrite.write(index +"");
                             break;
                     }
 

@@ -40,6 +40,7 @@ public class GUI extends Application implements ClientUI {
     private static UIMessages uimsg;
     private Stage primaryStage;
     private static GUI instance;
+    private static final Object lock = new Object();
     private Text messageToUser = new Text();
     private CmdWriter cmdWrite;
     private int playerId;
@@ -62,7 +63,10 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void start(Stage primaryStage) {
         //get the dimensions of the screen
-        sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(),this,getCmdWrite());
+        synchronized (lock) {
+            sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(), this, getCmdWrite());
+            lock.notifyAll();
+        }
         this.primaryStage = primaryStage;
     }
 
@@ -103,8 +107,18 @@ public class GUI extends Application implements ClientUI {
         messageToUser.setFont(new Font(10));
         VBox vbox = new VBox();
         vbox.getChildren().addAll(grid,messageToUser);
-        Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(), sceneCreator.getLoginWidth());
-        button.setOnAction(e -> {
+        synchronized (lock) {
+            while (sceneCreator == null) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+            Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(), sceneCreator.getLoginWidth());
+
+            button.setOnAction(e -> {
             synchronized (client.getLockCredentials()) {
                 client.setUsername(usernameField.getText());
                 client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
