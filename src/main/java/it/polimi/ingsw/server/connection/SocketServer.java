@@ -253,6 +253,12 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
+    @Override
+    public void notifyBoardChanged(){
+        outSocket.println("GAME board_changed");
+        outSocket.flush();
+    }
+
     /**
      * Sends the client a text description of the four drafted schema card passed as a parameter
      */

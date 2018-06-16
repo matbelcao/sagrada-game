@@ -64,6 +64,10 @@ public class RMIServer implements ServerConn {
 
     }
 
+    @Override
+    public void notifyBoardChanged() {
+
+    }
 
 
     /**

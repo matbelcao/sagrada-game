@@ -206,6 +206,14 @@ public class Game extends Thread implements Iterable  {
         }
     }
 
+    private void notifyBoardChanged(){
+        for(User u:users){
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                u.getServerConn().notifyBoardChanged();
+            }
+        }
+    }
+
     private void roundFlow() {
         status=fsm.newTurn(round.isFirstTurn());
         numDiePlaced=0;
@@ -293,7 +301,11 @@ public class Game extends Thread implements Iterable  {
         if(playerId>=users.size() || playerId <0){ throw new IllegalActionException(); }
         if(board.getPlayerById(playerId).getSchema()==null){ throw new IllegalActionException(); }
         if(playerId>=0 && playerId<users.size()){
-            return board.getPlayerById(playerId).getSchema();
+            if(fsm.isToolActive()){
+                return selectedTool.getNewSchema();
+            }else{
+                return board.getPlayerById(playerId).getSchema();
+            }
         }
         return null;
     }
@@ -305,7 +317,11 @@ public class Game extends Thread implements Iterable  {
      */
     public SchemaCard getUserSchemaCard(User user) throws IllegalActionException {
         if(board.getPlayer(user).getSchema()==null){ throw new IllegalActionException(); }
-        return board.getPlayer(user).getSchema();
+        if(fsm.isToolActive()){
+            return selectedTool.getNewSchema();
+        }else {
+            return board.getPlayer(user).getSchema();
+        }
     }
 
     /**
@@ -531,6 +547,10 @@ public class Game extends Thread implements Iterable  {
             response=board.schemaPlacement(userPlayingId,index,oldIndex,selectedDie,constraint);
             numDiePlaced++;
         }
+
+        if(response){
+            notifyBoardChanged();
+        }
         return response;
     }
 
@@ -592,6 +612,7 @@ public class Game extends Thread implements Iterable  {
                     fsm.setPlaceFrom(Place.ROUNDTRACK);
                     enableToolList=false;
             }
+            notifyBoardChanged();
         }else{
             exit();
         }
@@ -609,6 +630,7 @@ public class Game extends Thread implements Iterable  {
         }else{
             status=fsm.nextState(selectedCommand);
         }
+        notifyBoardChanged();
         return fsm.isToolActive();
     }
 
@@ -636,6 +658,7 @@ public class Game extends Thread implements Iterable  {
         selectedDie=null;
         diceList=new ArrayList<>();
         selectedCommand=Commands.NONE;
+        notifyBoardChanged();
     }
 
 

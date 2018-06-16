@@ -368,6 +368,10 @@ public class ToolCard extends Card {
         return constraint;
     }
 
+    public SchemaCard getNewSchema(){
+        return schemaTemp;
+    }
+
     /**
      * This method provide the information about if the card has been yet used
      * @return true iff has been used yet

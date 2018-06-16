@@ -21,6 +21,8 @@ public interface ServerConn {
 
     void notifyTurnEvent(String event,int playerId,int turnNumber);
 
+    void notifyBoardChanged();
+
     boolean ping();
 
 
