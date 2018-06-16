@@ -102,17 +102,19 @@ public class CLIViewUtils {
     /**
      * this method is used to fill up the space following a certain string until a defined total length is reached
      * @param toPad the string to be padded
-     * @param finalLenght the final desired length
+     * @param finalLength the final desired length
      * @param filler the character uset to fill the remaining space
      * @return a list of strings that represent that
      */
-    static List<String> padUntil(List<String> toPad,int finalLenght, char filler){
+    static List<String> padUntil(List<String> toPad,int finalLength, char filler){
         List<String> result= new ArrayList<>();
-        for(int i=0; i<toPad.size();i++){
-            result.add(padUntil(toPad.get(i),finalLenght,' '));
+        List<String> fitted= fitInLength(toPad,finalLength);
+        for(int i=0; i<fitted.size();i++){
+            result.add(padUntil(fitted.get(i),finalLength,' '));
         }
         return result;
     }
+
 
 
 
@@ -383,7 +385,9 @@ public class CLIViewUtils {
      * @return the padded string
      */
     static String padUntil(String toPad, int finalLength, char filler){
-        if(finalLength<0|| toPad==null||printableLength(toPad)>finalLength){throw new IllegalArgumentException();}
+        if(finalLength<0){throw new IllegalArgumentException("negative length");}
+        if(toPad==null){throw new IllegalArgumentException("string to be padded is null");}
+        if(printableLength(toPad)>finalLength){throw new IllegalArgumentException("already longer:"+toPad);}
 
         return toPad+ replicate(filler+"",finalLength - printableLength(toPad));
 
@@ -414,6 +418,14 @@ public class CLIViewUtils {
         return result;
     }
 
+
+    static List<String> fitInLength(List<String> lines, int length){
+        List<String> result= new ArrayList<>();
+        for (int line=0; line<lines.size();line++){
+            result.addAll(fitInLength(lines.get(line),length));
+        }
+        return result;
+    }
 
     /**
      * Adds the color to the cell being added to the "bigRow"

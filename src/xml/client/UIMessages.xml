@@ -93,7 +93,7 @@
         <ita>colonna:</ita>
     </col>
     <pos>
-        <eng>position: </eng>
+        <eng>position:</eng>
         <ita>posizione:</ita>
     </pos>
     <message-prompt>
@@ -157,4 +157,8 @@
         <eng>secondo turn</eng>
         <ita>secondo turno</ita>
     </second-turn>
+    <round-number>
+        <eng>round #</eng>
+        <ita>round #</ita>
+    </round-number>
 </messages>
