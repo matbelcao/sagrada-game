@@ -116,7 +116,7 @@ public class SocketServer extends Thread implements ServerConn  {
                     break;
                 case "EXIT":
                     if (!user.isMyTurn()) { throw new IllegalActionException(); }
-                    user.getGame().exit();
+                    user.getGame().exit(true);
                     break;
                 case "QUIT":
                     user.quit();

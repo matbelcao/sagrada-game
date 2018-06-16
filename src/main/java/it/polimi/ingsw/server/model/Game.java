@@ -218,7 +218,7 @@ public class Game extends Thread implements Iterable  {
         status=fsm.newTurn(round.isFirstTurn());
         numDiePlaced=0;
 
-        exit();
+        exit(false);
         endLock=false;
 
         //Notify to all the users the starting of the turn
@@ -614,7 +614,7 @@ public class Game extends Thread implements Iterable  {
             }
             notifyBoardChanged();
         }else{
-            exit();
+            exit(false);
         }
         return toolEnabled;
     }
@@ -626,7 +626,7 @@ public class Game extends Thread implements Iterable  {
         if(!selectedTool.toolCanContinue(board.getPlayer(user))){
             List<Integer> oldIndexes=selectedTool.getOldIndexes();
             board.removeOldDice(user,selectedTool.getPlaceFrom(),oldIndexes);
-            exit();
+            exit(false);
         }else{
             status=fsm.nextState(selectedCommand);
         }
@@ -647,7 +647,7 @@ public class Game extends Thread implements Iterable  {
         selectedDie=null;
     }
 
-    public void exit(){
+    public void exit(Boolean notifyBoardChanged){
         if(status.equals(ServerState.INIT)){return;}
         if(fsm.isToolActive()){
             selectedTool.toolExit(board.getPlayerById(userPlayingId));
@@ -658,7 +658,9 @@ public class Game extends Thread implements Iterable  {
         selectedDie=null;
         diceList=new ArrayList<>();
         selectedCommand=Commands.NONE;
-        notifyBoardChanged();
+        if(notifyBoardChanged){
+            notifyBoardChanged();
+        }
     }
 
 

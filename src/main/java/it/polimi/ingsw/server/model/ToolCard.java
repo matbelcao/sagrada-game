@@ -27,6 +27,7 @@ import java.util.List;
 public class ToolCard extends Card {
     private static final String XML_DESCRIPTION = MasterServer.XML_SOURCE + "ToolCard.xml";
     private static final String XML_LOGIC = MasterServer.XML_SOURCE + "ToolLogic.xml";
+    public static final int NUM_TOOL_CARDS=12;
 
     private boolean used;
     private Place from;
