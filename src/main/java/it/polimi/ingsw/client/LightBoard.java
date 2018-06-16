@@ -54,6 +54,7 @@ public class LightBoard extends Observable {
      */
     public List<LightSchemaCard> getDraftedSchemas() {
         return draftedSchemas;
+
     }
 
     /**
@@ -62,6 +63,7 @@ public class LightBoard extends Observable {
      */
     public void setDraftedSchemas(List<LightSchemaCard> draftedSchemas) {
         this.draftedSchemas = draftedSchemas;
+        setChanged();
     }
 
     /**
@@ -77,6 +79,7 @@ public class LightBoard extends Observable {
      */
     public void setMyPlayerId(int myPlayerId) {
         this.myPlayerId = myPlayerId;
+        setChanged();
     }
 
     /**
@@ -92,6 +95,7 @@ public class LightBoard extends Observable {
      */
     public void setNowPlaying(int nowPlaying) {
         this.nowPlaying = nowPlaying;
+        setChanged();
     }
 
     /**
@@ -101,6 +105,7 @@ public class LightBoard extends Observable {
     public void addPlayer(LightPlayer player){
         assert(players.size()<numPlayers);
         players.put(player.getPlayerId(),player);
+        setChanged();
     }
 
     /**
@@ -116,6 +121,7 @@ public class LightBoard extends Observable {
      */
     public void setPrivObj(LightPrivObj privObj) {
         this.privObj = privObj;
+        setChanged();
     }
 
     /**
@@ -124,6 +130,7 @@ public class LightBoard extends Observable {
      */
     public void setTools(List<LightTool> tools){
         this.tools=tools;
+        setChanged();
     }
 
 
@@ -162,6 +169,7 @@ public class LightBoard extends Observable {
      */
     public void setDraftPool(List<LightDie> draftPool) {
         this.draftPool=draftPool;
+        setChanged();
 
     }
 
@@ -180,6 +188,7 @@ public class LightBoard extends Observable {
     public void setRoundTrack(List<List<LightDie>> roundTrack, int numRound) {
         this.roundTrack = roundTrack;
         this.roundNumber = numRound;
+        setChanged();
     }
 
     /**
@@ -188,6 +197,7 @@ public class LightBoard extends Observable {
      */
     public void setPubObjs(List<LightCard> pubObjs){
         this.pubObj=pubObjs;
+        setChanged();
     }
 
     /**
@@ -197,7 +207,7 @@ public class LightBoard extends Observable {
      */
     public void updateSchema(int playerId, LightSchemaCard schema){
         players.get(playerId).setSchema(schema);
-        notifyObservers();
+        setChanged();
     }
 
     /**
@@ -224,6 +234,7 @@ public class LightBoard extends Observable {
      */
     public void setIsFirstTurn(boolean isFirstTurn) {
         this.isFirstTurn = isFirstTurn;
+        setChanged();
     }
 
     /**
@@ -239,6 +250,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestOptionsList(List<Commands> optionsList) {
         this.latestOptionsList = optionsList;
+        setChanged();
     }
 
     /**
@@ -261,6 +273,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestDiceList(List<IndexedCellContent> latestDiceList) {
         this.latestDiceList = latestDiceList;
+        setChanged();
     }
 
     /**
@@ -269,6 +282,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestPlacementsList(List<Integer> placementsList) {
         this.latestPlacementsList = placementsList;
+        setChanged();
     }
 
     /**
@@ -284,6 +298,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestSelectedDie(IndexedCellContent  latestSelectedDie) {
         this.latestSelectedDie = latestSelectedDie;
+        setChanged();
     }
 
     /**

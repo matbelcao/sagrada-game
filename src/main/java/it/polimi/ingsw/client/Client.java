@@ -124,11 +124,7 @@ public class Client {
     }
 
     public static Client getNewClient() throws InstantiationException {
-        Client newClient = parser();
-        if(newClient==null){
-            throw new InstantiationException();
-        }
-        return newClient;
+        return parser();
     }
 
 
@@ -351,8 +347,8 @@ public class Client {
     public void updateGameStart(int numPlayers, int playerId){
 
         this.board= new LightBoard(numPlayers);
-
         board.addObserver(clientUI);
+
         List<LightPlayer> players = clientConn.getPlayers();
         for (int i = 0; i < board.getNumPlayers(); i++) {
 
@@ -444,7 +440,7 @@ public class Client {
         }
 
 
-        clientUI.updateBoard(board);
+        board.notifyObservers();
 
     }
 
@@ -475,10 +471,6 @@ public class Client {
     }
 
 
-    //ONLY FOR DEBUG PURPOSES
-    public void printDebug(String message){
-        clientUI.printmsg(message);
-    }
 
     /**
      * this method quits the player from the game, he/she will not be able to resume the game

@@ -197,7 +197,6 @@ public class GUI extends Application implements ClientUI {
         });
     }
 
-    @Override
     public void updateBoard(LightBoard board) {
         Platform.runLater(() -> {
             if (board == null) {
@@ -277,45 +276,8 @@ public class GUI extends Application implements ClientUI {
         }
     }
 
-    @Override
-    public void updateDraftPool(List<LightDie> draftpool) {
 
-    }
 
-    @Override
-    public void updateSchema(LightPlayer player) {
-
-    }
-
-    @Override
-    public void updateRoundTrack(List<List<LightDie>> roundtrack) {
-
-    }
-
-    @Override
-    public void showRoundtrackDiceList(List<IndexedCellContent> roundtrack) {
-
-    }
-
-    @Override
-    public void showDraftPoolDiceList(List<IndexedCellContent> draftpool) {
-
-    }
-
-    @Override
-    public void showSchemaDiceList(List<IndexedCellContent> schema) {
-
-    }
-
-    @Override
-    public void updateToolUsage(List<LightTool> tools) {
-
-    }
-
-    @Override
-    public void showPlacementsList(List<Integer> placements, Place to, LightDie die) {
-
-    }
 
     @Override
     public void updateStatusMessage(String statusChange, int playerId) {
@@ -332,15 +294,6 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-    @Override
-    public void printmsg(String msg) {
-
-    }
-
-    @Override
-    public String getCommand() {
-        return null;
-    }
 
     @Override
     public void showOptions(List<Commands> optionsList) {
@@ -419,6 +372,6 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void update(Observable o, Object arg) {
-
+        updateBoard((LightBoard) o);
     }
 }

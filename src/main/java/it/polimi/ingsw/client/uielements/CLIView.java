@@ -184,7 +184,7 @@ public class CLIView {
 
         updateSchema=schemas.get(nowPlaying);
         Random randomGen = new Random();
-        updateSchema.set(0,addColorToLine(boldify(updateSchema.get(0)),Color.values()[randomGen.nextInt(Color.values().length)]));
+        updateSchema.set(0,addColorToLine(boldify(updateSchema.get(0)),Color.values()[randomGen.nextInt(Color.values().length - 1)]));
     }
 
     /**
