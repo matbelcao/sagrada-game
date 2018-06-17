@@ -59,8 +59,7 @@ public class Client {
     private ClientUI clientUI;
     private UILanguage lang;
     private LightBoard board;
-    private final Object lockState=new Object();
-    private ClientFSMState turnState;
+    private ClientFSM fsm;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
     private final Object lockCredentials=new Object();
 
@@ -92,12 +91,10 @@ public class Client {
         this.userStatus = UserStatus.DISCONNECTED;
         this.ready=false;
 
+
     }
 
 
-    public ClientFSMState getTurnState() {
-        return turnState;
-    }
 
     /**
      * parses the default settings in the xml file and creates a client based on that
@@ -290,7 +287,7 @@ public class Client {
 
             }while(!logged);
 
-
+            this.fsm=new ClientFSM(this);
             //start collecting commands from ui
             commandManager();
 
@@ -310,7 +307,7 @@ public class Client {
 
     private void commandManager(){
 
-        new UICommandManager(this).start();
+        new UICommandController(fsm,clientUI.getCommandQueue()).start();
 
     }
 
@@ -391,11 +388,6 @@ public class Client {
         board.setRoundTrack(clientConn.getRoundtrack(),numRound);
         if(numRound==0) {
 
-
-            synchronized (lockState) {
-                turnState=ClientFSMState.NOT_MY_TURN;
-                lockState.notifyAll();
-            }
             //get players
 
             synchronized (lockReady) {
@@ -444,11 +436,8 @@ public class Client {
         board.setIsFirstTurn(isFirstTurn);
         board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
 
-        synchronized (lockState) {
-
-            turnState=ClientFSMState.NOT_MY_TURN.nextState(playerId == board.getMyPlayerId());
-            lockState.notifyAll();
-        }
+        fsm.setNotMyTurn();
+        fsm.setMyTurn(playerId==board.getMyPlayerId());
 
 
         board.notifyObservers();
@@ -467,6 +456,7 @@ public class Client {
 
         board.notifyObservers();
 
+
     }
 
     public void updatePlayerStatus(int playerId, UserStatus status){
@@ -484,6 +474,9 @@ public class Client {
     }
 
 
+    public ClientFSMState getTurnState(){
+        return fsm.getState();
+    }
 
     /**
      * this method quits the player from the game, he/she will not be able to resume the game
@@ -530,12 +523,6 @@ public class Client {
 
     }
 
-    public void setTurnState(ClientFSMState clientFSMState) {
-        turnState=clientFSMState;
-    }
 
-    public Object getLockState() {
-        return lockState;
-    }
 
 }
