@@ -47,7 +47,7 @@ public enum Color { //need to add png address combined with Shade's ones
         return false;
     }
 
-    public static javafx.scene.paint.Color toFXColor(Color color){
+    public static javafx.scene.paint.Color toFXConstraintColor(Color color){
         if(color.equals(RED)){
             return javafx.scene.paint.Color.web("#bb331a");
         }else if(color.equals(GREEN)){
@@ -61,5 +61,18 @@ public enum Color { //need to add png address combined with Shade's ones
         }else{
             return javafx.scene.paint.Color.web("#9e9e9e");
         }
+    }
+
+    public static javafx.scene.paint.Color toFXColor(Color color){
+        if(color.equals(RED)){
+            return javafx.scene.paint.Color.RED;
+        }else if(color.equals(GREEN)){
+            return javafx.scene.paint.Color.GREEN;
+        }else if(color.equals(YELLOW)){
+            return javafx.scene.paint.Color.YELLOW;
+        }else if(color.equals(BLUE)){
+            return javafx.scene.paint.Color.BLUE;
+        }else
+            return javafx.scene.paint.Color.PURPLE;
     }
 }

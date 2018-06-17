@@ -435,7 +435,7 @@ public class GUIutil {
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double dieDim) {
         if (constraint.hasColor()) {
-            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
+            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXConstraintColor(constraint.getColor()));
             gc.fillRect(0, 0, dieDim, dieDim);
         }else{
             gc.setFill(Color.LIGHTGRAY);
@@ -449,7 +449,7 @@ public class GUIutil {
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double cellDim) {
         if (constraint.hasColor()) {
-            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
+            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXConstraintColor(constraint.getColor()));
             gc.fillRect(x, y, cellDim, cellDim);
         }else{
             gc.setFill(Color.LIGHTGRAY);
