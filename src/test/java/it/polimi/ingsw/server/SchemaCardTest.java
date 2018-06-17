@@ -100,8 +100,6 @@ class SchemaCardTest {
 
 
         schema1.putDie(2,new Die("FOUR","RED"));
-
-
         schema1.putDie(6,new Die("ONE","YELLOW"));
 
         List<Integer> list =new ArrayList<>();

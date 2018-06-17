@@ -211,6 +211,13 @@ public class Board {
         return null;
     }
 
+    /**
+     * Return the real position (0 to 19) for schema
+     * @param playerId
+     * @param from
+     * @param die
+     * @return
+     */
     public int getDiePosition(int playerId, Place from, Die die){
         switch (from){
             case SCHEMA:
