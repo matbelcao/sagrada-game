@@ -234,6 +234,7 @@ public class GUI extends Application implements ClientUI {
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.sizeToScene();
+            primaryStage.sizeToScene();
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
