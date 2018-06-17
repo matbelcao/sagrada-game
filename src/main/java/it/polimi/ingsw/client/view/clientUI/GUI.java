@@ -216,24 +216,24 @@ public class GUI extends Application implements ClientUI {
                     System.out.println("choose----------------------------------------------------------------");
                     break;
                 case NOT_MY_TURN:
-                    System.out.println("not my-------------------------------------------------------------");
+                    System.out.println("not my-----------------------------------------------------------------");
                     break;
                 case MAIN:
-                    System.out.println("main------------------------------------------------------------");
+                    System.out.println("main-------------------------------------------------------------------");
                     break;
                 case SELECT_DIE:
-                    System.out.println("select die--------------------------------------------------");
+                    System.out.println("select die-------------------------------------------------------------");
                     break;
                 case CHOOSE_OPTION:
                     if(board.getLatestOptionsList().size()>1){
-                        System.out.println("choose option---------------------------------------------------");
+                        System.out.println("choose option------------------------------------------------------");
                     }
                     break;
                 case CHOOSE_TOOL:
                     System.out.println("choose tool-------------------------------------------------------------");
                     break;
                 case CHOOSE_PLACEMENT:
-                    System.out.println("choose placement---------------------------------------------------------------");
+                    System.out.println("choose placement--------------------------------------------------------");
                     break;
                 case TOOL_CAN_CONTINUE:
                     System.out.println("tool can continue------------------------------------------------------------------");
@@ -242,6 +242,7 @@ public class GUI extends Application implements ClientUI {
             MainSceneGroup root = new MainSceneGroup(board);
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
+            primaryStage.sizeToScene();
             primaryStage.sizeToScene();
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
