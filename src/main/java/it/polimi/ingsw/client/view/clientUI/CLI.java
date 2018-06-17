@@ -1,9 +1,11 @@
-package it.polimi.ingsw.client;
+package it.polimi.ingsw.client.view.clientUI;
 
-import it.polimi.ingsw.client.uielements.CLIView;
-import it.polimi.ingsw.client.uielements.CLIViewUtils;
-import it.polimi.ingsw.client.uielements.UILanguage;
-import it.polimi.ingsw.client.uielements.UIMessages;
+import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.view.LightBoard;
+import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.view.clientUI.uielements.*;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Commands;
@@ -75,11 +77,11 @@ public class CLI implements ClientUI {
     public void updateLogin(boolean logged) {
         resetScreen();
         if (logged) {
-            console.printf(String.format("%s%n", uimsg.getMessage("login-ok")), client.getUsername());
+            console.printf(String.format("%s%n", uimsg.getMessage(UIMsg.LOGIN_OK)), client.getUsername());
             view.setClientInfo(client.getConnMode(),client.getUsername());
 
         } else {
-            console.printf(String.format("%s%n", uimsg.getMessage("login-ko")));
+            console.printf(String.format("%s%n", uimsg.getMessage(UIMsg.LOGIN_KO)));
             showLoginScreen();
         }
 
@@ -93,14 +95,14 @@ public class CLI implements ClientUI {
     @Override
     public void updateConnectionOk() {
         resetScreen();
-        console.printf(String.format("%n%s", uimsg.getMessage("connection-ok")));
+        console.printf(String.format("%n%s", uimsg.getMessage(UIMsg.CONNECTION_OK)));
 
     }
 
     @Override
     public void updateLobby(int numUsers){
 
-        console.printf(String.format("%s%n", uimsg.getMessage("lobby-update")),numUsers);
+        console.printf(String.format("%s%n", uimsg.getMessage(UIMsg.LOBBY_UPDATE)),numUsers);
 
     }
 
@@ -108,7 +110,7 @@ public class CLI implements ClientUI {
     public void updateGameStart(int numUsers, int playerId){
 
         resetScreen();
-        console.printf(String.format("%s%n", uimsg.getMessage("game-start")),numUsers,playerId);
+        console.printf(String.format("%s%n", uimsg.getMessage(UIMsg.GAME_START)),numUsers,playerId);
         this.view.setMatchInfo(playerId,client.getBoard().getNumPlayers());
 
     }
@@ -182,7 +184,7 @@ public class CLI implements ClientUI {
     public void updateConnectionClosed()
     {
         synchronized (client.getLockUI()) {
-            console.printf("Connection closed!%n");
+            console.printf(uimsg.getMessage(UIMsg.CLOSED_CONNECTION));
             client.getLockUI().notifyAll();
         }
     }
@@ -190,7 +192,7 @@ public class CLI implements ClientUI {
     @Override
     public void updateConnectionBroken() {
         synchronized (client.getLockUI()) {
-            console.printf("Connection broken!%n");
+            console.printf(uimsg.getMessage(UIMsg.BROKEN_CONNECTION));
             client.getLockUI().notifyAll();
         }
 
@@ -205,7 +207,7 @@ public class CLI implements ClientUI {
     public void showWaitingForGameStartScreen() {
         resetScreen();
 
-        String msg=String.format("%s%n", uimsg.getMessage("waiting-game-start"));
+        String msg=String.format("%s%n", uimsg.getMessage(UIMsg.WAIT_FOR_GAME_START));
         view.setLastScreen(msg);
         synchronized (client.getLockUI()) {
             console.printf(msg);

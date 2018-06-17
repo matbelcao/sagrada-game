@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client;
+package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.immutables.*;

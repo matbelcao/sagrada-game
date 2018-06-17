@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.uielements;
+package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import it.polimi.ingsw.client.Client;
 import org.w3c.dom.Document;

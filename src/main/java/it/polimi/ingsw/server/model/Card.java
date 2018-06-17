@@ -16,7 +16,7 @@ public abstract class Card {
     private int id;
 
     /**
-     * Read the xml file and inizialize the card's common parameter
+     * Read the xml file and initialize the card's common parameter
      * @param id card's id
      * @param xmlSrc xml file path
      * @param type card type

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.server.connection.MasterServer;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
 /**
@@ -9,15 +10,15 @@ import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 public class PrivObjectiveCard extends Card{
     private Color color;
     static final int NUM_PRIV_OBJ=5;
+    private static String xmlSource=MasterServer.XML_SOURCE+"PrivObjectiveCard.xml";
 
     /**
      * Constructs the card setting its id, name and description
      * @param id the id of the card
-     * @param xmlSrc the address to the xml file containing necessary information to initialize the cards
      */
-    public PrivObjectiveCard(int id, String xmlSrc){
+    public PrivObjectiveCard(int id){
         super();
-        this.color=Color.valueOf(super.xmlReader(id,xmlSrc,"PrivObjectiveCard"));
+        this.color=Color.valueOf(super.xmlReader(id,xmlSource,"PrivObjectiveCard"));
     }
 
     /**

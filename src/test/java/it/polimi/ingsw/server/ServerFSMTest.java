@@ -41,7 +41,16 @@ public class ServerFSMTest {
         state=fsm.fsmDiscard();
         assertEquals(ServerState.GET_DICE_LIST,state);
 
-
+        state=fsm.fsmExit();
+        assertEquals(ServerState.MAIN,state);
+        assertEquals(0,fsm.getNumDiePlaced());
+        fsm.placeDie();
+        assertEquals(1,fsm.getNumDiePlaced());
+        state=fsm.nextState(Commands.NONE);
+        state=fsm.nextState(Commands.NONE);
+        assertEquals(ServerState.MAIN,state);
+        state=fsm.nextState(Commands.NONE);
+        assertEquals(ServerState.MAIN,state);
     }
 
     @Test
@@ -57,6 +66,8 @@ public class ServerFSMTest {
 
         fsm.newToolUsage(tool);
         assertEquals(Place.SCHEMA,fsm.getPlaceFrom());
+        fsm.setPlaceFrom(Place.DRAFTPOOL);
+        assertNotEquals(Place.SCHEMA,fsm.getPlaceFrom());
         assertEquals(Place.SCHEMA,fsm.getPlaceTo());
         assertTrue(fsm.isToolActive());
 

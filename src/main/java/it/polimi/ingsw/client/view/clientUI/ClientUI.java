@@ -1,8 +1,8 @@
-package it.polimi.ingsw.client;
+package it.polimi.ingsw.client.view.clientUI;
 
+import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Commands;
-import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
 
 import java.io.File;
