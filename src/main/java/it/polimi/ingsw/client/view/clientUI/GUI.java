@@ -5,10 +5,10 @@ import it.polimi.ingsw.client.clientController.CmdWriter;
 import it.polimi.ingsw.client.clientController.QueuedCmdReader;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.textGen;
-import it.polimi.ingsw.client.view.clientUI.uielements.*;
 import it.polimi.ingsw.client.view.LightBoard;
+import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
+import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Commands;
@@ -242,8 +242,6 @@ public class GUI extends Application implements ClientUI {
             MainSceneGroup root = new MainSceneGroup(board);
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
-            primaryStage.sizeToScene();
-            primaryStage.sizeToScene();
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();

@@ -13,6 +13,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -207,6 +208,11 @@ public class GUIutil {
                 track.getChildren().add(c);
             }
         }
+        Button endTurn = new Button("end turn");
+        endTurn.setOnAction(e->cmdWrite.write("e"));
+        Button back = new Button("back");
+        back.setOnAction(e->cmdWrite.write("b"));
+        track.getChildren().addAll(back,endTurn);
         return new Group(track);
     }
 
