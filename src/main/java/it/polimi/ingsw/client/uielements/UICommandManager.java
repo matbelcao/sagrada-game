@@ -311,7 +311,9 @@ public class UICommandManager extends Thread {
 
                 client.getBoard().setLatestPlacementsList(client.getClientConn().getPlacementsList());
                 if(client.getBoard().getLatestPlacementsList().isEmpty()){
-                    toolContinue();
+                    if(isToolEnabled()) {
+                        toolContinue();
+                    }
                 }
             } else {
                 synchronized (client.getLockState()) {

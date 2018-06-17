@@ -144,7 +144,8 @@ public class CLI implements ClientUI {
                 view.updateMenuMain();
                 break;
             case SELECT_DIE:
-                if(board.getLatestDiceList().get(0).getPlace().equals(Place.ROUNDTRACK)){
+                if(board.getLatestDiceList().get(0).getPlace().equals(Place.ROUNDTRACK) &&
+                        board.getLatestOptionsList().get(0).equals(Commands.SWAP)){
                     board.getLatestDiceList().add(0,board.getLatestSelectedDie());
                 }
                 view.updateMenuDiceList(board.getLatestDiceList());

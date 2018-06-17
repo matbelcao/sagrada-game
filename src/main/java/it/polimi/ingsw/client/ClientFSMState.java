@@ -330,4 +330,7 @@ public enum ClientFSMState {
     public static synchronized boolean isPlacedDie() {
         return placedDie;
     }
+    public static synchronized boolean isToolEnabled() {
+        return toolEnabled;
+    }
 }
