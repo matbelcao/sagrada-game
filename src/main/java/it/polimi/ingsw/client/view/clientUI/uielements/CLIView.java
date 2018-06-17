@@ -1,7 +1,9 @@
-package it.polimi.ingsw.client.uielements;
+package it.polimi.ingsw.client.view.clientUI.uielements;
 
-import it.polimi.ingsw.client.ClientFSMState;
-import it.polimi.ingsw.client.LightBoard;
+import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.view.LightBoard;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.ConnectionMode;
@@ -12,7 +14,8 @@ import it.polimi.ingsw.server.model.SchemaCard;
 import java.io.IOException;
 import java.util.*;
 
-import static it.polimi.ingsw.client.uielements.CLIViewUtils.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.CLIViewUtils.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 
 public class CLIView {
 
@@ -47,12 +50,12 @@ public class CLIView {
         } catch (IOException e) {
 
         }
-        result.append(String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-username")));
+        result.append(String.format(cliElems.getElem("login-line"),uiMsg.getMessage(LOGIN_USERNAME)));
         return result.toString();
     }
 
     public String showLoginPassword() {
-        return String.format(cliElems.getElem("login-line"),uiMsg.getMessage("login-password"));
+        return String.format(cliElems.getElem("login-line"),uiMsg.getMessage(LOGIN_PASSWORD));
     }
 
 
@@ -97,7 +100,7 @@ public class CLIView {
      */
     public void updateDraftPool(List<LightDie> draftPool){
 
-        updateDraftPool(listToMap(draftPool));
+        updateDraftPool(toMap(draftPool));
 
 
     }
@@ -133,7 +136,7 @@ public class CLIView {
                 try{
                     builtRow= appendRows(builtRow,buildCell(roundTrack.get(round).get(row)));
                 }catch (IndexOutOfBoundsException e){
-                    builtRow= appendRows(builtRow,buildWall(' ',CELL_HEIGHT,CELL_WIDTH));
+                    builtRow= appendRows(builtRow,buildWall(CELL_HEIGHT, CELL_WIDTH, ' '));
                 }
             }
             result.addAll(builtRow);
@@ -146,8 +149,8 @@ public class CLIView {
         }
 
         result.addAll(buildCellRow(baseRow,0,10));
-        List<String> padding=buildWall(' ',result.size()-1,1);
-        padding.add(boldify(String.format(cliElems.getElem("point-left"),uiMsg.getMessage("roundtrack"))));
+        List<String> padding=buildWall(result.size()-1, 1, ' ');
+        padding.add(boldify(String.format(cliElems.getElem("point-left"),uiMsg.getMessage(ROUNDTRACK))));
         result= appendRows(result,padding);
         this.roundTrack=result;
     }
@@ -174,11 +177,11 @@ public class CLIView {
      */
     public void updateRoundTurn(int roundNumber, boolean isFirstTurn, int nowPlaying){
         turnRoundinfo= String.format(cliElems.getElem("round-turn"),
-                uiMsg.getMessage("round"),
+                uiMsg.getMessage(ROUND),
                 roundNumber,
                 isFirstTurn?
-                        uiMsg.getMessage("first-turn"):
-                        uiMsg.getMessage("second-turn")
+                        uiMsg.getMessage(FIRST_TURN):
+                        uiMsg.getMessage(SECOND_TURN)
         );
         List<String> updateSchema;
 
@@ -194,7 +197,7 @@ public class CLIView {
      */
     public void updateTools(List<LightTool> tools){
         this.tools.clear();
-        this.tools.add(String.format(uiMsg.getMessage("tools")));
+        this.tools.add(String.format(uiMsg.getMessage(TOOLS)));
         for(int i=0;i<LightBoard.NUM_TOOLS;i++) {
 
             this.tools.addAll(buildTool(tools.get(i), i));
@@ -245,11 +248,11 @@ public class CLIView {
         StringBuilder builder=new StringBuilder();
         List<String> priv = new ArrayList<>(privObj);
         List<String> drafted = new ArrayList<>(buildDraftedSchemas());
-        priv.add(0,boldify(uiMsg.getMessage("priv-obj")));
+        priv.add(0,boldify(uiMsg.getMessage(PRIVATE_OBJ)));
         priv.add("  ");
         builder.append("%n%n%n%n");
-        builder.append(printList(appendRows(appendRows(buildWall(' ',drafted.size(),SCHEMA_WIDTH+10),drafted),priv))).append("%n%n%n");
-        builder.append(uiMsg.getMessage("choose-schema")).append("%n%n");
+        builder.append(printList(appendRows(appendRows(buildWall(drafted.size(), SCHEMA_WIDTH+10, ' '),drafted),priv))).append("%n%n%n");
+        builder.append(uiMsg.getMessage(CHOOSE_SCHEMA)).append("%n%n");
         builder.append(getPrompt(ClientFSMState.CHOOSE_SCHEMA));
         lastScreen=builder.toString();
         schemas.clear();
@@ -267,7 +270,7 @@ public class CLIView {
     public void updateMenuNotMyTurn(String nowPlaying) {
         clearMenu();
         menuList.add(" ");
-        menuList.add(String.format(uiMsg.getMessage("not-my-turn"),nowPlaying));
+        menuList.add(String.format(uiMsg.getMessage(NOT_MY_TURN),nowPlaying));
         padMenu();
         fillMenu();
     }
@@ -278,7 +281,7 @@ public class CLIView {
     }
     public void updateMenuListTools(List<LightTool> tools){
         clearMenu();
-        menuList.add(uiMsg.getMessage("choose-tool"));
+        menuList.add(uiMsg.getMessage(CHOOSE_TOOL));
         for(int i=0; i<LightBoard.NUM_TOOLS;i++) {
             menuList.add(String.format(cliElems.getElem("li"),i, tools.get(i).getName()));
         }
@@ -290,10 +293,10 @@ public class CLIView {
     public void updateMenuMain(){
         clearMenu();
         menuList.add(" ");
-        menuList.add(uiMsg.getMessage("main-choice"));
+        menuList.add(uiMsg.getMessage(MAIN_CHOICE));
         menuList.add(" ");
-        menuList.add(String.format(cliElems.getElem("li"),0,uiMsg.getMessage("use-tool")));
-        if(!ClientFSMState.isPlacedDie())menuList.add(String.format(cliElems.getElem("li"),1,uiMsg.getMessage("place-die")));
+        menuList.add(String.format(cliElems.getElem("li"),0,uiMsg.getMessage(USE_TOOL)));
+        if(!ClientFSMState.isPlacedDie())menuList.add(String.format(cliElems.getElem("li"),1,uiMsg.getMessage(PLACE_DIE)));
 
         padMenu();
         fillMenu();
@@ -304,13 +307,13 @@ public class CLIView {
         if(dice.size()>1 && !dice.get(0).getPlace().equals(dice.get(1).getPlace())){
             menuList.addAll(buildCell(dice.get(0).getContent()));
             dice.remove(0);
-            String desc=String.format(uiMsg.getMessage("dice-list"), uiMsg.getMessage(dice.get(0).getPlace().toString().toLowerCase()));
+            String desc=String.format(uiMsg.getMessage(CHOOSE_FROM_DICE_LIST), uiMsg.getMessage(UIMsg.valueOf(dice.get(0).getPlace().toString().toUpperCase())));
             menuList.set(CELL_HEIGHT-1,
                     menuList.get(CELL_HEIGHT-1)+" "+ desc);
             menuList.add(" ");
         }else {
             menuList.add(" ");
-            menuList.add(String.format(uiMsg.getMessage("dice-list"), uiMsg.getMessage(dice.get(0).getPlace().toString().toLowerCase())));
+            menuList.add(String.format(uiMsg.getMessage(CHOOSE_FROM_DICE_LIST), uiMsg.getMessage(UIMsg.valueOf(dice.get(0).getPlace().toString().toUpperCase()))));
             menuList.add(" ");
         }
         menuList.addAll(buildDiceList(dice));
@@ -326,8 +329,8 @@ public class CLIView {
      */
     public void updateMenuListPlacements(List<Integer> placements, CellContent die){
 
-        List<String> msg = new ArrayList<>(buildWall(' ', CELL_HEIGHT - 1, 1));
-        msg.add(boldify(uiMsg.getMessage("can-be-placed")));
+        List<String> msg = new ArrayList<>(buildWall(CELL_HEIGHT - 1, 1, ' '));
+        msg.add(boldify(uiMsg.getMessage(CAN_BE_PLACED)));
 
         clearMenu();
         menuList.addAll(appendRows(buildCell(die),msg));
@@ -353,7 +356,7 @@ public class CLIView {
                 result= appendRows(result,entry.getValue());
             }
         }
-        result= appendRows(result,buildWall(' ',result.size(), (LightBoard.MAX_PLAYERS - numPlayers)*(SCHEMA_WIDTH+6)));
+        result= appendRows(result,buildWall(result.size(), (LightBoard.MAX_PLAYERS - numPlayers)*(SCHEMA_WIDTH+6), ' '));
         result= appendRows(result,buildSeparator(SCHEMA_HEIGHT+1));
         result= appendRows(result,objectives);
         return result;
@@ -369,16 +372,15 @@ public class CLIView {
         fillMenu();
         if(schemas.get(playerId).size()<menuList.size()){
             schemas.get(playerId).addAll(
-                    buildWall(' ',
-                            menuList.size()-schemas.get(playerId).size(),
-                            schemas.get(playerId).get(0).length()));
+                    buildWall(menuList.size()-schemas.get(playerId).size(), schemas.get(playerId).get(0).length(), ' '
+                    ));
         }
 
         List<String> result=appendRows(schemas.get(playerId),menuList);
 
 
         if(tools.size()>result.size()){
-            result.addAll(buildWall(' ',tools.size()-result.size(),printableLength(result.get(0))));
+            result.addAll(buildWall(tools.size()-result.size(), printableLength(result.get(0)), ' '));
         }
         result= appendRows(result,buildSeparator(result.size()));
         result= appendRows(result,tools);
@@ -432,22 +434,22 @@ public class CLIView {
     /**
      * @return a string that contains a message regarding the back option
      */
-    private String backOption(){ return uiMsg.getMessage("back-option")+" | ";}
+    private String backOption(){ return uiMsg.getMessage(BACK_OPTION)+" | ";}
 
     /**
      * @return a string that contains a message regarding the discard option
      */
-    private String discardOption(){ return uiMsg.getMessage("discard-option")+" | "; }
+    private String discardOption(){ return uiMsg.getMessage(DISCARD_OPTION)+" | "; }
 
     /**
      * @return a string that contains a message regarding the end-turn option
      */
-    private String endTurnOption(){ return uiMsg.getMessage("endturn-option")+" | "; }
+    private String endTurnOption(){ return uiMsg.getMessage(END_TURN_OPTION)+" | "; }
 
     /**
      * @return a string that contains a message regarding the quit option
      */
-    private String quitOption(){ return uiMsg.getMessage("quit-option"); }
+    private String quitOption(){ return uiMsg.getMessage(QUIT_OPTION); }
 
 
 
@@ -455,7 +457,7 @@ public class CLIView {
      * fills the remaining lines of the menu area with spaces
      */
     private void fillMenu() {
-        menuList.addAll(buildWall(' ',MENU_HEIGHT-menuList.size(),MENU_WIDTH));
+        menuList.addAll(buildWall(MENU_HEIGHT-menuList.size(), MENU_WIDTH, ' '));
     }
 
     /**
@@ -478,7 +480,7 @@ public class CLIView {
 
         bottomInfo = String.format(cliElems.getElem("player-info"),
                 username,
-                uiMsg.getMessage("connected-via"),
+                uiMsg.getMessage(CONNECTED_VIA),
                 mode.toString());
 
     }
@@ -529,9 +531,9 @@ public class CLIView {
         if(die.getPlace().equals(Place.SCHEMA)){
             entry.append(rowColmumn(die.getPosition()));
         } else if(die.getPlace().equals(Place.ROUNDTRACK)){
-            entry.append(String.format(cliElems.getElem("index"),uiMsg.getMessage("round-number"),die.getPosition()));
+            entry.append(String.format(cliElems.getElem("index"),uiMsg.getMessage(ROUND_NUMBER),die.getPosition()));
         }else{
-            entry.append(String.format(cliElems.getElem("index"),uiMsg.getMessage("pos"),die.getPosition()));
+            entry.append(String.format(cliElems.getElem("index"),uiMsg.getMessage(POS),die.getPosition()));
         }
         return entry.toString();
     }
@@ -565,7 +567,7 @@ public class CLIView {
     private static String rowColmumn(int index){
         int row= index/SchemaCard.NUM_COLS;
         int column= index%SchemaCard.NUM_COLS;
-        return String.format(cliElems.getElem("row-col"),uiMsg.getMessage("row"),row,uiMsg.getMessage("col"),column);
+        return String.format(cliElems.getElem("row-col"),uiMsg.getMessage(ROW),row,uiMsg.getMessage(COL),column);
     }
 
 
@@ -593,7 +595,7 @@ public class CLIView {
         if(result.size()>=CELL_HEIGHT) {
             result.set(CELL_HEIGHT - 1,
                     result.get(CELL_HEIGHT - 1) +
-                            boldify(String.format(cliElems.getElem("point-left"), uiMsg.getMessage("draftpool")))+"         "+ boldify(turnRoundinfo));
+                            boldify(String.format(cliElems.getElem("point-left"), uiMsg.getMessage(DRAFTPOOL)))+"         "+ boldify(turnRoundinfo));
             result.set(CELL_HEIGHT - 1, result.get(CELL_HEIGHT - 1)  + alignRight(boldify(bottomInfo), SCREEN_WIDTH - printableLength(result.get(CELL_HEIGHT - 1))));
             result = appendRows(buildSeparator(draftPool.size()), result);
         }
@@ -641,13 +643,13 @@ public class CLIView {
         if(player==null){throw new IllegalArgumentException();}
 
         String info=String.format(cliElems.getElem("username-id"),
-                player.getUsername(),alignRight(uiMsg.getMessage("player-number") +
+                player.getUsername(),alignRight(uiMsg.getMessage(PLAYER_NUMBER) +
                         player.getPlayerId(),width - player.getUsername().length()));
         info=info+(String.format(cliElems.getElem("tokens-info"),
-                uiMsg.getMessage("tokens"),
+                uiMsg.getMessage(REMAINING_TOKENS),
                 alignRight(
                         replicate(FAVOR,player.getFavorTokens()),
-                        width-uiMsg.getMessage("tokens").length()-1)));
+                        width-uiMsg.getMessage(REMAINING_TOKENS).length()-1)));
         return info;
     }
 
@@ -661,14 +663,14 @@ public class CLIView {
      */
     private List<String> buildObjectives(List<LightCard> pubObj, LightPrivObj privObj){
         List<String> result=new ArrayList<>();
-        result.add(boldify(uiMsg.getMessage("pub-obj")));
+        result.add(boldify(uiMsg.getMessage(PUBLIC_OBJ)));
         result.add(" ");
         for(LightCard card : pubObj){
             result.addAll(buildCard(card,OBJ_LENGTH));
             result.add("     ");
         }
 
-        result.add(boldify(uiMsg.getMessage("priv-obj")));
+        result.add(boldify(uiMsg.getMessage(PRIVATE_OBJ)));
         result.addAll(buildPrivObj(privObj,OBJ_LENGTH));
 
 

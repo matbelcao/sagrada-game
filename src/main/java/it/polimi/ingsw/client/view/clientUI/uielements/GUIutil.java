@@ -1,7 +1,8 @@
-package it.polimi.ingsw.client.uielements;
+package it.polimi.ingsw.client.view.clientUI.uielements;
 
-import it.polimi.ingsw.client.ClientFSMState;
-import it.polimi.ingsw.client.GUI;
+import it.polimi.ingsw.client.clientController.CmdWriter;
+import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.view.clientUI.GUI;
 import it.polimi.ingsw.common.immutables.LightConstraint;
 import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightPrivObj;

@@ -1,6 +1,4 @@
-package it.polimi.ingsw.client;
-
-import java.util.TooManyListenersException;
+package it.polimi.ingsw.client.clientFSM;
 
 /**
  * this class contains the information needed to know which state the FSM of the client is in, and retrieve the next one

@@ -1,14 +1,13 @@
-package it.polimi.ingsw.client.uielements;
+package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.client.LightBoard;
+import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 
 import java.io.IOException;
 
-import static it.polimi.ingsw.client.ClientFSMState.*;
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
 
 /**
  * this class implements the thread that manages the commands coming from the uis to perform changes on the client
