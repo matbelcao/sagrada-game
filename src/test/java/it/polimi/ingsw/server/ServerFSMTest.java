@@ -100,7 +100,7 @@ public class ServerFSMTest {
 
         state=fsm.newToolUsage(tool);
         assertEquals(ServerState.GET_DICE_LIST,state);
-        state=fsm.newTurn(true);
+        state=fsm.newTurn(0,true);
         assertFalse(fsm.isToolActive());
         assertTrue(fsm.isFirstTurn());
         assertEquals(ServerState.MAIN,state);

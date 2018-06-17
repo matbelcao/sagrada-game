@@ -1,38 +1,61 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
+import it.polimi.ingsw.common.enums.Turn;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
-import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
+import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
-import sun.net.www.content.text.plain;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
+/**
+ * This class implements the game logic useful to place the dice in the SchemaCard or execute a specific ToolCard.
+ * It also provides the methods for the random extraction of SchemaCards, ToolCards, Public and Private Objectives cards.
+ */
 public class Board {
-    private DraftPool draftPool;
-    private List<Player> players;
-    private PubObjectiveCard[] publicObjectives;
-    private ToolCard[] toolCards;
-    boolean additionalSchemas;
-
-
     public static final int NUM_OBJECTIVES=3;
     public static final int NUM_TOOLS=3;
     public static final int NUM_ROUNDS=10;
     public static final int NUM_PLAYER_SCHEMAS=4;
 
+    private DraftPool draftPool;
+    private List<Player> players;
+    private PubObjectiveCard[] publicObjectives;
+    private ToolCard[] toolCards;
+    private SchemaCard[]  schemaDrafted;
+    private boolean additionalSchemas;
+    private ServerFSM fsm;
+    private ServerState status;
 
+    private ToolCard selectedTool;
+    private Die selectedDie;
+    private int oldIndex;
+    private Commands selectedCommand;
+    private Boolean enableToolList;
+    private List<IndexedCellContent> diceList;
+    private List<Commands> commandsList;
+    private List<Integer> placements;
+
+    /**
+     * The class constructor. Initializes the variables and extracts the objects to distribute to the players
+     * @param users the List of users that are playing in the match
+     * @param additionalSchemas true if the additional schema FA is enabled
+     */
     public Board(List<User> users, boolean additionalSchemas){
         this.draftPool=new DraftPool();
         this.additionalSchemas=additionalSchemas;
         this.publicObjectives=draftPubObjectives();
         this.toolCards=draftToolCards();
+        status=ServerState.INIT;
+        fsm=new ServerFSM();
 
         //Instantiating the player's classes
         PrivObjectiveCard [] privObjectiveCards = draftPrivObjectives(users.size());
@@ -43,12 +66,12 @@ public class Board {
     }
 
     /**
-     * Selects random ToolCards to be used in the match
-     * @return an array containing the tools
+     * Selects the random ToolCards to be used in the match
+     * @return an array containing the ToolCards
      */
     private ToolCard[] draftToolCards() {
         toolCards= new ToolCard[Board.NUM_TOOLS];
-        /*Random randomGen = new Random();
+        Random randomGen = new Random();
         List<Integer> draftedTools= new ArrayList<>();
         Integer id;
         for(int i =0; i<Board.NUM_TOOLS;i++){
@@ -57,16 +80,16 @@ public class Board {
             }while (draftedTools.contains(id));
             draftedTools.add(id);
             toolCards[i]=new ToolCard(id);
-        }*/
-        toolCards[0]=new ToolCard(10);
-        toolCards[1]=new ToolCard(11);
-        toolCards[2]=new ToolCard(12);
+        }
+        /*toolCards[0]=new ToolCard(2);
+        toolCards[1]=new ToolCard(6);
+        toolCards[2]=new ToolCard(7);*/
         return toolCards;
     }
 
     /**
-     * Selects random Public Objective Cards
-     * @return an array containing the public objectives for the match
+     * Selects the random PublicObjectiveCards
+     * @return an array containing the PublicObjectiveCards for the match
      */
     private PubObjectiveCard[] draftPubObjectives() {
         PubObjectiveCard[] pubObjectiveCards= new PubObjectiveCard[Board.NUM_OBJECTIVES];
@@ -85,11 +108,11 @@ public class Board {
     }
 
     /**
-     * Select random Private Objective Cards
-     * @param numPlayers the number pf players of the match
-     * @return an array containing the private objectives for the match
+     * Select the random PrivateObjectiveCards
+     * @param numPlayers the number of users that are playing in the match
+     * @return an array containing the PrivateObjectiveCards for the match
      */
-    private PrivObjectiveCard[] draftPrivObjectives(Integer numPlayers) {
+    private PrivObjectiveCard[] draftPrivObjectives(int numPlayers) {
         PrivObjectiveCard[] privObjectiveCards= new PrivObjectiveCard[numPlayers];
         Random randomGen = new Random();
         Integer id;
@@ -107,11 +130,11 @@ public class Board {
     }
 
     /**
-     * Extract the random schema cards to be chosen by users
-     * @return an array containing the schema cards
+     * Extract the random SchemaCards to be chosen by users
+     * @return an array containing the SchemaCards
      */
     public SchemaCard[] draftSchemas() {
-        SchemaCard[]  schemaChoices= new SchemaCard[NUM_PLAYER_SCHEMAS*players.size()];
+        schemaDrafted= new SchemaCard[NUM_PLAYER_SCHEMAS*players.size()];
         Random randomGen = new Random();
         Integer id;
         List<Integer> draftedSchemas= new ArrayList<>();
@@ -122,28 +145,343 @@ public class Board {
             } while(draftedSchemas.contains(id));
 
             draftedSchemas.add(id);
-            schemaChoices[i]=new SchemaCard(id);
+            schemaDrafted[i]=new SchemaCard(id);
         }
-        return schemaChoices;
+        return schemaDrafted;
     }
 
-    public List<IndexedCellContent> indexedDiceList(int playerId,Place from, Color constraint){
-        switch(from) {
-            case SCHEMA:
-                return indexedSchemaDiceList(playerId,constraint);
-            case DRAFTPOOL:
-                return indexedDraftpoolDiceList();
-            case ROUNDTRACK:
-                return indexedRoundTrackDiceList();
-            default:
-                throw  new IllegalArgumentException();
+    /**
+     * Responds to the request by sending the player-specific schema card. If the toolcard execution is enabled, it will
+     * be sent the temporary schema card used during the tool-specific execution flow.
+     * @param playerId the id of the player's desired schema card
+     * @return the requested card
+     */
+    public SchemaCard getUserSchemaCard(int playerId) {
+        if(fsm.isToolActive()){
+            return selectedTool.getNewSchema();
+        }else {
+            return getPlayerById(playerId).getSchema();
         }
     }
 
-    private  List<IndexedCellContent> indexedSchemaDiceList(int playerId, Color constraint){
+    /**
+     * Returns to the User who made the request an indexed List of dice contained in a specific board position.
+     * The selection of the interested area is automated by the logic.
+     * @return the indexed List of dice contained in a specific board position
+     */
+    public List<IndexedCellContent> getDiceList(){
+        Color constraint = Color.NONE;
+
+        if(fsm.isToolActive()){
+            constraint=selectedTool.getColorConstraint();
+            if(selectedTool.isInternalSchemaPlacement()){
+                diceList=selectedTool.internalIndexedSchemaDiceList();
+                if(!selectedTool.isSetColorFromRountrackCard() || enableToolList ){
+                    enableToolList=true;
+                }
+            }else if(enableToolList && diceList.isEmpty()){ //skip if it's not required to select a die (ALL option)
+                status=fsm.endTool();
+                return diceList;
+            }
+        }
+
+        if(!enableToolList){
+            switch(fsm.getPlaceFrom()) {
+                case SCHEMA:
+                    diceList = indexedSchemaDiceList(constraint);
+                    break;
+                case DRAFTPOOL:
+                    diceList = indexedDraftpoolDiceList();
+                    break;
+                case ROUNDTRACK:
+                    diceList = indexedRoundTrackDiceList();
+                    break;
+                default:
+                    throw  new IllegalArgumentException();
+            }
+        }
+
+        if(status.equals(ServerState.MAIN)){
+            status=fsm.nextState(selectedCommand);
+        }
+        status=fsm.nextState(selectedCommand);
+        return diceList;
+    }
+
+    /**
+     * Allows the player to select a die from a previously sent list.
+     * Returns to the User who made the request an indexed List of commands that can be executed on a certain selected die.
+     * @param dieIndex the index of the previously indexed dice List sent to the client
+     * @return the indexed List of commands that can be executed
+     */
+    public List<Commands> selectDie(int dieIndex){
+
+        Color constraint = Color.NONE;
+
+        if(fsm.isToolActive()) {
+            //toolcard enabled
+            constraint = selectedTool.getColorConstraint();
+            if(selectedTool.isInternalSchemaPlacement() && enableToolList){
+                selectedDie=selectedTool.internalSelectDie(dieIndex);
+            }else if (selectedCommand.equals(Commands.INCREASE_DECREASE) || selectedCommand.equals(Commands.SET_SHADE)){
+                selectedDie.setColor(diceList.get(dieIndex).getContent().getColor().toString());
+                selectedDie.setShade(diceList.get(dieIndex).getContent().getShade().toInt());
+            } else{
+                selectedDie = getDieSelected(dieIndex, constraint);
+                oldIndex = getDiePosition(selectedDie);
+                selectedTool.selectDie(selectedDie);
+            }
+            commandsList = selectedTool.getActions();
+        }else {
+            //Toolcard disabled
+            selectedDie = getDieSelected(dieIndex, constraint);
+            oldIndex = getDiePosition(selectedDie);
+            commandsList=new ArrayList<>();
+            commandsList.add(Commands.PLACE_DIE);
+        }
+
+        status=fsm.nextState(selectedCommand);
+        enableToolList =false;
+        return commandsList;
+    }
+
+    /**
+     * Sets the chosen schema card to the user's relative player instance, if all the player have choose a schema card
+     * the timer will be stopped
+     * @param user the user to set the card
+     * @param schemaIndex the index of the schema card (for each player (0 to 3)
+     * @return true iff the operation was successful
+     */
+    public boolean chooseSchemaCard(User user,int schemaIndex){
+        boolean response;
+        if(schemaIndex<0 || schemaIndex >=4){return false;}
+        response=getPlayer(user).setSchema(schemaDrafted[(getPlayer(user).getGameId()*Board.NUM_PLAYER_SCHEMAS)+schemaIndex]);
+        return response;
+    }
+
+    /**
+     * Selects the command option to run and sets the class variables according to the specific case
+     * @param index the index of the option to select
+     * @return true iff the operation was successful
+     */
+    public boolean chooseOption(int index){
+        boolean response=true;
+        if(commandsList.size()<=index){return false;}
+        selectedCommand=commandsList.get(index);
+        if(fsm.isToolActive()){
+            switch (selectedCommand){
+                case INCREASE_DECREASE:
+                    diceList=selectedTool.shadeIncreaseDecrease(selectedDie);
+                    enableToolList =true;
+                    response=diceList != null;
+                    break;
+                case SWAP:
+                    fsm.setPlaceFrom(selectedTool.getPlaceTo());
+                    response= selectedTool.swapDie();
+                    break;
+                case REROLL:
+                    diceList=selectedTool.rerollDie();
+                    enableToolList =true;
+                    response=diceList != null;
+                    break;
+                case FLIP:
+                    diceList=selectedTool.flipDie();
+                    response=diceList != null;
+                    break;
+                case SET_SHADE:
+                    fsm.setPlaceFrom(Place.DICEBAG);
+                    selectedDie=getDraftPool().putInBagAndExtract(selectedDie);
+                    diceList=selectedTool.chooseShade();
+                    enableToolList =true;
+                    response=diceList != null;
+                    break;
+                case SET_COLOR:
+                    selectedTool.setColor();
+                    enableToolList =true;
+                    fsm.setPlaceFrom(selectedTool.getPlaceFrom());
+                    response= true;
+                    break;
+                case PLACE_DIE:
+                    response= true;
+                    break;
+                case NONE:
+                    response= true;
+                    break;
+                default:
+                    response= false;
+            }
+        }
+
+        if(response){
+            status=fsm.nextState(selectedCommand);
+        }
+        return response;
+    }
+
+    /**
+     * Place the die in the desired cell, which is selected with the index parameter from the list of possible placements
+     * previously sent to the client
+     * @param index the index of the cell in the prevoisly index List sent to the client
+     * @return true iff the operation was successful
+     */
+    public boolean choosePlacement(int index){
+        if(placements.size()<=index || !selectedCommand.equals(Commands.PLACE_DIE) || selectedDie==null){return false;}
+        boolean response;
+        IgnoredConstraint constraint;
+
+        if(fsm.isToolActive()){
+            if(selectedTool.isInternalSchemaPlacement()){
+                response=selectedTool.internalDiePlacement(index);
+            }else{
+                constraint = selectedTool.getIgnoredConstraint();
+                response=schemaPlacement(index,constraint);
+                fsm.placeDie();
+            }
+        }else{
+            constraint=IgnoredConstraint.NONE;
+            response=schemaPlacement(index,constraint);
+            fsm.placeDie();
+        }
+
+        if(response){
+            status=fsm.nextState(selectedCommand);
+        }
+        return response;
+    }
+
+    /**
+     * Returns to the User who made the request the list of possible placements if the selected action is PLACE_DIE.
+     * The composition of the list, according to the various Constraints/ToolCards enabled, is automated.
+     * @return the list of possible placements, ordered in increasing order
+     */
+    public List<Integer> getPlacements(){
+        IgnoredConstraint constraint;
+        SchemaCard schema = getPlayerById(fsm.getUserPlayingId()).getSchema();
+
+        if(fsm.isToolActive()) {
+            if(selectedTool.isInternalSchemaPlacement()){
+                placements=selectedTool.internalListPlacements();
+            }else{
+                constraint = selectedTool.getIgnoredConstraint();
+                placements = schema.listPossiblePlacements(selectedDie,constraint);
+            }
+
+        }else{
+            constraint=IgnoredConstraint.NONE;
+            placements = schema.listPossiblePlacements(selectedDie,constraint);
+        }
+
+
+        status=fsm.nextState(selectedCommand);
+        return placements;
+    }
+
+    /**
+     * Returns to the User who made the request the affirmative or negative answer to attempting to enable the selected
+     * tool card. If the response is affirmative, the method will trigger the client's update requests.
+     * @param index the index of the previously indexed List of tool cards sent to the client (0 to 2)
+     * @param turn if the turn is the first or the second of the round
+     * @param roundNumber the number of the round
+     * @return true if the ToolCard is successfully enabled
+     */
+    public boolean activeTool(int index,Turn turn,int roundNumber) {
+        Player player=getPlayerById(fsm.getUserPlayingId());
+
+        Boolean toolEnabled=getToolCard(index).enableToolCard(player,roundNumber,turn,fsm.getNumDiePlaced(),player.getSchema());
+        if(toolEnabled){
+            selectedTool=getToolCard(index);
+            status=fsm.newToolUsage(selectedTool);
+            if(selectedTool.isRerollAllDiceCard()){
+                List<Die> dielist;
+                switch (selectedTool.getPlaceFrom()){
+                    case DRAFTPOOL:
+                        dielist=getDraftPool().getDraftedDice();
+                        break;
+                    case ROUNDTRACK:
+                        dielist=getDraftPool().getRoundTrack().getTrackList();
+                        break;
+                    default:
+                        throw new IllegalArgumentException();
+                }
+                selectedTool.rerollAll(dielist);
+                diceList=new ArrayList<>();
+                enableToolList =true;
+            }else if(selectedTool.isSetColorFromRountrackCard()){
+                fsm.setPlaceFrom(Place.ROUNDTRACK);
+                enableToolList=false;
+            }
+        }else{
+            exit();
+        }
+        return toolEnabled;
+
+    }
+
+    /**
+     * Returns to the user who made the request the ToolCard status.
+     * A negative answer indicates that the execution of the action flow of the toolcard has ended.
+     * @return true if the execution flow is not ended, false otherwise
+     */
+    public boolean toolStatus() {
+        if(!selectedTool.toolCanContinue(getPlayerById(fsm.getUserPlayingId()))){
+            List<Integer> oldIndexes=selectedTool.getOldIndexes();
+            for (Integer index: oldIndexes){
+                switch (fsm.getPlaceFrom()){
+                    case SCHEMA:
+                        getPlayerById(fsm.getUserPlayingId()).getSchema().removeDie(index);
+                        break;
+                    case DRAFTPOOL:
+                        getDraftPool().removeDie(index);
+                        break;
+                    case ROUNDTRACK:
+                        getDraftPool().getRoundTrack().removeDie(index);
+                        break;
+                    default:
+                }
+            }
+            exit();
+        }else{
+            status=fsm.nextState(selectedCommand);
+        }
+        return fsm.isToolActive();
+    }
+
+    /**
+     * Allows the User to not perform a placement (with the current selected die) and select a new one without interrupting
+     * the execution of a multiple-message command.
+     */
+    public void discard(){
+        if(fsm.isToolActive()){
+            selectedTool.toolDiscard();
+        }
+        status=fsm.fsmDiscard();
+        selectedDie=null;
+    }
+
+    /**
+     * Allows the User to interrupt a multiple-message command (for COMPLEX ACTIONS like die placements, ToolCard usages, ecc)
+     */
+    public void exit(){
+        if(fsm.isToolActive()){
+            selectedTool.toolExit(getPlayerById(fsm.getUserPlayingId()));
+        }
+        status=fsm.fsmExit();
+        enableToolList =false;
+        selectedTool=null;
+        selectedDie=null;
+        diceList=new ArrayList<>();
+        selectedCommand=Commands.NONE;
+    }
+
+    /**
+     * Returns and indexed List of the dice contained in the player's SchemaCard
+     * @param constraint the constraint to select dice of only one color
+     * @return the indexed List of the dice contained in the SchemaCard
+     */
+    private  List<IndexedCellContent> indexedSchemaDiceList(Color constraint){
         List<IndexedCellContent> indexedList=new ArrayList<>();
         IndexedCellContent indexedCell;
-        SchemaCard schema= getPlayerById(playerId).getSchema();
+        SchemaCard schema= getPlayerById(fsm.getUserPlayingId()).getSchema();
         Die die;
 
         FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
@@ -163,6 +501,10 @@ public class Board {
         return indexedList;
     }
 
+    /**
+     * Returns and indexed List of the dice contained in the DraftPool
+     * @return the indexed List of the dice contained in the DraftPool
+     */
     private List<IndexedCellContent> indexedDraftpoolDiceList(){
         List<Die> draftedDice=getDraftPool().getDraftedDice();
         List<IndexedCellContent> indexedList=new ArrayList<>();
@@ -177,6 +519,10 @@ public class Board {
         return indexedList;
     }
 
+    /**
+     * Returns and indexed List of the dice contained in the RoundTrack
+     * @return the indexed List of the dice contained in the RoundTrack
+     */
     private List<IndexedCellContent> indexedRoundTrackDiceList(){
         List<List<Die>> dieTrack=getDraftPool().getRoundTrack().getTrack();
         List<IndexedCellContent> indexedList=new ArrayList<>();
@@ -193,35 +539,32 @@ public class Board {
     }
 
     /**
-     * Selects the die from a draftpool/user's schema card/roundtrack a returns the schema card's possible placements
-     * @param user the user who made the request
-     * @return the list of possible placements in the user's schema card
+     * Selects the die from the DraftPool/user's SchemaCard/RoundTrack and returns it.
+     * @return the die selected
      */
-    public Die selectDie(int playerId,Place from, int die_index,Color constraint) {
-
-        switch (from){
+    private Die getDieSelected(int dieIndex,Color constraint) {
+        switch (fsm.getPlaceFrom()){
             case SCHEMA:
-                return getPlayerById(playerId).getSchema().getSchemaDiceList(constraint).get(die_index);
+                return getPlayerById(fsm.getUserPlayingId()).getSchema().getSchemaDiceList(constraint).get(dieIndex);
             case DRAFTPOOL:
-                return getDraftPool().getDraftedDice().get(die_index);
+                return getDraftPool().getDraftedDice().get(dieIndex);
             case ROUNDTRACK:
                 List<Die> trackList = getDraftPool().getRoundTrack().getTrackList();
-                return trackList.get(die_index);
+                return trackList.get(dieIndex);
+            default:
+                return null;
         }
-        return null;
     }
 
     /**
-     * Return the real position (0 to 19) for schema
-     * @param playerId
-     * @param from
-     * @param die
-     * @return
+     * Retrieves the die's physical posizion from the DraftPool/user's SchemaCard/RoundTrack and returns it.
+     * @param die the die to find the position
+     * @return the die's position
      */
-    public int getDiePosition(int playerId, Place from, Die die){
-        switch (from){
+    private int getDiePosition(Die die){
+        switch (fsm.getPlaceFrom()){
             case SCHEMA:
-                return getPlayerById(playerId).getSchema().getDiePosition(die);
+                return getPlayerById(fsm.getUserPlayingId()).getSchema().getDiePosition(die);
             case DRAFTPOOL:
                 return getDraftPool().getDraftedDice().indexOf(die);
             case ROUNDTRACK:
@@ -232,9 +575,15 @@ public class Board {
     }
 
 
-    public boolean schemaPlacement(int playerId,int newIndex,int oldIndex, Die selectedDie, IgnoredConstraint constraint){
-        SchemaCard schemaCard=getPlayerById(playerId).getSchema();
-        List<Integer> placements= schemaCard.listPossiblePlacements(selectedDie,constraint);
+    /**
+     * Places the die in the SchemaCard and then removes it from the old position, it can be used only for external
+     * placements (!SchemaCard->SchemaCard)
+     * @param newIndex the index to place the die
+     * @param constraint the color restriction, if enabled
+     * @return true if the placement was completed successfully
+     */
+    private boolean schemaPlacement(int newIndex, IgnoredConstraint constraint){
+        SchemaCard schemaCard=getPlayerById(fsm.getUserPlayingId()).getSchema();
         try {
             schemaCard.putDie(placements.get(newIndex),selectedDie,constraint);
             getDraftPool().removeDie(oldIndex);
@@ -244,30 +593,11 @@ public class Board {
         }
     }
 
-    public List<Integer> listSchemaPlacements(int playerId, Die selectedDie, IgnoredConstraint constraint){
-        SchemaCard schema = getPlayerById(playerId).getSchema();
-        return schema.listPossiblePlacements(selectedDie,constraint);
-    }
-
-
-    public void removeOldDice(int playerId, Place from, List<Integer> oldIndexes){
-        for (Integer index: oldIndexes){
-            switch (from){
-                case SCHEMA:
-                    getPlayerById(playerId).getSchema().removeDie(index);
-                    break;
-                case DRAFTPOOL:
-                    getDraftPool().removeDie(index);
-                    break;
-                case ROUNDTRACK:
-                    getDraftPool().getRoundTrack().removeDie(index);
-                    break;
-                default:
-                    return;
-            }
-        }
-    }
-
+    /**
+     * Returna the Player reference binded to a certain User
+     * @param user the User to find the relative Player
+     * @return the Player's reference
+     */
     public Player getPlayer(User user) {
         for(Player p : players){
             if (p.matchesUser(user)){
@@ -277,6 +607,11 @@ public class Board {
         throw new NoSuchElementException();
     }
 
+    /**
+     * Returns the Player reference associated with a certain ID
+     * @param playerId the Player's ID
+     * @return the Player's reference
+     */
     public Player getPlayerById(int playerId) {
         for(Player p : players){
             if (p.getGameId()==playerId){
@@ -286,18 +621,40 @@ public class Board {
         throw new NoSuchElementException();
     }
 
+    /**
+     * Returns the ToolCard associated with a certain index (0 to 2)
+     * @param index the index of the ToolCard
+     * @return the requested ToolCard's referece
+     */
     public ToolCard getToolCard(int index) {
         assert (index>=0 && index<NUM_TOOLS);
         return toolCards[index];
     }
 
+    /**
+     * Returns the PubObjectiveCard associated with a certain index (0 to 2)
+     * @param index the index of the PubObjectiveCard
+     * @return the requested PubObjectiveCard's referece
+     */
     public PubObjectiveCard getPublicObjective(int index) {
         assert (index>=0 && index<NUM_OBJECTIVES);
         return publicObjectives[index];
     }
 
+    /**
+     * Returns the DraftPool's reference
+     * @return the DraftPool's reference
+     */
     public DraftPool getDraftPool(){
         return this.draftPool;
+    }
+
+    /**
+     * Returns the FSM reference
+     * @return the FSM reference
+     */
+    public ServerFSM getFSM(){
+        return fsm;
     }
 
 }

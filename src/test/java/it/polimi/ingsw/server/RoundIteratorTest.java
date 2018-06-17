@@ -1,7 +1,7 @@
 package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.server.model.User;
-import it.polimi.ingsw.server.model.Game;
+import it.polimi.ingsw.server.controller.Game;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;

@@ -1,6 +1,8 @@
 package it.polimi.ingsw.server.connection;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.ConnectionMode;
+import it.polimi.ingsw.server.controller.MasterServer;
+import it.polimi.ingsw.server.controller.Validator;
 import it.polimi.ingsw.server.model.User;
 
 import java.io.*;

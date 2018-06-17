@@ -12,6 +12,7 @@ public class ServerFSM {
     private boolean toolActive;
     private int numDiePlaced;
     private boolean isFirstTurn;
+    private int userPlayingId;
 
     private Place placeFrom;
     private Place placeTo;
@@ -58,11 +59,12 @@ public class ServerFSM {
      * @param isFirstTurn true if is the 1/2 player's turn
      * @return the new turn's state
      */
-    public ServerState newTurn(boolean isFirstTurn){
+    public ServerState newTurn(int userPlayingId, boolean isFirstTurn){
         curState=ServerState.MAIN;
         toolActive=false;
         numDiePlaced=0;
         this.isFirstTurn=isFirstTurn;
+        this.userPlayingId=userPlayingId;
         placeFrom=Place.DRAFTPOOL;
         placeTo=Place.SCHEMA;
         return curState;
@@ -211,5 +213,11 @@ public class ServerFSM {
         placeFrom=place;
     }
 
+    public ServerState getCurState(){
+        return curState;
+    }
 
+    public int getUserPlayingId() {
+        return userPlayingId;
+    }
 }

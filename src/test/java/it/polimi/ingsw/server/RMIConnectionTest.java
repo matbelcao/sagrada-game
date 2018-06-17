@@ -4,7 +4,7 @@ import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.client.uielements.UILanguage;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UIMode;
-import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;

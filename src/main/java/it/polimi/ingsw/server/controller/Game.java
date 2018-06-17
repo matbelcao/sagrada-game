@@ -1,9 +1,8 @@
-package it.polimi.ingsw.server.model;
+package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
-import it.polimi.ingsw.server.connection.MasterServer;
-import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
+import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
@@ -19,24 +18,17 @@ public class Game extends Thread implements Iterable  {
     private Board board;
     private boolean additionalSchemas; //to be used to enable additional schemas FA
     private List<User> users;
-    private SchemaCard [] draftedSchemas;
+    private SchemaCard[] draftedSchemas;
     private RoundIterator round;
     private Boolean endLock;
     private final Object lockRun;
     private Timer timer;
+
     private ServerFSM fsm;
-    private ServerState status;
 
     private User userPlaying;
-    private int userPlayingId;
-    private ToolCard selectedTool;
-    private Die selectedDie;
-    private int oldIndex;
-    private Commands selectedCommand;
-    private Boolean enableToolList;
-    private List<IndexedCellContent> diceList;
-    private List<Commands> commandsList;
-    private List<Integer> placements;
+    private int diceListSize;
+
 
     /**
      * Constructs the class and sets the players list
@@ -48,9 +40,7 @@ public class Game extends Thread implements Iterable  {
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         this.draftedSchemas = board.draftSchemas();
-        fsm=new ServerFSM();
-        status=ServerState.INIT;
-        this.selectedDie=null;
+        fsm=board.getFSM();
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
             u.setGame(this);
@@ -68,9 +58,7 @@ public class Game extends Thread implements Iterable  {
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         draftedSchemas = board.draftSchemas();
-        fsm=new ServerFSM();
-        status=ServerState.INIT;
-        this.selectedDie=null;
+        fsm=board.getFSM();
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
         }
@@ -147,12 +135,11 @@ public class Game extends Thread implements Iterable  {
         round = (RoundIterator) this.iterator();
 
         timer = new Timer();
-        timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * 1000);
+        timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * (long)1000);
         stopFlow();
 
         while (round.hasNextRound()){
             round.nextRound();
-            enableToolList =false;
             board.getDraftPool().draftDice(users.size());
 
             //Notify to all the users the starting of the round
@@ -160,8 +147,7 @@ public class Game extends Thread implements Iterable  {
 
             while(round.hasNext()){
                 userPlaying = round.next();
-                userPlayingId = board.getPlayer(userPlaying).getGameId();
-                Player curPlayer= board.getPlayerById(userPlayingId);
+                Player curPlayer= board.getPlayer(userPlaying);
 
                 if(userPlaying.getStatus().equals(UserStatus.PLAYING) && userPlaying.getGame().equals(this) && !curPlayer.isSkippingTurn()){
                     turnFlow();
@@ -221,9 +207,9 @@ public class Game extends Thread implements Iterable  {
      * to limit the maximum time of each turn.
      */
     private void turnFlow() {
-        status=fsm.newTurn(round.isFirstTurn());
-
+        fsm.newTurn(board.getPlayer(userPlaying).getGameId(),round.isFirstTurn());
         exit(false);
+
         endLock=false;
 
         //Notify to all the users the starting of the turn
@@ -232,7 +218,7 @@ public class Game extends Thread implements Iterable  {
         }
 
         timer = new Timer();
-        timer.schedule(new PlayerTurn(), MasterServer.getMasterServer().getTurnTime() * 1000);
+        timer.schedule(new PlayerTurn(), MasterServer.getMasterServer().getTurnTime() * (long)1000);
         stopFlow();
 
         //Notify to all the users the ending of the turn
@@ -312,13 +298,9 @@ public class Game extends Thread implements Iterable  {
         if(playerId>=users.size() || playerId <0){ throw new IllegalActionException(); }
         if(board.getPlayerById(playerId).getSchema()==null){ throw new IllegalActionException(); }
         if(playerId>=0 && playerId<users.size()){
-            if(fsm.isToolActive()){
-                return selectedTool.getNewSchema();
-            }else{
-                return board.getPlayerById(playerId).getSchema();
-            }
+            return board.getUserSchemaCard(playerId);
         }
-        return null;
+        throw new IllegalActionException();
     }
 
     /**
@@ -329,33 +311,30 @@ public class Game extends Thread implements Iterable  {
      * @throws IllegalActionException if the schema card is still not instantited
      */
     public SchemaCard getUserSchemaCard(User user) throws IllegalActionException {
+        Player player= board.getPlayer(user);
         if(board.getPlayer(user).getSchema()==null){ throw new IllegalActionException(); }
-        if(fsm.isToolActive()){
-            return selectedTool.getNewSchema();
-        }else {
-            return board.getPlayer(user).getSchema();
-        }
+        return getUserSchemaCard(player.getGameId());
     }
 
     /**
      * Responds to the request by sending the draftpool's content to the user of the match
      * @return the list of die in the draftpool
-     *      * @throws IllegalActionException if the request syntax is wrong, if the fsm state is not correct, if the index is
-     *      * bigger than the List of dice
+     * @throws IllegalActionException if the request syntax is wrong, if the fsm state is not correct, if the index is
+     * bigger than the List of dice
      */
     public List<Die> getDraftedDice() throws IllegalActionException {
-        if(status.equals(ServerState.INIT)){ throw new IllegalActionException(); }
+        if(fsm.getCurState().equals(ServerState.INIT)){ throw new IllegalActionException(); }
         return board.getDraftPool().getDraftedDice();
     }
 
     /**
      * Responds to the request by sending the roundracks's content to the user of the match
      * @return the list of die in the roundtrack
-     *      * @throws IllegalActionException if the request syntax is wrong, if the fsm state is not correct, if the index is
-     *      * bigger than the List of dice
+     * @throws IllegalActionException if the request syntax is wrong, if the fsm state is not correct, if the index is
+     * bigger than the List of dice
      */
     public List<List<Die>> getRoundTrackDice() throws IllegalActionException {
-        if(status.equals(ServerState.INIT)){ throw new IllegalActionException(); }
+        if(fsm.getCurState().equals(ServerState.INIT)){ throw new IllegalActionException(); }
         return board.getDraftPool().getRoundTrack().getTrack();
     }
 
@@ -383,41 +362,21 @@ public class Game extends Thread implements Iterable  {
         return 0;
     }
 
-
     /**
      * Returns to the User who made the request an indexed List of dice contained in a specific board position.
-     * The selection of the interested area is automated by the FSM and the game logic.
+     * The selection of the interested area is automated by the FSM and the Board logic.
      * @return the indexed List of dice contained in a specific board position
      * @throws IllegalActionException if the request syntax is wrong or if the fsm state is not correct
      */
     public List<IndexedCellContent> getDiceList() throws IllegalActionException {
-        if(!(status.equals(ServerState.MAIN)||status.equals(ServerState.GET_DICE_LIST))){throw new IllegalActionException();}
+        if(!(fsm.getCurState().equals(ServerState.MAIN)||fsm.getCurState().equals(ServerState.GET_DICE_LIST))){
+            throw new IllegalActionException();
+        }
         if(!fsm.isToolActive() && fsm.isDiePlaced()){throw new IllegalActionException();}
 
-        Color constraint = Color.NONE;
+        List<IndexedCellContent> diceList=board.getDiceList();
+        diceListSize=diceList.size();
 
-        if(fsm.isToolActive()){
-            constraint=selectedTool.getColorConstraint();
-            if(selectedTool.isInternalSchemaPlacement()){
-                diceList=selectedTool.internalIndexedSchemaDiceList();
-                if(!selectedTool.isSetColorFromRountrackCard() || enableToolList ){
-                    enableToolList=true;
-                }
-            }else if(enableToolList && diceList.isEmpty()){ //skip if it's not required to select a die (ALL option)
-                status=fsm.endTool();
-                return diceList;
-            }
-        }
-        //System.out.println("GET_DICE_LIST: "+status+" "+fsm.getPlaceFrom()+" "+enableToolList);
-
-        if(!enableToolList){
-            diceList=board.indexedDiceList(userPlayingId,fsm.getPlaceFrom(),constraint);
-        }
-
-        if(status.equals(ServerState.MAIN)){
-            status=fsm.nextState(selectedCommand);
-        }
-        status=fsm.nextState(selectedCommand);
         return diceList;
     }
 
@@ -430,43 +389,15 @@ public class Game extends Thread implements Iterable  {
      * bigger than the List of dice
      */
     public List<Commands> selectDie(int dieIndex) throws IllegalActionException {
-        //System.out.println("SELECT_DIE: "+status+" "+diceList.size()+" "+dieIndex);
-        if(!status.equals(ServerState.SELECT) || diceList.size()<=dieIndex){throw new IllegalActionException();}
+        if(!fsm.getCurState().equals(ServerState.SELECT) || diceListSize<=dieIndex){throw new IllegalActionException();}
 
-        Color constraint = Color.NONE;
-
-        if(fsm.isToolActive()) {
-            //toolcard enabled
-            constraint = selectedTool.getColorConstraint();
-            if(selectedTool.isInternalSchemaPlacement() && enableToolList){
-                selectedDie=selectedTool.internalSelectDie(dieIndex);
-            }else if (selectedCommand.equals(Commands.INCREASE_DECREASE) || selectedCommand.equals(Commands.SET_SHADE)){
-                selectedDie.setColor(diceList.get(dieIndex).getContent().getColor().toString());
-                selectedDie.setShade(diceList.get(dieIndex).getContent().getShade().toInt());
-            } else{
-                selectedDie = board.selectDie(userPlayingId, fsm.getPlaceFrom(), dieIndex, constraint);
-                oldIndex = board.getDiePosition(userPlayingId, fsm.getPlaceFrom(), selectedDie);
-                selectedTool.selectDie(selectedDie);
-            }
-            commandsList = selectedTool.getActions();
-        }else {
-            //Toolcard disabled
-            selectedDie = board.selectDie(userPlayingId, fsm.getPlaceFrom(), dieIndex, constraint);
-            oldIndex = board.getDiePosition(userPlayingId, fsm.getPlaceFrom(), selectedDie);
-            commandsList=new ArrayList<>();
-            commandsList.add(Commands.PLACE_DIE);
-        }
-        //System.out.println("selected-->"+selectedDie.toString());
-
-        status=fsm.nextState(selectedCommand);
-        enableToolList =false;
-        return commandsList;
+        return board.selectDie(dieIndex);
     }
 
 
     /**
      * Returns to the User who made the request the affirmative or negative answer to an action of choice.
-     * The choice may concern: the selection of a card scheme, an action to be performed, a placement
+     * The choice may concern: the selection of a card schema, an action to be performed, a placement.
      * @param user the user who made the request
      * @param index the index of the previously indexed List sent to the client
      * @return the indexed List of commands that can be executed
@@ -476,230 +407,84 @@ public class Game extends Thread implements Iterable  {
     public boolean choose(User user,int index) throws IllegalActionException {
         Boolean response;
 
-        switch(status){
+        switch(fsm.getCurState()){
             case INIT:
-                //System.out.println("CHOOSE_SCHEMA: "+status+" "+index);
-                return chooseSchemaCard(user,index);
+                response=board.chooseSchemaCard(user,index);
+                if(response) {
+                    for (User u: users){
+                        if(board.getPlayer(u).getSchema()==null){
+                            return true;
+                        }
+                    }
+                    startFlow();
+                }
+                return response;
             case CHOOSE_OPTION:
                 if(!user.equals(userPlaying)){throw new IllegalActionException();}
-                //System.out.println("CHOOSE_OPTIONS: "+status+" "+index);
-                response=chooseOption(index);
+                response=board.chooseOption(index);
                 break;
             case CHOOSE_PLACEMENT:
                 if(!user.equals(userPlaying)){throw new IllegalActionException();}
-                //System.out.println("CHOOSE_PLACEMENTS: "+placements.size()+" "+selectedCommand+" "+selectedDie);
-                response=choosePlacement(index);
+                response=board.choosePlacement(index);
+                if(response){
+                    notifyBoardChanged();
+                }
                 break;
             default:
                 throw new IllegalActionException();
-        }
-
-        if(response){
-            status=fsm.nextState(selectedCommand);
-        }
-        return response;
-    }
-
-    /**
-     * Sets the chosen schema card to the user's relative player instance, if all the player have choose a schema card
-     * the timer will be stopped
-     * @param user the user to set the card
-     * @param schemaIndex the index of the schema card (for each player (0 to 3)
-     * @return true iff the operation was successful
-     */
-    private boolean chooseSchemaCard(User user,int schemaIndex){
-        boolean response;
-        if(schemaIndex<0 || schemaIndex >=4){return false;}
-        response=board.getPlayer(user).setSchema(draftedSchemas[(users.indexOf(user)*Board.NUM_PLAYER_SCHEMAS)+schemaIndex]);
-        if(!response){return false;}
-        for (User u: users){
-            if(board.getPlayer(u).getSchema()==null){
-                return true;
-            }
-        }
-        startFlow();
-        return true;
-    }
-
-    /**
-     * Selects the command option to run and sets the class variables according to the specific case
-     * @param index the index of the option to select
-     * @return true iff the operation was successful
-     */
-    public boolean chooseOption(int index){
-        if(commandsList.size()<=index){return false;}
-        selectedCommand=commandsList.get(index);
-        if(fsm.isToolActive()){
-            switch (selectedCommand){
-                case INCREASE_DECREASE:
-                    diceList=selectedTool.shadeIncreaseDecrease(selectedDie);
-                    enableToolList =true;
-                    break;
-                case SWAP:
-                    fsm.setPlaceFrom(selectedTool.getPlaceTo());
-                    return selectedTool.swapDie();
-                case REROLL:
-                    diceList=selectedTool.rerollDie();
-                    enableToolList =true;
-                    break;
-                case FLIP:
-                    diceList=selectedTool.flipDie();
-                    break;
-                case SET_SHADE:
-                    fsm.setPlaceFrom(Place.DICEBAG);
-                    selectedDie=board.getDraftPool().putInBagAndExtract(selectedDie);
-                    diceList=selectedTool.chooseShade();
-                    enableToolList =true;
-                    break;
-                case SET_COLOR:
-                    selectedTool.setColor();
-                    enableToolList =true;
-                    fsm.setPlaceFrom(selectedTool.getPlaceFrom());
-                    return true;
-                case PLACE_DIE:
-                    return true;
-                case NONE:
-                    return true;
-                default:
-                    return false;
-            }
-            return diceList != null;
-        }else{
-            return true;
-        }
-    }
-
-    /**
-     * Place the die in the desired cell, which is selected with the index parameter from the list of possible placements
-     * previously sent to the client
-     * @param index the index of the cell in the prevoisly index List sent to the client
-     * @return true iff the operation was successful
-     */
-    private boolean choosePlacement(int index){
-        if(placements.size()<=index || !selectedCommand.equals(Commands.PLACE_DIE) || selectedDie==null){return false;}
-        boolean response;
-        IgnoredConstraint constraint;
-
-        if(fsm.isToolActive()){
-            if(selectedTool.isInternalSchemaPlacement()){
-                response=selectedTool.internalDiePlacement(index);
-            }else{
-                constraint = selectedTool.getIgnoredConstraint();
-                response=board.schemaPlacement(userPlayingId,index,oldIndex,selectedDie,constraint);
-                fsm.placeDie();
-            }
-        }else{
-            constraint=IgnoredConstraint.NONE;
-            response=board.schemaPlacement(userPlayingId,index,oldIndex,selectedDie,constraint);
-            fsm.placeDie();
-        }
-
-        if(response){
-            notifyBoardChanged();
         }
         return response;
     }
 
     /**
      * Returns to the User who made the request the list of possible placements if the selected action is PLACE_DIE.
-     * The composition of the list, according to the various constraints/ toolcards enabled, is automated.
-     * @param user the user who made the request
+     * The composition of the list, according to the various Constraints/ToolCards enabled, is automated by the board logic.
      * @return the list of possible placements, ordered in increasing order
      * @throws IllegalActionException if the request syntax is wrong, if the fsm state is not correct
      */
-    public List<Integer> getPlacements(User user) throws IllegalActionException {
-        //System.out.println("GET_PLACEMENTS: "+status);
-        IgnoredConstraint constraint;
+    public List<Integer> getPlacements() throws IllegalActionException {
+        if(!fsm.getCurState().equals(ServerState.GET_PLACEMENTS)) {throw new IllegalActionException();}
 
-        if(status.equals(ServerState.GET_PLACEMENTS)) {
-            if(fsm.isToolActive()) {
-                if(selectedTool.isInternalSchemaPlacement()){
-                    placements=selectedTool.internalListPlacements();
-                }else{
-                    constraint = selectedTool.getIgnoredConstraint();
-                    placements = board.listSchemaPlacements(userPlayingId, selectedDie,constraint);
-                }
-
-            }else{
-                constraint=IgnoredConstraint.NONE;
-                placements = board.listSchemaPlacements(userPlayingId, selectedDie,constraint);
-            }
-
-
-            status=fsm.nextState(selectedCommand);
-            return placements;
-        }
-        throw new IllegalActionException();
+        return board.getPlacements();
     }
 
     /**
      * Returns to the User who made the request the affirmative or negative answer to attempting to enable the selected
      * tool card. If the response is affirmative, the method will trigger the client's update requests.
      * @param index the index of the previously indexed List of tool cards sent to the client (0 to 2)
-     * @return true iff the operation was successful
+     * @return true if the ToolCard is successfully enabled
      * @throws IllegalActionException if the request syntax is wrong, if the fsm state is not correct, if the index is
      * OutOfBound (0 to 2)
      */
     public boolean activeTool(int index) throws IllegalActionException {
-        //System.out.println("TOOL_ENABLE: "+status);
-        if(!status.equals(ServerState.MAIN)){ throw new IllegalActionException(); }
+        if(!fsm.getCurState().equals(ServerState.MAIN)){ throw new IllegalActionException(); }
         if(index<0||index>2){return false;}
 
-
-        Player player=board.getPlayerById(userPlayingId);
         Turn turn = round.isFirstTurn()?Turn.FIRST_TURN:Turn.SECOND_TURN;
         int roundNumber = round.getRoundNumber();
 
-        Boolean toolEnabled=board.getToolCard(index).enableToolCard(player,roundNumber,turn,fsm.getNumDiePlaced(),player.getSchema());
+        Boolean toolEnabled=board.activeTool(index,turn,roundNumber);
+
         if(toolEnabled){
-            selectedTool=board.getToolCard(index);
-            status=fsm.newToolUsage(selectedTool);
-            if(selectedTool.isRerollAllDiceCard()){
-                List<Die> dielist;
-                switch (selectedTool.getPlaceFrom()){
-                    case DRAFTPOOL:
-                        dielist=board.getDraftPool().getDraftedDice();
-                        break;
-                    case ROUNDTRACK:
-                        dielist=board.getDraftPool().getRoundTrack().getTrackList();
-                        break;
-                    default:
-                        throw new IllegalActionException();
-                }
-                selectedTool.rerollAll(dielist);
-                diceList=new ArrayList<>();
-                enableToolList =true;
-            }else if(selectedTool.isSetColorFromRountrackCard()){
-                    fsm.setPlaceFrom(Place.ROUNDTRACK);
-                    enableToolList=false;
-            }
             notifyBoardChanged();
-        }else{
-            exit(false);
         }
         return toolEnabled;
     }
 
     /**
-     * Returns to the user who made the request the toolcard status.
+     * Returns to the user who made the request the ToolCard status.
      * A negative answer indicates that the execution of the action flow of the toolcard has ended.
      * @return true if the execution flow is not ended, false otherwise
      * @throws IllegalActionException if the request syntax is wrong or if the fsm state is not correct
      */
     public boolean toolStatus() throws IllegalActionException {
-        //System.out.println("TOOL_STATUS: "+status);
-        if(!status.equals(ServerState.TOOL_CAN_CONTINUE)){throw new IllegalActionException();}
+        if(!fsm.getCurState().equals(ServerState.TOOL_CAN_CONTINUE)){throw new IllegalActionException();}
 
-        if(!selectedTool.toolCanContinue(board.getPlayerById(userPlayingId))){
-            List<Integer> oldIndexes=selectedTool.getOldIndexes();
-            System.out.println(oldIndex);
-            board.removeOldDice(userPlayingId,selectedTool.getPlaceFrom(),oldIndexes);
-            exit(false);
-        }else{
-            status=fsm.nextState(selectedCommand);
-        }
+        boolean response = board.toolStatus();
+
         notifyBoardChanged();
-        return fsm.isToolActive();
+
+        return response;
     }
 
 
@@ -708,12 +493,8 @@ public class Game extends Thread implements Iterable  {
      * the execution of a multiple-message command.
      */
     public void discard(){
-        if(!status.equals(ServerState.CHOOSE_PLACEMENT)){return;}
-        if(fsm.isToolActive()){
-            selectedTool.toolDiscard();
-        }
-        status=fsm.fsmDiscard();
-        selectedDie=null;
+        if(!fsm.getCurState().equals(ServerState.CHOOSE_PLACEMENT)){return;}
+        board.discard();
     }
 
     /**
@@ -721,16 +502,10 @@ public class Game extends Thread implements Iterable  {
      * @param notifyBoardChanged if true, this flag will trigger the client's update requests.
      */
     public void exit(Boolean notifyBoardChanged){
-        if(status.equals(ServerState.INIT)){return;}
-        if(fsm.isToolActive()){
-            selectedTool.toolExit(board.getPlayerById(userPlayingId));
-        }
-        status=fsm.fsmExit();
-        enableToolList =false;
-        selectedTool=null;
-        selectedDie=null;
-        diceList=new ArrayList<>();
-        selectedCommand=Commands.NONE;
+        if(fsm.getCurState().equals(ServerState.INIT)){return;}
+
+        board.exit();
+
         if(notifyBoardChanged){
             notifyBoardChanged();
         }
@@ -814,7 +589,7 @@ public class Game extends Thread implements Iterable  {
      * @return if the game has started
      */
     public boolean gameStarted() {
-        return !status.equals(ServerState.INIT);
+        return !fsm.getCurState().equals(ServerState.INIT);
     }
 
     /**

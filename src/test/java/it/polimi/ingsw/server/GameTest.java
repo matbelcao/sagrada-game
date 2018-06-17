@@ -3,15 +3,12 @@ package it.polimi.ingsw.server;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.model.SchemaCard;
 import it.polimi.ingsw.server.model.User;
-import it.polimi.ingsw.server.model.Game;
+import it.polimi.ingsw.server.controller.Game;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
-import org.junit.BeforeClass;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

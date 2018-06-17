@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
 import it.polimi.ingsw.server.model.*;
@@ -76,14 +77,20 @@ public class BoardTest {
     }
 
     @Test
-    void testIndexedDiceList(){
-        Board board1=new Board(users1, additionalSchemas);
+    void testInternalPlacement(){
+        Board board=new Board(users1, additionalSchemas);
         SchemaCard schema= new SchemaCard(1);
         Die die1=new Die("FOUR","RED");
         Die die2=new Die("ONE","YELLOW");
 
-        Player player0 = board1.getPlayer(users1.get(0));
+        Player player0 = board.getPlayer(users1.get(0));
         player0.setSchema(schema);
+
+
+        ServerFSM fsm = board.getFSM();
+        fsm.newTurn(0,true);
+        board.exit();
+        fsm.setPlaceFrom(Place.SCHEMA);
 
         try {
             schema.putDie(2,die1);
@@ -92,71 +99,73 @@ public class BoardTest {
             e.printStackTrace();
         }
 
-        List<IndexedCellContent> schemaList1=board1.indexedDiceList(player0.getGameId(),Place.SCHEMA,Color.NONE);
+        board.getDraftPool().draftDice(4);
+        assertEquals(9, board.getDraftPool().getDraftedDice().size());
+
+        List<IndexedCellContent> schemaList1=board.getDiceList();
         assertEquals(die1.getShade(),schemaList1.get(0).getContent().getShade());
         assertEquals(die2.getColor(),schemaList1.get(1).getContent().getColor());
 
-        List<IndexedCellContent> schemaList2=board1.indexedDiceList(player0.getGameId(),Place.SCHEMA,Color.YELLOW);
-        assertNotEquals(die1.getShade(),schemaList2.get(0).getContent().getShade());
-        assertEquals(die2.getColor(),schemaList2.get(0).getContent().getColor());
-        assertEquals(Place.SCHEMA,schemaList2.get(0).getPlace());
+        assertEquals(Commands.PLACE_DIE,board.selectDie(0).get(0));
+
+        assertFalse(board.chooseOption(1));
+        assertTrue(board.chooseOption(0));
 
         List<Integer> list =new ArrayList<>();
         list.add(8);
         list.add(11);
         list.add(12);
-        List<Integer> schemaPlacements = board1.listSchemaPlacements(player0.getGameId(),new Die("TWO","RED"),IgnoredConstraint.NONE);
+        List<Integer> schemaPlacements = board.getPlacements();
         assertEquals(list,schemaPlacements);
 
-        board1.getDraftPool().draftDice(users1.size());
-        assertEquals(9,board1.indexedDiceList(player0.getGameId(),Place.DRAFTPOOL,Color.NONE).size());
-        assertEquals(0,board1.indexedDiceList(player0.getGameId(),Place.ROUNDTRACK,Color.NONE).size());
+        board.discard();
+        assertFalse(board.choosePlacement(3));
+        assertFalse(board.choosePlacement(1));
+        assertEquals(null, schema.getCell(11).getDie());
 
-        board1.getDraftPool().clearDraftPool(0);
-        assertEquals(0,board1.indexedDiceList(player0.getGameId(),Place.DRAFTPOOL,Color.NONE).size());
-        assertEquals(9,board1.indexedDiceList(player0.getGameId(),Place.ROUNDTRACK,Color.NONE).size());
+        assertEquals(Commands.PLACE_DIE,board.selectDie(0).get(0));
+        assertTrue(board.chooseOption(0));
+        assertTrue(board.choosePlacement(1));
+        assertEquals(die1, schema.getCell(11).getDie());
+        assertEquals("RED\\FOUR", schema.getCell(11).getDie().toString());
     }
 
     @Test
-    void testGameMethods(){
-        Board board1=new Board(users1, additionalSchemas);
-        SchemaCard schema= new SchemaCard(1);
-        Die die1=new Die("FOUR","RED");
-        Die die2=new Die("ONE","YELLOW");
+    void testChooseSchema(){
+        Board board=new Board(users1, additionalSchemas);
+        board.draftSchemas();
 
-        Player player0 = board1.getPlayer(users1.get(0));
-        player0.setSchema(schema);
+        Player player0 = board.getPlayer(users1.get(0));
+        assertTrue(board.chooseSchemaCard(users1.get(0),1));
+        assertFalse(board.chooseSchemaCard(users1.get(0),1));
 
-        try {
-            schema.putDie(2,die1);
-            schema.putDie(6,die2);
-        } catch (IllegalDieException e) {
-            e.printStackTrace();
-        }
+        Player player1 = board.getPlayer(users1.get(1));
+        SchemaCard schema=new SchemaCard(1);
+        player1.setSchema(schema);
+        assertEquals(schema,board.getUserSchemaCard(player1.getGameId()));
+    }
 
-        Die dieTemp = board1.selectDie(player0.getGameId(),Place.SCHEMA,0,Color.YELLOW);
-        assertEquals(die2,dieTemp);
-        assertEquals(2,board1.getDiePosition(player0.getGameId(),Place.SCHEMA,die1));
+    @Test
+    void indexedListTest(){
+        Board board=new Board(users1, additionalSchemas);
 
-        board1.getDraftPool().draftDice(users1.size());
-        Die dieDraftPool = board1.selectDie(player0.getGameId(),Place.DRAFTPOOL,1,Color.NONE);
-        assertEquals(1, board1.getDiePosition(player0.getGameId(),Place.DRAFTPOOL,dieDraftPool));
-        board1.getDraftPool().clearDraftPool(0);
-        assertEquals(-1, board1.getDiePosition(player0.getGameId(),Place.DRAFTPOOL,dieDraftPool));
-        board1.getDraftPool().draftDice(users1.size());
-        Die dieRoundTrack = board1.selectDie(player0.getGameId(),Place.ROUNDTRACK,1,Color.NONE);
-        assertEquals(1, board1.getDiePosition(player0.getGameId(),Place.ROUNDTRACK,dieRoundTrack));
-        assertEquals(dieDraftPool,dieRoundTrack);
+        ServerFSM fsm = board.getFSM();
+        fsm.newTurn(0,true);
+        board.exit();
+        fsm.setPlaceFrom(Place.DRAFTPOOL);
+        board.getDraftPool().draftDice(4);
+        assertEquals(9, board.getDraftPool().getDraftedDice().size());
+        assertEquals(9,board.getDiceList().size());
+        assertEquals(Place.DRAFTPOOL,board.getDiceList().get(0).getPlace());
 
-        List<Integer> oldIndexes=new ArrayList<>();
-        oldIndexes.add(2);
-        oldIndexes.add(6);
-        board1.removeOldDice(player0.getGameId(),Place.SCHEMA,oldIndexes);
-        assertEquals(0,schema.getSchemaDiceList(Color.NONE).size());
+        fsm.newTurn(1,true);
+        board.exit();
+        fsm.setPlaceFrom(Place.ROUNDTRACK);
+        assertEquals(0, board.getDraftPool().getRoundTrack().getTrackList().size());
+        assertEquals(0,board.getDiceList().size());
+        board.getDraftPool().clearDraftPool(0);
+        assertEquals(9,board.getDiceList().size());
+        assertEquals(Place.ROUNDTRACK,board.getDiceList().get(0).getPlace());
 
-        board1.removeOldDice(player0.getGameId(),Place.DRAFTPOOL,oldIndexes);
-        board1.removeOldDice(player0.getGameId(),Place.ROUNDTRACK,oldIndexes);
-        assertEquals(7,board1.getDraftPool().getDraftedDice().size());
-        assertEquals(7,board1.getDraftPool().getRoundTrack().getTrackList().size());
     }
 }

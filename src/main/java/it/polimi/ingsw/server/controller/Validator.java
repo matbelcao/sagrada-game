@@ -1,4 +1,4 @@
-package it.polimi.ingsw.server.connection;
+package it.polimi.ingsw.server.controller;
 
 import java.util.Arrays;
 import java.util.List;
