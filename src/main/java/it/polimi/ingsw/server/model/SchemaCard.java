@@ -375,23 +375,6 @@ public class SchemaCard implements Iterable<Cell>  {
     }
 
     /**
-     * Removes the die in the cell in the position indicated by row and column and returns it to the caller
-     * @param row the row of the cell containing the die
-     * @param column the column of the cell containing the die
-     */
-    public void removeDie(int row,int column) {
-        assert row>=0 && column>=0 && row<NUM_ROWS && column<NUM_COLS;
-        if (this.getCell(row, column).hasDie()) {
-            this.getCell(row, column).removeDie();
-            if(((FullCellIterator)this.iterator()).numOfDice()==0){
-                isFirstDie=true;
-            }
-            return;
-        }
-        throw new NoSuchElementException("there's no die to remove in this cell(row,column:" +row +","+column +")");
-    }
-
-    /**
      * Instantiates an iterator for cells containing a die
      * @return iterator on cells that contain a die
      */

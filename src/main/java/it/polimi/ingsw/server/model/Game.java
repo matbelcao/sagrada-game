@@ -24,7 +24,6 @@ public class Game extends Thread implements Iterable  {
     private Boolean endLock;
     private final Object lockRun;
     private Timer timer;
-
     private ServerFSM fsm;
     private ServerState status;
 
@@ -34,7 +33,6 @@ public class Game extends Thread implements Iterable  {
     private Die selectedDie;
     private int oldIndex;
     private Commands selectedCommand;
-    private int numDiePlaced;
     private Boolean enableToolList;
     private List<IndexedCellContent> diceList;
     private List<Commands> commandsList;
@@ -224,7 +222,6 @@ public class Game extends Thread implements Iterable  {
      */
     private void turnFlow() {
         status=fsm.newTurn(round.isFirstTurn());
-        numDiePlaced=0;
 
         exit(false);
         endLock=false;
@@ -395,7 +392,7 @@ public class Game extends Thread implements Iterable  {
      */
     public List<IndexedCellContent> getDiceList() throws IllegalActionException {
         if(!(status.equals(ServerState.MAIN)||status.equals(ServerState.GET_DICE_LIST))){throw new IllegalActionException();}
-        if(!fsm.isToolActive() && numDiePlaced>=1){throw new IllegalActionException();}
+        if(!fsm.isToolActive() && fsm.isDiePlaced()){throw new IllegalActionException();}
 
         Color constraint = Color.NONE;
 
@@ -589,12 +586,12 @@ public class Game extends Thread implements Iterable  {
             }else{
                 constraint = selectedTool.getIgnoredConstraint();
                 response=board.schemaPlacement(userPlayingId,index,oldIndex,selectedDie,constraint);
-                numDiePlaced++;
+                fsm.placeDie();
             }
         }else{
             constraint=IgnoredConstraint.NONE;
             response=board.schemaPlacement(userPlayingId,index,oldIndex,selectedDie,constraint);
-            numDiePlaced++;
+            fsm.placeDie();
         }
 
         if(response){
@@ -653,7 +650,7 @@ public class Game extends Thread implements Iterable  {
         Turn turn = round.isFirstTurn()?Turn.FIRST_TURN:Turn.SECOND_TURN;
         int roundNumber = round.getRoundNumber();
 
-        Boolean toolEnabled=board.getToolCard(index).enableToolCard(player,roundNumber,turn,numDiePlaced,player.getSchema());
+        Boolean toolEnabled=board.getToolCard(index).enableToolCard(player,roundNumber,turn,fsm.getNumDiePlaced(),player.getSchema());
         if(toolEnabled){
             selectedTool=board.getToolCard(index);
             status=fsm.newToolUsage(selectedTool);

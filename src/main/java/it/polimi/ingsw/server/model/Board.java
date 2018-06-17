@@ -101,7 +101,7 @@ public class Board {
             } while(draftedPrivs.contains(id));
             draftedPrivs.add(id);
 
-            privObjectiveCards[i]=new PrivObjectiveCard(id,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
+            privObjectiveCards[i]=new PrivObjectiveCard(id);
         }
         return privObjectiveCards;
     }
@@ -231,7 +231,7 @@ public class Board {
         }
     }
 
-    //only for
+
     public boolean schemaPlacement(int playerId,int newIndex,int oldIndex, Die selectedDie, IgnoredConstraint constraint){
         SchemaCard schemaCard=getPlayerById(playerId).getSchema();
         List<Integer> placements= schemaCard.listPossiblePlacements(selectedDie,constraint);

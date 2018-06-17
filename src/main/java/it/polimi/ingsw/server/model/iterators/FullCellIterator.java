@@ -96,6 +96,7 @@ public class FullCellIterator implements Iterator <Cell>{
     public int getIndex(){
         return index-1;
     }
+
     /**
      * not implemented
      */

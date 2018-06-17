@@ -142,7 +142,7 @@ class cliElemsTest {
         obj.add(LightCard.toLightCard(new PubObjectiveCard(2,MasterServer.XML_SOURCE+"PubObjectiveCard.xml")));
         obj.add(LightCard.toLightCard(new PubObjectiveCard(3,MasterServer.XML_SOURCE+"PubObjectiveCard.xml")));
         obj.add(LightCard.toLightCard(new PubObjectiveCard(4,MasterServer.XML_SOURCE+"PubObjectiveCard.xml")));
-        LightPrivObj privobj =LightPrivObj.toLightPrivObj(new PrivObjectiveCard(2,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml"));
+        LightPrivObj privobj =LightPrivObj.toLightPrivObj(new PrivObjectiveCard(2));
 
         cliview.updateObjectives(obj,privobj);
 

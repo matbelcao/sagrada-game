@@ -58,6 +58,8 @@ public class FullCellIteratorTest {
         } catch (IllegalDieException e) {
             e.printStackTrace();
         }
+
+        assertThrows(UnsupportedOperationException.class,() -> iter.remove());
     }
 
     @Test
@@ -71,6 +73,7 @@ public class FullCellIteratorTest {
 
         codeToTest= () -> schema.removeDie(0);
         assertThrows(NoSuchElementException.class,codeToTest);
+
 
         assertEquals(16,iter.numOfDice());
 

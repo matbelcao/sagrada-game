@@ -9,12 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class RoundIteratorTest {
@@ -61,16 +59,22 @@ public class RoundIteratorTest {
         User next;
         //round 1
         next=round.next();
+        assertTrue(round.isFirstTurn());
         assertEquals(users.get(0),next);
         next=round.next();
+        assertTrue(round.isFirstTurn());
         assertEquals(0,round.getRoundNumber());
         assertEquals(users.get(1),next);
         next=round.next();
+        assertTrue(round.isFirstTurn());
         assertEquals(users.get(2),next);
         next=round.next();
+        assertFalse(round.isFirstTurn());
         assertEquals(users.get(2),next);
         next=round.next();
+        assertFalse(round.isFirstTurn());
         assertEquals(users.get(1),next);
+        assertFalse(round.isFirstTurn());
         next=round.next();
         assertEquals(users.get(0),next);
 

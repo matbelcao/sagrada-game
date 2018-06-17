@@ -12,14 +12,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class PrivObjectiveCardTest {
     @Test
     void  testPrivObjectiveCardConstructor(){
-        PrivObjectiveCard priv1 = new PrivObjectiveCard(1,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
+        PrivObjectiveCard priv1 = new PrivObjectiveCard(1);
         assertEquals(Integer.parseInt("1"),priv1.getId());
         assertEquals("Sfumature Rosse",priv1.getName());
         assertEquals("src"+File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"1.png",priv1.getImgSrc());
         assertEquals("Somma dei valori su tutti i dadi rossi",priv1.getDescription());
         assertEquals("RED",priv1.getColor().toString());
 
-        PrivObjectiveCard priv2 = new PrivObjectiveCard(5,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
+        PrivObjectiveCard priv2 = new PrivObjectiveCard(5);
         assertEquals(Integer.parseInt("5"),priv2.getId());
         assertEquals("Sfumature Viola",priv2.getName());
         assertEquals("src"+File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"5.png",priv2.getImgSrc());
@@ -32,11 +32,11 @@ class PrivObjectiveCardTest {
         SchemaCard schema1 = new SchemaCard(1);
 
         //PrivateObjective cards
-        PrivObjectiveCard priv1 = new PrivObjectiveCard(1,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
-        PrivObjectiveCard priv2 = new PrivObjectiveCard(2,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
-        PrivObjectiveCard priv3 = new PrivObjectiveCard(3,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
-        PrivObjectiveCard priv4 = new PrivObjectiveCard(4,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
-        PrivObjectiveCard priv5 = new PrivObjectiveCard(5,MasterServer.XML_SOURCE+"PrivObjectiveCard.xml");
+        PrivObjectiveCard priv1 = new PrivObjectiveCard(1);
+        PrivObjectiveCard priv2 = new PrivObjectiveCard(2);
+        PrivObjectiveCard priv3 = new PrivObjectiveCard(3);
+        PrivObjectiveCard priv4 = new PrivObjectiveCard(4);
+        PrivObjectiveCard priv5 = new PrivObjectiveCard(5);
 
         //SchemaCard's dice
         Die die1= new Die("FOUR","RED");

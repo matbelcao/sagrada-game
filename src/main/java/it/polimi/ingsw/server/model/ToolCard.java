@@ -45,6 +45,7 @@ public class ToolCard extends Card {
     private List<Integer> oldIndexList;
 
 
+
     public ToolCard(int id) {
         super();
         super.xmlReader(id, XML_DESCRIPTION, "ToolCard");
@@ -102,18 +103,17 @@ public class ToolCard extends Card {
     }
 
     /**
-     * Checks whether the player can or can not use the tool card, based on the cost in favor tokens
-     *
-     * @param player the player that wants to use the tool card
-     * @return true iff the
+     * Checks whether the player can or can not use the tool card, based on the cost in favor tokens and other (turn,
+     * dice already placed,...) constraints. It also clones the player's SchemaCard in a temporary to be used for
+     * internal placements (subsequently it will replace the original if the execution of the card is executed completely
+     * and correctly)
+     * @param player the player who wants to use the toolcard
+     * @param roundNumber the number of the match's round
+     * @param turnFirstOrSecond if the turn is the first or the second in the round
+     * @param numDiePlaced the number of dice already placed by the player in the turn
+     * @param schema the player's SchemaCard
+     * @return true if the ToolCard has been activated successfully
      */
-    public boolean canBeUsedBy(Player player) {
-        int cost;
-        if (used) cost = 2;
-        else cost = 1;
-        return player.getFavorTokens() >= cost;
-    }
-
     public boolean enableToolCard(Player player,int roundNumber,Turn turnFirstOrSecond, int numDiePlaced , SchemaCard schema) {
         try {
             if((actions.contains(Commands.SWAP) || actions.contains(Commands.SET_COLOR)) && roundNumber==0){return false;}
@@ -145,6 +145,13 @@ public class ToolCard extends Card {
         return true;
     }
 
+    /**
+     * Check the placement conditions according to whether the card performs a placement action  SchemaCard->SchemaCard
+     * or DraftPool->SchemaCard
+     * @param numDiePlaced the number of dice already placed by the player in the turn
+     * @param schema the player's SchemaCard
+     * @return true if the card can be activated
+     */
     private boolean checkPlacementConditions(int numDiePlaced, SchemaCard schema) {
         if(isExternalPlacement() &&  numDiePlaced>=1 && !turn.equals(Turn.FIRST_TURN) && (to.equals(Place.SCHEMA) || to.equals(Place.DICEBAG))) {
             return true;
@@ -160,6 +167,11 @@ public class ToolCard extends Card {
         return false;
     }
 
+    /**
+     * Performs the increase / decrease action of the die's face
+     * @param die the die the player wants to change
+     * @return the indexed list of possible die-changing options
+     */
     public List<IndexedCellContent> shadeIncreaseDecrease(Die die){
         Die tmpDie;
         List <Die> modifiedDie=new ArrayList<>();
@@ -179,6 +191,10 @@ public class ToolCard extends Card {
         return toIndexedDieList(modifiedDie);
     }
 
+    /**
+     * Performs the swapping action between two dice, if the selected die is only one, it is only stored
+     * @return true if the swapping action was successful
+     */
     public boolean swapDie() {
         if(selectedDice.size()==1){return true;}// the swap will take effect on the next iteration
         else if(selectedDice.size()==2){
@@ -188,6 +204,10 @@ public class ToolCard extends Card {
         return false;
     }
 
+    /**
+     * Performs a random change of the selected die face (ONE to SIX)
+     * @return the indexed list containing the modified die
+     */
     public List<IndexedCellContent> rerollDie(){
         List<Die> dieList= new ArrayList<>();
         selectedDice.get(0).reroll();
@@ -195,12 +215,20 @@ public class ToolCard extends Card {
         return toIndexedDieList(dieList);
     }
 
+    /**
+     * Performs a random change of the selected dice List faces (ONE to SIX)
+     * @param rerollList the list of dice to reroll
+     */
     public void rerollAll(List<Die> rerollList){
         for(Die d:rerollList){
             d.reroll();
         }
     }
 
+    /**
+     * Inverts the face of the previously selected die
+     * @return the indexed list containing the modified die
+     */
     public List<IndexedCellContent> flipDie(){
         List<Die> dieList= new ArrayList<>();
         selectedDice.get(0).flipShade();
@@ -208,6 +236,10 @@ public class ToolCard extends Card {
         return toIndexedDieList(dieList);
     }
 
+    /**
+     * Returns the possible faces that the die (which the player wants to change) can take
+     * @return the indexed list of possible face-changing options
+     */
     public List<IndexedCellContent> chooseShade(){
         List <Die> modifiedDie=new ArrayList<>();
         for(int i=1;i<=6;i++){
@@ -216,10 +248,17 @@ public class ToolCard extends Card {
         return toIndexedDieList(modifiedDie);
     }
 
+    /**
+     * Sets a color constraint for future ToolCard's placement actions
+     */
     public void setColor(){
         constraint=selectedDice.get(0).getColor();
     }
 
+    /**
+     * Returns an indexed List of dice contained in the temporary schemacard
+     * @return the indexed List of dice
+     */
     public List<IndexedCellContent> internalIndexedSchemaDiceList(){
         List<IndexedCellContent> indexedList=new ArrayList<>();
         IndexedCellContent indexedCell;
@@ -242,18 +281,32 @@ public class ToolCard extends Card {
         return indexedList;
     }
 
+    /**
+     * Select a die that will be used later for the ToolCard-specific actions
+     * @param die the die the player wants to manipulate
+     */
     public void selectDie(Die die){
         selectedDice.add(die);
         return;
     }
 
+    /**
+     * Selects the die from the internal indexed dice List of the temporary SchemaCard (to be used only for SchemaCard->
+     * SchemaCard placements)
+     * @param listIndex the index of the die the user wants to select
+     * @return the die selected by the player
+     */
     public Die internalSelectDie(int listIndex){
         selectedDice.add(0,schemaTemp.getSchemaDiceList(constraint).get(listIndex));
         oldIndexList.add(0,schemaTemp.getDiePosition(selectedDice.get(0)));
         return selectedDice.get(0);
     }
 
-
+    /**
+     * Calculates and returns a list of integers that are the indexes (from 0 to 19) where the die could be placed. The
+     * die is assumed that was previously selected (to be used only for SchemaCard->SchemaCard placements)
+     * @return the list of possible placements for the selected die
+     */
     public List<Integer> internalListPlacements() {
         schemaTemp.removeDie(oldIndexList.get(0));
         List<Integer> placements=schemaTemp.listPossiblePlacements(selectedDice.get(0),ignoredConstraint);
@@ -266,6 +319,12 @@ public class ToolCard extends Card {
         return placements;
     }
 
+    /**
+     * Places the die in the user-selected cell on the temporary SchemaCard (to be used only for SchemaCard->SchemaCard
+     * placements)
+     * @param index the index of the List of possible placements
+     * @return true if the placement operation was successfully
+     */
     public boolean internalDiePlacement(int index){
         List<Integer> placerments= internalListPlacements();
         try {
@@ -283,6 +342,11 @@ public class ToolCard extends Card {
         return true;
     }
 
+    /**
+     * Constructs an indexed list of dice starting from a simple list of dice
+     * @param dieList the originl list of dice
+     * @return the new immutable indexed List of dice
+     */
     private List<IndexedCellContent> toIndexedDieList(List<Die> dieList){
         List<IndexedCellContent> indexedList=new ArrayList<>();
         IndexedCellContent indexedCell;
@@ -296,6 +360,13 @@ public class ToolCard extends Card {
         return indexedList;
     }
 
+    /**
+     * Checks if the execution flow of the ToolCard is finished or must continue. If the execution flow is completed
+     * correctly, it replaces the SchemaCard of the player with the temporary one ( only if internal placings have been
+     * performed)
+     * @param player the player is currently using the ToolCard
+     * @return if the execution flow is not finished yet, false elsewhere
+     */
     public boolean toolCanContinue(Player player){
         //System.out.println(selectedDice+"  "+oldIndexList);
         if(actions.get(actionIndex)!=Commands.SWAP && actions.get(actionIndex)!=Commands.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
@@ -315,6 +386,9 @@ public class ToolCard extends Card {
         return true;
     }
 
+    /**
+     * Allows to cancel the selection of a die, and then removes the temporarily stored die
+     */
     public void toolDiscard(){
         if(actions.get(actionIndex)!=Commands.SWAP && actions.get(actionIndex)!=Commands.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
             selectedDice.remove(0);
@@ -324,6 +398,11 @@ public class ToolCard extends Card {
         }
     }
 
+    /**
+     * Allows to exit the ToolCard execution procedure, interrupting the regular execution flow. If there are internal
+     * placements completed correctly, it replaces the SchemaCard of the player with the temporary one.
+     * @param player the player is currently using the ToolCard
+     */
     public void toolExit(Player player){
         if(isInternalSchemaPlacement()) {
             if (quantity.contains(DieQuantity.TWO) && numDiePlaced== 2) {
@@ -336,60 +415,103 @@ public class ToolCard extends Card {
         }
     }
 
+    /**
+     * Returns the index of the old dices to delete from a certain position
+     * @return a list of indexes
+     */
     public List<Integer> getOldIndexes(){
         return oldIndexList;
     }
 
-
+    /**
+     * Returns true if the placements of the ToolCard are not internal (from!=to)
+     * @return if the placements are not internal
+     */
     public boolean isExternalPlacement(){
         return !from.equals(to);
     }
 
+    /**
+     * Returns true if the placements of the ToolCard are internal (SchemaCard->SchemaCard)
+     * @return if the placements are internal
+     */
     public boolean isInternalSchemaPlacement() {
         return from.equals(Place.SCHEMA) && to.equals(Place.SCHEMA);
     }
 
+    /**
+     * Returns true if the ToolCard expects that all dice will be rolled
+     * @return if the ToolCard expects that all dice will be rolled
+     */
     public boolean isRerollAllDiceCard(){
         return actions.get(actionIndex).equals(Commands.REROLL) && quantity.contains(DieQuantity.ALL);
     }
 
+    /**
+     * Returns true if the card expects a color constraint to be selected
+     * @return if the card expects a color constraint to be selected
+     */
     public boolean isSetColorFromRountrackCard(){
         return actions.get(actionIndex).equals(Commands.SET_COLOR);
     }
 
+    /**
+     * Returns the position from which the dice selected by the player come from, when the ToolCard is enabled
+     * @return the from position
+     */
     public Place getPlaceFrom(){
         return from;
     }
 
+    /**
+     * Returns the position from which the dice must be placed, when the ToolCard is enabled
+     * @return the destination position
+     */
     public Place getPlaceTo(){
         return to;
     }
 
+    /**
+     * Returns the color constraint selected by the player during the ToolCard execution, if expected
+     * @return the Color constraint selected
+     */
     public Color getColorConstraint(){
         return constraint;
     }
 
+    /**
+     * Returns the temporary SchemaCard used for performing the internal placements (SchemaCard->SchemaCard), when the
+     * ToolCard is enabled
+     * @return the internal temporary SchemaCard
+     */
     public SchemaCard getNewSchema(){
         return schemaTemp;
     }
 
     /**
-     * This method provide the information about if the card has been yet used
-     * @return true iff has been used yet
+     * This method provide the information about if the card has already been used
+     * @return true if the ToolCard has already been used
      */
     public boolean isAlreadyUsed(){
         return this.used;
     }
 
+    /**
+     * Returns the List containing the possible actions that the player needs to perform for the correct execution
+     * flow of the ToolCard selected
+     * @return the List containing the possible actions to perform
+     */
     public List<Commands> getActions(){
         List<Commands> commands=new ArrayList<>();
         commands.add(actions.get(actionIndex));
         return commands;
     }
 
+    /**
+     * Returns the constraint to ignore (if there is) during the ToolCard usage
+     * @return the constraint to ignore
+     */
     public IgnoredConstraint getIgnoredConstraint(){
         return ignoredConstraint;
     }
-
-
 }
