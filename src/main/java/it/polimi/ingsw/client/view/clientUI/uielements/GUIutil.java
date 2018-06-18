@@ -585,7 +585,7 @@ public class GUIutil {
         gc.fillRoundRect(x,y,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
         gc.fillRoundRect(x+lineWidth,y+lineWidth,dieDim-2*lineWidth,dieDim-2*lineWidth, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM*dieDim);
-        drawSpots(gc,dieDim,lightDie.getShade().toInt());
+        drawSpots(gc,x,y,dieDim,lightDie.getShade().toInt());
     }
 
     private void drawSpots(GraphicsContext gc, double dieDim, int count) {
