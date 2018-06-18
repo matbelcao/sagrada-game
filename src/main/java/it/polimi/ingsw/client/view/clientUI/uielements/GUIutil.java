@@ -17,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -110,11 +111,11 @@ public class GUIutil {
     }
 
     private double getCardWidth(){
-        double width = 184.58712093023254;
+        double width = 258;
         return width;
     }
     private double getCardHeight(){
-        double height = 249.915;
+        double height = 350;
         return height;
     }
 
@@ -231,21 +232,31 @@ public class GUIutil {
     }
 
     public Group drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState) {
-        GridPane grid = new GridPane();
-        int i = 0;
-        int j = 0;
-        grid.add( drawCard(privObj,getCardWidth(),getCardHeight()),j,i);
-        for (LightCard pubObjCard : pubObjs){
-            j++;
-            grid.add(drawCard(pubObjCard,getCardWidth(),getCardHeight()),j,i);
-        }
-        i++;
-        j = 0;
-        for (LightCard toolCard : tools) {
-            j++;
-            grid.add(drawCard(toolCard,getCardWidth(),getCardHeight()),j,i);
-        }
-        return new Group(grid);
+        Button priv = new Button("Private Objective");
+        Button pub = new Button("Public Objectives");
+        Button tool = new Button("Tools");
+
+        HBox buttonContainer = new HBox(priv,pub,tool);
+        HBox cardContainer =  new HBox();
+        VBox primaryContainer = new VBox(buttonContainer,cardContainer);
+
+        priv.setOnAction(e->cardContainer.getChildren().setAll(drawCard(privObj,getCardWidth(),getCardHeight())));
+        pub.setOnAction(e->{
+            ArrayList<Canvas> cards = new ArrayList();
+            for (LightCard pubObjCard : pubObjs){
+                cards.add(drawCard(pubObjCard,getCardWidth(),getCardHeight()));
+            }
+            cardContainer.getChildren().setAll(cards);
+        });
+        tool.setOnAction(e->{
+            ArrayList<Canvas> cards = new ArrayList();
+            for (LightCard toolCard : tools) {
+                cards.add(drawCard(toolCard,getCardWidth(),getCardHeight()));
+            }
+            cardContainer.getChildren().setAll(cards);
+        });
+        pub.fire();
+        return new Group(primaryContainer);
 
     }
 
