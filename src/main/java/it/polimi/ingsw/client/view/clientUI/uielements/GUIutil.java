@@ -5,6 +5,7 @@ import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.clientUI.GUI;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.immutables.*;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
@@ -108,6 +109,15 @@ public class GUIutil {
         return drawingWidth/ DRAFTED_CANVAS_SCENE_RATIO;
     }
 
+    private double getCardWidth(){
+        double width = 184.58712093023254;
+        return width;
+    }
+    private double getCardHeight(){
+        double height = 249.915;
+        return height;
+    }
+
     public double getSelectedSchemaLineWidth(double sceneWidth, double sceneHeight){
         DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth,sceneHeight);
         double drawingWidth = sizes.getDrawingWidth();
@@ -164,6 +174,10 @@ public class GUIutil {
                         System.out.println("selected die at position " + finalI + "in draftpool");
                         cmdWrite.write(finalI +"");
                         break;
+                    case CHOOSE_PLACEMENT:
+                        cmdWrite.write("b");
+                        cmdWrite.write("1");
+                        cmdWrite.write(finalI +"");
                 }
             });
         }
@@ -178,18 +192,21 @@ public class GUIutil {
 
     public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie){
         GridPane grid = new GridPane();
+        Insets padding = new Insets(10,10,10,10);
+        grid.setPadding(padding);
         double cellDIm = width/5;
         for(int i = 0; i < NUM_ROWS; i++){
             for(int j = 0; j < NUM_COLS; j++){
                 Canvas cell = new Canvas(cellDIm,cellDIm);
-                if(lightSchemaCard.hasDieAt(i,j)){
-                    cell = lightDieToCanvas(lightSchemaCard.getDieAt(i,j),cellDIm);
-                    grid.add(cell,j,i);
-                }else if(lightSchemaCard.hasConstraintAt(i,j)){
+                if(lightSchemaCard.hasConstraintAt(i,j)){
                     cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i,j),cellDIm);
                     grid.add(cell,j,i);
                 }else{
                     cell = whiteCanvas(cellDIm);
+                    grid.add(cell,j,i);
+                }
+                if(lightSchemaCard.hasDieAt(i,j)){
+                    cell = lightDieToCanvas(lightSchemaCard.getDieAt(i,j),cellDIm);
                     grid.add(cell,j,i);
                 }
                 int position = i*NUM_COLS+j;
@@ -211,6 +228,25 @@ public class GUIutil {
             }
         }
         return grid;
+    }
+
+    public Group drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState) {
+        GridPane grid = new GridPane();
+        int i = 0;
+        int j = 0;
+        grid.add( drawCard(privObj,getCardWidth(),getCardHeight()),j,i);
+        for (LightCard pubObjCard : pubObjs){
+            j++;
+            grid.add(drawCard(pubObjCard,getCardWidth(),getCardHeight()),j,i);
+        }
+        i++;
+        j = 0;
+        for (LightCard toolCard : tools) {
+            j++;
+            grid.add(drawCard(toolCard,getCardWidth(),getCardHeight()),j,i);
+        }
+        return new Group(grid);
+
     }
 
     private void highlight(Canvas cell, double cellDim) {
@@ -257,26 +293,25 @@ public class GUIutil {
     }
 
 
-
-   /* private void drawSchema(LightSchemaCard lightSchemaCard, GraphicsContext gc) {
-        double dieDim = getDieDimension();
-        double y = 0;
-        double x = 0;
-        for(int i = 0; i < NUM_ROWS; i++){
-            for(int j = 0; j < NUM_COLS; j++){
-                if(lightSchemaCard.hasDieAt(i,j)){
-                    drawDie(lightSchemaCard.getDieAt(i,j),gc,x,y,dieDim);
-                }else if(lightSchemaCard.hasConstraintAt(i,j)){
-                    drawConstraint(lightSchemaCard.getConstraintAt(i,j),gc,x,y,dieDim);
-                }else{
-                    drawWhiteCell(gc,x,y,dieDim);
-                }
-                x += dieDim;
-            }
-            x = 0;
-            y += dieDim;
-        }
-    }*/
+    /* private void drawSchema(LightSchemaCard lightSchemaCard, GraphicsContext gc) {
+         double dieDim = getDieDimension();
+         double y = 0;
+         double x = 0;
+         for(int i = 0; i < NUM_ROWS; i++){
+             for(int j = 0; j < NUM_COLS; j++){
+                 if(lightSchemaCard.hasDieAt(i,j)){
+                     drawDie(lightSchemaCard.getDieAt(i,j),gc,x,y,dieDim);
+                 }else if(lightSchemaCard.hasConstraintAt(i,j)){
+                     drawConstraint(lightSchemaCard.getConstraintAt(i,j),gc,x,y,dieDim);
+                 }else{
+                     drawWhiteCell(gc,x,y,dieDim);
+                 }
+                 x += dieDim;
+             }
+             x = 0;
+             y += dieDim;
+         }
+     }*/
    //todo delete class
     //just a class to avoid having repeated code
     private class DraftedSchemasWindowDim {
@@ -353,7 +388,7 @@ public class GUIutil {
         //clean the canvas
         gc.clearRect(0, 0, sceneWidth, sceneHeight);
 
-        drawPrivObj(privObj,gc,privObjX,privObjY,privObjWidth,privObjHeight);
+        drawCard(privObj,gc,privObjX,privObjY,privObjWidth,privObjHeight);
         drawCompleteSchema(gc,lightSchemaCard.get(0),x+extPadding,y+extPadding,schemaWidth,schemaHeight);
         drawCompleteSchema(gc,lightSchemaCard.get(1),x+extPadding+schemaWidth+intPadding,y+extPadding,schemaWidth,schemaHeight);
         drawCompleteSchema(gc,lightSchemaCard.get(2),x+extPadding,y+extPadding+schemaHeight+intPadding,schemaWidth,schemaHeight);
@@ -424,22 +459,31 @@ public class GUIutil {
         }
     }
 
-    private void drawPrivObj(LightPrivObj privObj, GraphicsContext gc, double x, double y, double imageWidth, double imageHeight) {
-       // Image image = new Image(getClass().getResourceAsStream("src"+ File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"1.png"));
-       // Image image = new Image(client.class.getResourceAsStream("src"+ File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"1.png"));
+
+    private void drawCard(LightCard card, GraphicsContext gc, double x, double y, double imageWidth, double imageHeight) {
+        // Image image = new Image(getClass().getResourceAsStream("src"+ File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"1.png"));
+        // Image image = new Image(client.class.getResourceAsStream("src"+ File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"1.png"));
         //TODO hookup with resources
         //try (InputStream is = new FileInputStream("src" + File.separator + "img" + File.separator + "PrivObjectiveCard" + File.separator + "1.png")) {
-        try (InputStream is = new FileInputStream(privObj.getImgSrc()+".png")) {
+        try (InputStream is = new FileInputStream(card.getImgSrc()+".png")) {
             Image img = new Image(is);
             gc.drawImage(img,x,y,imageWidth,imageHeight);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
     }
 
+    private Canvas drawCard(LightCard card, double imageWidth, double imageHeight) {
+        Canvas cardCanvas = new Canvas(imageWidth,imageHeight);
+        GraphicsContext gc = cardCanvas.getGraphicsContext2D();
+        try (InputStream is = new FileInputStream(card.getImgSrc()+".png")) {
+            Image img = new Image(is);
+            gc.drawImage(img,0,0,imageWidth,imageHeight);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return cardCanvas;
+    }
     private void drawWhiteCell(GraphicsContext gc, double x, double y, double cellDim) {
         gc.setFill(Color.WHITE);
         gc.setStroke(Color.BLACK);
