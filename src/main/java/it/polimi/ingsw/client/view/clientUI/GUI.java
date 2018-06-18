@@ -242,6 +242,9 @@ public class GUI extends Application implements ClientUI {
             MainSceneGroup root = new MainSceneGroup(board);
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
+            primaryStage.setMinWidth(600);
+            primaryStage.setMinHeight(800);
+            primaryStage.sizeToScene();
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
@@ -278,8 +281,8 @@ public class GUI extends Application implements ClientUI {
         void redraw(double newWidth, double newHeight) {
             double cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
             ClientFSMState turnState = client.getTurnState();
-            roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight));
-            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState));
+            roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight,turnState,board.getLatestPlacementsList(),board.getLatestSelectedDie()));
+            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState,board.getLatestPlacementsList(),board.getLatestSelectedDie()));
             draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim,turnState));
         }
     }

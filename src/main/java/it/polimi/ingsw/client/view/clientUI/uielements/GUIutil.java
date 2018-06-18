@@ -3,10 +3,8 @@ package it.polimi.ingsw.client.view.clientUI.uielements;
 import it.polimi.ingsw.client.clientController.CmdWriter;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.clientUI.GUI;
-import it.polimi.ingsw.common.immutables.LightConstraint;
-import it.polimi.ingsw.common.immutables.LightDie;
-import it.polimi.ingsw.common.immutables.LightPrivObj;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.common.enums.Place;
+import it.polimi.ingsw.common.immutables.*;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
@@ -29,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.NOT_MY_TURN;
 
 public class GUIutil {
     private final CmdWriter cmdWrite;
@@ -115,47 +115,55 @@ public class GUIutil {
         return LINE_TO_CELL*CELL_TO_SCHEMA_W*schemaWidth;
     }
 
+    public Group drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie) {
+        GridPane g = schemaToGrid(schema,dieDim*NUM_COLS,dieDim*NUM_ROWS,turnState,latestPlacementsList,latestSelectedDie);
+        return new Group(g);
+    }
 
-
-    public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth,ClientFSMState turnState){
+    public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie){
         GridPane grid = new GridPane();
-        double dieDim = width/5;
+        double cellDIm = width/5;
         for(int i = 0; i < NUM_ROWS; i++){
             for(int j = 0; j < NUM_COLS; j++){
-                Canvas cell = new Canvas(dieDim,dieDim);
+                Canvas cell = new Canvas(cellDIm,cellDIm);
                 if(lightSchemaCard.hasDieAt(i,j)){
-                    cell = lightDieToCanvas(lightSchemaCard.getDieAt(i,j),dieDim);
+                    cell = lightDieToCanvas(lightSchemaCard.getDieAt(i,j),cellDIm);
                     grid.add(cell,j,i);
                 }else if(lightSchemaCard.hasConstraintAt(i,j)){
-                    cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i,j),dieDim);
+                    cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i,j),cellDIm);
                     grid.add(cell,j,i);
                 }else{
-                    cell = whiteCanvas(dieDim);
+                    cell = whiteCanvas(cellDIm);
                     grid.add(cell,j,i);
                 }
-                int finalJ = j;
-                int finalI = i;
+                int position = i*NUM_COLS+j;
+                if(turnState.equals(ClientFSMState.CHOOSE_PLACEMENT)&& latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)&& latestPlacementsList.contains(position)){
+                   highlight(cell,cellDIm);
+                   cell.setOnMouseClicked(e->{
+                       cmdWrite.write(latestPlacementsList.indexOf(position) +"");
+                       System.out.println("selected position " + position);
+                   });
+                   continue;
+                }
                 cell.setOnMouseClicked(e->{
                     switch (turnState){
                         case NOT_MY_TURN:
                             System.out.println("clicked not my turn");
                             break;
-                        case MAIN:
-                            System.out.println("clicked schema");
-                            cmdWrite.write("e");
-                            break;
-                        case CHOOSE_PLACEMENT:
-                            int index = finalI*NUM_COLS+finalJ;
-                            System.out.println("selected placement " + index);
-                            cmdWrite.write(index +"");
-                            break;
                     }
-
                 });
             }
         }
         return grid;
     }
+
+    private void highlight(Canvas cell, double cellDim) {
+        GraphicsContext gc = cell.getGraphicsContext2D();
+        gc.setStroke(Color.ORANGE);
+        gc.setLineWidth(cellDim*LINE_TO_CELL);
+        gc.strokeRect(0,0,cellDim,cellDim);
+    }
+
     private Canvas whiteCanvas(double dim){
         Canvas whiteCanvas = new Canvas(dim,dim);
         GraphicsContext gc = whiteCanvas.getGraphicsContext2D();
@@ -192,7 +200,7 @@ public class GUIutil {
         return 100;
     }
 
-    public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height) {
+    public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie) {
         double dieDim = getMainSceneCellDim(width,height);
         HBox track = new HBox();
         track.setSpacing(10);
@@ -212,13 +220,14 @@ public class GUIutil {
         endTurn.setOnAction(e->cmdWrite.write("e"));
         Button back = new Button("back");
         back.setOnAction(e->cmdWrite.write("b"));
-        track.getChildren().addAll(back,endTurn);
+        Rectangle turnStateIndicator = new Rectangle(100,100);
+        if(turnState.equals(NOT_MY_TURN)){
+            turnStateIndicator.setFill(Color.RED);
+        }else{
+            turnStateIndicator.setFill(Color.GREEN);
+        }
+        track.getChildren().addAll(back,endTurn,turnStateIndicator);
         return new Group(track);
-    }
-
-    public Group drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState) {
-        GridPane g = schemaToGrid(schema,dieDim*NUM_COLS,dieDim*NUM_ROWS,turnState);
-       return new Group(g);
     }
 
     public Group drawDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState) {
@@ -469,7 +478,7 @@ public class GUIutil {
     }
 
     private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
-        //todo change
+        //todo update line width
         graphicsContext2D.setFill(Color.BLACK);
         graphicsContext2D.fillRoundRect(0,0,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
         graphicsContext2D.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
