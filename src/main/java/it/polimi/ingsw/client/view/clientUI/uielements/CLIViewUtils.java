@@ -33,6 +33,7 @@ public class CLIViewUtils {
     static final String FAVOR= "●";
     private static final String ESCAPE="\\u001B\\[([0-9]|([0-9][0-9]))m";
     private static final String DOUBLE_COLON ="::" ;
+    private static final String GREY = "\u001b[37m";
 
     static CLIElements cliElements;
 
@@ -368,13 +369,25 @@ public class CLIViewUtils {
 
 
 
+    static String greyLine(String line){
+        return GREY+line+Color.NONE.getUtf();
+    }
 
-
+    static List<String> greyLines(List<String> lines){
+        List<String> result= new ArrayList<>();
+        for(String line : lines){
+            result.add(greyLine(line));
+        }
+        return result;
+    }
     /**
      * Creates a list containing characters needed to visually separate schemas on the screen
      * @return said list
      */
     static  List<String> buildSeparator(int height){
+        if(height<0){
+            throw new IllegalArgumentException();
+        }
         List<String> separator= new ArrayList<>();
         for(int i=0;i< height;i++){
             separator.add(SPACE+SEPARATOR+SPACE);

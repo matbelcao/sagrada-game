@@ -637,7 +637,7 @@ public class CLIView {
                 ,schem);
         schem= appendRows(schem,buildSeparator(height+1));
 
-        return schem;
+        return player.isPlaying()?schem:greyLines(schem);
     }
 
 
@@ -658,7 +658,7 @@ public class CLIView {
                             replicate(FAVOR, player.getFavorTokens()),
                             width - uiMsg.getMessage(REMAINING_TOKENS).length() - 1)));
         }else{
-            info = info + padUntil(uiMsg.getMessage(UIMsg.valueOf(player.getStatus().toString())),width,SPACE);
+            info = greyLine(info + padUntil(uiMsg.getMessage(UIMsg.valueOf(player.getStatus().toString())),width,SPACE));
         }
         return info;
     }

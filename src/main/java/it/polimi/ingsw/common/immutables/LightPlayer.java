@@ -78,5 +78,9 @@ public class LightPlayer {
     public LightSchemaCard getSchema() {
         return schema;
     }
+
+    public boolean isPlaying() {
+        return this.status.equals(LightPlayerStatus.PLAYING);
+    }
 }
 
