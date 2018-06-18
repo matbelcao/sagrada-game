@@ -32,7 +32,7 @@ public class CLIViewUtils {
     static final int MENU_HEIGHT = 21;
     static final String FAVOR= "●";
     private static final String ESCAPE="\\u001B\\[([0-9]|([0-9][0-9]))m";
-    private static final String DOUBLE_COLON ="::" ;
+
     private static final String GREY = "\u001b[37m";
 
     static CLIElements cliElements;
@@ -238,9 +238,9 @@ public class CLIViewUtils {
         List<String> index= new ArrayList<>();
 
         for(int i=0; i<CELL_HEIGHT;i++){
-            index.add(EMPTY_STRING);
+            index.add(EMPTY_STRING+SPACE+SPACE);
         }
-        index.set(CELL_HEIGHT/2,row+SPACE+SPACE+EMPTY_STRING);
+        index.set(CELL_HEIGHT/2,row+EMPTY_STRING+SPACE);
         return index;
     }
 

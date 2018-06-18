@@ -22,7 +22,7 @@ public class CLIView {
 
     private static final int MAX_MENULIST_COLUMNS = 4;
 
-
+    static final String DOUBLE_COLON ="::" ;
     static final char SPACE=' ';
     static final char DASH='–';
     static final String EMPTY_STRING ="" ;
@@ -55,7 +55,7 @@ public class CLIView {
     public String showLoginUsername() {
         StringBuilder result= new StringBuilder();
 
-        result.append(cliElements.getElem(SAGRADA_WALL.toString()));
+        result.append(cliElements.getElem(SAGRADA_WALL.toString()).replaceAll(DOUBLE_COLON,EMPTY_STRING));
 
         result.append(String.format(cliElements.getElem(LOGIN_LINE.toString()),uiMsg.getMessage(LOGIN_USERNAME)));
         return result.toString();
