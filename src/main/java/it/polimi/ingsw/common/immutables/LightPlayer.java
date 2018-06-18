@@ -3,13 +3,13 @@ package it.polimi.ingsw.common.immutables;
 import it.polimi.ingsw.server.model.Player;
 
 public class LightPlayer {
-    String username;
-    int playerId;
-    int points;
-    int finalPosition;
-    LightSchemaCard schema;
-    int favorTokens;
-
+    private String username;
+    private int playerId;
+    private int points;
+    private int finalPosition;
+    private LightSchemaCard schema;
+    private int favorTokens;
+    private LightPlayerStatus status;
 
     public LightPlayer(String username, int playerId) {
         this.username = username;
@@ -17,6 +17,7 @@ public class LightPlayer {
         this.playerId = playerId;
         this.points=0;
         this.finalPosition=0;
+        this.status=LightPlayerStatus.PLAYING;
     }
 
     public static LightPlayer toLightPlayer(Player player){
@@ -27,6 +28,19 @@ public class LightPlayer {
         lightPlayer.setSchema(LightSchemaCard.toLightSchema(player.getSchema()));
         lightPlayer.setFinalPosition(player.getFinalPosition());
         return lightPlayer;
+    }
+
+    public LightPlayerStatus getStatus(){
+        return status;
+    }
+    public void setDisconnected(){
+        this.status=LightPlayerStatus.DISCONNECTED;
+    }
+    public void setQuitted(){
+        this.status=LightPlayerStatus.QUITTED;
+    }
+    public void setPlaying(){
+        this.status=LightPlayerStatus.PLAYING;
     }
 
     public int getFavorTokens() {

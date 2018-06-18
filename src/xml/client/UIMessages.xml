@@ -168,4 +168,12 @@
         <eng>round #</eng>
         <ita>round #</ita>
     </round-number>
+    <quitted>
+        <eng>Has abandoned the game</eng>
+        <ita>Ha abbandonato la partita</ita>
+    </quitted>
+    <disconnected>
+        <eng>Temporarily disconnected</eng>
+        <ita>Temporaneamente disconnesso</ita>
+    </disconnected>
 </messages>

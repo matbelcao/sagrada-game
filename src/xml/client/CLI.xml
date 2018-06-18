@@ -34,4 +34,5 @@
     </sagrada-wall>
     <login-line>%n%n                %s</login-line>
     <lobby>%n%n                 %s</lobby>
+    <drafted-info>(%s) %s</drafted-info>
 </cli-components>

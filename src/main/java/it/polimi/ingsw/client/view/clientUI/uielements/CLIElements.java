@@ -10,17 +10,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
-public class CLIElems {
+public class CLIElements {
     private Element elemFile;
     private static final String ELEM_FILE= Client.XML_SOURCE+"CLI.xml";
     private static final String WALL_FILE= "src"+ File.separator+"img"+File.separator+"sagrada-ascii.txt";
     private static final String CLI_COMP= "cli-components";
     private static final String BIG_EL="[A-Z]+";
 
-    public CLIElems() throws InstantiationException {
+    public CLIElements() throws InstantiationException {
         this.elemFile=parser();
         if(this.elemFile==null){
             throw new InstantiationException();
@@ -58,9 +56,4 @@ public class CLIElems {
         }
     }
 
-    public String getWall() throws IOException {
-
-        return new String( Files.readAllBytes(Paths.get(WALL_FILE)));
-
-    }
 }

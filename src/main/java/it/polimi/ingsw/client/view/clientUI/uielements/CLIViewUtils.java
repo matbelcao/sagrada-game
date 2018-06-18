@@ -8,6 +8,8 @@ import it.polimi.ingsw.server.model.SchemaCard;
 import java.io.IOException;
 import java.util.*;
 
+import static it.polimi.ingsw.client.view.clientUI.uielements.CLIView.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIElems.*;
 import static it.polimi.ingsw.common.enums.ErrMsg.*;
 
 /**
@@ -17,6 +19,7 @@ import static it.polimi.ingsw.common.enums.ErrMsg.*;
 public class CLIViewUtils {
 
 
+    private static final String NIL_CHAR = "\0";
     private static final String BOLD = "\u001B[1m";
     static final int SCHEMA_WIDTH = 35;
     static final int SCHEMA_HEIGHT = 18;
@@ -29,12 +32,13 @@ public class CLIViewUtils {
     static final int MENU_HEIGHT = 21;
     static final String FAVOR= "●";
     private static final String ESCAPE="\\u001B\\[([0-9]|([0-9][0-9]))m";
+    private static final String DOUBLE_COLON ="::" ;
 
-    static CLIElems cliElems;
+    static CLIElements cliElements;
 
     static {
         try {
-            cliElems = new CLIElems();
+            cliElements = new CLIElements();
         } catch (InstantiationException e) {
             System.exit(2);
         }
@@ -108,7 +112,7 @@ public class CLIViewUtils {
      * @return a list of strings that represent that
      */
     static List<String> padUntil(List<String> toPad,int finalLength, char filler){
-        if(toPad==null){ throw new IllegalArgumentException("toPad"+ IS_NULL.toString());}
+        if(toPad==null){ throw new IllegalArgumentException("toPad "+ IS_NULL.toString());}
         List<String> result= new ArrayList<>();
         List<String> fittedLines= fitInLength(toPad,finalLength);
         for (String line : fittedLines) {
@@ -131,7 +135,7 @@ public class CLIViewUtils {
         List<String> result=new ArrayList<>();
         if(height<=0||width<=0){ return result;}
         for(int row=0;row<height;row++){
-            result.add(padUntil("",width,filler));
+            result.add(padUntil(EMPTY_STRING,width,filler));
         }
         return result;
     }
@@ -195,7 +199,7 @@ public class CLIViewUtils {
      */
     static String alignRight(String line, int size){
         if(line==null||line.length()>size){ throw new IllegalArgumentException();}
-        return padUntil("",size-printableLength(line),' ')+line;
+        return padUntil(EMPTY_STRING,size-printableLength(line),SPACE)+line;
     }
 
 
@@ -208,7 +212,7 @@ public class CLIViewUtils {
     static  List<String> buildSchema(LightSchemaCard schema, boolean setIndexes) {
         List<String> result= new ArrayList<>();
 
-        if(setIndexes){result.add(cliElems.getElem("schema-cols"));}
+        if(setIndexes){result.add(cliElements.getElem(SCHEMA_COLUMNS.toString()));}
 
         for(int row = 0; row< SchemaCard.NUM_ROWS; row++){
             if(setIndexes){
@@ -233,9 +237,9 @@ public class CLIViewUtils {
         List<String> index= new ArrayList<>();
 
         for(int i=0; i<CELL_HEIGHT;i++){
-            index.add("  ");
+            index.add(EMPTY_STRING);
         }
-        index.set(CELL_HEIGHT/2,row+" ");
+        index.set(CELL_HEIGHT/2,row+SPACE+SPACE+EMPTY_STRING);
         return index;
     }
 
@@ -247,7 +251,7 @@ public class CLIViewUtils {
      * @return the so constructed string
      */
     public static String replicate(String toReplicate,int times){
-        return new String (new char[times]).replaceAll("\0",toReplicate);
+        return new String (new char[times]).replaceAll(NIL_CHAR,toReplicate);
     }
 
 
@@ -271,7 +275,7 @@ public class CLIViewUtils {
     static List<String> buildPrivObj(LightPrivObj privObj, int width) {
         List<String> result=new ArrayList<>();
         List<String> description=buildCard(privObj,width-CELL_WIDTH);
-        description.add(0,padUntil("",width-CELL_WIDTH,' '));
+        description.add(0,padUntil(EMPTY_STRING,width-CELL_WIDTH,SPACE));
         result.addAll(
                 appendRows(
                         buildCell(new LightConstraint(privObj.getColor())),
@@ -302,13 +306,13 @@ public class CLIViewUtils {
 
         if(cellContent==null){
             //empty
-            rows = splitElem(cliElems.getBigDie("EMPTI"));
+            rows = splitElem(cliElements.getBigDie(EMPTY.toString()));
         }else {
             //not empty
 
             //die
             if (cellContent.isDie()) {
-                rows = splitElem(cliElems.getBigDie(cellContent.getShade().toString()));
+                rows = splitElem(cliElements.getBigDie(cellContent.getShade().toString()));
             }
 
             //constraint
@@ -316,11 +320,11 @@ public class CLIViewUtils {
                 if (cellContent.hasColor()) {
 
                     //color constraint
-                    rows = splitElem(cliElems.getBigDie("FILLED"));
+                    rows = splitElem(cliElements.getBigDie(FILLED.toString()));
                 } else {
 
                     //shade constraint
-                    rows = splitElem(cliElems.getBigDie(cellContent.getShade().toString()));
+                    rows = splitElem(cliElements.getBigDie(cellContent.getShade().toString()));
                 }
             }
 
@@ -356,9 +360,9 @@ public class CLIViewUtils {
         List<String> result;
         result= buildCard(tool,OBJ_LENGTH);
         if(tool.isUsed()) {
-            result.set(0, result.get(0)+" "+ FAVOR);
+            result.set(0, result.get(0)+SPACE+ FAVOR);
         }
-        result.set(0,boldify(String.format(cliElems.getElem("li"),index,result.get(0))));
+        result.set(0,boldify(String.format(cliElements.getElem(LIST_ELEMENT.toString()),index,result.get(0))));
         return result;
     }
 
@@ -373,7 +377,7 @@ public class CLIViewUtils {
     static  List<String> buildSeparator(int height){
         List<String> separator= new ArrayList<>();
         for(int i=0;i< height;i++){
-            separator.add(" | ");
+            separator.add(SPACE+SEPARATOR+SPACE);
         }
 
         return separator;
@@ -390,7 +394,7 @@ public class CLIViewUtils {
         if(toPad==null){throw new IllegalArgumentException("toPad"+ IS_NULL);}
         if(printableLength(toPad)>finalLength){throw new IllegalArgumentException(LONGER_THAN_EXPECTED.toString()+toPad);}
 
-        return toPad+ replicate(filler+"",finalLength - printableLength(toPad));
+        return toPad+ replicate(filler+EMPTY_STRING,finalLength - printableLength(toPad));
 
     }
 
@@ -407,14 +411,14 @@ public class CLIViewUtils {
         String lineToFit= line;
         while(printableLength(lineToFit)>length){
             int i = length;
-            while(lineToFit.charAt(i) != ' '){
+            while(lineToFit.charAt(i) != SPACE){
                 i--;
             }
             result.add(lineToFit.substring(0,i));
             lineToFit=lineToFit.substring(i).trim();
         }
         if(printableLength(lineToFit.trim())>=0){
-            result.add(padUntil(lineToFit,length,' '));
+            result.add(padUntil(lineToFit,length,SPACE));
         }
         return result;
     }
@@ -470,7 +474,7 @@ public class CLIViewUtils {
             result.addAll(tempB);
         }else{
             if(tempA.size()<tempB.size()){
-                tempA.addAll(buildWall(tempB.size()-tempA.size(), tempA.get(tempA.size()-1).length(), ' '));
+                tempA.addAll(buildWall(tempB.size()-tempA.size(), tempA.get(tempA.size()-1).length(), SPACE));
             }
 
             for(int row=0; row<tempA.size();row++){
@@ -490,7 +494,7 @@ public class CLIViewUtils {
      * @return the array of strings containing the parts of the elem divided by "::"
      */
     private static String[] splitElem(String elem){
-        return elem.split("::");
+        return elem.split(DOUBLE_COLON);
     }
 
 
