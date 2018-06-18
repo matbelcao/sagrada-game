@@ -32,7 +32,7 @@ public class CLIViewUtils {
     static final int MENU_HEIGHT = 21;
     static final String FAVOR= "●";
     private static final String ESCAPE="\\u001B\\[([0-9]|([0-9][0-9]))m";
-    private static final String DOUBLE_COLON ="::" ;
+
     private static final String GREY = "\u001b[37m";
 
     static CLIElements cliElements;
@@ -63,14 +63,14 @@ public class CLIViewUtils {
     /**
      * this method is used to clean the screen and to make sure the lines of the page are printed starting from the top of the screen
      */
-    public synchronized static String resetScreenPosition() {
+    public static  String resetScreenPosition() {
 
 
         if(Client.isWindows()){
             try {
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
             } catch (InterruptedException | IOException e) {
-                System.err.println(ERR.toString()+CLS_COMMAND_ERR.toString());
+                System.err.println(ERR+CLS_COMMAND_ERR.toString());
                 System.exit(2);
             }
             return "";
@@ -97,7 +97,7 @@ public class CLIViewUtils {
      * @return said string
      */
     static String printList(List<String> toPrint){
-        if(toPrint==null){throw new IllegalArgumentException("toPrint "+IS_NULL.toString());}
+        if(toPrint==null){throw new IllegalArgumentException("toPrint "+IS_NULL);}
         StringBuilder builder=new StringBuilder();
         for(String line : toPrint) {
             builder.append(line).append("%n");
@@ -113,7 +113,7 @@ public class CLIViewUtils {
      * @return a list of strings that represent that
      */
     static List<String> padUntil(List<String> toPad,int finalLength, char filler){
-        if(toPad==null){ throw new IllegalArgumentException("toPad "+ IS_NULL.toString());}
+        if(toPad==null){ throw new IllegalArgumentException("toPad "+ IS_NULL);}
         List<String> result= new ArrayList<>();
         List<String> fittedLines= fitInLength(toPad,finalLength);
         for (String line : fittedLines) {
@@ -147,7 +147,7 @@ public class CLIViewUtils {
      */
     static Map<Integer,LightDie> toMap(List<LightDie> list) {
         if(list==null){
-            throw new IllegalArgumentException("list "+ IS_NULL.toString());
+            throw new IllegalArgumentException("list "+ IS_NULL);
         }
         HashMap<Integer, LightDie> map = new HashMap<>();
         for (int i = 0; i<list.size();i++){
@@ -213,7 +213,7 @@ public class CLIViewUtils {
     static  List<String> buildSchema(LightSchemaCard schema, boolean setIndexes) {
         List<String> result= new ArrayList<>();
 
-        if(setIndexes){result.add(cliElements.getElem(SCHEMA_COLUMNS.toString()));}
+        if(setIndexes){result.add(cliElements.getElem(SCHEMA_COLUMNS));}
 
         for(int row = 0; row< SchemaCard.NUM_ROWS; row++){
             if(setIndexes){
@@ -238,9 +238,9 @@ public class CLIViewUtils {
         List<String> index= new ArrayList<>();
 
         for(int i=0; i<CELL_HEIGHT;i++){
-            index.add(EMPTY_STRING);
+            index.add(EMPTY_STRING+SPACE+SPACE);
         }
-        index.set(CELL_HEIGHT/2,row+SPACE+SPACE+EMPTY_STRING);
+        index.set(CELL_HEIGHT/2,row+EMPTY_STRING+SPACE);
         return index;
     }
 
@@ -307,13 +307,13 @@ public class CLIViewUtils {
 
         if(cellContent==null){
             //empty
-            rows = splitElem(cliElements.getBigDie(EMPTY.toString()));
+            rows = splitElem(cliElements.getElem(EMPTY));
         }else {
             //not empty
 
             //die
             if (cellContent.isDie()) {
-                rows = splitElem(cliElements.getBigDie(cellContent.getShade().toString()));
+                rows = splitElem(cliElements.getBigDie(cellContent.getShade()));
             }
 
             //constraint
@@ -321,11 +321,11 @@ public class CLIViewUtils {
                 if (cellContent.hasColor()) {
 
                     //color constraint
-                    rows = splitElem(cliElements.getBigDie(FILLED.toString()));
+                    rows = splitElem(cliElements.getElem(FILLED));
                 } else {
 
                     //shade constraint
-                    rows = splitElem(cliElements.getBigDie(cellContent.getShade().toString()));
+                    rows = splitElem(cliElements.getBigDie(cellContent.getShade()));
                 }
             }
 
@@ -363,7 +363,7 @@ public class CLIViewUtils {
         if(tool.isUsed()) {
             result.set(0, result.get(0)+SPACE+ FAVOR);
         }
-        result.set(0,boldify(String.format(cliElements.getElem(LIST_ELEMENT.toString()),index,result.get(0))));
+        result.set(0,boldify(String.format(cliElements.getElem(LIST_ELEMENT),index,result.get(0))));
         return result;
     }
 
@@ -405,7 +405,7 @@ public class CLIViewUtils {
     static String padUntil(String toPad, int finalLength, char filler){
         if(finalLength<0){throw new IllegalArgumentException(INVALID_NEGATIVE_PARAM.toString());}
         if(toPad==null){throw new IllegalArgumentException("toPad"+ IS_NULL);}
-        if(printableLength(toPad)>finalLength){throw new IllegalArgumentException(LONGER_THAN_EXPECTED.toString()+toPad);}
+        if(printableLength(toPad)>finalLength){throw new IllegalArgumentException(LONGER_THAN_EXPECTED+toPad);}
 
         return toPad+ replicate(filler+EMPTY_STRING,finalLength - printableLength(toPad));
 
@@ -478,8 +478,8 @@ public class CLIViewUtils {
      * @return the result of appending, string by string, a to b
      */
     static List<String> appendRows(List<String> a, List<String> b){
-        if(a==null ){throw new IllegalArgumentException("a "+IS_NULL.toString());}
-        if( b==null){ throw new IllegalArgumentException("b "+IS_NULL.toString());}
+        if(a==null ){throw new IllegalArgumentException("a "+IS_NULL);}
+        if( b==null){ throw new IllegalArgumentException("b "+IS_NULL);}
         List<String> tempA= new ArrayList<>(a);
         List<String> tempB= new ArrayList<>(b);
         List<String> result= new ArrayList<>();

@@ -310,6 +310,36 @@ public enum ClientFSMState {
         public ClientFSMState nextState(boolean canContinue){
             return nextState(canContinue,false,false,false);
         }
+    },
+    /**
+     * in this state the client is presented with the ranking for the previous match and is asked if it wants to participate to a new match
+     */
+    GAME_ENDED{
+        /**
+         * this method is called when the client has decided whether or not if it wants to play a new match
+         * @param newMatch true iff the client wants to participate to a new match
+         * @param back has no effect here
+         * @param endTurn has no effect here
+         * @param discard has no effect here
+         * @return the next state
+         */
+        @Override
+        public ClientFSMState nextState(boolean newMatch, boolean back, boolean endTurn, boolean discard) {
+            if(newMatch){
+                return CHOOSE_SCHEMA;
+            }
+            return GAME_ENDED;
+        }
+
+        /**
+         * this method is called when the client has decided whether or not if it wants to play a new match
+         * @param newMatch true iff the client wants to participate to a new match
+         * @return the next state
+         */
+        @Override
+        public ClientFSMState nextState(boolean newMatch ) {
+            return nextState(newMatch,false,false,false);
+        }
     };
 
     /**

@@ -3,6 +3,7 @@ package it.polimi.ingsw.client;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.clientUI.uielements.CLIElements;
 import it.polimi.ingsw.client.view.clientUI.uielements.CLIView;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIElems;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
@@ -19,15 +20,18 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIElems.FILLED;
+import static it.polimi.ingsw.common.enums.Shade.*;
+
 class cliElemsTest {
     private static CLIElements cliel;
     private static String OS = null;
-    public static String getOsName()
+    static String getOsName()
     {
         if(OS == null) { OS = System.getProperty("os.name"); }
         return OS;
     }
-    public static boolean isWindows()
+    static boolean isWindows()
     {
         return getOsName().startsWith("Windows");
     }
@@ -150,21 +154,21 @@ class cliElemsTest {
     }
     @Test
     void  testGetOne(){
-        System.out.printf(cliel.getBigDie("ONE"));
+        System.out.printf(cliel.getBigDie(ONE));
         System.out.println("");
-        System.out.printf(cliel.getBigDie("TWO"));
+        System.out.printf(cliel.getBigDie(TWO));
         System.out.println("");
-        System.out.printf(cliel.getBigDie("THREE"));
+        System.out.printf(cliel.getBigDie(THREE));
         System.out.println("");
-        System.out.printf(cliel.getBigDie("FOUR"));
+        System.out.printf(cliel.getBigDie(FOUR));
         System.out.println("");
-        System.out.printf(Color.BLUE.getUtf()+cliel.getBigDie("FIVE")+ Color.NONE.getUtf());
+        System.out.printf(Color.BLUE.getUtf()+cliel.getBigDie(FIVE)+ Color.NONE.getUtf());
         System.out.println("");
-        System.out.printf(cliel.getBigDie("SIX"));
+        System.out.printf(cliel.getBigDie(SIX));
         System.out.println("");
-        System.out.printf(cliel.getBigDie("FILLED"));
+        System.out.printf(cliel.getElem(FILLED));
         System.out.println("");
-        System.out.printf(cliel.getBigDie("EMPTI"));
+        System.out.printf(cliel.getElem(CLIElems.EMPTY));
 
         System.out.println("");System.out.println("");System.out.println("");
 

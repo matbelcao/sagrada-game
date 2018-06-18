@@ -207,8 +207,8 @@ class ToolCardTest {
         assertEquals(0,tool.getOldIndexes().size());
         assertFalse(tool.toolCanContinue(player));
 
-        assertEquals("YELLOW\\ONE",die1.toString());
-        assertEquals("RED\\FOUR",die2.toString());
+        assertEquals("YELLOW"+File.separator+"ONE",die1.toString());
+        assertEquals("RED"+File.separator+"FOUR",die2.toString());
     }
 
     @Test

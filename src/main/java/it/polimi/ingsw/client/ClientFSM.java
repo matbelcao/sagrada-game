@@ -113,10 +113,27 @@ public class ClientFSM {
 
             case TOOL_CAN_CONTINUE:
                 break;
+            case GAME_ENDED:
+                manageNewGameChoice(index);
+                break;
             default:
                 client.getClientUI().showLastScreen();
                 break;
         }
+    }
+
+    private void manageNewGameChoice(int index) {
+        if(index==1){
+            newGame();
+        }else if(index==0){
+            client.quit();
+        }else{
+            client.getClientUI().showLastScreen();
+        }
+    }
+
+    private void newGame() {
+        client.reset();
     }
 
     /**
@@ -219,10 +236,8 @@ public class ClientFSM {
                 }
                 client.getBoard().stateChanged();
 
-            } else if (client.getBoard().getLatestOptionsList().size() == 1) {
-                singleOption();
             } else {
-                multipleOptions();
+                singleOption();
             }
             client.getBoard().notifyObservers();
         } else {
@@ -239,19 +254,6 @@ public class ClientFSM {
 
             chooseOptionAction(0);
         }
-    }
-
-    /**
-     * this is called in the rare case there are more than one options, it will display a list of possible choices to the
-     * and set the state to CHOOSE_OPTION
-     */
-    private void multipleOptions() {
-
-        synchronized (lockState) {
-            state=SELECT_DIE.nextState(false);
-            lockState.notifyAll();
-        }
-        client.getClientUI().showOptions(client.getBoard().getLatestOptionsList());
     }
 
 
@@ -358,5 +360,12 @@ public class ClientFSM {
             lockState.notifyAll();
         }
         client.getBoard().stateChanged();
+    }
+
+    public void endGame() {
+        synchronized (lockState) {
+            state = GAME_ENDED;
+            lockState.notifyAll();
+        }
     }
 }
