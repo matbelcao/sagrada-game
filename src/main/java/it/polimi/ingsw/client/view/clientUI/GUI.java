@@ -243,7 +243,7 @@ public class GUI extends Application implements ClientUI {
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(600);
-            primaryStage.setMinHeight(800);
+            primaryStage.setMinHeight(750);
             primaryStage.sizeToScene();
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
@@ -262,18 +262,21 @@ public class GUI extends Application implements ClientUI {
         LightBoard board;
         BorderPane b;
         HBox roundTrack;
-        GridPane schema;
+        Group schema;
         HBox draftpool;
         VBox schemaVbox;
+        Group cards;
         MainSceneGroup(LightBoard board){
             this.board = board;
             this.b = new BorderPane();
             this.roundTrack = new HBox();
-            this.schema = new GridPane();
+            this.schema = new Group();
             this.draftpool = new HBox();
             this.schemaVbox = new VBox(schema,draftpool);
+            this.cards = new Group();
             b.setTop(roundTrack);
-            b.setCenter(schemaVbox);
+            b.setLeft(schemaVbox);
+            b.setRight(cards);
             this.getChildren().add(b);
             redraw(200,200);
         }
@@ -284,6 +287,8 @@ public class GUI extends Application implements ClientUI {
             roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight,turnState,board.getLatestPlacementsList(),board.getLatestSelectedDie()));
             schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState,board.getLatestPlacementsList(),board.getLatestSelectedDie()));
             draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim,turnState));
+            cards.getChildren().setAll(sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState));
+
         }
     }
 
