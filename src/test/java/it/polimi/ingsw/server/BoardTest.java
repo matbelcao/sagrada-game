@@ -70,16 +70,16 @@ public class BoardTest {
     @Test
     void testDraftSchemas(){
         Board board1=new Board(users1, additionalSchemas);
-        Board board2=new Board(users2, additionalSchemas);
-
         assertEquals(16,board1.draftSchemas().length);
-        assertEquals(8,board2.draftSchemas().length);
+
+        Board board3=new Board(users2,true);
+        assertEquals(8,board3.draftSchemas().length);
     }
 
     @Test
     void testInternalPlacement(){
         Board board=new Board(users1, additionalSchemas);
-        SchemaCard schema= new SchemaCard(1);
+        SchemaCard schema= new SchemaCard(1,false);
         Die die1=new Die("FOUR","RED");
         Die die2=new Die("ONE","YELLOW");
 
@@ -140,7 +140,7 @@ public class BoardTest {
         assertFalse(board.chooseSchemaCard(users1.get(0),1));
 
         Player player1 = board.getPlayer(users1.get(1));
-        SchemaCard schema=new SchemaCard(1);
+        SchemaCard schema=new SchemaCard(1,false);
         player1.setSchema(schema);
         assertEquals(schema,board.getUserSchemaCard(player1.getGameId()));
     }

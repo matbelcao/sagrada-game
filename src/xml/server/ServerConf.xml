@@ -8,5 +8,5 @@
 	<portSocket>3000</portSocket>
     <timeLobby>5</timeLobby>
     <timeGame>90</timeGame>
-	<additionalSchemas>false</additionalSchemas>
+	<additionalSchemas>true</additionalSchemas>
 </conf>

@@ -64,7 +64,7 @@ class ToolCardTest {
     @Test
     void testInternalPlacement(){
         Player player = new Player("Player1",0,board,priv);
-        SchemaCard schema= new SchemaCard(1);
+        SchemaCard schema= new SchemaCard(1,false);
         Die die1=new Die("FOUR","RED");
         Die die2=new Die("ONE","YELLOW");
         player.setSchema(schema);
@@ -110,7 +110,7 @@ class ToolCardTest {
     @Test
     void testToolExitAndDiscard(){
         Player player = new Player("Player1",0,board,priv);
-        SchemaCard schema= new SchemaCard(1);
+        SchemaCard schema= new SchemaCard(1,false);
         Die die1=new Die("FOUR","RED");
         Die die2=new Die("ONE","YELLOW");
         player.setSchema(schema);
@@ -183,7 +183,7 @@ class ToolCardTest {
     @Test
     void testSwapDie(){
         Player player = new Player("Player1",0,board,priv);
-        SchemaCard schema= new SchemaCard(1);
+        SchemaCard schema= new SchemaCard(1,false);
         Die die1=new Die("FOUR","RED");
         Die die2=new Die("ONE","YELLOW");
         player.setSchema(schema);
@@ -214,7 +214,7 @@ class ToolCardTest {
     @Test
     void testRerollOneDie(){
         Player player = new Player("Player1",0,board,priv);
-        SchemaCard schema= new SchemaCard(1);
+        SchemaCard schema= new SchemaCard(1,false);
         Die die1=new Die("FOUR","RED");
         player.setSchema(schema);
         ToolCard tool= new ToolCard(6);
@@ -236,7 +236,7 @@ class ToolCardTest {
     @Test
     void testRerollAllDice(){
         Player player = new Player("Player1",0,board,priv);
-        SchemaCard schema= new SchemaCard(1);
+        SchemaCard schema= new SchemaCard(1,false);
         List<Die> dieList=new ArrayList<>();
         dieList.add(new Die("FOUR","RED"));
         dieList.add(new Die("ONE","GREEN"));
@@ -263,7 +263,7 @@ class ToolCardTest {
     @Test
     void testFlipDie(){
         Player player = new Player("Player1",0,board,priv);
-        SchemaCard schema= new SchemaCard(1);
+        SchemaCard schema= new SchemaCard(1,false);
         Die die1=new Die("ONE","RED");
         player.setSchema(schema);
         ToolCard tool= new ToolCard(10);
@@ -285,7 +285,7 @@ class ToolCardTest {
     @Test
     void testChooseShade(){
         Player player = new Player("Player1",0,board,priv);
-        SchemaCard schema= new SchemaCard(1);
+        SchemaCard schema= new SchemaCard(1,false);
         Die die1=new Die("FIVE","PURPLE");
         player.setSchema(schema);
         ToolCard tool= new ToolCard(11);
@@ -311,7 +311,7 @@ class ToolCardTest {
     @Test
     void testSetColor(){
         Player player = new Player("Player1",0,board,priv);
-        SchemaCard schema= new SchemaCard(1);
+        SchemaCard schema= new SchemaCard(1,false);
         Die die1=new Die("FIVE","PURPLE");
         player.setSchema(schema);
         ToolCard tool= new ToolCard(12);

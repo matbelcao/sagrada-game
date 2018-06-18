@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SchemaCardTest {
     @Test
     void testSchemaCardConstructor(){
-        SchemaCard schema1 = new SchemaCard(1);
+        SchemaCard schema1 = new SchemaCard(1,false);
         assertEquals("Kaleidoscopic Dream",schema1.getName());
         assertEquals(Integer.parseInt("1"),schema1.getId());
         assertEquals(Integer.parseInt("4"),schema1.getFavorTokens());
@@ -61,7 +61,7 @@ class SchemaCardTest {
         assertEquals("BLUE",schema1.getCell(3, 3).getConstraint().toString());
         assertEquals("YELLOW",schema1.getCell(3, 4).getConstraint().toString());
 
-        SchemaCard schema2 = new SchemaCard(24);
+        SchemaCard schema2 = new SchemaCard(24,false);
         assertEquals("Industria",schema2.getName());
         assertEquals(Integer.parseInt("24"),schema2.getId());
         assertEquals(Integer.parseInt("5"),schema2.getFavorTokens());
@@ -70,7 +70,7 @@ class SchemaCardTest {
     //toolcard #9
     @Test
     void testNonAdjacentPlacement(){
-        SchemaCard schema1 = new SchemaCard(1);
+        SchemaCard schema1 = new SchemaCard(1,false);
         ArrayList list= (ArrayList) schema1.listPossiblePlacements(new Die("FOUR","GREEN"),IgnoredConstraint.ADJACENCY);
         assertEquals(11,list.size());
         try {
@@ -96,7 +96,7 @@ class SchemaCardTest {
     @Test
 
     void testListPlacementsSwap() throws IllegalDieException {
-        SchemaCard schema1 = new SchemaCard(1);
+        SchemaCard schema1 = new SchemaCard(1,false);
 
 
         schema1.putDie(2,new Die("FOUR","RED"));
@@ -115,7 +115,7 @@ class SchemaCardTest {
     }
     @Test
     void testDiePlacement(){
-        SchemaCard schema1 = new SchemaCard(1);
+        SchemaCard schema1 = new SchemaCard(1,false);
         Die die1= new Die("FOUR","RED");
         Die die2= new Die("TWO","GREEN");
         Die die3= new Die("FOUR","RED");
@@ -183,7 +183,7 @@ class SchemaCardTest {
 
     @Test
     void testListGenerator(){
-        SchemaCard schema1 = new SchemaCard(1);
+        SchemaCard schema1 = new SchemaCard(1,false);
         Die die1= new Die("FOUR","RED");
         Die die2= new Die("TWO","GREEN");
         Die die3= new Die("FOUR","RED");

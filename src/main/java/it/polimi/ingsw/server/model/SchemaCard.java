@@ -28,10 +28,12 @@ public class SchemaCard implements Iterable<Cell>  {
     private int favorTokens;
     private final Cell [][] cell;
     private Boolean isFirstDie;
+    private Boolean additionalSchema;
     public static final int NUM_COLS=5;
     public static final int NUM_ROWS=4;
     public static final int NUM_SCHEMA=24;
-    private static String xmlSource=MasterServer.XML_SOURCE+"SchemaCard.xml";
+    private static String xmlSchema=MasterServer.XML_SOURCE+"SchemaCard.xml";
+    private static String xmlAdditionalSchema=MasterServer.XML_SOURCE+"AdditionalSchemaCard.xml";
 
     /**
      * Retrieves the SchemaCard(id) data from the xml file and instantiates it
@@ -48,10 +50,12 @@ public class SchemaCard implements Iterable<Cell>  {
 
     /**
      * The SchemaCard's class constructor. Retrieves the SchemaCard(id) data from the xml file and instantiates it
+     * @param additionalSchema true to enable a personalized SchemaCard instantiation
      * @param id the ID of the schema card to instantiate
      */
-    public SchemaCard(int id){
-        SchemaCard temp= parser(id);
+    public SchemaCard(int id,boolean additionalSchema){
+        SchemaCard temp= parser(id,additionalSchema);
+        this.additionalSchema=additionalSchema;
         assert temp != null;
         cell = temp.cell;
         this.id=id;
@@ -63,10 +67,18 @@ public class SchemaCard implements Iterable<Cell>  {
     /**
      * Retrieve the SchemaCard's data from the xml file ant initilizes the related parameters
      * @param id the ScheCard's id
-     * @return
+     * @param additionalSchema true to enable a personalized SchemaCard instantiation
+     * @return the bulit SchemaCard
      */
-    public static SchemaCard parser(int id){
-        File xmlFile= new File(xmlSource);
+    public static SchemaCard parser(int id,boolean additionalSchema){
+        File xmlFile=null;
+
+        if(additionalSchema){
+            xmlFile= new File(xmlAdditionalSchema);
+        }else{
+            xmlFile= new File(xmlSchema);
+        }
+
         String name="";
         int favorTokens=0;
         Cell[][] cells= new Cell[NUM_ROWS][NUM_COLS];
@@ -110,6 +122,31 @@ public class SchemaCard implements Iterable<Cell>  {
             System.err.println("ERR: couldn't load schema card");
         }
         return null;
+    }
+
+    /**
+     * Returns the number of custom SchemasCards present in the XML file
+     * @return the number of SchemaCards
+     */
+    public static int getAdditionalSchemaSize(){
+        File xmlFile= new File(xmlAdditionalSchema);
+
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder;
+
+        try {
+
+            dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xmlFile);
+            doc.getDocumentElement().normalize();
+
+            NodeList nodeList = doc.getElementsByTagName("SchemaCard");
+            return nodeList.getLength();
+
+        }catch (SAXException | ParserConfigurationException | IOException e1) {
+            System.err.println("ERR: couldn't open the file correctly");
+            return 0;
+        }
     }
 
     /**
@@ -398,7 +435,7 @@ public class SchemaCard implements Iterable<Cell>  {
      * @return the copy reference
      */
     public SchemaCard cloneSchema(){
-        SchemaCard temp= new SchemaCard(this.id);
+        SchemaCard temp= new SchemaCard(this.id,additionalSchema);
         FullCellIterator iter= (FullCellIterator) iterator();
         Cell tempCell;
         while(iter.hasNext()){
@@ -448,5 +485,4 @@ public class SchemaCard implements Iterable<Cell>  {
         }
         return -1;
     }
-
 }

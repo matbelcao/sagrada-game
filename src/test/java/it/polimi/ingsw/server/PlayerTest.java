@@ -28,7 +28,7 @@ public class PlayerTest {
 
         board = new Board(users, additionalSchemas);
 
-        schema = new SchemaCard(1);
+        schema = new SchemaCard(1,false);
     }
 
     @Test
