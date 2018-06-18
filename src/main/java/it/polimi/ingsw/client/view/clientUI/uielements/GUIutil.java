@@ -109,6 +109,15 @@ public class GUIutil {
         return drawingWidth/ DRAFTED_CANVAS_SCENE_RATIO;
     }
 
+    private double getCardWidth(){
+        double width = 184.58712093023254;
+        return width;
+    }
+    private double getCardHeight(){
+        double height = 249.915;
+        return height;
+    }
+
     public double getSelectedSchemaLineWidth(double sceneWidth, double sceneHeight){
         DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth,sceneHeight);
         double drawingWidth = sizes.getDrawingWidth();
@@ -225,16 +234,16 @@ public class GUIutil {
         GridPane grid = new GridPane();
         int i = 0;
         int j = 0;
-        grid.add( drawCard(privObj,200,400),j,i);
+        grid.add( drawCard(privObj,getCardWidth(),getCardHeight()),j,i);
         for (LightCard pubObjCard : pubObjs){
             j++;
-            grid.add(drawCard(pubObjCard,200,400),j,i);
+            grid.add(drawCard(pubObjCard,getCardWidth(),getCardHeight()),j,i);
         }
         i++;
         j = 0;
         for (LightCard toolCard : tools) {
             j++;
-            grid.add(drawCard(toolCard,200,400),j,i);
+            grid.add(drawCard(toolCard,getCardWidth(),getCardHeight()),j,i);
         }
         return new Group(grid);
 
