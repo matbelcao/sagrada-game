@@ -1,7 +1,7 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
-import it.polimi.ingsw.client.view.clientUI.uielements.CLIElems;
+import it.polimi.ingsw.client.view.clientUI.uielements.CLIElements;
 import it.polimi.ingsw.client.view.clientUI.uielements.CLIView;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.enums.Color;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class cliElemsTest {
-    private static CLIElems cliel;
+    private static CLIElements cliel;
     private static String OS = null;
     public static String getOsName()
     {
@@ -35,7 +35,7 @@ class cliElemsTest {
 
     static {
         try {
-            cliel = new CLIElems();
+            cliel = new CLIElements();
         } catch (InstantiationException e) {
             e.printStackTrace();
         }

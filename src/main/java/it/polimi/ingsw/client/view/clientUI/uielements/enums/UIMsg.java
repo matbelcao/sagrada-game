@@ -42,7 +42,9 @@ public enum UIMsg {
     FIRST_TURN("first-turn"),
     SECOND_TURN("second-turn"),
     BROKEN_CONNECTION("broken-connection"),
-    CLOSED_CONNECTION("closed-connection");
+    CLOSED_CONNECTION("closed-connection"),
+    QUITTED("quitted"),
+    DISCONNECTED("disconnected");
 
 
 

@@ -95,13 +95,13 @@ public class CLI implements ClientUI {
     @Override
     public void updateConnectionOk() {
         resetScreen();
-        console.printf(String.format("%n%s", uimsg.getMessage(UIMsg.CONNECTION_OK)));
+        console.printf(String.format("%s%n", uimsg.getMessage(UIMsg.CONNECTION_OK)));
 
     }
 
     @Override
     public void updateLobby(int numUsers){
-
+        resetScreen();
         console.printf(String.format("%s%n", uimsg.getMessage(UIMsg.LOBBY_UPDATE)),numUsers);
 
     }
