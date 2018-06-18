@@ -357,7 +357,6 @@ public class Client {
 
         List<LightPlayer> players = clientConn.getPlayers();
         for (int i = 0; i < board.getNumPlayers(); i++) {
-
             board.addPlayer(players.get(i));
         }
 

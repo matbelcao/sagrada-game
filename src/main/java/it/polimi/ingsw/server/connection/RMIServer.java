@@ -39,7 +39,34 @@ public class RMIServer implements ServerConn {
     @Override
     public void notifyGameStart(int n, int id) {
         try {
-            remoteObj.notifyGameStart( n, id);
+            remoteObj.notifyGameStart(n, id);
+        } catch (RemoteException e) {
+            user.disconnect();
+        }
+    }
+
+    @Override
+    public void notifyGameEnd(List<LightPlayer> players) {
+        try {
+            remoteObj.notifyGameEnd(players);
+        } catch (RemoteException e) {
+            user.disconnect();
+        }
+    }
+
+    @Override
+    public void notifyRoundEvent(String event, int roundNumber) {
+        try {
+            remoteObj.notifyRoundEvent(event,roundNumber);
+        } catch (RemoteException e) {
+            user.disconnect();
+        }
+    }
+
+    @Override
+    public void notifyTurnEvent(String event, int playerId, int turnNumber) {
+        try {
+            remoteObj.notifyTurnEvent(event,playerId,turnNumber);
         } catch (RemoteException e) {
             user.disconnect();
         }
@@ -47,32 +74,29 @@ public class RMIServer implements ServerConn {
 
     @Override
     public void notifyStatusUpdate(String event, int id) {
-
-    }
-
-    @Override
-    public void notifyGameEnd(List<LightPlayer> players) {
-
-    }
-
-    @Override
-    public void notifyRoundEvent(String event, int roundNumber) {
-
-    }
-
-    @Override
-    public void notifyTurnEvent(String event, int playerId, int turnNumber) {
-
+        try {
+            remoteObj.notifyStatusUpdate(event,id);
+        } catch (RemoteException e) {
+            user.disconnect();
+        }
     }
 
     @Override
     public void notifyBoardChanged() {
-
+        try {
+            remoteObj.notifyBoardChanged();
+        } catch (RemoteException e) {
+            user.disconnect();
+        }
     }
 
     @Override
     public void close() {
-
+        try {
+            remoteObj.close() ;
+        } catch (RemoteException e) {
+            user.disconnect();
+        }
     }
 
 
@@ -90,7 +114,4 @@ public class RMIServer implements ServerConn {
         }
         return result;
     }
-
-
-
 }

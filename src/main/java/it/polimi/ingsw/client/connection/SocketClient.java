@@ -63,7 +63,7 @@ public class SocketClient implements ClientConn {
                         if (ClientParser.parse(inSocket.readln(), result)) {
                             if (ClientParser.isStatus(inSocket.readln())) {
                                 inSocket.pop();
-                                switch (result.get(1)) {
+                                switch (result.get(1)) {    //todo
                                     case "check":
                                         pong();
                                         break;
@@ -186,7 +186,6 @@ public class SocketClient implements ClientConn {
                 client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
                 break;
             case "board_changed":
-
                 client.getUpdates();
         }
     }
@@ -558,10 +557,11 @@ public class SocketClient implements ClientConn {
     }
 
     /**
-     * This function can be invoked to select one die of a previolsly GET_DICE_LIST command and obtain
+     * This function can be invoked to select one die of a previously GET_DICE_LIST command and obtain
      * a list of to options to manipulate it
      * @return and immutable and indexed list containing the dice
      */
+    @Override
     public List<Commands> select(int dieIndex){
         ArrayList<String> result= new ArrayList<>();
         List<Commands> options=new ArrayList<>();
@@ -760,11 +760,5 @@ public class SocketClient implements ClientConn {
             return false;
         }
         return true;
-    }
-
-    //ONLY FOR DEBUG PURPOSES
-    public void sendDebugMessage(String message){
-        outSocket.println(message);
-        outSocket.flush();
     }
 }
