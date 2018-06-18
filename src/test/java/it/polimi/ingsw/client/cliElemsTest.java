@@ -63,10 +63,10 @@ class cliElemsTest {
             AnsiConsole.systemInstall();
         }
 
-        schema0=LightSchemaCard.toLightSchema(new SchemaCard(1));
-        schema1=LightSchemaCard.toLightSchema(new SchemaCard(2));
-        schema2=LightSchemaCard.toLightSchema(new SchemaCard(3));
-        schema3=LightSchemaCard.toLightSchema(new SchemaCard(4));
+        schema0=LightSchemaCard.toLightSchema(new SchemaCard(1,false));
+        schema1=LightSchemaCard.toLightSchema(new SchemaCard(2,false));
+        schema2=LightSchemaCard.toLightSchema(new SchemaCard(3,false));
+        schema3=LightSchemaCard.toLightSchema(new SchemaCard(4,false));
 
         draftpool=new ArrayList<>();
 

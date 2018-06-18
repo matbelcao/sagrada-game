@@ -31,7 +31,7 @@ public class Board {
     private PubObjectiveCard[] publicObjectives;
     private ToolCard[] toolCards;
     private SchemaCard[]  schemaDrafted;
-    private boolean additionalSchemas;
+    private boolean additionalSchema;
     private ServerFSM fsm;
     private ServerState status;
 
@@ -47,11 +47,11 @@ public class Board {
     /**
      * The class constructor. Initializes the variables and extracts the objects to distribute to the players
      * @param users the List of users that are playing in the match
-     * @param additionalSchemas true if the additional schema FA is enabled
+     * @param additionalSchema true if the additional schema FA is enabled
      */
-    public Board(List<User> users, boolean additionalSchemas){
+    public Board(List<User> users, boolean additionalSchema){
         this.draftPool=new DraftPool();
-        this.additionalSchemas=additionalSchemas;
+        this.additionalSchema=additionalSchema;
         this.publicObjectives=draftPubObjectives();
         this.toolCards=draftToolCards();
         status=ServerState.INIT;
@@ -130,22 +130,76 @@ public class Board {
     }
 
     /**
-     * Extract the random SchemaCards to be chosen by users
+     * Extracts the random SchemaCards to be chosen by users
      * @return an array containing the SchemaCards
      */
     public SchemaCard[] draftSchemas() {
         schemaDrafted= new SchemaCard[NUM_PLAYER_SCHEMAS*players.size()];
         Random randomGen = new Random();
         Integer id;
-        List<Integer> draftedSchemas= new ArrayList<>();
+        List<Integer> draftedIndex= new ArrayList<>();
+        int offset=0;
+        int i=0;
+        int p=0;
 
-        for(int i =0; i < NUM_PLAYER_SCHEMAS*players.size();i++){
-            do{
-                id=randomGen.nextInt(SchemaCard.NUM_SCHEMA) + 1;
-            } while(draftedSchemas.contains(id));
+        if(additionalSchema){
+            int numAdditionalSchemas=SchemaCard.getAdditionalSchemaSize();
 
-            draftedSchemas.add(id);
-            schemaDrafted[i]=new SchemaCard(id);
+            if(numAdditionalSchemas>NUM_PLAYER_SCHEMAS*players.size()){
+                numAdditionalSchemas=NUM_PLAYER_SCHEMAS*players.size();
+            }
+
+            offset=numAdditionalSchemas/players.size();
+
+            schemaDrafted=draftAdditionalSchemas(offset);
+
+        }
+
+        for(p=0;p<players.size();p++) {
+            for (i = 0; i < (NUM_PLAYER_SCHEMAS-offset); i++) {
+                do {
+                    id = randomGen.nextInt(SchemaCard.NUM_SCHEMA) + 1;
+                } while (draftedIndex.contains(id));
+
+                draftedIndex.add(id);
+                schemaDrafted[(p*NUM_PLAYER_SCHEMAS)+i+offset] = new SchemaCard(id, false);
+            }
+        }
+
+        System.out.println("--------------------");
+        for(SchemaCard s: schemaDrafted){
+            System.out.println(s.getName());
+        }
+
+        return schemaDrafted;
+    }
+
+    /**
+     * Extracts the personalized SchemaCards and puts them into an array
+     * @param quantity the number of cards to extract
+     * @return the Array containig the additional SchemaCards extracted
+     */
+    private SchemaCard[] draftAdditionalSchemas(int quantity){
+        Random randomGen = new Random();
+        Integer id;
+        List<Integer> draftedIndex= new ArrayList<>();
+        List<SchemaCard> additionalSchemas=new ArrayList<>();
+
+        if(quantity>0) {
+            for(int i=0;i<quantity*players.size();i++){
+                do{
+                    id=randomGen.nextInt(quantity*players.size()) + 1;
+                } while(draftedIndex.contains(id));
+                draftedIndex.add(id);
+                additionalSchemas.add(i,new SchemaCard(id,true));
+            }
+
+            for(int p=0;p<players.size();p++){
+                for(int i=0;i<quantity;i++){
+                    schemaDrafted[(p*NUM_PLAYER_SCHEMAS)+i]=additionalSchemas.get(0);
+                    additionalSchemas.remove(0);
+                }
+            }
         }
         return schemaDrafted;
     }
