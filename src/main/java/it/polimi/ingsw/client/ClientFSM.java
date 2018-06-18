@@ -269,6 +269,7 @@ public class ClientFSM {
                 }
 
                 client.getBoard().setLatestPlacementsList(client.getClientConn().getPlacementsList());
+
                 if(client.getBoard().getLatestPlacementsList().isEmpty()){
                     if(isToolEnabled()) {
                         toolContinue();
@@ -295,6 +296,13 @@ public class ClientFSM {
         }
         if(canContinue){
             client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
+            if(client.getBoard().getLatestDiceList().isEmpty()) {
+                synchronized (lockState) {
+                    state = SELECT_DIE.nextState(true);
+                    lockState.notifyAll();
+                }
+                client.getClientConn().exit();
+            }
         }
 
         client.getBoard().notifyObservers();

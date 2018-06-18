@@ -14,18 +14,32 @@ import java.util.List;
 
 
 public class ServerOptions {
+    private static final String HELP_MESSAGE ="help-message" ;
+    private static final String HELP_FILE = "helpmessage.xml";
+    private static final String SHORT_HELP = "h";
+    private static final String SHORT_IP_ADDRESS = "a";
+    private static final String SHORT_ADDITIONAL_CARDS = "A";
+    private static final String SHORT_TURN_TIME = "t";
+    private static final String SHORT_LOBBY_TIME = "l";
+
+
+
+
+
+
+
     private ServerOptions(){}
 
     private static final String LONG_OPTION="(\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+))";
     private static final String SHORT_OPTION="\\-[haAtl]+";
     private static final String IP_ADDRESS="(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$)";
-    private static final String SECONDS="(([1-9][0-9])|[0-9]|([1-9][0-9][0-9]))";
+    private static final String SECONDS="(([1-9][0-9])|[0-9]|([1-9][0-9][0-9])|([1-9][0-9][0-9][0-9]))";
 
 
     public static void printHelpMessage(){
         String message="ERROR: couldn't load configuration files\n";
 
-        File xmlFile= new File(MasterServer.XML_SOURCE+"helpmessage.xml");
+        File xmlFile= new File(MasterServer.XML_SOURCE+HELP_FILE);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -33,7 +47,7 @@ public class ServerOptions {
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
 
-            message = doc.getElementsByTagName("help-message").item(0).getTextContent();
+            message = doc.getElementsByTagName(HELP_MESSAGE).item(0).getTextContent();
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
         }
@@ -61,14 +75,11 @@ public class ServerOptions {
 
                 if (option.matches(LONG_OPTION)) {
                     checkLongOptions(args, options, index, option);
-                }
-                if (option.matches(SHORT_OPTION)) {
+                }else if (option.matches(SHORT_OPTION)) {
                     checkShortOptions(args, options, index, option);
-                }
-                if (option.matches(IP_ADDRESS)) {
+                }else if (option.matches(IP_ADDRESS)) {
                     checkIPOption(options, option);
-                }
-                if (option.matches(SECONDS)) {
+                }else if (option.matches(SECONDS)) {
                     checkSecondsOption(options, option);
                 }
             }
@@ -165,26 +176,27 @@ public class ServerOptions {
             //options without parameters
             if (shortOption.matches("[Ah]")) {
                 options.add(shortOption);
-            } else if (!isLastShortOption(option, i)) {
-                //options with parameters must be at the end of a set of short options following the same '-'
-                throw new IllegalArgumentException();
-            }
-            switch (shortOption) {
-                case "l":
-                case "t":
-                    if (!checkOptionWithParam(options, args, index, SECONDS, shortOption)) {
-                        throw new IllegalArgumentException();
-                    }
-                    break;
-                case "a":
-                    if (!checkOptionWithParam(options, args, index, IP_ADDRESS, shortOption)) {
-                        throw new IllegalArgumentException();
-                    }
-                    break;
-                default:
+            } else {
+                if (!isLastShortOption(option, i)) {
+                    //options with parameters must be at the end of a set of short options following the same '-'
                     throw new IllegalArgumentException();
+                }
+                switch (shortOption) {
+                    case "l":
+                    case "t":
+                        if (!checkOptionWithParam(options, args, index, SECONDS, shortOption)) {
+                            throw new IllegalArgumentException();
+                        }
+                        break;
+                    case "a":
+                        if (!checkOptionWithParam(options, args, index, IP_ADDRESS, shortOption)) {
+                            throw new IllegalArgumentException();
+                        }
+                        break;
+                    default:
+                        throw new IllegalArgumentException();
+                }
             }
-
 
             i++;
         }

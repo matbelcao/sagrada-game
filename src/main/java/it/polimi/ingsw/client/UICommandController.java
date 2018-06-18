@@ -16,8 +16,9 @@ public class UICommandController extends Thread {
     private static final String VALID_OPTION = "(["+BACK+QUIT+DISCARD+END_TURN+"])";
 
     /**
-     * this sets the needed parameters for the manager to work properly
-     * @param
+     * the constructor sets the needed parameters for the controller to work properly
+     * @param clientFSM the fsm of the client
+     * @param commandQueue the queue of commands that will need to be managed
      */
     public UICommandController(ClientFSM clientFSM, QueuedReader commandQueue){
         this.clientFSM = clientFSM;
