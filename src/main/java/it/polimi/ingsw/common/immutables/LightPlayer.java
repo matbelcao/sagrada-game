@@ -25,22 +25,15 @@ public class LightPlayer {
         int playerId = player.getGameId();
         LightPlayer lightPlayer = new LightPlayer(username,playerId);
         lightPlayer.setPoints(player.getScore());
-        lightPlayer.setSchema(LightSchemaCard.toLightSchema(player.getSchema()));
+        if(player.getSchema()!=null){
+            lightPlayer.setSchema(LightSchemaCard.toLightSchema(player.getSchema()));
+        }
         lightPlayer.setFinalPosition(player.getFinalPosition());
         return lightPlayer;
     }
 
     public LightPlayerStatus getStatus(){
         return status;
-    }
-    public void setDisconnected(){
-        this.status=LightPlayerStatus.DISCONNECTED;
-    }
-    public void setQuitted(){
-        this.status=LightPlayerStatus.QUITTED;
-    }
-    public void setPlaying(){
-        this.status=LightPlayerStatus.PLAYING;
     }
 
     public int getFavorTokens() {
@@ -81,6 +74,10 @@ public class LightPlayer {
 
     public boolean isPlaying() {
         return this.status.equals(LightPlayerStatus.PLAYING);
+    }
+
+    public void setStatus(LightPlayerStatus status) {
+        this.status=status;
     }
 }
 

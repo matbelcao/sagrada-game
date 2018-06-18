@@ -63,15 +63,18 @@ public class SocketClient implements ClientConn {
                         if (ClientParser.parse(inSocket.readln(), result)) {
                             if (ClientParser.isStatus(inSocket.readln())) {
                                 inSocket.pop();
-                                switch (result.get(1)) {
+                                switch (result.get(1)) {    //todo
                                     case "check":
                                         pong();
                                         break;
                                     case "reconnect":
+                                        client.updatePlayerStatus(Integer.parseInt(result.get(2)),LightPlayerStatus.PLAYING);
                                         break;
                                     case "disconnect":
+                                        client.updatePlayerStatus(Integer.parseInt(result.get(2)),LightPlayerStatus.DISCONNECTED);
                                         break;
                                     case "quit":
+                                        client.updatePlayerStatus(Integer.parseInt(result.get(2)),LightPlayerStatus.QUITTED);
                                         break;
                                 }
                             } else if (ClientParser.isLobby(inSocket.readln())) {
@@ -163,15 +166,12 @@ public class SocketClient implements ClientConn {
                 client.updateGameStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
                 break;
             case "end":
+                List<RankingEntry> ranking= new ArrayList<>();
                 for(i=COMMA_PARAMS_START; i<outcomes.size();i++){
                     param=outcomes.get(i).split(",");
-                    LightPlayer player=client.getBoard().getPlayerById(Integer.parseInt(param[0]));
-                    if (player.getPlayerId()==Integer.parseInt(param[0])){
-                        player.setPoints(Integer.parseInt(param[1]));
-                        player.setFinalPosition(Integer.parseInt(param[2]));
-                    }
+                    ranking.add(new RankingEntry(Integer.parseInt(param[0]),Integer.parseInt(param[1]),Integer.parseInt(param[2])));
                 }
-                client.updateGameEnd();
+                client.updateGameEnd(ranking);
                 break;
             case "round_start":
                 client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)));
@@ -186,7 +186,6 @@ public class SocketClient implements ClientConn {
                 client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
                 break;
             case "board_changed":
-
                 client.getUpdates();
         }
     }
@@ -558,10 +557,11 @@ public class SocketClient implements ClientConn {
     }
 
     /**
-     * This function can be invoked to select one die of a previolsly GET_DICE_LIST command and obtain
+     * This function can be invoked to select one die of a previously GET_DICE_LIST command and obtain
      * a list of to options to manipulate it
      * @return and immutable and indexed list containing the dice
      */
+    @Override
     public List<Commands> select(int dieIndex){
         ArrayList<String> result= new ArrayList<>();
         List<Commands> options=new ArrayList<>();
@@ -760,11 +760,5 @@ public class SocketClient implements ClientConn {
             return false;
         }
         return true;
-    }
-
-    //ONLY FOR DEBUG PURPOSES
-    public void sendDebugMessage(String message){
-        outSocket.println(message);
-        outSocket.flush();
     }
 }

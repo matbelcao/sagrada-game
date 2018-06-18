@@ -14,6 +14,7 @@ import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -129,7 +130,7 @@ public class BoardTest {
         assertTrue(board.chooseOption(0));
         assertTrue(board.choosePlacement(1));
         assertEquals(die1, schema.getCell(11).getDie());
-        assertEquals("RED\\FOUR", schema.getCell(11).getDie().toString());
+        assertEquals("RED"+File.separator+"FOUR", schema.getCell(11).getDie().toString());
     }
 
     @Test

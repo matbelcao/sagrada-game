@@ -1,9 +1,8 @@
 package it.polimi.ingsw.client.view.clientUI;
 
-import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.common.connection.QueuedReader;
-import it.polimi.ingsw.common.enums.Commands;
-import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.common.immutables.LightPrivObj;
+import it.polimi.ingsw.common.immutables.LightSchemaCard;
 
 import java.io.File;
 import java.util.List;
@@ -53,11 +52,6 @@ public interface ClientUI extends Observer {
 
 
     /**
-     * this method is used
-     */
-    void updateStatusMessage(String statusChange, int playerId);
-
-    /**
      * this notifies the client that wanted to quit that his connection has been closed and he has successfully quit
      */
     void updateConnectionClosed();
@@ -68,11 +62,8 @@ public interface ClientUI extends Observer {
     void updateConnectionBroken();
 
 
-    void showOptions(List<Commands> optionsList);
-
     void showWaitingForGameStartScreen();
 
-    void showMainScreen(ClientFSMState turnState);
 
     QueuedReader getCommandQueue();
 }

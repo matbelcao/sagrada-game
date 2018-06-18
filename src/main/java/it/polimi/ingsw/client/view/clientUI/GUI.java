@@ -298,10 +298,7 @@ public class GUI extends Application implements ClientUI {
 
 
 
-    @Override
-    public void updateStatusMessage(String statusChange, int playerId) {
 
-    }
 
     @Override
     public void updateConnectionClosed() {
@@ -315,11 +312,6 @@ public class GUI extends Application implements ClientUI {
 
 
     @Override
-    public void showOptions(List<Commands> optionsList) {
-
-    }
-
-    @Override
     public void showWaitingForGameStartScreen() {
         Platform.runLater(() -> {
             String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
@@ -328,10 +320,6 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-    @Override
-    public void showMainScreen(ClientFSMState turnState) {
-        //no usage
-    }
 
     class DraftedSchemasGroup extends Group{
         Canvas canvas;

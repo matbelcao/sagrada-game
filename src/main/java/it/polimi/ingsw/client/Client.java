@@ -14,7 +14,9 @@ import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMode;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.immutables.LightPlayer;
+import it.polimi.ingsw.common.immutables.LightPlayerStatus;
 import it.polimi.ingsw.common.immutables.LightTool;
+import it.polimi.ingsw.common.immutables.RankingEntry;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 import it.polimi.ingsw.server.connection.RMIServerObject;
@@ -68,6 +70,9 @@ public class Client {
     private final Object lockUI = new Object();
 
 
+    /**
+     * @return true iff the client is using windows
+     */
     public static boolean isWindows()
     {
         return System.getProperty("os.name").startsWith("Windows");
@@ -89,12 +94,30 @@ public class Client {
         this.port = port;
         this.lang = lang;
         this.userStatus = UserStatus.DISCONNECTED;
-        this.ready=false;
-
-
+        this.ready = false;
     }
 
+    void reset() {
+        synchronized (lockStatus) {
+            this.userStatus = UserStatus.DISCONNECTED;
+        }
 
+        boolean logged;
+        try {
+            logged=login();
+        } catch (RemoteException | MalformedURLException | NotBoundException e) {
+            e.printStackTrace();
+            System.err.println(ERR.toString()+COULDNT_LOG_BACK_IN.toString());
+            System.exit(1);// TODO: 19/06/2018 add to ERRMsg a code for system exits
+        }
+        synchronized (lockStatus) {
+            this.userStatus = UserStatus.CONNECTED;
+        }
+        synchronized (lockReady) {
+            this.ready = false;
+        }
+
+    }
 
     /**
      * parses the default settings in the xml file and creates a client based on that
@@ -124,17 +147,19 @@ public class Client {
             return null;
         }
 
-
     }
 
-    public static Client getNewClient() {
+    /**
+     * @return a new Client object
+     */
+    private static Client getNewClient() {
         return parser();
     }
 
-
-
-
-    public LightBoard getBoard() {
+    /**
+     * @return the client's light version of the board
+     */
+    LightBoard getBoard() {
         return board;
     }
 
@@ -157,7 +182,7 @@ public class Client {
      * This method sets the wanted language
      * @param lang the requested language
      */
-    public void setLang(UILanguage lang) {
+    void setLang(UILanguage lang) {
         this.lang = lang;
     }
 
@@ -171,7 +196,7 @@ public class Client {
      * this method sets the ip of the server to connect to
      * @param serverIP the ipv4 address of the server
      */
-    public void setServerIP(String serverIP) { this.serverIP = serverIP; }
+    void setServerIP(String serverIP) { this.serverIP = serverIP; }
 
     /**
      * this sets the username of the client
@@ -200,10 +225,17 @@ public class Client {
      */
     public String getUsername() { return username; }
 
+    /**
+     * this method allows to change the status of the user
+     * @param status the new  user status
+     */
     public void setUserStatus(UserStatus status){
         this.userStatus=status;
     }
 
+    /**
+     * @return the connection mode of the user
+     */
     public ConnectionMode getConnMode() {
         return connMode;
     }
@@ -211,7 +243,7 @@ public class Client {
     /**
      * @return the object that is the connection of the client towards the server
      */
-    public ClientConn getClientConn(){ return clientConn; }
+    ClientConn getClientConn(){ return clientConn; }
 
     /**
      * @return the object that is the UI of the client
@@ -268,11 +300,7 @@ public class Client {
                     }
                 }
 
-                if (connMode.equals(ConnectionMode.RMI)) {
-                    logged = loginRMI();
-                } else {
-                    logged = clientConn.login(username, password);
-                }
+                logged = login();
 
 
                 if(!logged) {
@@ -305,12 +333,26 @@ public class Client {
         }
     }
 
+    private boolean login() throws RemoteException, MalformedURLException, NotBoundException {
+        boolean logged;
+        if (connMode.equals(ConnectionMode.RMI)) {
+            logged = loginRMI();
+        } else {
+            logged = clientConn.login(username, password);
+        }
+        return logged;
+    }
+
     private void commandManager(){
 
         new UICommandController(fsm,clientUI.getCommandQueue()).start();
 
     }
 
+    /**
+     *
+     * @return
+     */
     public Object getLockUI() {
         return lockUI;
     }
@@ -339,8 +381,14 @@ public class Client {
         return false;
     }
 
+    /**
+     * @return the lock on the user's credentials
+     */
     public Object getLockCredentials(){ return lockCredentials;  }
 
+    /**
+     * @return true iff the user is still connected to the server
+     */
     public boolean isLogged(){
         return userStatus.equals(UserStatus.LOBBY)||userStatus.equals(UserStatus.PLAYING);
     }
@@ -357,7 +405,6 @@ public class Client {
 
         List<LightPlayer> players = clientConn.getPlayers();
         for (int i = 0; i < board.getNumPlayers(); i++) {
-
             board.addPlayer(players.get(i));
         }
 
@@ -380,16 +427,21 @@ public class Client {
 
     }
 
-    public void updateGameEnd(){
-        //lettura lista di player e classifica
+    public void updateGameEnd(List<RankingEntry> ranking){
+        for(RankingEntry entry : ranking){
+            LightPlayer player=board.getPlayerById(entry.getPlayerId());
+            player.setFinalPosition(entry.getFinalPosition());
+            player.setPoints(entry.getPoints());
+        }
+        fsm.endGame();
+        board.stateChanged();
+        board.notifyObservers();
     }
 
     public void updateGameRoundStart(int numRound){
         board.setRoundTrack(clientConn.getRoundtrack(),numRound);
         if(numRound==0) {
-
             //get players
-
             synchronized (lockReady) {
                 for (int i = 0; i < board.getNumPlayers(); i++) {
 
@@ -446,11 +498,17 @@ public class Client {
 
     public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
         board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
-        board.getPlayerById(playerTurnId).setFavorTokens(clientConn.getFavorTokens(playerTurnId));
+        board.getPlayerById(playerTurnId)
+                .setFavorTokens(clientConn.getFavorTokens(playerTurnId));
+
         List<LightTool> tools=clientConn.getTools();
+
         for(int i=0;i<LightBoard.NUM_TOOLS;i++) {
-            if (!board.getTools().get(i).isUsed()) {
-                board.getTools().set(i, tools.get(i));
+            if (!board.getTools()
+                    .get(i)
+                    .isUsed()) {
+                board.getTools()
+                        .set(i, tools.get(i));
             }
         }
 
@@ -459,10 +517,18 @@ public class Client {
 
     }
 
-    public void updatePlayerStatus(int playerId, UserStatus status){
 
+    public void updatePlayerStatus(int playerId, LightPlayerStatus status){
+
+        board.getPlayerById(playerId)
+                .setStatus(status);
+        board.stateChanged();
+        board.notifyObservers();
     }
 
+    /**
+     * this method updates the board with the changes regarding the user that is currently playing
+     */
     public void getUpdates(){
 
             board.setDraftPool(clientConn.getDraftPool());
@@ -474,6 +540,9 @@ public class Client {
     }
 
 
+    /**
+     * @return the state of the client's fsm
+     */
     public ClientFSMState getTurnState(){
         return fsm.getState();
     }
@@ -491,6 +560,9 @@ public class Client {
         System.exit(0);
     }
 
+    /**
+     * this method sets the status of the client to disconnected and notifies the user that the connection was found to be broken
+     */
     public void disconnect(){
         synchronized (lockStatus) {
             userStatus = UserStatus.DISCONNECTED;
@@ -500,9 +572,13 @@ public class Client {
         System.exit(0);
     }
 
+    /**
+     * the main method for the client
+     * @param args the arguments coming from the commandline
+     */
     public static void main(String[] args){
         ArrayList<String> options=new ArrayList<>();
-        Client client = null;
+        Client client;
         client = Client.getNewClient();
         if (args.length>0) {
             if(!ClientOptions.getOptions(args,options) || options.contains("h")){

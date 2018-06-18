@@ -7,7 +7,9 @@ public enum ErrMsg {
     ERR("ERR:"),
     CLS_COMMAND_ERR ("error while executing cls command"),
     INTERRUPTED_READY_WAIT("error while waiting for board elements"),
-    INTERRUPTED_LOGIN_PROCEDURE("error while logging in");
+    ERROR_RETRIEVING_CONSOLE("error while retrieving the system console"),
+    INTERRUPTED_LOGIN_PROCEDURE("error while logging in"),
+    COULDNT_LOG_BACK_IN("error while trying to log back in for a new match");
 
 
     private String errMsg;
