@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
+import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.server.model.Player;
 import it.polimi.ingsw.server.model.User;
 
@@ -50,7 +51,7 @@ public class RMIServer implements ServerConn {
     }
 
     @Override
-    public void notifyGameEnd(List<Player> players) {
+    public void notifyGameEnd(List<LightPlayer> players) {
 
     }
 

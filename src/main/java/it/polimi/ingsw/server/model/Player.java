@@ -1,8 +1,10 @@
 package it.polimi.ingsw.server.model;
 
+import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public class  Player {
@@ -133,32 +135,11 @@ public class  Player {
     }
 
     /**
-     * Gets the player's chosen die for the current turn (make sure to set it before getting it)
-     * @return the die
-     */
-    public Die getChosenDie() {
-        if(chosenDie==null){ throw new NoSuchElementException(); }
-        return chosenDie;
-    }
-
-    /**
-     * Sets the chosen die for the turn
-     * @param chosenDie the chosen die
-     */
-    public void setChosenDie(Die chosenDie) { this.chosenDie = chosenDie; }
-
-    /**
-     * Flushes (sets to null) the chosen die of the turn
-     */
-    public void flushChosenDie() {
-        setChosenDie(null);
-    }
-
-    /**
      * Calculates and sets the score of the player
      */
     public void calculateScore(){
-        FullCellIterator diceIterator=(FullCellIterator)this.schema.iterator();
+        List<Die> schemaDie=schema.getSchemaDiceList(Color.NONE);
+
         if (this.score != 0) {
             this.score = 0;
         }
@@ -167,7 +148,11 @@ public class  Player {
         }
         this.score += this.favorTokens;
         this.score += this.privObjective.getCardScore(this.schema);
-        this.score -= (SchemaCard.NUM_ROWS * SchemaCard.NUM_COLS) - diceIterator.numOfDice();
+        this.score -= (SchemaCard.NUM_ROWS * SchemaCard.NUM_COLS) - schemaDie.size();
+
+        if(this.score<0){
+            this.score=0;
+        }
     }
 
     /**
@@ -191,7 +176,4 @@ public class  Player {
     public boolean hasQuitted(){
         return quitted;
     }
-
-
-
 }

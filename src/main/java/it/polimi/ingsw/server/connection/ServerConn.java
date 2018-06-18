@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
+import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.server.model.*;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface ServerConn {
 
     void notifyStatusUpdate (String event,int id);
 
-    void notifyGameEnd(List<Player> players);
+    void notifyGameEnd(List<LightPlayer> players);
 
     void notifyRoundEvent(String event,int roundNumber);
 

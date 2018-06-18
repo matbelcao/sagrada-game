@@ -51,6 +51,15 @@ public class PlayerTest {
             e.printStackTrace();
         }
         assertEquals(2,player.getFavorTokens());
+
+        assertFalse(player.isSkippingTurn());
+        player.setSkipsNextTurn(true);
+        assertTrue(player.isSkippingTurn());
+        assertFalse(player.isSkippingTurn());
+
+        assertFalse(player.hasQuitted());
+        player.quitMatch();
+        assertTrue(player.hasQuitted());
     }
 
 }

@@ -3,7 +3,9 @@ package it.polimi.ingsw.server;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
+import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
+import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
@@ -147,7 +149,7 @@ public class BoardTest {
 
     @Test
     void indexedListTest(){
-        Board board=new Board(users1, additionalSchemas);
+        Board board=new Board(users2, additionalSchemas);
 
         ServerFSM fsm = board.getFSM();
         fsm.newTurn(0,true);
@@ -167,5 +169,9 @@ public class BoardTest {
         assertEquals(9,board.getDiceList().size());
         assertEquals(Place.ROUNDTRACK,board.getDiceList().get(0).getPlace());
 
+        board.getPlayer(users2.get(0)).setSchema(new SchemaCard(1,false));
+        board.getPlayer(users2.get(1)).setSchema(new SchemaCard(2,false));
+        List<LightPlayer> playerScores=board.gameEnd();
+        assertEquals(2,playerScores.size());
     }
 }

@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
+import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
@@ -161,11 +162,20 @@ public class Game extends Thread implements Iterable  {
             notifyRoundEnd();
             board.getDraftPool().clearDraftPool(round.getRoundNumber());
         }
-        /*for(User u:users){
+
+        notifyGameEnd();
+    }
+
+    /**
+     * Notifies to the connected clients the ending of the current match
+     */
+    private void notifyGameEnd() {
+        for(User u:users){
+            List<LightPlayer> scores=board.gameEnd();
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
-                u.getServerConn().notifyGameEnd(board.getPlayers);
+                u.getServerConn().notifyGameEnd(scores);
             }
-        }*/
+        }
     }
 
     /**

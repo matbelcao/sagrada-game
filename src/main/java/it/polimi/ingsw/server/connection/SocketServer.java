@@ -3,6 +3,7 @@ package it.polimi.ingsw.server.connection;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
+import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.server.controller.Game;
 import it.polimi.ingsw.server.controller.Validator;
 import it.polimi.ingsw.server.model.*;
@@ -212,10 +213,10 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param players the player's list containing the data
      */
     @Override
-    public void notifyGameEnd(List<Player> players){
+    public void notifyGameEnd(List<LightPlayer> players){
         outSocket.print("GAME end");
-        for(Player p : players){
-            outSocket.print(" "+p.getGameId()+","+p.getScore()+","+p.getFinalPosition());
+        for(LightPlayer p : players){
+            outSocket.print(" "+p.getPlayerId()+","+p.getPoints()+","+p.getFinalPosition());
         }
         outSocket.println("");
         outSocket.flush();
