@@ -164,6 +164,10 @@ public class GUIutil {
                         System.out.println("selected die at position " + finalI + "in draftpool");
                         cmdWrite.write(finalI +"");
                         break;
+                    case CHOOSE_PLACEMENT:
+                        cmdWrite.write("b");
+                        cmdWrite.write("1");
+                        cmdWrite.write(finalI +"");
                 }
             });
         }
@@ -182,14 +186,15 @@ public class GUIutil {
         for(int i = 0; i < NUM_ROWS; i++){
             for(int j = 0; j < NUM_COLS; j++){
                 Canvas cell = new Canvas(cellDIm,cellDIm);
-                if(lightSchemaCard.hasDieAt(i,j)){
-                    cell = lightDieToCanvas(lightSchemaCard.getDieAt(i,j),cellDIm);
-                    grid.add(cell,j,i);
-                }else if(lightSchemaCard.hasConstraintAt(i,j)){
+                if(lightSchemaCard.hasConstraintAt(i,j)){
                     cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i,j),cellDIm);
                     grid.add(cell,j,i);
                 }else{
                     cell = whiteCanvas(cellDIm);
+                    grid.add(cell,j,i);
+                }
+                if(lightSchemaCard.hasDieAt(i,j)){
+                    cell = lightDieToCanvas(lightSchemaCard.getDieAt(i,j),cellDIm);
                     grid.add(cell,j,i);
                 }
                 int position = i*NUM_COLS+j;
