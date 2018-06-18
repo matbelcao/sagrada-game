@@ -1,7 +1,8 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.uielements.UILanguage;
-import it.polimi.ingsw.client.uielements.UIMessages;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -14,10 +15,10 @@ class UIMessagesTest {
     @Test
     void testGetMessage() {
 
-        System.out.printf(uimsg.getMessage("game-start"),4,2);
+        System.out.printf(uimsg.getMessage(UIMsg.GAME_START),4,2);
 
         UIMessages uita = new UIMessages(UILanguage.ita);
-        System.out.printf(uita.getMessage("game-start"),4,2);
+        System.out.printf(uita.getMessage(UIMsg.GAME_START),4,2);
     }
 
 }

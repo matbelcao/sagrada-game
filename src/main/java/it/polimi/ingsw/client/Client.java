@@ -1,13 +1,17 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.view.clientUI.CLI;
+import it.polimi.ingsw.client.view.clientUI.ClientUI;
 import it.polimi.ingsw.client.connection.ClientConn;
 import it.polimi.ingsw.client.connection.RMIClient;
 import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.client.connection.SocketClient;
-import it.polimi.ingsw.client.uielements.UICommandManager;
-import it.polimi.ingsw.client.uielements.UILanguage;
+import it.polimi.ingsw.client.view.clientUI.GUI;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.common.enums.ConnectionMode;
-import it.polimi.ingsw.common.enums.UIMode;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMode;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.immutables.LightPlayer;
 import it.polimi.ingsw.common.immutables.LightTool;
@@ -32,6 +36,8 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.polimi.ingsw.common.enums.ErrMsg.*;
+
 /**
  * This class represents a client that can connect to the server and participate to a match of the game.
  * Every client has some preferences that can be set via command line options (-h to see them)
@@ -53,8 +59,7 @@ public class Client {
     private ClientUI clientUI;
     private UILanguage lang;
     private LightBoard board;
-    private final Object lockState=new Object();
-    private ClientFSMState turnState;
+    private ClientFSM fsm;
     public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
     private final Object lockCredentials=new Object();
 
@@ -86,12 +91,10 @@ public class Client {
         this.userStatus = UserStatus.DISCONNECTED;
         this.ready=false;
 
+
     }
 
 
-    public ClientFSMState getTurnState() {
-        return turnState;
-    }
 
     /**
      * parses the default settings in the xml file and creates a client based on that
@@ -124,7 +127,7 @@ public class Client {
 
     }
 
-    public static Client getNewClient() throws InstantiationException {
+    public static Client getNewClient() {
         return parser();
     }
 
@@ -225,7 +228,6 @@ public class Client {
             }
             clientUI=new CLI(this,lang);
         }else{
-            System.out.println("Launching GUI (still not implemented....");
             new Thread(() -> GUI.launch(this,lang)).start();
             while(GUI.getGUI() == null){
                 try {
@@ -248,7 +250,7 @@ public class Client {
      * If the login is successful the client will be put in the lobby where he will wait for the beginning of a new match
      */
     private void connectAndLogin() throws InterruptedException {
-        boolean logged=false;
+        boolean logged;
         synchronized (lockStatus) {
             userStatus = UserStatus.CONNECTED;
             lockStatus.notifyAll();
@@ -285,7 +287,7 @@ public class Client {
 
             }while(!logged);
 
-
+            this.fsm=new ClientFSM(this);
             //start collecting commands from ui
             commandManager();
 
@@ -305,7 +307,7 @@ public class Client {
 
     private void commandManager(){
 
-        new UICommandManager(this).start();
+        new UICommandController(fsm,clientUI.getCommandQueue()).start();
 
     }
 
@@ -386,11 +388,6 @@ public class Client {
         board.setRoundTrack(clientConn.getRoundtrack(),numRound);
         if(numRound==0) {
 
-
-            synchronized (lockState) {
-                turnState=ClientFSMState.NOT_MY_TURN;
-                lockState.notifyAll();
-            }
             //get players
 
             synchronized (lockReady) {
@@ -429,6 +426,8 @@ public class Client {
                     lockReady.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    System.err.println(ERR.toString()+INTERRUPTED_READY_WAIT);
+                    System.exit(2);
                 }
             }
         }
@@ -437,11 +436,8 @@ public class Client {
         board.setIsFirstTurn(isFirstTurn);
         board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
 
-        synchronized (lockState) {
-
-            turnState=ClientFSMState.NOT_MY_TURN.nextState(playerId == board.getMyPlayerId());
-            lockState.notifyAll();
-        }
+        fsm.setNotMyTurn();
+        fsm.setMyTurn(playerId==board.getMyPlayerId());
 
 
         board.notifyObservers();
@@ -460,6 +456,7 @@ public class Client {
 
         board.notifyObservers();
 
+
     }
 
     public void updatePlayerStatus(int playerId, UserStatus status){
@@ -477,6 +474,9 @@ public class Client {
     }
 
 
+    public ClientFSMState getTurnState(){
+        return fsm.getState();
+    }
 
     /**
      * this method quits the player from the game, he/she will not be able to resume the game
@@ -503,13 +503,7 @@ public class Client {
     public static void main(String[] args){
         ArrayList<String> options=new ArrayList<>();
         Client client = null;
-        try {
-            client = Client.getNewClient();
-        } catch (InstantiationException e) {
-            System.err.println("\u001B[31m"+"ERR: couldn't start the Client"+"\u001B[0m");
-
-            System.exit(1);
-        }
+        client = Client.getNewClient();
         if (args.length>0) {
             if(!ClientOptions.getOptions(args,options) || options.contains("h")){
                 ClientOptions.printHelpMessage();
@@ -523,18 +517,12 @@ public class Client {
         try {
             client.connectAndLogin();
         } catch (InterruptedException e) {
-            System.err.println("ERR: connectAndLogin method interrupted");
-            System.exit(1);
+            System.err.println(ERR.toString() + INTERRUPTED_LOGIN_PROCEDURE.toString());
+            System.exit(2);
         }
 
     }
 
-    public void setTurnState(ClientFSMState clientFSMState) {
-        turnState=clientFSMState;
-    }
 
-    public Object getLockState() {
-        return lockState;
-    }
 
 }

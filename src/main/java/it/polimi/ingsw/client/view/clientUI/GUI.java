@@ -1,6 +1,14 @@
-package it.polimi.ingsw.client;
+package it.polimi.ingsw.client.view.clientUI;
 
-import it.polimi.ingsw.client.uielements.*;
+import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.clientController.CmdWriter;
+import it.polimi.ingsw.client.clientController.QueuedCmdReader;
+import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.textGen;
+import it.polimi.ingsw.client.view.clientUI.uielements.*;
+import it.polimi.ingsw.client.view.LightBoard;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Commands;
@@ -30,6 +38,7 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.Observable;
 
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.CENTER;
 
 public class GUI extends Application implements ClientUI {
@@ -140,12 +149,12 @@ public class GUI extends Application implements ClientUI {
         if (logged) {
             Platform.runLater(() -> {
                 messageToUser.setFill(Color.GREEN);
-                messageToUser.setText(String.format(uimsg.getMessage("login-ok"),client.getUsername()));
+                messageToUser.setText(String.format(uimsg.getMessage(LOGIN_OK),client.getUsername()));
             });
         } else {
             Platform.runLater(() -> {
                 messageToUser.setFill(Color.FIREBRICK);
-                messageToUser.setText(uimsg.getMessage("login-ko"));
+                messageToUser.setText(uimsg.getMessage(LOGIN_KO));
             });
         }
     }
@@ -161,7 +170,7 @@ public class GUI extends Application implements ClientUI {
             messageToUser.setFill(Color.GREEN);
             /* TODO add other text field */
            // messageToUser.setText("lobby "+numUsers);
-            messageToUser.setText(String.format(uimsg.getMessage("lobby-update"),numUsers));
+            messageToUser.setText(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
         });
 
     }
@@ -207,24 +216,24 @@ public class GUI extends Application implements ClientUI {
                     System.out.println("choose----------------------------------------------------------------");
                     break;
                 case NOT_MY_TURN:
-                    System.out.println("not my-------------------------------------------------------------");
+                    System.out.println("not my-----------------------------------------------------------------");
                     break;
                 case MAIN:
-                    System.out.println("main------------------------------------------------------------");
+                    System.out.println("main-------------------------------------------------------------------");
                     break;
                 case SELECT_DIE:
-                    System.out.println("select die--------------------------------------------------");
+                    System.out.println("select die-------------------------------------------------------------");
                     break;
                 case CHOOSE_OPTION:
                     if(board.getLatestOptionsList().size()>1){
-                        System.out.println("choose option---------------------------------------------------");
+                        System.out.println("choose option------------------------------------------------------");
                     }
                     break;
                 case CHOOSE_TOOL:
                     System.out.println("choose tool-------------------------------------------------------------");
                     break;
                 case CHOOSE_PLACEMENT:
-                    System.out.println("choose placement---------------------------------------------------------------");
+                    System.out.println("choose placement--------------------------------------------------------");
                     break;
                 case TOOL_CAN_CONTINUE:
                     System.out.println("tool can continue------------------------------------------------------------------");
@@ -233,6 +242,7 @@ public class GUI extends Application implements ClientUI {
             MainSceneGroup root = new MainSceneGroup(board);
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
+            primaryStage.sizeToScene();
             primaryStage.sizeToScene();
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
@@ -303,7 +313,7 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void showWaitingForGameStartScreen() {
         Platform.runLater(() -> {
-            String message = String.format("%s%n", uimsg.getMessage("waiting-game-start"));
+            String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
             primaryStage.setScene(sceneCreator.waitingForGameStartScene(message));
         });
 

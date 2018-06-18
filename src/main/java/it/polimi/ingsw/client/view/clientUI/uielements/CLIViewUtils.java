@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.uielements;
+package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.enums.Color;
@@ -7,6 +7,8 @@ import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.io.IOException;
 import java.util.*;
+
+import static it.polimi.ingsw.common.enums.ErrMsg.*;
 
 /**
  * This class contains all utility methods for the cliview class. All methods here are static
@@ -28,8 +30,6 @@ public class CLIViewUtils {
     static final String FAVOR= "●";
     private static final String ESCAPE="\\u001B\\[([0-9]|([0-9][0-9]))m";
 
-
-
     static CLIElems cliElems;
 
     static {
@@ -42,7 +42,7 @@ public class CLIViewUtils {
 
     private CLIViewUtils(){}
 
-    public static int printableLength(String line){
+    static int printableLength(String line){
         String[] chars=line.split(ESCAPE);
         int length=0;
         for(String part: chars){
@@ -56,7 +56,7 @@ public class CLIViewUtils {
     }
 
     /**
-     * this method is used to cleanx the screen and to make sure the lines of the page are printed starting from the top of the screen
+     * this method is used to clean the screen and to make sure the lines of the page are printed starting from the top of the screen
      */
     public static String resetScreenPosition() {
 
@@ -65,7 +65,8 @@ public class CLIViewUtils {
             try {
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
             } catch (InterruptedException | IOException e) {
-
+                System.err.println(ERR.toString()+CLS_COMMAND_ERR.toString());
+                System.exit(2);
             }
             return "";
         }
@@ -74,7 +75,7 @@ public class CLIViewUtils {
     }
 
 
-    public static String buildSmallDie(CellContent die){
+    static String buildSmallDie(CellContent die){
         if(die==null || !die.isDie()){
             throw new IllegalArgumentException();
         }
@@ -91,7 +92,7 @@ public class CLIViewUtils {
      * @return said string
      */
     static String printList(List<String> toPrint){
-        if(toPrint==null){throw new IllegalArgumentException();}
+        if(toPrint==null){throw new IllegalArgumentException("toPrint "+IS_NULL.toString());}
         StringBuilder builder=new StringBuilder();
         for(String line : toPrint) {
             builder.append(line).append("%n");
@@ -107,10 +108,11 @@ public class CLIViewUtils {
      * @return a list of strings that represent that
      */
     static List<String> padUntil(List<String> toPad,int finalLength, char filler){
+        if(toPad==null){ throw new IllegalArgumentException("toPad"+ IS_NULL.toString());}
         List<String> result= new ArrayList<>();
-        List<String> fitted= fitInLength(toPad,finalLength);
-        for(int i=0; i<fitted.size();i++){
-            result.add(padUntil(fitted.get(i),finalLength,' '));
+        List<String> fittedLines= fitInLength(toPad,finalLength);
+        for (String line : fittedLines) {
+            result.add(padUntil(line, finalLength, filler));
         }
         return result;
     }
@@ -120,15 +122,14 @@ public class CLIViewUtils {
 
     /**
      * creates a rectangle filled with the filler of the  selected sizes
-     * @param filler the character used as a filler
      * @param height the height of the rectangle
      * @param width the width of the rectangle
+     * @param filler the character used as a filler
      * @return the wall
      */
-    static  List<String> buildWall(char filler,int height, int width){
-        if(height<0||width<0){ return new ArrayList<>();}
-
+    static  List<String> buildWall(int height, int width, char filler){
         List<String> result=new ArrayList<>();
+        if(height<=0||width<=0){ return result;}
         for(int row=0;row<height;row++){
             result.add(padUntil("",width,filler));
         }
@@ -139,9 +140,9 @@ public class CLIViewUtils {
      * @param list the list to convert
      * @return the converted list as a map
      */
-    static Map<Integer,LightDie> listToMap(List<LightDie> list) {
+    static Map<Integer,LightDie> toMap(List<LightDie> list) {
         if(list==null){
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("list "+ IS_NULL.toString());
         }
         HashMap<Integer, LightDie> map = new HashMap<>();
         for (int i = 0; i<list.size();i++){
@@ -385,9 +386,9 @@ public class CLIViewUtils {
      * @return the padded string
      */
     static String padUntil(String toPad, int finalLength, char filler){
-        if(finalLength<0){throw new IllegalArgumentException("negative length");}
-        if(toPad==null){throw new IllegalArgumentException("string to be padded is null");}
-        if(printableLength(toPad)>finalLength){throw new IllegalArgumentException("already longer:"+toPad);}
+        if(finalLength<0){throw new IllegalArgumentException(INVALID_NEGATIVE_PARAM.toString());}
+        if(toPad==null){throw new IllegalArgumentException("toPad"+ IS_NULL);}
+        if(printableLength(toPad)>finalLength){throw new IllegalArgumentException(LONGER_THAN_EXPECTED.toString()+toPad);}
 
         return toPad+ replicate(filler+"",finalLength - printableLength(toPad));
 
@@ -453,26 +454,30 @@ public class CLIViewUtils {
     }
 
     /**
-     * appends two lists of strings one  by one one to the other to create a new list (number of strings)
+     * appends two lists of strings one  by one one to the other to create a new list (number of strings) if b is longer than a
+     * a will be padded to be as long as b with a wall of whitespaces of the same width as the last line of the original a
      * @param a the list of strings that will come first in the resulting list
      * @param b the list of strings being appended to a
      * @return the result of appending, string by string, a to b
      */
     static List<String> appendRows(List<String> a, List<String> b){
-        if(a==null || b==null || (!a.isEmpty() && a.size()<b.size())){
-            throw new IllegalArgumentException("a: "+a+",b: "+b);
-        }
-
+        if(a==null ){throw new IllegalArgumentException("a "+IS_NULL.toString());}
+        if( b==null){ throw new IllegalArgumentException("b "+IS_NULL.toString());}
+        List<String> tempA= new ArrayList<>(a);
+        List<String> tempB= new ArrayList<>(b);
         List<String> result= new ArrayList<>();
-        if(a.isEmpty()){
-            result.addAll(b);
+        if(tempA.isEmpty()){
+            result.addAll(tempB);
         }else{
-            assert(a.size()>=b.size());
-            for(int row=0; row<a.size();row++){
-                if(row<b.size()) {
-                    result.add(row,a.get(row)+b.get(row));
+            if(tempA.size()<tempB.size()){
+                tempA.addAll(buildWall(tempB.size()-tempA.size(), tempA.get(tempA.size()-1).length(), ' '));
+            }
+
+            for(int row=0; row<tempA.size();row++){
+                if(row<tempB.size()) {
+                    result.add(row,tempA.get(row)+tempB.get(row));
                 }else{
-                    result.add(row,a.get(row));
+                    result.add(row,tempA.get(row));
                 }
             }
         }

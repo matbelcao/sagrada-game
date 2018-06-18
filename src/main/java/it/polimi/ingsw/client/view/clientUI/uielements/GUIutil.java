@@ -1,7 +1,8 @@
-package it.polimi.ingsw.client.uielements;
+package it.polimi.ingsw.client.view.clientUI.uielements;
 
-import it.polimi.ingsw.client.ClientFSMState;
-import it.polimi.ingsw.client.GUI;
+import it.polimi.ingsw.client.clientController.CmdWriter;
+import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.view.clientUI.GUI;
 import it.polimi.ingsw.common.immutables.LightConstraint;
 import it.polimi.ingsw.common.immutables.LightDie;
 import it.polimi.ingsw.common.immutables.LightPrivObj;
@@ -62,7 +63,9 @@ public class GUIutil {
     //Main scene
     private static  final double MAIN_SCENE_RATIO =  1.4286;
     private static final double MAIN_SCENE_TO_SCREEN = 0.8;
-    //die s
+    private static final double DIE_ARC_TO_DIM = 0.35;
+    private static final double DIE_LINE_TO_DIM = 0.1;
+    //die s..
     private static final int SCREEN_TO_DIE = 25;
     private static final int DIE_TO_LINE = 10;
     private static final int SPOT_RATIO = 6;
@@ -168,14 +171,12 @@ public class GUIutil {
 
     public Canvas lightDieToCanvas(LightDie die, double dieDim){
         Canvas dieCanvas = new Canvas(dieDim,dieDim);
-        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
         drawDie(die,dieCanvas.getGraphicsContext2D(),dieDim);
         return dieCanvas;
     }
 
     private Canvas lightConstraintToCanvas(LightConstraint constraint, double dieDim){
         Canvas dieCanvas = new Canvas(dieDim,dieDim);
-        GraphicsContext gc = dieCanvas.getGraphicsContext2D();
         drawConstraint(constraint,dieCanvas.getGraphicsContext2D(),0,0,dieDim);
         return dieCanvas;
     }
@@ -187,13 +188,14 @@ public class GUIutil {
     }
 
     public double getMainSceneCellDim(double newWidth, double newHeight) {
-        return 50;
+        return 100;
     }
 
     public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height) {
         double dieDim = getMainSceneCellDim(width,height);
         HBox track = new HBox();
-        if(roundTrack.size() == 0){
+        track.setSpacing(10);
+        if(roundTrack.isEmpty()){
             Canvas c = new Canvas(dieDim,dieDim);
             drawWhiteCell(c.getGraphicsContext2D(),0,0,dieDim);
             track.getChildren().add(c);
@@ -215,6 +217,7 @@ public class GUIutil {
 
     public Group drawDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState) {
         HBox pool = new HBox();
+        pool.setSpacing(10);
         for(int i = 0 ; i<draftPool.size();i++){
             Canvas c = new Canvas(dieDim,dieDim);
             drawDie(draftPool.get(i),c.getGraphicsContext2D(),dieDim);
@@ -433,7 +436,7 @@ public class GUIutil {
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double dieDim) {
         if (constraint.hasColor()) {
-            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
+            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXConstraintColor(constraint.getColor()));
             gc.fillRect(0, 0, dieDim, dieDim);
         }else{
             gc.setFill(Color.LIGHTGRAY);
@@ -447,7 +450,7 @@ public class GUIutil {
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double cellDim) {
         if (constraint.hasColor()) {
-            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(constraint.getColor()));
+            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXConstraintColor(constraint.getColor()));
             gc.fillRect(x, y, cellDim, cellDim);
         }else{
             gc.setFill(Color.LIGHTGRAY);
@@ -460,20 +463,23 @@ public class GUIutil {
     }
 
     private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
+        //todo change
+        graphicsContext2D.setFill(Color.BLACK);
+        graphicsContext2D.fillRoundRect(0,0,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
         graphicsContext2D.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
-        graphicsContext2D.fillRect(0,0,dieDim,dieDim);
-        graphicsContext2D.setStroke(Color.BLACK);
-        graphicsContext2D.setLineWidth(LINE_WIDTH);
-        graphicsContext2D.strokeRect(0,0,dieDim, dieDim);
+        double lineWidth = 4.5;
+        graphicsContext2D.fillRoundRect(lineWidth,lineWidth,dieDim-2*lineWidth,dieDim-2*lineWidth, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM*dieDim);
         drawSpots(graphicsContext2D,dieDim,lightDie.getShade().toInt());
     }
     //to be used when drawing schema to canvas
     private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double dieDim) {
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
-        gc.fillRect(x,y,dieDim,dieDim);
+        gc.fillRoundRect(x,y,dieDim,dieDim, DIE_ARC_TO_DIM *dieDim, DIE_ARC_TO_DIM *dieDim);
         gc.setStroke(Color.BLACK);
-        gc.setLineWidth(LINE_WIDTH);
-        gc.strokeRect(x, y, dieDim, dieDim);
+        gc.setLineWidth(DIE_LINE_TO_DIM*dieDim);
+       // gc.strokeRoundRect(0,0,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
+
+
     }
 
     private void drawSpots(GraphicsContext gc, double dieDim, int count) {

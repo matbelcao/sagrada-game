@@ -1,91 +1,47 @@
-package it.polimi.ingsw.client.uielements;
+package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.client.LightBoard;
-import it.polimi.ingsw.common.connection.QueuedReader;
+import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 
-import java.io.IOException;
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
 
-import static it.polimi.ingsw.client.ClientFSMState.*;
 
-/**
- * this class implements the thread that manages the commands coming from the uis to perform changes on the client
- * status and view
- */
-public class UICommandManager extends Thread {
-    private static final String INDEX = "([0-9]|([1-9][0-9]))";
-    private static final String SINGLE_CHAR = "([qebd])";
-    private static final String QUIT = "q";
-    private static final String END_TURN = "e";
-    private static final String BACK = "b";
-    private static final String DISCARD = "d";
+public class ClientFSM {
 
-    private final Client client;
-    private final QueuedReader commandQueue;
+    static final char QUIT = 'q';
+    static final char END_TURN = 'e';
+    static final char BACK = 'b';
+    static final char DISCARD = 'd';
 
-    /**
-     * this sets the needed parameters for the manager to work properly
-     * @param client the client object
-     */
-    public UICommandManager(Client client){
-        this.client = client;
-        this.commandQueue=client.getClientUI().getCommandQueue();
+    private final Object lockState=new Object();
+    private ClientFSMState state;
+    private Client client;
+
+    ClientFSM(Client client){
+        state= ClientFSMState.CHOOSE_SCHEMA;
+        this.client=client;
     }
 
-    /**
-     * this is the task that the thread has to perform, it simply waits for a new command and then elaborate on that
-     */
-    @Override
-    public void run() {
-        String command = "";
-        synchronized (client.getLockState()) {
-            client.setTurnState(CHOOSE_SCHEMA);
-        }
-
-        while (client.isLogged()) {
-
-            try {
-                commandQueue.waitForLine();
-            } catch (IOException e) {
-                System.err.println("ERR: couldn't read from console");
-                System.exit(2);
-            }
-
-            command = commandQueue.readln();
-            commandQueue.pop();
-
-            if (command.matches(INDEX)) {
-
-                manageIndex(command);
-
-            } else if (command.matches(SINGLE_CHAR)) {
-
-                manageOption(command);
-
-            } else {
-                client.getClientUI().showLastScreen();
-            }
-
-        }
-
+    public boolean isAlive(){
+        return client.isLogged();
     }
 
     /**
      * this method manages a command that is not an index but some letter, those letters have a particular meaning and can
      * trigger different actions
-     * @param command the command received from the ui (SINGLE_CHAR)
+     * @param option the command received from the ui (SINGLE_CHAR)
      */
-    private void manageOption(String command) {
-        synchronized (client.getLockState()) {
-            switch (command) {
+    void evolve(char option){
+        synchronized (lockState) {
+            switch (option) {
 
                 case QUIT:
                     client.quit();
                     break;
                 case END_TURN:
-                    if(!(client.getTurnState().equals(NOT_MY_TURN)||client.getTurnState().equals(CHOOSE_SCHEMA))) {
+                    if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA))) {
                         client.getClientConn().endTurn();
                     }else{
                         client.getClientUI().showLastScreen();
@@ -95,7 +51,7 @@ public class UICommandManager extends Thread {
                     client.getClientConn().exit();
                     break;
                 case DISCARD:
-                    if (client.getTurnState().equals(CHOOSE_PLACEMENT)) {
+                    if (state.equals(CHOOSE_PLACEMENT)) {
                         client.getClientConn().discard();
                         client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
                     }else{
@@ -109,20 +65,23 @@ public class UICommandManager extends Thread {
             }
             //state update
 
-            client.setTurnState(client.getTurnState().nextState(false, command.equals(BACK), command.equals(END_TURN), command.equals(DISCARD)));
-            client.getLockState().notifyAll();
+            state=state.nextState(false, option==BACK, option==END_TURN, option==DISCARD);
+            lockState.notifyAll();
         }
         client.getBoard().notifyObservers();
+    }
+
+    public void invalidInput() {
+        client.getClientUI().showLastScreen();
     }
 
     /**
      * this manages the indexes received from the ui that have a different meaning and trigger different procedures
      * according to the state of the client
-     * @param command the index to be elaborated
+     * @param index index to be elaborated
      */
-    private void manageIndex(String command) {
-        int index = Integer.parseInt(command);
-        switch (client.getTurnState()) {
+    public void evolve(int index) {
+        switch (state) {
 
             case CHOOSE_SCHEMA:
                 chooseSchemaAction(index);
@@ -166,9 +125,9 @@ public class UICommandManager extends Thread {
      */
     private void chooseSchemaAction(int index) {
         if (client.getClientConn().choose(index)) {
-            synchronized (client.getLockState()) {
-                client.setTurnState( CHOOSE_SCHEMA.nextState(true));
-                client.getLockState().notifyAll();
+            synchronized (lockState) {
+                state=CHOOSE_SCHEMA.nextState(true);
+                lockState.notifyAll();
             }
             client.getClientUI().showWaitingForGameStartScreen();
         } else {
@@ -189,16 +148,16 @@ public class UICommandManager extends Thread {
 
                 }
                 client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
-                synchronized (client.getLockState()) {
-                    client.setTurnState(MAIN.nextState(false));
-                    client.getLockState().notifyAll();
+                synchronized (lockState) {
+                    state=MAIN.nextState(false);
+                    lockState.notifyAll();
                 }
                 break;
             case 0:
 
-                synchronized (client.getLockState()) {
-                    client.setTurnState(MAIN.nextState(true));
-                    client.getLockState().notifyAll();
+                synchronized (lockState) {
+                    state=MAIN.nextState(true);
+                    lockState.notifyAll();
                 }
                 client.getBoard().stateChanged();
 
@@ -217,22 +176,22 @@ public class UICommandManager extends Thread {
     private void chooseToolAction(int index) {
         if (index < LightBoard.NUM_TOOLS && index >= 0) {
             if (client.getClientConn().enableTool(index)) {
-                synchronized (client.getLockState()) {
-                    client.setTurnState(CHOOSE_TOOL.nextState(true));
-                    client.getLockState().notifyAll();
+                synchronized (lockState) {
+                    state=CHOOSE_TOOL.nextState(true);
+                    lockState.notifyAll();
                 }
                 client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
                 if(client.getBoard().getLatestDiceList().isEmpty()){
-                    synchronized (client.getLockState()) {
-                        client.setTurnState(SELECT_DIE.nextState(true));
-                        client.getLockState().notifyAll();
+                    synchronized (lockState) {
+                        state=SELECT_DIE.nextState(true);
+                        lockState.notifyAll();
                     }
                     toolContinue();
                 }
             } else {
-                synchronized (client.getLockState()) {
-                    client.setTurnState( CHOOSE_TOOL.nextState(false));//back to MAIN
-                    client.getLockState().notifyAll();
+                synchronized (lockState) {
+                    state=CHOOSE_TOOL.nextState(false);//back to MAIN
+                    lockState.notifyAll();
                 }
                 client.getBoard().stateChanged();
             }
@@ -254,9 +213,9 @@ public class UICommandManager extends Thread {
             client.getBoard().setLatestOptionsList(client.getClientConn().select(index));
 
             if(client.getBoard().getLatestOptionsList().isEmpty()){
-                synchronized (client.getLockState()) {
-                    client.setTurnState(SELECT_DIE.nextState(true));
-                    client.getLockState().notifyAll();
+                synchronized (lockState) {
+                    state=SELECT_DIE.nextState(true);
+                    lockState.notifyAll();
                 }
                 client.getBoard().stateChanged();
 
@@ -275,8 +234,8 @@ public class UICommandManager extends Thread {
      * this is called in case the options received sum to one and simply makes an automatic choice for that option
      */
     private void singleOption() {
-        synchronized (client.getLockState()) {
-            client.setTurnState(SELECT_DIE.nextState(false));
+        synchronized (lockState) {
+            state=SELECT_DIE.nextState(false);
 
             chooseOptionAction(0);
         }
@@ -288,9 +247,9 @@ public class UICommandManager extends Thread {
      */
     private void multipleOptions() {
 
-        synchronized (client.getLockState()) {
-            client.setTurnState(SELECT_DIE.nextState(false));
-            client.getLockState().notifyAll();
+        synchronized (lockState) {
+            state=SELECT_DIE.nextState(false);
+            lockState.notifyAll();
         }
         client.getClientUI().showOptions(client.getBoard().getLatestOptionsList());
     }
@@ -304,9 +263,9 @@ public class UICommandManager extends Thread {
         if(client.getClientConn().choose(index)) {
 
             if (client.getBoard().getLatestOptionsList().get(index).equals(Commands.PLACE_DIE)) {
-                synchronized (client.getLockState()) {
-                    client.setTurnState(CHOOSE_OPTION.nextState(true));
-                    client.getLockState().notifyAll();
+                synchronized (lockState) {
+                    state=CHOOSE_OPTION.nextState(true);
+                    lockState.notifyAll();
                 }
 
                 client.getBoard().setLatestPlacementsList(client.getClientConn().getPlacementsList());
@@ -316,8 +275,8 @@ public class UICommandManager extends Thread {
                     }
                 }
             } else {
-                synchronized (client.getLockState()) {
-                    client.setTurnState(CHOOSE_OPTION.nextState(false));
+                synchronized (lockState) {
+                    state=CHOOSE_OPTION.nextState(false);
                 }
                 toolContinue();
             }
@@ -330,9 +289,9 @@ public class UICommandManager extends Thread {
     private void toolContinue() {
 
         boolean canContinue = client.getClientConn().toolCanContinue();
-        synchronized (client.getLockState()) {
-            client.setTurnState(TOOL_CAN_CONTINUE.nextState(canContinue));
-            client.getLockState().notifyAll();
+        synchronized (lockState) {
+            state=TOOL_CAN_CONTINUE.nextState(canContinue);
+            lockState.notifyAll();
         }
         if(canContinue){
             client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
@@ -358,11 +317,11 @@ public class UICommandManager extends Thread {
 
         if(client.getClientConn().choose(index)) {
 
-            synchronized (client.getLockState()) {
-                client.setTurnState(CHOOSE_PLACEMENT.nextState( isPlacedDieFromOutside()));
-                client.getLockState().notifyAll();
+            synchronized (lockState) {
+                state=CHOOSE_PLACEMENT.nextState( isPlacedDieFromOutside());
+                lockState.notifyAll();
             }
-            if(client.getTurnState().equals(TOOL_CAN_CONTINUE)){
+            if(state.equals(TOOL_CAN_CONTINUE)){
                 toolContinue();
             }
             client.getBoard().notifyObservers();
@@ -371,4 +330,25 @@ public class UICommandManager extends Thread {
         }
     }
 
+    public ClientFSMState getState(){
+        return state;
+    }
+
+    public void setNotMyTurn() {
+        synchronized (lockState) {
+            state = NOT_MY_TURN;
+
+            lockState.notifyAll();
+        }
+        client.getBoard().stateChanged();
+    }
+
+    public void setMyTurn(boolean isMyTurn) {
+        synchronized (lockState) {
+            assert (state.equals(NOT_MY_TURN));
+            state = NOT_MY_TURN.nextState(isMyTurn);
+            lockState.notifyAll();
+        }
+        client.getBoard().stateChanged();
+    }
 }

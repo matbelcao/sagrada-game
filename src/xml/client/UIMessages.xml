@@ -20,13 +20,21 @@
         <eng>Could not login, please try again ...</eng>
         <ita>Impossibile effettuare il login, per favore riprova ...</ita>
     </login-ko>
+    <broken-connection>
+        <eng>Something went wrong with your connection to the server...%n</eng>
+        <ita>Si sono verificati dei problemi alla connessione verso il server...%n</ita>
+    </broken-connection>
+    <closed-connection>
+        <eng>The connection was successfully closed!%n</eng>
+        <ita>La connessione è stata chiusa correttamente!%n</ita>
+    </closed-connection>
     <lobby-update>
-        <eng>%n%n          Waiting for other players to connect ... %n          %d players are waiting for the start of the game ...</eng>
-        <ita>%n%n          In attesa della connessione di altri giocatori ... %n          %d giocatori stanno aspettando di iniziare la partita ...</ita>
+        <eng>%n%nWaiting for other players to connect ... %n %d players are waiting for the start of the game ...</eng>
+        <ita>%n%nIn attesa della connessione di altri giocatori ... %n %d giocatori stanno aspettando di iniziare la partita ...</ita>
     </lobby-update>
     <game-start>
-        <eng>          A new match is starting right now with %d players %n          You are player number %d %n%n          Good luck!</eng>
-        <ita>          Una nuova partita sta per iniziare con %d giocatori %n          Sei il giocatore numero %d %n%n          Buona fortuna!</ita>
+        <eng>A new match is starting right now with %d players %nYou are player number %d %n%n          Good luck!</eng>
+        <ita>Una nuova partita sta per iniziare con %d giocatori %nSei il giocatore numero %d %n%n          Buona fortuna!</ita>
     </game-start>
     <connected-via>
         <eng>Connected via:</eng>
@@ -48,10 +56,10 @@
         <eng>Tools:</eng>
         <ita>Utensili:</ita>
     </tools>
-    <tokens>
+    <remaining-tokens>
         <eng>Remaining tokens:</eng>
         <ita>Gettoni rimanenti:</ita>
-    </tokens>
+    </remaining-tokens>
     <tool-number>
         <eng>Tool number:</eng>
         <ita>Utensile numero:</ita>
@@ -60,16 +68,16 @@
         <eng>Round</eng>
         <ita>Round</ita>
     </round>
-    <turn>
+    <turn-of>
         <eng>Turn of the player number:%d</eng>
         <ita>Turno del giocatore numero:%d</ita>
-    </turn>
-    <yourTurn>
+    </turn-of>
+    <your-turn>
         <eng>It's your turn</eng>
         <ita>E' il tuo turno</ita>
-    </yourTurn>
+    </your-turn>
     <draftpool>
-        <eng>Draft pool</eng>
+        <eng>Draftpool</eng>
         <ita>Riserva</ita>
     </draftpool>
     <roundtrack>
@@ -96,10 +104,10 @@
         <eng>position:</eng>
         <ita>posizione:</ita>
     </pos>
-    <message-prompt>
+    <prompt-message>
         <eng>Insert your commands here</eng>
         <ita>Digita qui le tue mosse</ita>
-    </message-prompt>
+    </prompt-message>
     <quit-option>
         <eng>q › abandon the match</eng>
         <ita>q › abbandona partita</ita>
@@ -116,10 +124,10 @@
         <eng>b › go back to tool/placement choice</eng>
         <ita>b › torna alla scelta tool/piazzamento</ita>
     </back-option>
-    <dice-list>
+    <choose-from-dice-list>
         <eng>Choose one of the dice from the %s :</eng>
         <ita>Scegli uno dei dadi da %s :</ita>
-    </dice-list>
+    </choose-from-dice-list>
     <place-die>
         <eng>Place a die in your window</eng>
         <ita>Piazza un dado nella tua vetrata</ita>
@@ -128,7 +136,6 @@
         <eng>Use a Tool</eng>
         <ita>Usa un Utensile</ita>
     </use-tool>
-
     <choose-schema>
         <eng>Choose your schema by entering its number</eng>
         <ita>Scegli la tua vetrata digitandone il numero</ita>
@@ -137,10 +144,10 @@
         <eng>Choose the Tool by entering its number</eng>
         <ita>Scegli l'Utensile digitandone il numero</ita>
     </choose-tool>
-    <waiting-game-start>
+    <wait-for-game-start>
         <eng>Please, wait for the first round to begin</eng>
         <ita>Per favore, attendi l'inizio del primo round</ita>
-    </waiting-game-start>
+    </wait-for-game-start>
     <main-choice>
         <eng>Choose your next move:</eng>
         <ita>Scegli la tua prossima mossa:</ita>

@@ -1,8 +1,9 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.uielements.CLIElems;
-import it.polimi.ingsw.client.uielements.CLIView;
-import it.polimi.ingsw.client.uielements.UILanguage;
+import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.view.clientUI.uielements.CLIElems;
+import it.polimi.ingsw.client.view.clientUI.uielements.CLIView;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.immutables.*;
