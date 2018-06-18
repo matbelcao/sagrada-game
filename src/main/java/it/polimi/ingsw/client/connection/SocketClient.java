@@ -188,8 +188,6 @@ public class SocketClient implements ClientConn {
             case "board_changed":
 
                 client.getUpdates();
-
-
         }
     }
 

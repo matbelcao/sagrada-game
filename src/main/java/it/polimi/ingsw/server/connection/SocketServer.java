@@ -60,7 +60,7 @@ public class SocketServer extends Thread implements ServerConn  {
                     return;
                 }
 
-                if(!inSocket.isEmpty()){
+                if(!inSocket.isEmpty() && connectionOk){
                     command=inSocket.getln();
                     if (Validator.isValid(command, parsedResult)) {
                         playing = execute(command,parsedResult);
@@ -79,6 +79,11 @@ public class SocketServer extends Thread implements ServerConn  {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void close(){
+        connectionOk=false;
     }
 
     /**

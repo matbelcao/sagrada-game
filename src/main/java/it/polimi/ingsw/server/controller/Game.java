@@ -139,22 +139,19 @@ public class Game extends Thread implements Iterable  {
         timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * (long)1000);
         stopFlow();
 
-        while (round.hasNextRound()){
+        while (round.hasNextRound() && getUsersActive()>1){
             round.nextRound();
             board.getDraftPool().draftDice(users.size());
 
             //Notify to all the users the starting of the round
             notifyRoundStart();
 
-            while(round.hasNext()){
+            while(round.hasNext() && getUsersActive()>1){
                 userPlaying = round.next();
                 Player curPlayer= board.getPlayer(userPlaying);
 
-                if(userPlaying.getStatus().equals(UserStatus.PLAYING) && userPlaying.getGame().equals(this) && !curPlayer.isSkippingTurn()){
+                if(userPlaying.getStatus().equals(UserStatus.PLAYING) && userPlaying.getGame().equals(this) && !curPlayer.isSkippingTurn()) {
                     turnFlow();
-                }else if (getUsersActive()<=1){
-                    //todo go to the last round
-                    System.out.println("La partita sarebbe finita!");
                 }
             }
 
@@ -170,10 +167,18 @@ public class Game extends Thread implements Iterable  {
      * Notifies to the connected clients the ending of the current match
      */
     private void notifyGameEnd() {
+        List<LightPlayer> scores;
+        if(fsm.getCurState().equals(ServerState.INIT)){
+            scores=board.gameInitEnd();
+        }else{
+            scores=board.gameRunningEnd();
+        }
+
         for(User u:users){
-            List<LightPlayer> scores=board.gameEnd();
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
                 u.getServerConn().notifyGameEnd(scores);
+                board.getPlayer(u).quitMatch();
+                u.closeConnection();
             }
         }
     }
@@ -575,7 +580,7 @@ public class Game extends Thread implements Iterable  {
             }
         }
         board.getPlayer(user).quitMatch();
-        if((userPlaying!=null && userPlaying.equals(user))||getUsersActive()<=1){
+        if((userPlaying!=null && userPlaying.equals(user))||(getUsersActive()<=1)){
             startFlow();
         }
     }

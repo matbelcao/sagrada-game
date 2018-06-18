@@ -24,6 +24,8 @@ public interface ServerConn {
 
     void notifyBoardChanged();
 
+    void close();
+
     boolean ping();
 
 

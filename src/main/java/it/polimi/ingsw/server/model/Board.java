@@ -11,6 +11,7 @@ import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
+import javafx.scene.effect.Light;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -534,7 +535,7 @@ public class Board {
      * Calculates the players scores and returns the ranking inside the LightPlayer object
      * @return the list of players in the match with the updated ranks
      */
-    public List<LightPlayer> gameEnd(){
+    public List<LightPlayer> gameRunningEnd(){
         List<LightPlayer> playerScores=new ArrayList<>();
         int maxScore=0;
         int position=1;
@@ -546,7 +547,6 @@ public class Board {
         }
 
         for(int i=0; i<players.size();i++){
-
             for(Player p2: players){
                 if(p2.getScore()>maxScore && p2.getFinalPosition()==0){
                     maxScore=p2.getScore();
@@ -567,6 +567,20 @@ public class Board {
 
         return playerScores;
     }
+
+    public List<LightPlayer> gameInitEnd(){
+        List<LightPlayer> playerScores=new ArrayList<>();
+        LightPlayer player;
+
+        for(Player p:players){
+            player=new LightPlayer(p.getUsername(),p.getGameId());
+            playerScores.add(player);
+        }
+
+        return playerScores;
+    }
+
+
 
     /**
      * Returns and indexed List of the dice contained in the player's SchemaCard

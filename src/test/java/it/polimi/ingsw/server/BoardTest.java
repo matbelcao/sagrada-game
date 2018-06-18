@@ -171,7 +171,7 @@ public class BoardTest {
 
         board.getPlayer(users2.get(0)).setSchema(new SchemaCard(1,false));
         board.getPlayer(users2.get(1)).setSchema(new SchemaCard(2,false));
-        List<LightPlayer> playerScores=board.gameEnd();
+        List<LightPlayer> playerScores=board.gameRunningEnd();
         assertEquals(2,playerScores.size());
     }
 }

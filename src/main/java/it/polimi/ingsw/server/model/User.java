@@ -63,6 +63,12 @@ public class User{
         }
     }
 
+    public void closeConnection(){
+        game=null;
+        status=UserStatus.DISCONNECTED;
+        getServerConn().close();
+    }
+
     /**
      * Sets the user connection status (CONNECTED, PLAYING,....)
      * @param status the connection status to be set

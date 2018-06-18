@@ -358,6 +358,10 @@ public class MasterServer{
         return null;
     }
 
+    public void endGame(Game game){
+        games.remove(game);
+    }
+
 
     /**
      * Metod to return the user whose name matches to the input String
@@ -425,5 +429,6 @@ public class MasterServer{
         server.startSocket();
         server.startHeartBeat();
     }
+
 
 }

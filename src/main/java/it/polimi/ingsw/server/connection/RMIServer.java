@@ -70,6 +70,11 @@ public class RMIServer implements ServerConn {
 
     }
 
+    @Override
+    public void close() {
+
+    }
+
 
     /**
      * Pings the client invoking a remote method
