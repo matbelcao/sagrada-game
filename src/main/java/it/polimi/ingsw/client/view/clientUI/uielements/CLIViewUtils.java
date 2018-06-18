@@ -63,7 +63,7 @@ public class CLIViewUtils {
     /**
      * this method is used to clean the screen and to make sure the lines of the page are printed starting from the top of the screen
      */
-    public static String resetScreenPosition() {
+    public synchronized static String resetScreenPosition() {
 
 
         if(Client.isWindows()){
