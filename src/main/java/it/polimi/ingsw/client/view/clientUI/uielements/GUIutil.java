@@ -115,6 +115,62 @@ public class GUIutil {
         return LINE_TO_CELL*CELL_TO_SCHEMA_W*schemaWidth;
     }
 
+
+    public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie) {
+        double dieDim = getMainSceneCellDim(width,height);
+        HBox track = new HBox();
+        track.setSpacing(10);
+        if(roundTrack.isEmpty()){
+            Canvas c = new Canvas(dieDim,dieDim);
+            drawWhiteCell(c.getGraphicsContext2D(),0,0,dieDim);
+            track.getChildren().add(c);
+        }else {
+            for (int i = 0; i < roundTrack.size(); i++) {
+                Canvas c = new Canvas(dieDim, dieDim);
+                GraphicsContext gc = c.getGraphicsContext2D();
+                drawDie(roundTrack.get(i).get(0), gc, dieDim);
+                track.getChildren().add(c);
+            }
+        }
+        Button endTurn = new Button("end turn");
+        endTurn.setOnAction(e->cmdWrite.write("e"));
+        Button back = new Button("back");
+        back.setOnAction(e->cmdWrite.write("b"));
+        Rectangle turnStateIndicator = new Rectangle(100,100);
+        if(turnState.equals(NOT_MY_TURN)){
+            turnStateIndicator.setFill(Color.RED);
+        }else{
+            turnStateIndicator.setFill(Color.GREEN);
+        }
+        track.getChildren().addAll(back,endTurn,turnStateIndicator);
+        return new Group(track);
+    }
+
+    public Group drawDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState) {
+        HBox pool = new HBox();
+        pool.setSpacing(10);
+        for(int i = 0 ; i<draftPool.size();i++){
+            Canvas c = new Canvas(dieDim,dieDim);
+            drawDie(draftPool.get(i),c.getGraphicsContext2D(),dieDim);
+            pool.getChildren().add(c);
+            int finalI = i;
+            c.setOnMouseClicked(e->{
+                switch (turnState){
+                    case NOT_MY_TURN:
+                        System.out.println("clicked not my turn");
+                        break;
+                    case MAIN:
+                        cmdWrite.write("1");
+                        System.out.println("selected die at position " + finalI + "in draftpool");
+                        cmdWrite.write(finalI +"");
+                        break;
+                }
+            });
+        }
+        return  new Group(pool);
+
+        }
+
     public Group drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie) {
         GridPane g = schemaToGrid(schema,dieDim*NUM_COLS,dieDim*NUM_ROWS,turnState,latestPlacementsList,latestSelectedDie);
         return new Group(g);
@@ -138,12 +194,12 @@ public class GUIutil {
                 }
                 int position = i*NUM_COLS+j;
                 if(turnState.equals(ClientFSMState.CHOOSE_PLACEMENT)&& latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)&& latestPlacementsList.contains(position)){
-                   highlight(cell,cellDIm);
-                   cell.setOnMouseClicked(e->{
-                       cmdWrite.write(latestPlacementsList.indexOf(position) +"");
-                       System.out.println("selected position " + position);
-                   });
-                   continue;
+                    highlight(cell,cellDIm);
+                    cell.setOnMouseClicked(e->{
+                        cmdWrite.write(latestPlacementsList.indexOf(position) +"");
+                        System.out.println("selected position " + position);
+                    });
+                    continue;
                 }
                 cell.setOnMouseClicked(e->{
                     switch (turnState){
@@ -199,63 +255,6 @@ public class GUIutil {
     public double getMainSceneCellDim(double newWidth, double newHeight) {
         return 100;
     }
-
-    public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie) {
-        double dieDim = getMainSceneCellDim(width,height);
-        HBox track = new HBox();
-        track.setSpacing(10);
-        if(roundTrack.isEmpty()){
-            Canvas c = new Canvas(dieDim,dieDim);
-            drawWhiteCell(c.getGraphicsContext2D(),0,0,dieDim);
-            track.getChildren().add(c);
-        }else {
-            for (int i = 0; i < roundTrack.size(); i++) {
-                Canvas c = new Canvas(dieDim, dieDim);
-                GraphicsContext gc = c.getGraphicsContext2D();
-                drawDie(roundTrack.get(i).get(0), gc, dieDim);
-                track.getChildren().add(c);
-            }
-        }
-        Button endTurn = new Button("end turn");
-        endTurn.setOnAction(e->cmdWrite.write("e"));
-        Button back = new Button("back");
-        back.setOnAction(e->cmdWrite.write("b"));
-        Rectangle turnStateIndicator = new Rectangle(100,100);
-        if(turnState.equals(NOT_MY_TURN)){
-            turnStateIndicator.setFill(Color.RED);
-        }else{
-            turnStateIndicator.setFill(Color.GREEN);
-        }
-        track.getChildren().addAll(back,endTurn,turnStateIndicator);
-        return new Group(track);
-    }
-
-    public Group drawDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState) {
-        HBox pool = new HBox();
-        pool.setSpacing(10);
-        for(int i = 0 ; i<draftPool.size();i++){
-            Canvas c = new Canvas(dieDim,dieDim);
-            drawDie(draftPool.get(i),c.getGraphicsContext2D(),dieDim);
-            pool.getChildren().add(c);
-            int finalI = i;
-            c.setOnMouseClicked(e->{
-                switch (turnState){
-                    case NOT_MY_TURN:
-                        System.out.println("clicked not my turn");
-                        break;
-                    case MAIN:
-                        cmdWrite.write("1");
-                        break;
-                    case SELECT_DIE:
-                        System.out.println("selected die " + finalI);
-                        cmdWrite.write(finalI +"");
-                        break;
-                }
-            });
-        }
-        return  new Group(pool);
-
-        }
 
 
 
