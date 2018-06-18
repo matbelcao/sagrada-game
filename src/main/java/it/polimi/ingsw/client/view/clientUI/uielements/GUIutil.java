@@ -543,18 +543,8 @@ public class GUIutil {
         gc.strokeRect(x,y,cellDim,cellDim);
     }
 
-    private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double dieDim) {
-        if (constraint.hasColor()) {
-            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXConstraintColor(constraint.getColor()));
-            gc.fillRect(0, 0, dieDim, dieDim);
-        }else{
-            gc.setFill(Color.LIGHTGRAY);
-            gc.fillRect(0, 0, dieDim, dieDim);
-            drawConstraintSpots(gc,dieDim,constraint.getShade().toInt());
-        }
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(LINE_WIDTH);
-        gc.strokeRect(0, 0, dieDim, dieDim);
+    private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double cellDim) {
+        drawConstraint(constraint,gc,0,0,cellDim);
     }
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double cellDim) {
@@ -572,12 +562,7 @@ public class GUIutil {
     }
 
     private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
-        double lineWidth = LINE_TO_DIE*dieDim;
-        graphicsContext2D.setFill(Color.BLACK);
-        graphicsContext2D.fillRoundRect(0,0,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
-        graphicsContext2D.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
-        graphicsContext2D.fillRoundRect(lineWidth,lineWidth,dieDim-2*lineWidth,dieDim-2*lineWidth, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM*dieDim);
-        drawSpots(graphicsContext2D,dieDim,lightDie.getShade().toInt());
+        drawDie(lightDie,graphicsContext2D,0,0,dieDim);
     }
     private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double dieDim) {
         double lineWidth = LINE_TO_DIE*dieDim;
@@ -589,67 +574,7 @@ public class GUIutil {
     }
 
     private void drawSpots(GraphicsContext gc, double dieDim, int count) {
-        switch (count) {
-            case 1:
-                drawSpot(gc, dieDim / 2, dieDim / 2,dieDim);
-                break;
-            case 3:
-                drawSpot(gc, dieDim/ 2, dieDim/ 2,dieDim);
-                // Fall thru to next case
-            case 2:
-                drawSpot(gc, dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4,dieDim);
-                break;
-            case 5:
-                drawSpot(gc, dieDim/ 2, dieDim/ 2,dieDim);
-                // Fall thru to next case
-            case 4:
-                drawSpot(gc, dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                break;
-            case 6:
-                drawSpot(gc, dieDim / 4, dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawSpot(gc, dieDim/ 4, dieDim/ 2,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 2,dieDim);
-                break;
-        }
-    }
-
-    private void drawConstraintSpots(GraphicsContext gc, double dieDim, int count) {
-        switch (count) {
-            case 1:
-                drawConstraintSpot(gc, dieDim / 2, dieDim / 2,dieDim);
-                break;
-            case 3:
-                drawConstraintSpot(gc, dieDim/ 2, dieDim/ 2,dieDim);
-                // Fall thru to next case
-            case 2:
-                drawConstraintSpot(gc, dieDim/ 4, dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4,dieDim);
-                break;
-            case 5:
-                drawConstraintSpot(gc, dieDim/ 2, dieDim/ 2,dieDim);
-                // Fall thru to next case
-            case 4:
-                drawConstraintSpot(gc, dieDim/ 4, dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                break;
-            case 6:
-                drawConstraintSpot(gc, dieDim / 4, dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, dieDim/ 4, dieDim/ 2,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim/ 4, dieDim/ 2,dieDim);
-                break;
-        }
+        drawSpots(gc,0,0,dieDim,count);
     }
 
     private void drawSpots(GraphicsContext gc,double xAxisDiePosition,double Y_axis_die_position,double dieDim, int count) {
@@ -684,6 +609,9 @@ public class GUIutil {
         }
     }
 
+    private void drawConstraintSpots(GraphicsContext gc, double dieDim, int count) {
+        drawConstraintSpots(gc,0,0,dieDim,count);
+    }
     private void drawConstraintSpots(GraphicsContext gc,double xAxisDiePosition,double Y_axis_die_position,double dieDim, int count) {
         switch (count) {
             case 1:
@@ -717,25 +645,8 @@ public class GUIutil {
     }
 
     private void drawConstraintSpot(GraphicsContext gc, double x, double y, double dieDim) {
-        double spotDiameter = dieDim/SPOT_RATIO;
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(spotDiameter/5);
-        gc.fillOval(x - spotDiameter / 2, y - spotDiameter / 2, spotDiameter, spotDiameter);
-        gc.strokeOval(x - spotDiameter / 2, y - spotDiameter / 2, spotDiameter, spotDiameter);
+        drawConstraintSpot(gc,x,y,dieDim,0,0);
     }
-    private void drawSpot(GraphicsContext gc, double x, double y, double dieDim) {
-        double spotDiameter = dieDim/SPOT_RATIO;
-        gc.setFill(Color.BLACK);
-        gc.fillOval(x - spotDiameter / 2, y - spotDiameter / 2, spotDiameter, spotDiameter);
-    }
-
-    private void drawSpot(GraphicsContext gc, double x, double y,double dieDim,double xAxisDiePosition,double yAxisDiePosition) {
-        double spotDiameter = dieDim/SPOT_RATIO;
-        gc.setFill(Color.BLACK);
-        gc.fillOval(xAxisDiePosition +(x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
-    }
-
     private void drawConstraintSpot(GraphicsContext gc, double x, double y,double dieDim,double xAxisDiePosition,double yAxisDiePosition) {
         double spotDiameter = dieDim/SPOT_RATIO;
         gc.setFill(Color.WHITE);
@@ -744,6 +655,12 @@ public class GUIutil {
         gc.fillOval(xAxisDiePosition +(x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
         gc.strokeOval(xAxisDiePosition +(x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
     }
-
-
+    private void drawSpot(GraphicsContext gc, double x, double y, double dieDim) {
+        drawSpot(gc,x,y,dieDim,0,0);
+    }
+    private void drawSpot(GraphicsContext gc, double x, double y,double dieDim,double xAxisDiePosition,double yAxisDiePosition) {
+        double spotDiameter = dieDim/SPOT_RATIO;
+        gc.setFill(Color.BLACK);
+        gc.fillOval(xAxisDiePosition +(x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
+    }
 }
