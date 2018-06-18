@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.controller.MasterServer;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 

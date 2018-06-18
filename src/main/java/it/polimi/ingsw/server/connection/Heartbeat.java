@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.enums.UserStatus;
+import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.User;
 
 public class Heartbeat extends Thread{

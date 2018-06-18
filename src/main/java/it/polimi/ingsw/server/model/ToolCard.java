@@ -2,7 +2,7 @@ package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
-import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;

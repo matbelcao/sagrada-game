@@ -1,8 +1,11 @@
-package it.polimi.ingsw.server.connection;
+package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.ServerOptions;
-import it.polimi.ingsw.server.model.Game;
+import it.polimi.ingsw.server.connection.AuthenticationInt;
+import it.polimi.ingsw.server.connection.Heartbeat;
+import it.polimi.ingsw.server.connection.RMIAuthenticator;
+import it.polimi.ingsw.server.connection.SocketAuthenticator;
 import it.polimi.ingsw.server.model.User;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

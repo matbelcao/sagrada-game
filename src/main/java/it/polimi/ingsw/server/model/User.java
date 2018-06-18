@@ -1,12 +1,10 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.ConnectionMode;
-import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.UserStatus;
-import it.polimi.ingsw.server.connection.MasterServer;
+import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.connection.ServerConn;
-import it.polimi.ingsw.server.model.Game;
-import it.polimi.ingsw.server.model.Player;
+import it.polimi.ingsw.server.controller.Game;
 
 /**
  * This class contains the data concerning the user and the connection mode used

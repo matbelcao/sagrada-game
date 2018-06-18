@@ -3,6 +3,8 @@ package it.polimi.ingsw.server.connection;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.immutables.IndexedCellContent;
+import it.polimi.ingsw.server.controller.Game;
+import it.polimi.ingsw.server.controller.Validator;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 
@@ -422,7 +424,7 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void sendPlacementList() throws IllegalActionException {
         System.out.println("QUIXXXXX");// TODO: 13/06/2018 delete
-        List<Integer> placements=user.getGame().getPlacements(user);
+        List<Integer> placements=user.getGame().getPlacements();
 
         outSocket.print("LIST_PLACEMENTS");
         for(int i=0;i<placements.size();i++){
