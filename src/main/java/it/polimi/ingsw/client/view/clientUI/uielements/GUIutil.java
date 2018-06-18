@@ -9,15 +9,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -64,6 +62,9 @@ public class GUIutil {
     private static final double SCHEMA_W_TO_INTERNAL_PADDING = 18;
     private static final double SCHEMA_W_TO_PRIV_OBJ_PADDING = 9;
     //Main scene
+    private static final int ROUNDTRACK_SIZE = 10;
+    private static final double ROUNDTRACK_TEXT_SIZE_TO_CELL = 0.7;
+    private static final double TEXT_DIM_TO_CELL_DIM = 0.5;
     private static  final double MAIN_SCENE_RATIO =  1.4286;
     private static final double MAIN_SCENE_TO_SCREEN = 0.8;
     private static final double DIE_ARC_TO_DIM = 0.35;
@@ -128,21 +129,21 @@ public class GUIutil {
 
 
     public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie) {
-        double dieDim = getMainSceneCellDim(width,height);
+        double cellDim = getMainSceneCellDim(width,height);
         HBox track = new HBox();
         track.setSpacing(10);
-        if(roundTrack.isEmpty()){
-            Canvas c = new Canvas(dieDim,dieDim);
-            drawWhiteCell(c.getGraphicsContext2D(),0,0,dieDim);
-            track.getChildren().add(c);
-        }else {
-            for (int i = 0; i < roundTrack.size(); i++) {
-                Canvas c = new Canvas(dieDim, dieDim);
-                GraphicsContext gc = c.getGraphicsContext2D();
-                drawDie(roundTrack.get(i).get(0), gc, dieDim);
-                track.getChildren().add(c);
+
+            for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
+                Pane p = new Pane();
+                p.getChildren().add(emptyRoundTrackCell(i,cellDim));
+                if(i<roundTrack.size()) {
+                    Canvas c = new Canvas(cellDim, cellDim);
+                    GraphicsContext gc = c.getGraphicsContext2D();
+                    drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                    p.getChildren().add(c);
+                }
+                track.getChildren().add(p);
             }
-        }
         Button endTurn = new Button("end turn");
         endTurn.setOnAction(e->cmdWrite.write("e"));
         Button back = new Button("back");
@@ -156,6 +157,35 @@ public class GUIutil {
         track.getChildren().addAll(back,endTurn,turnStateIndicator);
         return new Group(track);
     }
+
+    private Node emptyRoundTrackCell(int i, double cellDim) {
+        int displayedIndex = i + 1;
+        double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL*cellDim;
+        Text t = new Text(displayedIndex+"");
+        t.setFont(Font.font ("Verdana", textSize));
+        t.setFill(Color.BLACK);
+        double lineWidth = cellDim*LINE_TO_CELL;
+        double innerCellDim = cellDim - lineWidth;
+        Rectangle outerRect = new Rectangle(0,0,cellDim,cellDim);
+        Rectangle innerRect = new Rectangle(lineWidth,lineWidth,innerCellDim,innerCellDim);
+        innerRect.setFill(Color.WHITE);
+        return new StackPane(outerRect,innerRect,t);
+    }
+
+    private void drawEmptyRoundTrackCell(GraphicsContext gc, int index,double cellDim) {
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(cellDim*LINE_TO_CELL);
+        gc.strokeRect(0, 0, cellDim, cellDim);
+        drawRoundTrackNumber(gc,index,cellDim);
+
+    }
+    private void drawRoundTrackNumber(GraphicsContext gc,int index, double cellDim) {
+        double textSize = TEXT_DIM_TO_CELL_DIM*cellDim;
+        gc.setFont(Font.font("Calibri", textSize));
+        //gc.setTextAlign(TextAlignment.CENTER);
+        gc.fillText(index+"",cellDim/2,cellDim/2);
+    }
+
 
     public Group drawDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState) {
         HBox pool = new HBox();
@@ -195,7 +225,7 @@ public class GUIutil {
         GridPane grid = new GridPane();
         Insets padding = new Insets(10,10,10,10);
         grid.setPadding(padding);
-        double cellDIm = width/5;
+        double cellDIm = width/NUM_COLS;
         for(int i = 0; i < NUM_ROWS; i++){
             for(int j = 0; j < NUM_COLS; j++){
                 Canvas cell = new Canvas(cellDIm,cellDIm);
@@ -426,7 +456,7 @@ public class GUIutil {
         int textLen = lightSchemaCard.getName().length();
         x = initialX + schemaWidth/2;
         y = initialY + TEXT_HEIGHT_TO_SCHEMA_H*schemaHeight;
-        drawText(gc,x,y,schemaWidth,lightSchemaCard);
+        drawSchemaText(gc,x,y,schemaWidth,lightSchemaCard);
         drawFavorTokens(gc,initialX,y,schemaWidth,lightSchemaCard);
 
     }
@@ -443,7 +473,7 @@ public class GUIutil {
 
     }
 
-    public void drawText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard){
+    public void drawSchemaText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard){
         double textSize = TEXT_DIM_TO_SCHEMA_W*schemaWidth;
         gc.setFont(Font.font("Serif", textSize));
         gc.setTextAlign(TextAlignment.CENTER);
@@ -451,6 +481,8 @@ public class GUIutil {
         gc.setFill(Color.AZURE);
         gc.fillText(lightSchemaCard.getName(),x,y);
     }
+
+
 
     private void drawSchema(GraphicsContext gc,LightSchemaCard lightSchemaCard,double x,double y, double cellDim) {
         double initX = x;
