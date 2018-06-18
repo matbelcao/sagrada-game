@@ -9,13 +9,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -68,7 +70,8 @@ public class GUIutil {
     private static  final double MAIN_SCENE_RATIO =  1.4286;
     private static final double MAIN_SCENE_TO_SCREEN = 0.8;
     private static final double DIE_ARC_TO_DIM = 0.35;
-    private static final double DIE_LINE_TO_DIM = 0.1;
+    private static final double LINE_TO_DIE = 0.045;
+
     //die s..
     private static final int SCREEN_TO_DIE = 25;
     private static final int DIE_TO_LINE = 10;
@@ -134,12 +137,17 @@ public class GUIutil {
         track.setSpacing(10);
 
             for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
-                Pane p = new Pane();
-                p.getChildren().add(emptyRoundTrackCell(i,cellDim));
+                StackPane p = emptyRoundTrackCell(i,cellDim);
                 if(i<roundTrack.size()) {
                     Canvas c = new Canvas(cellDim, cellDim);
                     GraphicsContext gc = c.getGraphicsContext2D();
-                    drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                    if(roundTrack.get(i).size()>1){
+                        //draw to dice in a cell
+                        drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                        drawDie(roundTrack.get(i).get(1), gc,cellDim/2,0, cellDim);
+                    }else {
+                        drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                    }
                     p.getChildren().add(c);
                 }
                 track.getChildren().add(p);
@@ -158,7 +166,7 @@ public class GUIutil {
         return new Group(track);
     }
 
-    private Node emptyRoundTrackCell(int i, double cellDim) {
+    private StackPane emptyRoundTrackCell(int i, double cellDim) {
         int displayedIndex = i + 1;
         double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL*cellDim;
         Text t = new Text(displayedIndex+"");
@@ -564,23 +572,20 @@ public class GUIutil {
     }
 
     private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
-        //todo update line width
+        double lineWidth = LINE_TO_DIE*dieDim;
         graphicsContext2D.setFill(Color.BLACK);
         graphicsContext2D.fillRoundRect(0,0,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
         graphicsContext2D.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
-        double lineWidth = 4.5;
         graphicsContext2D.fillRoundRect(lineWidth,lineWidth,dieDim-2*lineWidth,dieDim-2*lineWidth, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM*dieDim);
         drawSpots(graphicsContext2D,dieDim,lightDie.getShade().toInt());
     }
-    //to be used when drawing schema to canvas
     private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double dieDim) {
+        double lineWidth = LINE_TO_DIE*dieDim;
+        gc.setFill(Color.BLACK);
+        gc.fillRoundRect(x,y,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
-        gc.fillRoundRect(x,y,dieDim,dieDim, DIE_ARC_TO_DIM *dieDim, DIE_ARC_TO_DIM *dieDim);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(DIE_LINE_TO_DIM*dieDim);
-       // gc.strokeRoundRect(0,0,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
-
-
+        gc.fillRoundRect(x+lineWidth,y+lineWidth,dieDim-2*lineWidth,dieDim-2*lineWidth, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM*dieDim);
+        drawSpots(gc,dieDim,lightDie.getShade().toInt());
     }
 
     private void drawSpots(GraphicsContext gc, double dieDim, int count) {
