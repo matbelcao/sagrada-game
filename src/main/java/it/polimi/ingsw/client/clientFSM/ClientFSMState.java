@@ -167,7 +167,7 @@ public enum ClientFSMState {
                 return MAIN; }
             if(endTurn){ return NOT_MY_TURN; }
             if(isListEmpty){
-                return TOOL_CAN_CONTINUE;
+                return MAIN;
             }
             return CHOOSE_OPTION;
         }
