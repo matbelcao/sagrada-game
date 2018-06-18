@@ -1,6 +1,8 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIElems;
+import it.polimi.ingsw.common.enums.Shade;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -14,9 +16,8 @@ import java.io.IOException;
 public class CLIElements {
     private Element elemFile;
     private static final String ELEM_FILE= Client.XML_SOURCE+"CLI.xml";
-    private static final String WALL_FILE= "src"+ File.separator+"img"+File.separator+"sagrada-ascii.txt";
     private static final String CLI_COMP= "cli-components";
-    private static final String BIG_EL="[A-Z]+";
+
 
     public CLIElements() throws InstantiationException {
         this.elemFile=parser();
@@ -41,14 +42,32 @@ public class CLIElements {
             return null;
         }
     }
-    public String getBigDie(String face){
-        if(face.matches(BIG_EL)) {
-            return getElem(face);
-        }
-        throw new IllegalArgumentException();
+
+    /**
+     * this method returns an uncolored big die that has the face corresponding to the param
+     * @param face the wanted face of the die
+     * @return the string containing a raw representation of the face
+     */
+    public String getBigDie(Shade face){
+
+        return getString(face.toString());
     }
 
-    public String getElem(String elem){
+    /**
+     * this method returns an element that is not the face of a die
+     * @param elem the requested element
+     * @return the string containing the element's representation
+     */
+    public String getElem(CLIElems elem){
+        return getString(elem.toString());
+    }
+
+    /**
+     * this is the method that actually gets the requested element from the xml file
+     * @param elem the wanted element
+     * @return the string related to the element
+     */
+    private String getString(String elem) {
         try {
             return elemFile.getElementsByTagName(elem).item(0).getTextContent();
         }catch(NullPointerException e){

@@ -2,8 +2,9 @@ package it.polimi.ingsw.client.view.clientUI;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.client.view.LightBoard;
-import it.polimi.ingsw.client.clientFSM.ClientFSMState;
-import it.polimi.ingsw.client.view.clientUI.uielements.*;
+import it.polimi.ingsw.client.view.clientUI.uielements.CLIView;
+import it.polimi.ingsw.client.view.clientUI.uielements.CLIViewUtils;
+import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
@@ -18,19 +19,31 @@ import java.io.Console;
 import java.util.List;
 import java.util.Observable;
 
+import static it.polimi.ingsw.common.enums.ErrMsg.ERR;
+import static it.polimi.ingsw.common.enums.ErrMsg.ERROR_RETRIEVING_CONSOLE;
+
+/**
+ * This is the class that implements the UI for the client as a command line interface
+ */
 public class CLI implements ClientUI {
+    private static final String STRING_NEWLINE="%s%n";
     private final CLIView view;
     private Console console;
 
     private Client client;
     private UIMessages uimsg;
 
+    /**
+     * this constructs the object
+     * @param client the client
+     * @param lang the set language
+     */
     public CLI(Client client,UILanguage lang) {
 
         this.console=System.console();
 
         if (console == null) {
-            System.err.println("ERR: couldn't retrieve any console!");
+            System.err.println(ERR.toString()+ERROR_RETRIEVING_CONSOLE);
             System.exit(1);
         }
 
@@ -42,14 +55,16 @@ public class CLI implements ClientUI {
     }
 
 
-
-
-
-
+    /**
+     * this cleans the screen and resets the cursor at the top of the page
+     */
     private void resetScreen(){
         console.printf(CLIViewUtils.resetScreenPosition());
     }
 
+    /**
+     * this method builds and shows the login screen
+     */
     @Override
     public void showLoginScreen() {
         String username;
@@ -61,11 +76,10 @@ public class CLI implements ClientUI {
 
                 console.printf(view.showLoginPassword());
                 password = Credentials.hash(username, console.readPassword());
-                synchronized (client.getLockCredentials()) {
-                    client.setPassword(password);
-                    client.setUsername(username);
-                    client.getLockCredentials().notifyAll();
-                }
+
+                client.setPassword(password);
+                client.setUsername(username);
+
             } catch (Exception e) {
                 client.disconnect();
             }
@@ -73,48 +87,73 @@ public class CLI implements ClientUI {
     }
 
 
+    /**
+     * this updates the login screen according to the outcome of the latest attempt to login
+     * @param logged the outcome of the login (true iff it went fine)
+     */
     @Override
     public void updateLogin(boolean logged) {
         resetScreen();
         if (logged) {
-            console.printf(String.format("%s%n", uimsg.getMessage(UIMsg.LOGIN_OK)), client.getUsername());
+            console.printf(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOGIN_OK)), client.getUsername());
             view.setClientInfo(client.getConnMode(),client.getUsername());
 
         } else {
-            console.printf(String.format("%s%n", uimsg.getMessage(UIMsg.LOGIN_KO)));
+            console.printf(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOGIN_KO)));
             showLoginScreen();
         }
 
     }
 
+    /**
+     * this method is used to show the last screen that was printed to the console
+     */
     @Override
     public void showLastScreen() {
-        console.printf(view.printLastScreen());
+        console.printf(view.printLatestScreen());
     }
 
+    /**
+     * this notifies the successful connection towards the server
+     */
     @Override
     public void updateConnectionOk() {
         resetScreen();
-        console.printf(String.format("%s%n", uimsg.getMessage(UIMsg.CONNECTION_OK)));
+        console.printf(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.CONNECTION_OK)));
 
     }
 
+    /**
+     * this is the message that notifies the clients in the lobby that another player has logged in
+     * @param numUsers the number of connected players at the moment
+     */
     @Override
     public void updateLobby(int numUsers){
         resetScreen();
-        console.printf(String.format("%s%n", uimsg.getMessage(UIMsg.LOBBY_UPDATE)),numUsers);
+        console.printf(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOBBY_UPDATE)),numUsers);
 
     }
 
+    /**
+     * this method notifies the start of the game
+     * @param numUsers the number of participants
+     * @param playerId the id of the user
+     */
     @Override
     public void updateGameStart(int numUsers, int playerId){
 
         resetScreen();
-        console.printf(String.format("%s%n", uimsg.getMessage(UIMsg.GAME_START)),numUsers,playerId);
-        this.view.setMatchInfo(playerId,client.getBoard().getNumPlayers());
+        console.printf(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.GAME_START)),numUsers,playerId);
+        this.view.setMatchInfo(playerId,numUsers);
 
     }
 
+    /**
+     * this method is called right after the message that signals the start of a game and shows to the user elements
+     * of the board and the drafted schemas to be able to make a choice of the schema based on them
+     * @param draftedSchemas the schemas that have been drafted for this player
+     * @param privObj the private objective of the player
+     */
     @Override
     public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
         view.updateDraftedSchemas(draftedSchemas);
@@ -122,7 +161,11 @@ public class CLI implements ClientUI {
         console.printf(view.printSchemaChoiceView());
     }
 
-   private void updateBoard(LightBoard board) {
+    /**
+     * this method updates the view to the latest changes in the lightboard and/or state of the client
+     * @param board the board
+     */
+    private void updateBoard(LightBoard board) {
         if(board==null){ throw new IllegalArgumentException();}
         view.updateTools(board.getTools());
         view.updatePrivObj(board.getPrivObj());
@@ -153,9 +196,6 @@ public class CLI implements ClientUI {
                 view.updateMenuDiceList(board.getLatestDiceList());
                 break;
             case CHOOSE_OPTION:
-                if(board.getLatestOptionsList().size()>1){
-                    view.updateMenuListOptions(board.getLatestOptionsList());
-                }
                 break;
             case CHOOSE_TOOL:
                 view.updateMenuListTools(board.getTools());
@@ -174,12 +214,9 @@ public class CLI implements ClientUI {
     }
 
 
-    @Override
-    public void updateStatusMessage(String statusChange, int playerId) {
-
-    }
-
-
+    /**
+     * this notifies the client that wanted to quit that his connection has been closed and he has successfully quit
+     */
     @Override
     public void updateConnectionClosed()
     {
@@ -189,6 +226,9 @@ public class CLI implements ClientUI {
         }
     }
 
+    /**
+     * this notifies an error in the connection towards the server
+     */
     @Override
     public void updateConnectionBroken() {
         synchronized (client.getLockUI()) {
@@ -198,17 +238,13 @@ public class CLI implements ClientUI {
 
     }
 
-    @Override
-    public void showOptions(List<Commands> optionsList) {
-
-    }
 
     @Override
     public void showWaitingForGameStartScreen() {
         resetScreen();
 
-        String msg=String.format("%s%n", uimsg.getMessage(UIMsg.WAIT_FOR_GAME_START));
-        view.setLastScreen(msg);
+        String msg=String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.WAIT_FOR_GAME_START));
+        view.setLatestScreen(msg);
         synchronized (client.getLockUI()) {
             console.printf(msg);
             client.getLockUI().notifyAll();
@@ -216,14 +252,7 @@ public class CLI implements ClientUI {
 
     }
 
-    @Override
-    public void showMainScreen(ClientFSMState turnState) {
-        synchronized (client.getLockUI()) {
-            console.printf(view.printMainView(turnState));
-            client.getLockUI().notifyAll();
-        }
 
-    }
 
     @Override
     public QueuedBufferedReader getCommandQueue() {

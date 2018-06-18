@@ -33,15 +33,6 @@ public class LightPlayer {
     public LightPlayerStatus getStatus(){
         return status;
     }
-    public void setDisconnected(){
-        this.status=LightPlayerStatus.DISCONNECTED;
-    }
-    public void setQuitted(){
-        this.status=LightPlayerStatus.QUITTED;
-    }
-    public void setPlaying(){
-        this.status=LightPlayerStatus.PLAYING;
-    }
 
     public int getFavorTokens() {
         return favorTokens;
@@ -81,6 +72,10 @@ public class LightPlayer {
 
     public boolean isPlaying() {
         return this.status.equals(LightPlayerStatus.PLAYING);
+    }
+
+    public void setStatus(LightPlayerStatus status) {
+        this.status=status;
     }
 }
 
