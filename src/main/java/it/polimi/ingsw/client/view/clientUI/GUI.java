@@ -39,7 +39,9 @@ import java.util.List;
 import java.util.Observable;
 
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
+import static javafx.geometry.Pos.BOTTOM_CENTER;
 import static javafx.geometry.Pos.CENTER;
+import static javafx.geometry.Pos.TOP_CENTER;
 
 public class GUI extends Application implements ClientUI {
     private GUIutil sceneCreator;
@@ -265,6 +267,7 @@ public class GUI extends Application implements ClientUI {
         Group schema;
         HBox draftpool;
         VBox schemaVbox;
+        VBox cardsVbox;
         Group cards;
         MainSceneGroup(LightBoard board){
             this.board = board;
@@ -272,11 +275,14 @@ public class GUI extends Application implements ClientUI {
             this.roundTrack = new HBox();
             this.schema = new Group();
             this.draftpool = new HBox();
-            this.schemaVbox = new VBox(schema,draftpool);
+            this.schemaVbox = new VBox(schema);
             this.cards = new Group();
+            this.cardsVbox = new VBox(cards,draftpool);
+            draftpool.setAlignment(BOTTOM_CENTER);
             b.setTop(roundTrack);
+            roundTrack.setAlignment(TOP_CENTER);
             b.setLeft(schemaVbox);
-            b.setRight(cards);
+            b.setRight(cardsVbox);
             this.getChildren().add(b);
             redraw(200,200);
         }

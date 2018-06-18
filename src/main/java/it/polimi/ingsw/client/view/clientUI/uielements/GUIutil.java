@@ -17,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -63,10 +64,14 @@ public class GUIutil {
     private static final double SCHEMA_W_TO_INTERNAL_PADDING = 18;
     private static final double SCHEMA_W_TO_PRIV_OBJ_PADDING = 9;
     //Main scene
+    private static final int ROUNDTRACK_SIZE = 10;
+    private static final double ROUNDTRACK_TEXT_SIZE_TO_CELL = 0.7;
+    private static final double TEXT_DIM_TO_CELL_DIM = 0.5;
     private static  final double MAIN_SCENE_RATIO =  1.4286;
     private static final double MAIN_SCENE_TO_SCREEN = 0.8;
     private static final double DIE_ARC_TO_DIM = 0.35;
-    private static final double DIE_LINE_TO_DIM = 0.1;
+    private static final double LINE_TO_DIE = 0.045;
+
     //die s..
     private static final int SCREEN_TO_DIE = 25;
     private static final int DIE_TO_LINE = 10;
@@ -110,11 +115,11 @@ public class GUIutil {
     }
 
     private double getCardWidth(){
-        double width = 184.58712093023254;
+        double width = 258;
         return width;
     }
     private double getCardHeight(){
-        double height = 249.915;
+        double height = 350;
         return height;
     }
 
@@ -127,21 +132,26 @@ public class GUIutil {
 
 
     public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie) {
-        double dieDim = getMainSceneCellDim(width,height);
+        double cellDim = getMainSceneCellDim(width,height);
         HBox track = new HBox();
         track.setSpacing(10);
-        if(roundTrack.isEmpty()){
-            Canvas c = new Canvas(dieDim,dieDim);
-            drawWhiteCell(c.getGraphicsContext2D(),0,0,dieDim);
-            track.getChildren().add(c);
-        }else {
-            for (int i = 0; i < roundTrack.size(); i++) {
-                Canvas c = new Canvas(dieDim, dieDim);
-                GraphicsContext gc = c.getGraphicsContext2D();
-                drawDie(roundTrack.get(i).get(0), gc, dieDim);
-                track.getChildren().add(c);
+
+            for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
+                StackPane p = emptyRoundTrackCell(i,cellDim);
+                if(i<roundTrack.size()) {
+                    Canvas c = new Canvas(cellDim, cellDim);
+                    GraphicsContext gc = c.getGraphicsContext2D();
+                    if(roundTrack.get(i).size()>1){
+                        //draw to dice in a cell
+                        drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                        drawDie(roundTrack.get(i).get(1), gc,cellDim/2,0, cellDim);
+                    }else {
+                        drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                    }
+                    p.getChildren().add(c);
+                }
+                track.getChildren().add(p);
             }
-        }
         Button endTurn = new Button("end turn");
         endTurn.setOnAction(e->cmdWrite.write("e"));
         Button back = new Button("back");
@@ -155,6 +165,35 @@ public class GUIutil {
         track.getChildren().addAll(back,endTurn,turnStateIndicator);
         return new Group(track);
     }
+
+    private StackPane emptyRoundTrackCell(int i, double cellDim) {
+        int displayedIndex = i + 1;
+        double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL*cellDim;
+        Text t = new Text(displayedIndex+"");
+        t.setFont(Font.font ("Verdana", textSize));
+        t.setFill(Color.BLACK);
+        double lineWidth = cellDim*LINE_TO_CELL;
+        double innerCellDim = cellDim - lineWidth;
+        Rectangle outerRect = new Rectangle(0,0,cellDim,cellDim);
+        Rectangle innerRect = new Rectangle(lineWidth,lineWidth,innerCellDim,innerCellDim);
+        innerRect.setFill(Color.WHITE);
+        return new StackPane(outerRect,innerRect,t);
+    }
+
+    private void drawEmptyRoundTrackCell(GraphicsContext gc, int index,double cellDim) {
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(cellDim*LINE_TO_CELL);
+        gc.strokeRect(0, 0, cellDim, cellDim);
+        drawRoundTrackNumber(gc,index,cellDim);
+
+    }
+    private void drawRoundTrackNumber(GraphicsContext gc,int index, double cellDim) {
+        double textSize = TEXT_DIM_TO_CELL_DIM*cellDim;
+        gc.setFont(Font.font("Calibri", textSize));
+        //gc.setTextAlign(TextAlignment.CENTER);
+        gc.fillText(index+"",cellDim/2,cellDim/2);
+    }
+
 
     public Group drawDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState) {
         HBox pool = new HBox();
@@ -194,7 +233,7 @@ public class GUIutil {
         GridPane grid = new GridPane();
         Insets padding = new Insets(10,10,10,10);
         grid.setPadding(padding);
-        double cellDIm = width/5;
+        double cellDIm = width/NUM_COLS;
         for(int i = 0; i < NUM_ROWS; i++){
             for(int j = 0; j < NUM_COLS; j++){
                 Canvas cell = new Canvas(cellDIm,cellDIm);
@@ -231,21 +270,31 @@ public class GUIutil {
     }
 
     public Group drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState) {
-        GridPane grid = new GridPane();
-        int i = 0;
-        int j = 0;
-        grid.add( drawCard(privObj,getCardWidth(),getCardHeight()),j,i);
-        for (LightCard pubObjCard : pubObjs){
-            j++;
-            grid.add(drawCard(pubObjCard,getCardWidth(),getCardHeight()),j,i);
-        }
-        i++;
-        j = 0;
-        for (LightCard toolCard : tools) {
-            j++;
-            grid.add(drawCard(toolCard,getCardWidth(),getCardHeight()),j,i);
-        }
-        return new Group(grid);
+        Button priv = new Button("Private Objective");
+        Button pub = new Button("Public Objectives");
+        Button tool = new Button("Tools");
+
+        HBox buttonContainer = new HBox(priv,pub,tool);
+        HBox cardContainer =  new HBox();
+        VBox primaryContainer = new VBox(buttonContainer,cardContainer);
+
+        priv.setOnAction(e->cardContainer.getChildren().setAll(drawCard(privObj,getCardWidth(),getCardHeight())));
+        pub.setOnAction(e->{
+            ArrayList<Canvas> cards = new ArrayList();
+            for (LightCard pubObjCard : pubObjs){
+                cards.add(drawCard(pubObjCard,getCardWidth(),getCardHeight()));
+            }
+            cardContainer.getChildren().setAll(cards);
+        });
+        tool.setOnAction(e->{
+            ArrayList<Canvas> cards = new ArrayList();
+            for (LightCard toolCard : tools) {
+                cards.add(drawCard(toolCard,getCardWidth(),getCardHeight()));
+            }
+            cardContainer.getChildren().setAll(cards);
+        });
+        pub.fire();
+        return new Group(primaryContainer);
 
     }
 
@@ -415,7 +464,7 @@ public class GUIutil {
         int textLen = lightSchemaCard.getName().length();
         x = initialX + schemaWidth/2;
         y = initialY + TEXT_HEIGHT_TO_SCHEMA_H*schemaHeight;
-        drawText(gc,x,y,schemaWidth,lightSchemaCard);
+        drawSchemaText(gc,x,y,schemaWidth,lightSchemaCard);
         drawFavorTokens(gc,initialX,y,schemaWidth,lightSchemaCard);
 
     }
@@ -432,7 +481,7 @@ public class GUIutil {
 
     }
 
-    public void drawText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard){
+    public void drawSchemaText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard){
         double textSize = TEXT_DIM_TO_SCHEMA_W*schemaWidth;
         gc.setFont(Font.font("Serif", textSize));
         gc.setTextAlign(TextAlignment.CENTER);
@@ -440,6 +489,8 @@ public class GUIutil {
         gc.setFill(Color.AZURE);
         gc.fillText(lightSchemaCard.getName(),x,y);
     }
+
+
 
     private void drawSchema(GraphicsContext gc,LightSchemaCard lightSchemaCard,double x,double y, double cellDim) {
         double initX = x;
@@ -492,18 +543,8 @@ public class GUIutil {
         gc.strokeRect(x,y,cellDim,cellDim);
     }
 
-    private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double dieDim) {
-        if (constraint.hasColor()) {
-            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXConstraintColor(constraint.getColor()));
-            gc.fillRect(0, 0, dieDim, dieDim);
-        }else{
-            gc.setFill(Color.LIGHTGRAY);
-            gc.fillRect(0, 0, dieDim, dieDim);
-            drawConstraintSpots(gc,dieDim,constraint.getShade().toInt());
-        }
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(LINE_WIDTH);
-        gc.strokeRect(0, 0, dieDim, dieDim);
+    private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double cellDim) {
+        drawConstraint(constraint,gc,0,0,cellDim);
     }
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double cellDim) {
@@ -521,87 +562,19 @@ public class GUIutil {
     }
 
     private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
-        //todo update line width
-        graphicsContext2D.setFill(Color.BLACK);
-        graphicsContext2D.fillRoundRect(0,0,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
-        graphicsContext2D.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
-        double lineWidth = 4.5;
-        graphicsContext2D.fillRoundRect(lineWidth,lineWidth,dieDim-2*lineWidth,dieDim-2*lineWidth, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM*dieDim);
-        drawSpots(graphicsContext2D,dieDim,lightDie.getShade().toInt());
+        drawDie(lightDie,graphicsContext2D,0,0,dieDim);
     }
-    //to be used when drawing schema to canvas
     private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double dieDim) {
+        double lineWidth = LINE_TO_DIE*dieDim;
+        gc.setFill(Color.BLACK);
+        gc.fillRoundRect(x,y,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
-        gc.fillRoundRect(x,y,dieDim,dieDim, DIE_ARC_TO_DIM *dieDim, DIE_ARC_TO_DIM *dieDim);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(DIE_LINE_TO_DIM*dieDim);
-       // gc.strokeRoundRect(0,0,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
-
-
+        gc.fillRoundRect(x+lineWidth,y+lineWidth,dieDim-2*lineWidth,dieDim-2*lineWidth, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM*dieDim);
+        drawSpots(gc,x,y,dieDim,lightDie.getShade().toInt());
     }
 
     private void drawSpots(GraphicsContext gc, double dieDim, int count) {
-        switch (count) {
-            case 1:
-                drawSpot(gc, dieDim / 2, dieDim / 2,dieDim);
-                break;
-            case 3:
-                drawSpot(gc, dieDim/ 2, dieDim/ 2,dieDim);
-                // Fall thru to next case
-            case 2:
-                drawSpot(gc, dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4,dieDim);
-                break;
-            case 5:
-                drawSpot(gc, dieDim/ 2, dieDim/ 2,dieDim);
-                // Fall thru to next case
-            case 4:
-                drawSpot(gc, dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                break;
-            case 6:
-                drawSpot(gc, dieDim / 4, dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim);
-                drawSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawSpot(gc, dieDim/ 4, dieDim/ 2,dieDim);
-                drawSpot(gc, 3 * dieDim/ 4, dieDim/ 2,dieDim);
-                break;
-        }
-    }
-
-    private void drawConstraintSpots(GraphicsContext gc, double dieDim, int count) {
-        switch (count) {
-            case 1:
-                drawConstraintSpot(gc, dieDim / 2, dieDim / 2,dieDim);
-                break;
-            case 3:
-                drawConstraintSpot(gc, dieDim/ 2, dieDim/ 2,dieDim);
-                // Fall thru to next case
-            case 2:
-                drawConstraintSpot(gc, dieDim/ 4, dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4,dieDim);
-                break;
-            case 5:
-                drawConstraintSpot(gc, dieDim/ 2, dieDim/ 2,dieDim);
-                // Fall thru to next case
-            case 4:
-                drawConstraintSpot(gc, dieDim/ 4, dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                break;
-            case 6:
-                drawConstraintSpot(gc, dieDim / 4, dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim/ 4, dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, dieDim/ 4, 3 * dieDim/ 4,dieDim);
-                drawConstraintSpot(gc, dieDim/ 4, dieDim/ 2,dieDim);
-                drawConstraintSpot(gc, 3 * dieDim/ 4, dieDim/ 2,dieDim);
-                break;
-        }
+        drawSpots(gc,0,0,dieDim,count);
     }
 
     private void drawSpots(GraphicsContext gc,double xAxisDiePosition,double Y_axis_die_position,double dieDim, int count) {
@@ -636,6 +609,9 @@ public class GUIutil {
         }
     }
 
+    private void drawConstraintSpots(GraphicsContext gc, double dieDim, int count) {
+        drawConstraintSpots(gc,0,0,dieDim,count);
+    }
     private void drawConstraintSpots(GraphicsContext gc,double xAxisDiePosition,double Y_axis_die_position,double dieDim, int count) {
         switch (count) {
             case 1:
@@ -669,25 +645,8 @@ public class GUIutil {
     }
 
     private void drawConstraintSpot(GraphicsContext gc, double x, double y, double dieDim) {
-        double spotDiameter = dieDim/SPOT_RATIO;
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(spotDiameter/5);
-        gc.fillOval(x - spotDiameter / 2, y - spotDiameter / 2, spotDiameter, spotDiameter);
-        gc.strokeOval(x - spotDiameter / 2, y - spotDiameter / 2, spotDiameter, spotDiameter);
+        drawConstraintSpot(gc,x,y,dieDim,0,0);
     }
-    private void drawSpot(GraphicsContext gc, double x, double y, double dieDim) {
-        double spotDiameter = dieDim/SPOT_RATIO;
-        gc.setFill(Color.BLACK);
-        gc.fillOval(x - spotDiameter / 2, y - spotDiameter / 2, spotDiameter, spotDiameter);
-    }
-
-    private void drawSpot(GraphicsContext gc, double x, double y,double dieDim,double xAxisDiePosition,double yAxisDiePosition) {
-        double spotDiameter = dieDim/SPOT_RATIO;
-        gc.setFill(Color.BLACK);
-        gc.fillOval(xAxisDiePosition +(x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
-    }
-
     private void drawConstraintSpot(GraphicsContext gc, double x, double y,double dieDim,double xAxisDiePosition,double yAxisDiePosition) {
         double spotDiameter = dieDim/SPOT_RATIO;
         gc.setFill(Color.WHITE);
@@ -696,6 +655,12 @@ public class GUIutil {
         gc.fillOval(xAxisDiePosition +(x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
         gc.strokeOval(xAxisDiePosition +(x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
     }
-
-
+    private void drawSpot(GraphicsContext gc, double x, double y, double dieDim) {
+        drawSpot(gc,x,y,dieDim,0,0);
+    }
+    private void drawSpot(GraphicsContext gc, double x, double y,double dieDim,double xAxisDiePosition,double yAxisDiePosition) {
+        double spotDiameter = dieDim/SPOT_RATIO;
+        gc.setFill(Color.BLACK);
+        gc.fillOval(xAxisDiePosition +(x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
+    }
 }
