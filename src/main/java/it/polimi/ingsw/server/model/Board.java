@@ -75,7 +75,7 @@ public class Board {
      */
     private ToolCard[] draftToolCards() {
         toolCards= new ToolCard[Board.NUM_TOOLS];
-        Random randomGen = new Random();
+       /* Random randomGen = new Random();
         List<Integer> draftedTools= new ArrayList<>();
         Integer id;
         for(int i =0; i<Board.NUM_TOOLS;i++){
@@ -84,10 +84,10 @@ public class Board {
             }while (draftedTools.contains(id));
             draftedTools.add(id);
             toolCards[i]=new ToolCard(id);
-        }
-        /*toolCards[0]=new ToolCard(2);
+        }*/
+        toolCards[0]=new ToolCard(1);
         toolCards[1]=new ToolCard(6);
-        toolCards[2]=new ToolCard(7);*/
+        toolCards[2]=new ToolCard(10);
         return toolCards;
     }
 
