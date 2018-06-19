@@ -5,7 +5,7 @@ import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.UserStatus;
-import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.common.serializables.*;
 
 import java.io.*;
 import java.net.Socket;

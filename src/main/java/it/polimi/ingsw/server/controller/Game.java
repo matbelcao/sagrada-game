@@ -1,8 +1,10 @@
 package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.common.enums.*;
-import it.polimi.ingsw.common.immutables.IndexedCellContent;
-import it.polimi.ingsw.common.immutables.LightPlayer;
+import it.polimi.ingsw.common.serializables.Event;
+import it.polimi.ingsw.common.serializables.IndexedCellContent;
+import it.polimi.ingsw.common.serializables.LightPlayer;
+import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
@@ -167,16 +169,16 @@ public class Game extends Thread implements Iterable  {
      * Notifies to the connected clients the ending of the current match
      */
     private void notifyGameEnd() {
-        List<LightPlayer> scores;
+        List<RankingEntry> ranking;
         if(fsm.getCurState().equals(ServerState.INIT)){
-            scores=board.gameInitEnd();
+            ranking=board.gameInitEnd();
         }else{
-            scores=board.gameRunningEnd();
+            ranking=board.gameRunningEnd();
         }
 
         for(User u:users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
-                u.getServerConn().notifyGameEnd(scores);
+                u.getServerConn().notifyGameEnd(ranking);
                 board.getPlayer(u).quitMatch();
                 u.closeConnection();
             }
@@ -189,7 +191,7 @@ public class Game extends Thread implements Iterable  {
     private void notifyRoundStart() {
         for(User u:users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
-                u.getServerConn().notifyRoundEvent("start", round.getRoundNumber());
+                u.getServerConn().notifyRoundEvent(Event.ROUND_START, round.getRoundNumber());
             }
         }
     }
@@ -200,7 +202,7 @@ public class Game extends Thread implements Iterable  {
     private void notifyRoundEnd() {
         for(User u:users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
-                u.getServerConn().notifyRoundEvent("end", round.getRoundNumber());
+                u.getServerConn().notifyRoundEvent(Event.ROUND_END, round.getRoundNumber());
             }
         }
     }
@@ -229,7 +231,7 @@ public class Game extends Thread implements Iterable  {
 
         //Notify to all the users the starting of the turn
         for(User u:users){
-            u.getServerConn().notifyTurnEvent("start",board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
+            u.getServerConn().notifyTurnEvent(Event.TURN_START,board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
         }
 
         timer = new Timer();
@@ -238,7 +240,7 @@ public class Game extends Thread implements Iterable  {
 
         //Notify to all the users the ending of the turn
         for(User u:users){
-            u.getServerConn().notifyTurnEvent("end",board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
+            u.getServerConn().notifyTurnEvent(Event.TURN_END,board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
         }
     }
 
@@ -545,7 +547,7 @@ public class Game extends Thread implements Iterable  {
     public void reconnectUser(User user){
         for(User u : users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)){
-                u.getServerConn().notifyStatusUpdate("reconnect",users.indexOf(user));
+                u.getServerConn().notifyStatusUpdate(Event.RECONNECT,users.indexOf(user));
             }
         }
         user.setStatus(UserStatus.PLAYING);
@@ -559,7 +561,7 @@ public class Game extends Thread implements Iterable  {
         user.setStatus(UserStatus.DISCONNECTED);
         for(User u : users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)){
-                u.getServerConn().notifyStatusUpdate("disconnect",users.indexOf(user));
+                u.getServerConn().notifyStatusUpdate(Event.DISCONNECT,users.indexOf(user));
             }
         }
         if((userPlaying!=null && userPlaying.equals(user))||getUsersActive()<=1){
@@ -576,7 +578,7 @@ public class Game extends Thread implements Iterable  {
         // add control for number of players still in the game...
         for(User u : users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)){
-                u.getServerConn().notifyStatusUpdate("quit",users.indexOf(user));
+                u.getServerConn().notifyStatusUpdate(Event.QUIT,users.indexOf(user));
             }
         }
         board.getPlayer(user).quitMatch();

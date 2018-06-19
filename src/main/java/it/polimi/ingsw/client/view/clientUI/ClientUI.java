@@ -1,8 +1,8 @@
 package it.polimi.ingsw.client.view.clientUI;
 
 import it.polimi.ingsw.common.connection.QueuedReader;
-import it.polimi.ingsw.common.immutables.LightPrivObj;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.common.serializables.LightPrivObj;
+import it.polimi.ingsw.common.serializables.LightSchemaCard;
 
 import java.io.File;
 import java.util.List;

@@ -1,14 +1,13 @@
 package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.common.enums.*;
-import it.polimi.ingsw.common.immutables.IndexedCellContent;
+import it.polimi.ingsw.common.serializables.IndexedCellContent;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.tools.Tool;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

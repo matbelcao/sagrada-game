@@ -1,4 +1,4 @@
-package it.polimi.ingsw.common.immutables;
+package it.polimi.ingsw.common.serializables;
 
 public class RankingEntry {
     private int playerId;

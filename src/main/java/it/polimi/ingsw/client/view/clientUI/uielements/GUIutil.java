@@ -4,7 +4,7 @@ import it.polimi.ingsw.client.clientController.CmdWriter;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.clientUI.GUI;
 import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.common.serializables.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;

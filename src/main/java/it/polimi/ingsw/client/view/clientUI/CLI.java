@@ -11,8 +11,8 @@ import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.immutables.LightPrivObj;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.common.serializables.LightPrivObj;
+import it.polimi.ingsw.common.serializables.LightSchemaCard;
 
 import java.io.BufferedReader;
 import java.io.Console;

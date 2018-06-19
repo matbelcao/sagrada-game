@@ -2,8 +2,10 @@ package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Commands;
-import it.polimi.ingsw.common.immutables.IndexedCellContent;
-import it.polimi.ingsw.common.immutables.LightPlayer;
+import it.polimi.ingsw.common.serializables.Event;
+import it.polimi.ingsw.common.serializables.IndexedCellContent;
+import it.polimi.ingsw.common.serializables.LightPlayer;
+import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.controller.Game;
 import it.polimi.ingsw.server.controller.Validator;
 import it.polimi.ingsw.server.model.*;
@@ -215,13 +217,13 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Sends the match ending message and the relative ranking  to the user
-     * @param players the player's list containing the data
+     * @param ranking the ranking for the game
      */
     @Override
-    public void notifyGameEnd(List<LightPlayer> players){
+    public void notifyGameEnd(List<RankingEntry> ranking){
         outSocket.print("GAME end");
-        for(LightPlayer p : players){
-            outSocket.print(" "+p.getPlayerId()+","+p.getPoints()+","+p.getFinalPosition());
+        for(RankingEntry e : ranking){
+            outSocket.print(" "+e.getPlayerId()+","+e.getPoints()+","+e.getFinalPosition());
         }
         outSocket.println("");
         outSocket.flush();
@@ -233,8 +235,8 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param roundNumber the round's number
      */
     @Override
-    public void notifyRoundEvent(String event,int roundNumber){
-        outSocket.println("GAME round_"+event+" "+roundNumber);
+    public void notifyRoundEvent(Event event, int roundNumber){
+        outSocket.println("GAME "+event.toString().toLowerCase()+" "+roundNumber);
         outSocket.flush();
     }
 
@@ -245,8 +247,8 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param turnNumber the turn number
      */
     @Override
-    public void notifyTurnEvent(String event,int playerId,int turnNumber){
-        outSocket.println("GAME turn_"+event+" "+playerId+" "+turnNumber);
+    public void notifyTurnEvent(Event event,int playerId,int turnNumber){
+        outSocket.println("GAME "+event.toString().toLowerCase()+" "+playerId+" "+turnNumber);
         outSocket.flush();
     }
 
@@ -256,14 +258,14 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param id the id of the interested user
      */
     @Override
-    public void notifyStatusUpdate (String event,int id){
-        outSocket.println("STATUS "+event+" "+id);
+    public void notifyStatusUpdate (Event event,int id){
+        outSocket.println("STATUS "+event.toString().toLowerCase()+" "+id);
         outSocket.flush();
     }
 
     @Override
     public void notifyBoardChanged(){
-        outSocket.println("GAME board_changed");
+        outSocket.println("GAME "+Event.BOARD_CHANGED.toString().toLowerCase());
         outSocket.flush();
     }
 

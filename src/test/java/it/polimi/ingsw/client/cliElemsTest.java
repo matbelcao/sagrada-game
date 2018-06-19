@@ -7,7 +7,7 @@ import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIElems;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
-import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.PrivObjectiveCard;
 import it.polimi.ingsw.server.model.PubObjectiveCard;

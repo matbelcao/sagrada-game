@@ -3,7 +3,7 @@ package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
-import it.polimi.ingsw.common.immutables.LightDie;
+import it.polimi.ingsw.common.serializables.LightDie;
 
 import java.io.File;
 import java.util.Random;

@@ -1,11 +1,13 @@
-package it.polimi.ingsw.common.immutables;
+package it.polimi.ingsw.common.serializables;
 
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.server.model.Die;
 
-public class IndexedCellContent {
+import java.io.Serializable;
+
+public class IndexedCellContent implements Serializable {
     private Place place;
     private int position;
     private CellContent content;
