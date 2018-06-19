@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.MAIN;
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.NOT_MY_TURN;
 
 public class GUIutil {
@@ -283,13 +284,23 @@ public class GUIutil {
             ArrayList<Canvas> cards = new ArrayList();
             for (LightCard pubObjCard : pubObjs){
                 cards.add(drawCard(pubObjCard,getCardWidth(),getCardHeight()));
+
             }
             cardContainer.getChildren().setAll(cards);
         });
-        tool.setOnAction(e->{
+        tool.setOnAction(e1->{
             ArrayList<Canvas> cards = new ArrayList();
             for (LightCard toolCard : tools) {
-                cards.add(drawCard(toolCard,getCardWidth(),getCardHeight()));
+                Canvas c = drawCard(toolCard,getCardWidth(),getCardHeight());
+                c.setOnMouseClicked(e2->{
+                    if(turnState.equals(MAIN)){
+                        cmdWrite.write("0");
+                        System.out.println(".................selected tool "+ tools.indexOf(toolCard)+"..........");
+                        cmdWrite.write(tools.indexOf(toolCard)+"");
+                    }
+
+                });
+                cards.add(c);
             }
             cardContainer.getChildren().setAll(cards);
         });
