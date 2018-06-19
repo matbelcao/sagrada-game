@@ -19,8 +19,10 @@ public class RMIServer implements ServerConn {
     }
 
     /**
-     * Notifies the client waiting in a lobby that the lobby has updated
-     * @param n lobby's current size
+     * The server notified to all players in the lobby after a successful login of a player that isn't reconnecting to a
+     * match he was previously playing. The message is sent again to all said players whenever there is a change in the
+     * number of the users in the lobby.
+     * @param n number of the players waiting in the lobby to begin a new match
      */
     @Override
     public void notifyLobbyUpdate(int n) {
@@ -33,9 +35,9 @@ public class RMIServer implements ServerConn {
     }
 
     /**
-     * Notifies the client that the game has started
-     * @param n the number of players playing the game
-     * @param id the client's identification number in the game
+     * Notifies that the game to which the user is playing is ready to begin
+     * @param n the number of players that are participating to the new match
+     * @param id the assigned number of the user receiving this notification
      */
     @Override
     public void notifyGameStart(int n, int id) {
@@ -46,6 +48,11 @@ public class RMIServer implements ServerConn {
         }
     }
 
+    /**
+     * The server notifies the end of a match and sends to each client a list of fields that represent the ranking of
+     * the match's players.
+     * @param ranking the List containing the ranking
+     */
     @Override
     public void notifyGameEnd(List<RankingEntry> ranking) {
         try {
@@ -55,6 +62,11 @@ public class RMIServer implements ServerConn {
         }
     }
 
+    /**
+     * This message is sent whenever a round is about to begin or has just ended.
+     * @param event the event that has occurred (start/end)
+     * @param roundNumber the number of the round (0 to 9)
+     */
     @Override
     public void notifyRoundEvent(Event event, int roundNumber) {
         try {
@@ -64,6 +76,12 @@ public class RMIServer implements ServerConn {
         }
     }
 
+    /**
+     * Notifies the beginning/ending of a turn
+     * @param event the event that has occurred (start/end)
+     * @param playerId the player's identifier (0 to 3)
+     * @param turnNumber the number of the turn within the single round (0 to 1)
+     */
     @Override
     public void notifyTurnEvent(Event event, int playerId, int turnNumber) {
         try {
@@ -73,6 +91,11 @@ public class RMIServer implements ServerConn {
         }
     }
 
+    /**
+     * Notifies to all connected users that the status of a certain player has been changed
+     * @param event the new status of the player (reconnect|disconnect|quit)
+     * @param id the id of the interested player
+     */
     @Override
     public void notifyStatusUpdate(Event event, int id) {
         try {
@@ -82,6 +105,9 @@ public class RMIServer implements ServerConn {
         }
     }
 
+    /**
+     * Notifies that some parameter in the board has changed. Triggers the update request of the receiving client
+     */
     @Override
     public void notifyBoardChanged() {
         try {
@@ -91,6 +117,9 @@ public class RMIServer implements ServerConn {
         }
     }
 
+    /**
+     * Closes the connection with the client
+     */
     @Override
     public void close() {
         try {
@@ -102,8 +131,8 @@ public class RMIServer implements ServerConn {
 
 
     /**
-     * Pings the client invoking a remote method
-     * @ truee iff the remote call doesn't throw an exception, therefore the connession between client and server is still up
+     * Tests if the client is still connected
+     * @return true if the client is connected
      */
     @Override
     public boolean ping(){

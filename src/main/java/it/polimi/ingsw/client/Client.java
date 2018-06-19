@@ -491,19 +491,6 @@ public class Client {
 
     public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
         board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
-        board.getPlayerById(playerTurnId)
-                .setFavorTokens(clientConn.getFavorTokens(playerTurnId));
-
-        List<LightTool> tools=clientConn.getTools();
-
-        for(int i=0;i<LightBoard.NUM_TOOLS;i++) {
-            if (!board.getTools()
-                    .get(i)
-                    .isUsed()) {
-                board.getTools()
-                        .set(i, tools.get(i));
-            }
-        }
 
         board.notifyObservers();
 

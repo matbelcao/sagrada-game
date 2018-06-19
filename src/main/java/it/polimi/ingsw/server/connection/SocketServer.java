@@ -80,6 +80,9 @@ public class SocketServer extends Thread implements ServerConn  {
         }
     }
 
+    /**
+     * Closes the connection with the client
+     */
     @Override
     public void close(){
         connectionOk=false;
@@ -94,7 +97,8 @@ public class SocketServer extends Thread implements ServerConn  {
         try {
             switch (parsedResult.get(0)) {
                 case "GAME":
-                    gameCommand(parsedResult);
+                    if(!user.isMyTurn()){ throw new IllegalActionException(); }
+                    user.getGame().startFlow();
                     break;
                 case "GET":
                     getCommands(parsedResult);
@@ -140,15 +144,6 @@ public class SocketServer extends Thread implements ServerConn  {
         return true;
     }
 
-    private void gameCommand(ArrayList<String> parsedResult) throws IllegalActionException {
-        if (parsedResult.get(1).equals("end_turn")) {
-            if(!user.isMyTurn()){
-                throw new IllegalActionException();
-            }
-            user.getGame().startFlow();
-        }
-    }
-
     private void toolCommand(ArrayList<String> parsedResult) throws IllegalActionException {
         if(!user.isMyTurn()){throw new IllegalActionException();}
         if ("enable".equals(parsedResult.get(1))) {
@@ -192,8 +187,10 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the lobby update message to the user
-     * @param n the number of players in the lobby
+     * The server notified to all players in the lobby after a successful login of a player that isn't reconnecting to a
+     * match he was previously playing. The message is sent again to all said players whenever there is a change in the
+     * number of the users in the lobby.
+     * @param n number of the players waiting in the lobby to begin a new match
      */
     @Override
     public void notifyLobbyUpdate(int n){
@@ -202,9 +199,9 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the match starting message to the user
-     * @param n the number of connected players
-     * @param id the assigned id of the specific user
+     * Notifies that the game to which the user is playing is ready to begin
+     * @param n the number of players that are participating to the new match
+     * @param id the assigned number of the user receiving this notification
      */
     @Override
     public void notifyGameStart(int n,int id){
@@ -213,8 +210,9 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the match ending message and the relative ranking  to the user
-     * @param ranking the ranking for the game
+     * The server notifies the end of a match and sends to each client a list of fields that represent the ranking of
+     * the match's players.
+     * @param ranking the List containing the ranking
      */
     @Override
     public void notifyGameEnd(List<RankingEntry> ranking){
@@ -227,9 +225,9 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the round starting/ending message to the user
-     * @param event the round's event string: "start" or "end"
-     * @param roundNumber the round's number
+     * This message is sent whenever a round is about to begin or has just ended.
+     * @param event the event that has occurred (start/end)
+     * @param roundNumber the number of the round (0 to 9)
      */
     @Override
     public void notifyRoundEvent(Event event, int roundNumber){
@@ -238,10 +236,10 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Sends the turn starting/ending message to the user
-     * @param event the turns's event string: "start" or "end"
-     * @param playerId the involved player's ID
-     * @param turnNumber the turn number
+     * Notifies the beginning/ending of a turn
+     * @param event the event that has occurred (start/end)
+     * @param playerId the player's identifier (0 to 3)
+     * @param turnNumber the number of the turn within the single round (0 to 1)
      */
     @Override
     public void notifyTurnEvent(Event event,int playerId,int turnNumber){
@@ -250,9 +248,9 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Notifies the client of a user's status change
-     * @param event the event happened
-     * @param id the id of the interested user
+     * Notifies to all connected users that the status of a certain player has been changed
+     * @param event the new status of the player (reconnect|disconnect|quit)
+     * @param id the id of the interested player
      */
     @Override
     public void notifyStatusUpdate (Event event,int id){
@@ -260,6 +258,9 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
+    /**
+     * Notifies that some parameter in the board has changed. Triggers the update request of the receiving client
+     */
     @Override
     public void notifyBoardChanged(){
         outSocket.println("GAME "+Event.BOARD_CHANGED.toString().toLowerCase());
@@ -464,6 +465,11 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
+    /**
+     * Notifies the server that the user wants to enable a ToolCard and sends the result to the client
+     * @param toolIndex the index of the tool to enable
+     * @throws IllegalActionException
+     */
     private void toolEnable(int toolIndex) throws IllegalActionException {
         Boolean used;
         used=user.getGame().activeTool(toolIndex);
@@ -475,6 +481,10 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
+    /**
+     * Recalls to the controller if the execution of the toolcard is terminated and sends the response to the client
+     * @throws IllegalActionException
+     */
     private void toolCanContinue() throws IllegalActionException {
         Boolean isActive=null;
         isActive=user.getGame().toolStatus();
@@ -526,6 +536,10 @@ public class SocketServer extends Thread implements ServerConn  {
         }
     }
 
+    /**
+     * Tests if the client is still connected
+     * @return true if the client is connected
+     */
     @Override
     public boolean ping() {
         List<String> result= new ArrayList<>();

@@ -18,11 +18,12 @@ public class RMIClient implements ClientConn{
         this.client = client;
     }
 
-    @Override
-    public boolean login(String username, char[] password) {
-        return false;
-    }
-
+    /**
+     * This function can be invoked to request the updated schema card or the complete schema card (in case of reconnection
+     * or if it’s the beginning of the first round).The draft option makes the server send the four schema cards the user
+     * has to choose from.
+     * @return the list of four schema cards immutable objects
+     */
     @Override
     public List<LightSchemaCard> getSchemaDraft() {
         List <LightSchemaCard>result = null;
@@ -34,6 +35,12 @@ public class RMIClient implements ClientConn{
         return result;
     }
 
+    /**
+     * This function can be invoked to request the updated schema card or the complete schema card (in case of reconnection
+     * or if it’s the beginning of the first round) of a scecific user.
+     * @param playerId the id of the player's desired schema card
+     * @return one schema card immutable object
+     */
     @Override
     public LightSchemaCard getSchema(int playerId) {
         LightSchemaCard schema=null;
@@ -45,6 +52,10 @@ public class RMIClient implements ClientConn{
         return schema;
     }
 
+    /**
+     * This function can be invoked to request the private objective card parameters
+     * @return one private objective card immutable object
+     */
     @Override
     public LightPrivObj getPrivateObject() {
         LightPrivObj card = null;
@@ -56,6 +67,10 @@ public class RMIClient implements ClientConn{
         return card;
     }
 
+    /**
+     * This function can be invoked to request the three public objective cards parameters
+     * @return a list of three public objective cards immutable objects
+     */
     @Override
     public List<LightCard> getPublicObjects() {
         List<LightCard> result = null;
@@ -67,6 +82,10 @@ public class RMIClient implements ClientConn{
         return result;
     }
 
+    /**
+     * This function can be invoked to request the three toolcards parameters
+     * @return a list of three toolcards immutable objects
+     */
     @Override
     public List<LightTool> getTools() {
         List<LightTool> result = null;
@@ -78,6 +97,10 @@ public class RMIClient implements ClientConn{
         return result;
     }
 
+    /**
+     * This function can be invoked to request the dice in the draftpool
+     * @return a list of immutable dice contained in the draftpool
+     */
     @Override
     public List<LightDie> getDraftPool() {
         List<LightDie> draftPool = null;
@@ -89,6 +112,10 @@ public class RMIClient implements ClientConn{
         return draftPool;
     }
 
+    /**
+     * This function can be invoked to request the dice in the roundtrack
+     * @return a list of immutable dice contained in the roundtrack
+     */
     @Override
     public List<List<LightDie>> getRoundtrack() {
         List<List<LightDie>> roundTrack=null;
@@ -101,6 +128,10 @@ public class RMIClient implements ClientConn{
 
     }
 
+    /**
+     * The client invokes this function to request the list of players of the match
+     * @return a list of immutable players that are playing the match
+     */
     @Override
     public List<LightPlayer> getPlayers() {
         List<LightPlayer> players = null;
@@ -112,6 +143,11 @@ public class RMIClient implements ClientConn{
         return players;
     }
 
+    /**
+     * This function can be invoked to get the number of tokens remaining to the specified player.
+     * @param playerId the id of the player (0 to 3)
+     * @return the number of favor tokens of the specific player
+     */
     @Override
     public int getFavorTokens(int playerId) {
         int favorTokens = 0;
@@ -123,6 +159,11 @@ public class RMIClient implements ClientConn{
         return favorTokens;
     }
 
+    /**
+     * This function can be invoked to obtain an immutable and indexed list containing the information about the dice placed
+     * in the actual selected element (schema,draftpool,roundtrack....)
+     * @return an immutable and indexed list containing the dice
+     */
     @Override
     public List<IndexedCellContent> getDiceList() {
         List<IndexedCellContent> diceList=null;
@@ -134,17 +175,28 @@ public class RMIClient implements ClientConn{
         return diceList;
     }
 
+    /**
+     * This function can be invoked to select one die of a previolsly SELECT_DIE command and obtain
+     * a list of to options to manipulate it
+     * @param dieIndex the index of the die to select
+     * @return and immutable and indexed list containing the dice
+     */
     @Override
-    public List<Actions> select(int die_index) {
+    public List<Actions> select(int dieIndex) {
         List<Actions> options=null;
         try{
-            options = remoteObj.select(die_index);
+            options = remoteObj.select(dieIndex);
         }catch(RemoteException | IllegalActionException e){
             e.printStackTrace();
         }
         return options;
     }
 
+    /**
+     * This function can be invoked by the client to request the list of possible placements of a die (that is
+     * temporarily selected by the user) in his schema card
+     * @return an immutable and indexed list of possible placements
+     */
     @Override
     public List<Integer> getPlacementsList() {
         List<Integer> placements=null;
@@ -156,26 +208,42 @@ public class RMIClient implements ClientConn{
         return placements;
     }
 
+    /**
+     *  This function can be invoked to notify the server in order to make a possibly definitive choice. The server is
+     *  still going to do his checks and will reply.
+     * @param optionIndex the index of the object in the list previously sent by the server
+     * @return true if the procedure is successful
+     */
     @Override
-    public boolean choose(int index) {
+    public boolean choose(int optionIndex) {
         try{
-            return remoteObj.choose(index);
+            return remoteObj.choose(optionIndex);
         }catch(RemoteException | IllegalActionException e){
             e.printStackTrace();
         }
         return false;
     }
 
+    /**
+     * This function can be invoked to notify the server the intenction to select a tool car. The server is
+     * still going to do his checks and will reply.
+     * @param toolIndex the index of the toolcard the user wants to use
+     * @return true iff the toolcard has been activated
+     */
     @Override
-    public boolean enableTool(int tool_index) {
+    public boolean enableTool(int toolIndex) {
         try{
-            return remoteObj.enableTool(tool_index);
+            return remoteObj.enableTool(toolIndex);
         }catch(RemoteException | IllegalActionException e){
             e.printStackTrace();
         }
         return false;
     }
 
+    /**
+     * This function is invoked by the client to know if the toolcard's execution flow is still active
+     * @return true iff the toolcard is active
+     */
     @Override
     public boolean toolCanContinue() {
         try{
@@ -186,6 +254,9 @@ public class RMIClient implements ClientConn{
         return false;
     }
 
+    /**
+     * This function can be invoked to notify the server in case the client wants to end his turn before the timer goes off.
+     */
     @Override
     public void endTurn() {
         try {
@@ -195,6 +266,10 @@ public class RMIClient implements ClientConn{
         }
     }
 
+    /**
+     * This message is sent to the server when the client that received a list of possible placement for a die chooses
+     * not to place that die
+     */
     @Override
     public void discard() {
         try {
@@ -204,6 +279,9 @@ public class RMIClient implements ClientConn{
         }
     }
 
+    /**
+     * This message is sent to the server when the client wants to stop using a toolcard before it ends
+     */
     @Override
     public void back() {
         try {
@@ -216,7 +294,7 @@ public class RMIClient implements ClientConn{
     }
 
     /**
-     * Tells the server the client is quitting the game
+     * This method tells the server the end of the session
      */
     @Override
     public void quit() {
@@ -227,8 +305,20 @@ public class RMIClient implements ClientConn{
         }
     }
 
+    /**
+     * This method provides the ping functionality for the client-side hearthBreath thread
+     * @return false iff the connection has broken
+     */
     @Override
     public boolean pong() {
+        return false;
+    }
+
+    /*
+     *  Disabled for RMI
+     */
+    @Override
+    public boolean login(String username, char[] password) {
         return false;
     }
 

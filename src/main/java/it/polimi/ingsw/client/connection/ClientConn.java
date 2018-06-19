@@ -85,9 +85,10 @@ public interface ClientConn {
     /**
      * This function can be invoked to select one die of a previolsly SELECT_DIE command and obtain
      * a list of to options to manipulate it
+     * @param dieIndex the index of the die to select
      * @return and immutable and indexed list containing the dice
      */
-    List<Actions> select(int die_index);
+    List<Actions> select(int dieIndex);
 
     /**
      * This function can be invoked by the client to request the list of possible placements of a die (that is
@@ -97,20 +98,20 @@ public interface ClientConn {
     List<Integer> getPlacementsList();
 
     /**
-     *  This function can be invoked to notify the server in order to make a possibly definitive choice. The server is
-     *  still going to do his checks and will reply.
-     * @param option_index the index of the object in the list previously sent by the server
+     * This function can be invoked to notify the server in order to make a possibly definitive choice. The server is
+     * still going to do his checks and will reply.
+     * @param optionIndex the index of the object in the list previously sent by the server
      * @return true if the procedure is successful
      */
-    boolean choose(int option_index);
+    boolean choose(int optionIndex);
 
     /**
      *  This function can be invoked to notify the server the intenction to select a tool car. The server is
      *  still going to do his checks and will reply.
-     * @param tool_index the index of the toolcard the user wants to use
+     * @param toolIndex the index of the toolcard the user wants to use
      * @return true iff the toolcard has been activated
      */
-    boolean enableTool(int tool_index);
+    boolean enableTool(int toolIndex);
 
     /**
      * This function is invoked by the client to know if the toolcard's execution flow is still active

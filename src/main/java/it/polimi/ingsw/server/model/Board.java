@@ -170,11 +170,6 @@ public class Board {
             }
         }
 
-        System.out.println("--------------------");
-        for(SchemaCard s: schemaDrafted){
-            System.out.println(s.getName());
-        }
-
         return schemaDrafted;
     }
 
