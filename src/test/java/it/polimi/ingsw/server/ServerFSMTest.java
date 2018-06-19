@@ -1,11 +1,10 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.server.model.ServerFSM;
 import it.polimi.ingsw.server.model.ToolCard;
 import it.polimi.ingsw.server.model.enums.ServerState;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,24 +19,24 @@ public class ServerFSMTest {
         assertEquals(Place.DRAFTPOOL,fsm.getPlaceFrom());
         assertEquals(Place.SCHEMA,fsm.getPlaceTo());
 
-        state=fsm.nextState(Commands.NONE);
+        state=fsm.nextState(Actions.NONE);
         assertEquals(ServerState.MAIN,state);
-        state=fsm.nextState(Commands.NONE);
-        state=fsm.nextState(Commands.NONE);
-        state=fsm.nextState(Commands.NONE);
-        state=fsm.nextState(Commands.PLACE_DIE);
+        state=fsm.nextState(Actions.NONE);
+        state=fsm.nextState(Actions.NONE);
+        state=fsm.nextState(Actions.NONE);
+        state=fsm.nextState(Actions.PLACE_DIE);
         assertEquals(ServerState.GET_PLACEMENTS,state);
-        state=fsm.nextState(Commands.PLACE_DIE);
-        state=fsm.nextState(Commands.PLACE_DIE);
+        state=fsm.nextState(Actions.PLACE_DIE);
+        state=fsm.nextState(Actions.PLACE_DIE);
         assertEquals(ServerState.MAIN,state);
 
-        state=fsm.nextState(Commands.NONE);
-        state=fsm.nextState(Commands.NONE);
-        state=fsm.nextState(Commands.NONE);
-        state=fsm.nextState(Commands.PLACE_DIE);
+        state=fsm.nextState(Actions.NONE);
+        state=fsm.nextState(Actions.NONE);
+        state=fsm.nextState(Actions.NONE);
+        state=fsm.nextState(Actions.PLACE_DIE);
         assertEquals(ServerState.GET_PLACEMENTS,state);
 
-        state=fsm.nextState(Commands.PLACE_DIE);
+        state=fsm.nextState(Actions.PLACE_DIE);
         state=fsm.fsmDiscard();
         assertEquals(ServerState.GET_DICE_LIST,state);
 
@@ -46,10 +45,10 @@ public class ServerFSMTest {
         assertEquals(0,fsm.getNumDiePlaced());
         fsm.placeDie();
         assertEquals(1,fsm.getNumDiePlaced());
-        state=fsm.nextState(Commands.NONE);
-        state=fsm.nextState(Commands.NONE);
+        state=fsm.nextState(Actions.NONE);
+        state=fsm.nextState(Actions.NONE);
         assertEquals(ServerState.MAIN,state);
-        state=fsm.nextState(Commands.NONE);
+        state=fsm.nextState(Actions.NONE);
         assertEquals(ServerState.MAIN,state);
     }
 
@@ -61,7 +60,7 @@ public class ServerFSMTest {
 
         assertEquals(Place.DRAFTPOOL,fsm.getPlaceFrom());
         assertEquals(Place.SCHEMA,fsm.getPlaceTo());
-        state=fsm.nextState(Commands.NONE);
+        state=fsm.nextState(Actions.NONE);
         assertEquals(ServerState.MAIN,state);
 
         fsm.newToolUsage(tool);
@@ -71,21 +70,21 @@ public class ServerFSMTest {
         assertEquals(Place.SCHEMA,fsm.getPlaceTo());
         assertTrue(fsm.isToolActive());
 
-        state=fsm.nextState(Commands.NONE);
-        state=fsm.nextState(Commands.NONE);
+        state=fsm.nextState(Actions.NONE);
+        state=fsm.nextState(Actions.NONE);
         assertEquals(ServerState.CHOOSE_OPTION,state);
-        state=fsm.nextState(Commands.REROLL);
+        state=fsm.nextState(Actions.REROLL);
         assertEquals(ServerState.TOOL_CAN_CONTINUE,state);
-        state=fsm.nextState(Commands.NONE);
+        state=fsm.nextState(Actions.NONE);
         assertEquals(ServerState.GET_DICE_LIST,state);
-        state=fsm.nextState(Commands.NONE);
-        state=fsm.nextState(Commands.NONE);
+        state=fsm.nextState(Actions.NONE);
+        state=fsm.nextState(Actions.NONE);
         assertEquals(ServerState.CHOOSE_OPTION,state);
-        state=fsm.nextState(Commands.PLACE_DIE);
-        state=fsm.nextState(Commands.PLACE_DIE);
-        state=fsm.nextState(Commands.PLACE_DIE);
+        state=fsm.nextState(Actions.PLACE_DIE);
+        state=fsm.nextState(Actions.PLACE_DIE);
+        state=fsm.nextState(Actions.PLACE_DIE);
         assertEquals(ServerState.TOOL_CAN_CONTINUE,state);
-        state=fsm.nextState(Commands.NONE);
+        state=fsm.nextState(Actions.NONE);
         assertEquals(ServerState.GET_DICE_LIST,state);
 
 

@@ -3,7 +3,7 @@ package it.polimi.ingsw.client.connection;
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
 
@@ -562,9 +562,9 @@ public class SocketClient implements ClientConn {
      * @return and immutable and indexed list containing the dice
      */
     @Override
-    public List<Commands> select(int dieIndex){
+    public List<Actions> select(int dieIndex){
         ArrayList<String> result= new ArrayList<>();
-        List<Commands> options=new ArrayList<>();
+        List<Actions> options=new ArrayList<>();
 
         outSocket.println("SELECT "+dieIndex);
         outSocket.flush();
@@ -584,7 +584,7 @@ public class SocketClient implements ClientConn {
         }
         for(int i=LIST_START;i<result.size();i++) {
             String [] opt=result.get(i).split(",");
-            options.add(Commands.valueOf(opt[1]));
+            options.add(Actions.valueOf(opt[1]));
         }
 
         return options;
@@ -728,8 +728,8 @@ public class SocketClient implements ClientConn {
      * This message is sent to the server when the client wants to stop using a toolcard before it ends
      */
     @Override
-    public void exit(){
-        outSocket.println("EXIT");
+    public void back(){
+        outSocket.println("BACK");
         outSocket.flush();
     }
 

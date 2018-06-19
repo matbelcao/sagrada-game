@@ -3,8 +3,9 @@ package it.polimi.ingsw.common.serializables;
 import it.polimi.ingsw.server.model.Card;
 
 import java.io.File;
+import java.io.Serializable;
 
-public class LightCard {
+public class LightCard implements Serializable {
     private String name;
     private String description;
     private static final String imgSrc="src"+ File.separator+"img"+File.separator+"PubObjectiveCard"+File.separator;

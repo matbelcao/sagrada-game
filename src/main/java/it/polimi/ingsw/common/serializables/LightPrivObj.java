@@ -4,10 +4,12 @@ import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.server.model.PrivObjectiveCard;
 
 import java.io.File;
+import java.io.Serializable;
 
-public class LightPrivObj extends LightCard {
+public class LightPrivObj extends LightCard implements Serializable {
     private Color color;
     private static String imgSrc="src"+ File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator;
+
     public LightPrivObj(String name, String description, int id, Color color) {
         super(name, description, id);
         this.color = color;

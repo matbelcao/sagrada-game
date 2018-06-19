@@ -4,7 +4,9 @@ import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.Constraint;
 
-public class LightConstraint implements CellContent {
+import java.io.Serializable;
+
+public class LightConstraint implements CellContent,Serializable {
     private Color color;
     private Shade shade;
     private boolean isColorConstraint;

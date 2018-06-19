@@ -1,11 +1,8 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
-import it.polimi.ingsw.common.enums.Commands;
-import it.polimi.ingsw.common.serializables.Event;
-import it.polimi.ingsw.common.serializables.IndexedCellContent;
-import it.polimi.ingsw.common.serializables.LightPlayer;
-import it.polimi.ingsw.common.serializables.RankingEntry;
+import it.polimi.ingsw.common.enums.Actions;
+import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.controller.Game;
 import it.polimi.ingsw.server.controller.Validator;
 import it.polimi.ingsw.server.model.*;
@@ -124,9 +121,9 @@ public class SocketServer extends Thread implements ServerConn  {
                     if (!user.isMyTurn()) { throw new IllegalActionException(); }
                     user.getGame().discard();
                     break;
-                case "EXIT":
+                case "BACK":
                     if (!user.isMyTurn()) { throw new IllegalActionException(); }
-                    user.getGame().exit(true);
+                    user.getGame().back(true);
                     break;
                 case "QUIT":
                     user.quit();
@@ -273,19 +270,17 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text description of the four drafted schema card passed as a parameter
      */
     private void draftSchemaCards() throws IllegalActionException {
-        Cell cell;
         Game game= user.getGame();
-        ArrayList<SchemaCard> schemas=(ArrayList<SchemaCard>) game.getDraftedSchemaCards(user);
+        List<LightSchemaCard> lightSchemas=game.getDraftedSchemaCards(user);
 
-        for(SchemaCard s: schemas){
+        for(LightSchemaCard s: lightSchemas){
             outSocket.print("SEND schema "+s.getName().replaceAll(" ","_")+" "+s.getFavorTokens());
             for (int index=0; index < SchemaCard.NUM_ROWS*SchemaCard.NUM_COLS ; index++) {
-                cell = s.getCell(index);
-                if (cell.hasConstraint()) {
-                    outSocket.print(" C,"+index+"," + cell.getConstraint().toString());
+                if (s.hasConstraintAt(index)) {
+                    outSocket.print(" C,"+index+"," + s.getConstraintAt(index).toString());
                 }
-                if (cell.hasDie()) {
-                    outSocket.print(" D,"+index+"," + cell.getDie().getColor().toString() + "," + cell.getDie().getShade().toString());
+                if (s.hasDieAt(index)) {
+                    outSocket.print(" D,"+index+"," + s.getDieAt(index).getColor().toString() + "," + s.getDieAt(index).getShade().toString());
                 }
             }
             outSocket.println("");
@@ -298,16 +293,14 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param playerId the Id of the requested player's schema card
      */
     private void sendUserSchemaCard(int playerId) throws IllegalActionException {
-        Cell cell;
-        SchemaCard schemaCard = user.getGame().getUserSchemaCard(playerId);
+        LightSchemaCard lightSchema = user.getGame().getUserSchemaCard(playerId);
 
-        outSocket.print("SEND schema "+schemaCard.getName().replaceAll(" ","_")+" "+schemaCard.getFavorTokens());
+        outSocket.print("SEND schema "+lightSchema.getName().replaceAll(" ","_")+" "+lightSchema.getFavorTokens());
         for (int index=0; index < SchemaCard.NUM_ROWS*SchemaCard.NUM_COLS ; index++) {
-            cell = schemaCard.getCell(index);
-            if (cell.hasDie()) {
-                outSocket.print(" D," + index + "," + cell.getDie().getColor().toString() + "," + cell.getDie().getShade().toString());
-            }else if (cell.hasConstraint()) {
-                outSocket.print(" C," + index + "," + cell.getConstraint().toString());
+            if (lightSchema.hasDieAt(index)) {
+                outSocket.print(" D," + index + "," + lightSchema.getDieAt(index).getColor().toString() + "," + lightSchema.getDieAt(index).getShade().toString());
+            }else if (lightSchema.hasConstraintAt(index)) {
+                outSocket.print(" C," + index + "," + lightSchema.getConstraintAt(index).toString());
             }
         }
         outSocket.println("");
@@ -327,7 +320,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text description of the private objective card
      */
     private void sendPrivateObjectiveCard(){
-        PrivObjectiveCard privObjectiveCard=user.getGame().getPrivCard(user);
+        LightPrivObj privObjectiveCard=user.getGame().getPrivCard(user);
 
         outSocket.println("SEND priv "+privObjectiveCard.getId()+" "+privObjectiveCard.getName().replaceAll(" ", "_")
                 +" "+privObjectiveCard.getDescription().replaceAll(" ", "_")+" "+privObjectiveCard.getColor().toString());
@@ -338,9 +331,9 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text description of the public objective card
      */
     private void sendPublicObjectiveCards(){
-        ArrayList<PubObjectiveCard> pubObjectiveCards= (ArrayList<PubObjectiveCard>) user.getGame().getPubCards();
+        List<LightCard> pubObjectiveCards= user.getGame().getPubCards();
 
-        for(PubObjectiveCard p:pubObjectiveCards){
+        for(LightCard p:pubObjectiveCards){
             outSocket.println("SEND pub "+p.getId()+" "+p.getName().replaceAll(" ", "_")+" "+p.getDescription().replaceAll(" ", "_"));
             outSocket.flush();
         }
@@ -350,10 +343,10 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text description of the tool card passed as a parameter
      */
     private void sendToolCards(){
-        ArrayList<ToolCard> toolCards= (ArrayList<ToolCard>) user.getGame().getToolCards();
+        List<LightTool> toolCards= user.getGame().getToolCards();
 
-        for (ToolCard t:toolCards){
-            outSocket.println("SEND tool "+t.getId()+" "+t.getName().replaceAll(" ", "_")+" "+t.getDescription().replaceAll(" ", "_") +" "+t.isAlreadyUsed());
+        for (LightTool t:toolCards){
+            outSocket.println("SEND tool "+t.getId()+" "+t.getName().replaceAll(" ", "_")+" "+t.getDescription().replaceAll(" ", "_") +" "+t.isUsed());
             outSocket.flush();
         }
     }
@@ -363,12 +356,11 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void sendDraftPoolDice() throws IllegalActionException {
         Die die;
-        ArrayList<Die> dice= (ArrayList<Die>) user.getGame().getDraftedDice();
+        List<LightDie> draftPool= user.getGame().getDraftedDice();
 
         outSocket.print("SEND draftpool");
-        for (int i=0;i<dice.size();i++){
-            die=dice.get(i);
-            outSocket.print(" "+i+","+die.getColor().toString()+","+die.getShade().toString());
+        for (int i=0;i<draftPool.size();i++){
+            outSocket.print(" "+i+","+draftPool.get(i).getColor().toString()+","+draftPool.get(i).getShade().toString());
         }
         outSocket.println("");
         outSocket.flush();
@@ -379,13 +371,13 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a textual list of the dice in the RoundTrack (can be placed multiple die at the same index)
      */
     private void sendRoundTrackDice() throws IllegalActionException {
-        List<List<Die>> trackList = user.getGame().getRoundTrackDice();
-        ArrayList<Die> dieList;
+        List<List<LightDie>> trackList = user.getGame().getRoundTrackDice();
+        List<LightDie> dieList;
 
         outSocket.print("SEND roundtrack");
         for(int i=0;i<trackList.size();i++){
-            dieList= (ArrayList<Die>) trackList.get(i);
-            for(Die d:dieList){
+            dieList= trackList.get(i);
+            for(LightDie d:dieList){
                 outSocket.print(" "+i+","+d.getColor().toString()+","+d.getShade().toString());
             }
         }
@@ -398,11 +390,11 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a text description of the users that are currently playing in the match
      */
     private void sendPlayers(){
-        ArrayList<Player> players= (ArrayList<Player>) user.getGame().getPlayers();
+        List<LightPlayer> players= user.getGame().getPlayers();
 
         outSocket.print("SEND players");
-        for (Player p:players){
-            outSocket.print(" "+p.getGameId()+","+p.getUsername());
+        for (LightPlayer p:players){
+            outSocket.print(" "+p.getPlayerId()+","+p.getUsername());
         }
         outSocket.println("");
         outSocket.flush();
@@ -446,7 +438,7 @@ public class SocketServer extends Thread implements ServerConn  {
      * @param dieIndex the index of the die previously received by the client
      */
     private void selectDie(int dieIndex) throws IllegalActionException {
-        List<Commands> options = user.getGame().selectDie(dieIndex);
+        List<Actions> options = user.getGame().selectDie(dieIndex);
 
         outSocket.print("LIST_OPTIONS");
         for(int i=0;i<options.size();i++){

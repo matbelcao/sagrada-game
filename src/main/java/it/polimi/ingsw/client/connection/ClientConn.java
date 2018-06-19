@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;
 
 import java.rmi.RemoteException;
@@ -87,7 +87,7 @@ public interface ClientConn {
      * a list of to options to manipulate it
      * @return and immutable and indexed list containing the dice
      */
-    List<Commands> select(int die_index);
+    List<Actions> select(int die_index);
 
     /**
      * This function can be invoked by the client to request the list of possible placements of a die (that is
@@ -132,7 +132,7 @@ public interface ClientConn {
     /**
      * This message is sent to the server when the client wants to stop using a toolcard before it ends
      */
-    void exit();
+    void back();
 
     /**
      * This method tells the server the end of the session
