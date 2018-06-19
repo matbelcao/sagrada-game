@@ -6,11 +6,14 @@ import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
+import it.polimi.ingsw.server.connection.SocketServer;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * This class is the implementation of the SOCKET client-side connection methods
@@ -26,6 +29,8 @@ public class SocketClient implements ClientConn {
     private PrintWriter outSocket;
     private Client client;
     private final Object lockin=new Object();
+    private Timer pingTimer;
+    private final Object pingLock=new Object();
 
     /**
      * Thi is the class constructor, it instantiates the new socket and the input/output buffers for the communications
@@ -745,9 +750,29 @@ public class SocketClient implements ClientConn {
         try{
             outSocket.println("PONG");
             outSocket.flush();
+            synchronized (pingLock) {
+                pingTimer.cancel();
+                pingTimer = new Timer();
+                pingTimer.schedule(new connectionTimeout(), 5100);
+                pingLock.notifyAll();
+            }
         } catch (Exception e) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Timeot connection
+     */
+    private class connectionTimeout extends TimerTask {
+        @Override
+        public void run(){
+            synchronized (pingLock) {
+                System.out.println("CONNECTION TIMEOUT!");
+                    quit();
+                    pingLock.notifyAll();
+            }
+        }
     }
 }

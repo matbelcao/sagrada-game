@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * This test class performs general tests on the constructor and the getter and setter methods of the User class
+ */
 public class UserTest {
 
     @Test

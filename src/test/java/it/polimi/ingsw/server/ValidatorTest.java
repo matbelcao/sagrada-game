@@ -7,10 +7,17 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This test class aims to verify the correct recognition by the parser of the strings entering the socket, and to
+ * discard those with an incorrect syntax
+ */
 public class ValidatorTest {
     private static ArrayList<String> parsedResult = new ArrayList<>();
     private static String command;
 
+    /**
+     * Checks if the LOGIN message syntax is correct
+     */
     @Test
     public void testCheckLogin(){
         String keyword;
@@ -35,6 +42,10 @@ public class ValidatorTest {
         assertFalse(Validator.isValid("   LOGIN    , ,,MR     ",parsedResult));
         assertTrue(parsedResult.isEmpty());
     }
+
+    /**
+     * Checks if the GET message syntax is correct
+     */
     @Test
     public void testCheckGetSchema(){
         String keyword;
@@ -87,6 +98,9 @@ public class ValidatorTest {
 
     }
 
+    /**
+     * Checks if the SELECT message syntax is correct
+     */
     @Test
     public void testCheckSelect(){
 
@@ -105,6 +119,9 @@ public class ValidatorTest {
         assertFalse(Validator.isValid(command,parsedResult));
     }
 
+    /**
+     * Checks if the PONG message syntax is correct
+     */
     @Test
     public void testCheckPong(){
         command= "     PONG  ";
@@ -117,7 +134,9 @@ public class ValidatorTest {
         assertFalse(Validator.isValid(command,parsedResult));
     }
 
-
+    /**
+     * Checks if the CHOOSE message syntax is correct
+     */
     @Test
     public void testCheckChoose() {
 
@@ -146,12 +165,18 @@ public class ValidatorTest {
 
     }
 
+    /**
+     * Checks if the GET_PLACEMENTS_LIST message syntax is correct
+     */
     @Test
     public void testGetPlacementsList(){
         assertTrue(Validator.isValid("GET_PLACEMENTS_LIST", parsedResult));
         assertEquals("GET_PLACEMENTS_LIST",parsedResult.get(0));
     }
 
+    /**
+     * Tests some cases of username not valid
+     */
     @Test
     public void testIsValidUsername(){
         assertTrue(Validator.isValidUsername("luca"));

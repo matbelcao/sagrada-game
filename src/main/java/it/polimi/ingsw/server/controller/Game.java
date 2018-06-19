@@ -168,17 +168,15 @@ public class Game extends Thread implements Iterable  {
      */
     private void notifyGameEnd() {
         List<RankingEntry> ranking;
-        if(fsm.getCurState().equals(ServerState.INIT)){
-            ranking=board.gameInitEnd();
-        }else{
-            ranking=board.gameRunningEnd();
-        }
+
+        ranking=board.gameRunningEnd();
 
         for(User u:users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
                 u.getServerConn().notifyGameEnd(ranking);
                 board.getPlayer(u).quitMatch();
                 u.closeConnection();
+                System.out.println("End match: "+u.getUsername());
             }
         }
     }

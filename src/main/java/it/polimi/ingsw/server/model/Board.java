@@ -563,19 +563,6 @@ public class Board {
         return playerScores;
     }
 
-    public List<RankingEntry> gameInitEnd(){
-        List<RankingEntry> playerScores=new ArrayList<>();
-        LightPlayer player;
-
-        for(Player p:players){
-
-            playerScores.add(new RankingEntry(p.getGameId(),p.getScore(),p.getFinalPosition()));
-        }
-
-        return playerScores;
-    }
-
-
 
     /**
      * Returns and indexed List of the dice contained in the player's SchemaCard

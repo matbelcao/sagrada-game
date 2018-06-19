@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This test class performs general tests of the Shade enum
+ */
 public class ShadeTest {
     @Test
     void testContainsMethod(){

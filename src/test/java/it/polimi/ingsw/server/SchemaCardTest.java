@@ -16,7 +16,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Loading from file and initialization of attributes
+ * Correct assignment of constraints
+ * Possible placings of a valid die
+ * Positioning invalid first die on non-board cell
+ * Valid placement of the first die
+ * Invalid placement of the same die in the same cell
+ * Invalid placement of a die in a cell not adjacent to other dice
+ * Invalid placement of a die in a busy cell
+ * Invalid placement of a die in a cell with color restriction
+ * Invalid placement of a die in a cell with face restriction
+ * Valid placement in a cell with color restrictions
+ * Valid placement in a cell with face restrictions
+ */
 class SchemaCardTest {
+    /**
+     * Tests the correct instantiation of the card
+     */
     @Test
     void testSchemaCardConstructor(){
         SchemaCard schema1 = new SchemaCard(1,false);
@@ -67,7 +84,9 @@ class SchemaCardTest {
         assertEquals(Integer.parseInt("5"),schema2.getFavorTokens());
     }
 
-    //toolcard #9
+    /**
+     * Tests the list of possible placements with the adjacency constraint, for the tool #9
+     */
     @Test
     void testNonAdjacentPlacement(){
         SchemaCard schema1 = new SchemaCard(1,false);
@@ -93,14 +112,17 @@ class SchemaCardTest {
 
 
     }
-    @Test
 
-    void testListPlacementsSwap() throws IllegalDieException {
+    @Test
+    void testListPlacementsSwap(){
         SchemaCard schema1 = new SchemaCard(1,false);
 
-
-        schema1.putDie(2,new Die("FOUR","RED"));
-        schema1.putDie(6,new Die("ONE","YELLOW"));
+        try {
+            schema1.putDie(2,new Die("FOUR","RED"));
+            schema1.putDie(6,new Die("ONE","YELLOW"));
+        } catch (IllegalDieException e) {
+            e.printStackTrace();
+        }
 
         List<Integer> list =new ArrayList<>();
         list.add(2);
@@ -109,10 +131,15 @@ class SchemaCardTest {
 
         assertEquals(list,schema1.listPossiblePlacementsSwap(new Die("TWO","RED"), Color.RED));
 
-        schema1.putDie(7,new Die("FIVE","RED"),IgnoredConstraint.FORCE);
+        try {
+            schema1.putDie(7,new Die("FIVE","RED"),IgnoredConstraint.FORCE);
+        } catch (IllegalDieException e) {
+            e.printStackTrace();
+        }
         assertTrue(schema1.getCell(7).hasDie());
 
     }
+
     @Test
     void testDiePlacement(){
         SchemaCard schema1 = new SchemaCard(1,false);

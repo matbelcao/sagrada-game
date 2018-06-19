@@ -14,6 +14,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This test class performs tests on the execution flow of the toolcard and the various specific methods of the possible actions
+ */
 class ToolCardTest {
     private static Board board;
     private static PrivObjectiveCard priv;
@@ -27,6 +30,9 @@ class ToolCardTest {
         priv =new PrivObjectiveCard(1);
     }
 
+    /**
+     * Tests if the ToolCard is correctly instantiated from the XML file
+     */
     @Test
     void  testToolCardConstructor(){
         ToolCard tool1 = new ToolCard(1);
@@ -60,6 +66,10 @@ class ToolCardTest {
 
     }
 
+    /**
+     * Tries to perform a SchemaCard->SchemaCard placement and checks that the old player's toolcard is replaced with the
+     * new one at the end of the toolcard'd execution
+     */
     @Test
     void testInternalPlacement(){
         Player player = new Player("Player1",0,board,priv);
@@ -106,8 +116,11 @@ class ToolCardTest {
         assertTrue(tool.isAlreadyUsed());
     }
 
+    /**
+     * tests the correct working of the Back and discard actions during the toolcard execution
+     */
     @Test
-    void testToolExitAndDiscard(){
+    void testToolBackAndDiscard(){
         Player player = new Player("Player1",0,board,priv);
         SchemaCard schema= new SchemaCard(1,false);
         Die die1=new Die("FOUR","RED");
@@ -151,6 +164,9 @@ class ToolCardTest {
         assertFalse(tool.enableToolCard(player,0,Turn.FIRST_TURN,1,schema));
     }
 
+    /**
+     * Tests the INCREASE_DECREASE action on a die
+     */
     @Test
     void testShadeIncreaseDecrease(){
         ToolCard tool= new ToolCard(1);
@@ -179,6 +195,9 @@ class ToolCardTest {
         assertEquals("GREEN",diceList.get(0).getContent().getColor().toString());
     }
 
+    /**
+     * Tests the SWAP action on a die
+     */
     @Test
     void testSwapDie(){
         Player player = new Player("Player1",0,board,priv);
@@ -210,6 +229,9 @@ class ToolCardTest {
         assertEquals("RED"+File.separator+"FOUR",die2.toString());
     }
 
+    /**
+     * Tests the REROLL action on a die
+     */
     @Test
     void testRerollOneDie(){
         Player player = new Player("Player1",0,board,priv);
@@ -232,6 +254,9 @@ class ToolCardTest {
 
     }
 
+    /**
+     * Tests the REROLL action of the draftpool
+     */
     @Test
     void testRerollAllDice(){
         Player player = new Player("Player1",0,board,priv);
@@ -259,6 +284,9 @@ class ToolCardTest {
         assertEquals("PURPLE",dieList.get(2).getColor().toString());
     }
 
+    /**
+     * Tests the FLIP action on a die
+     */
     @Test
     void testFlipDie(){
         Player player = new Player("Player1",0,board,priv);
@@ -281,6 +309,9 @@ class ToolCardTest {
         assertFalse(tool.toolCanContinue(player));
     }
 
+    /**
+     * Tests the CHOOSE_SHADE action on a die, for the toolcard #11
+     */
     @Test
     void testChooseShade(){
         Player player = new Player("Player1",0,board,priv);
@@ -307,6 +338,9 @@ class ToolCardTest {
         assertEquals(Actions.PLACE_DIE,tool.getActions().get(0));
     }
 
+    /**
+     * Tests the SET_COLOR action on a die, for the toolcard #12
+     */
     @Test
     void testSetColor(){
         Player player = new Player("Player1",0,board,priv);

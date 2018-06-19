@@ -9,8 +9,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This test class checks the server-side FSM execution
+ */
 public class ServerFSMTest {
 
+    /**
+     * Tests the FSM flow of a normal placement
+     */
     @Test
     void testFsmFlow(){
         ServerFSM fsm=new ServerFSM();
@@ -52,6 +58,9 @@ public class ServerFSMTest {
         assertEquals(ServerState.MAIN,state);
     }
 
+    /**
+     * Tests the FSM flow during a toolcard usage
+     */
     @Test
     void testFsmFlowTool(){
         ServerFSM fsm=new ServerFSM();
