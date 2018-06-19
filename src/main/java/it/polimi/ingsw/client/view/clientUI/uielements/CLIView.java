@@ -675,7 +675,7 @@ public class CLIView {
 
 
         //add top info
-        schem.addAll(0,fitInLength(buildSchemaInfo(player,width), width));
+        schem.addAll(0, fitInWidth(buildSchemaInfo(player,width), width));
         //add top border
         schem.add(padUntil(EMPTY_STRING,width,DASH));
 
@@ -704,7 +704,7 @@ public class CLIView {
 
         String info=String.format(cliElements.getElem(USERNAME_ID),
                 player.getUsername(),alignRight(uiMsg.getMessage(PLAYER_NUMBER) +
-                        player.getPlayerId(),width - player.getUsername().length()));
+                        player.getPlayerId(),width - printableLength(player.getUsername())));
         if(player.getStatus().equals(LightPlayerStatus.PLAYING)) {
             info = info + (String.format(cliElements.getElem(TOKENS_INFO),
                     uiMsg.getMessage(REMAINING_TOKENS),
@@ -712,7 +712,7 @@ public class CLIView {
                             replicate(FAVOR, player.getFavorTokens()),
                             width - uiMsg.getMessage(REMAINING_TOKENS).length() - 1)));
         }else{
-            info = greyLine(info + padUntil(uiMsg.getMessage(UIMsg.valueOf(player.getStatus().toString())),width,SPACE));
+            info = greyLine(info + alignRight(uiMsg.getMessage(UIMsg.valueOf(player.getStatus().toString())),width));
         }
         return info;
     }

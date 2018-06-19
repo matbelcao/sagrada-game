@@ -444,7 +444,7 @@ public class Client {
                 //get tools
                 board.setTools(clientConn.getTools());
 
-                 board.setPubObjs(clientConn.getPublicObjects());
+                board.setPubObjs(clientConn.getPublicObjects());
 
 
                 ready=true;
