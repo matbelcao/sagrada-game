@@ -349,13 +349,6 @@ public class Client {
 
     }
 
-    /**
-     *
-     * @return
-     */
-    public Object getLockUI() {
-        return lockUI;
-    }
 
     /**
      * This method implements the login to the server via rmi
