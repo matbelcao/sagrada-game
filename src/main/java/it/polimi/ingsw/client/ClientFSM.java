@@ -24,7 +24,7 @@ public class ClientFSM {
         this.client=client;
     }
 
-    public boolean isAlive(){
+    boolean isAlive(){
         return client.isLogged();
     }
 
@@ -41,14 +41,18 @@ public class ClientFSM {
                     client.quit();
                     break;
                 case END_TURN:
-                    if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA))) {
+                    if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(GAME_ENDED))) {
                         client.getClientConn().endTurn();
                     }else{
                         client.getClientUI().showLastScreen();
                     }
                     break;
                 case BACK:
-                    client.getClientConn().back();
+                    if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(GAME_ENDED)||state.equals(MAIN))){
+                        client.getClientConn().back();
+                    }else{
+                        client.getClientUI().showLastScreen();
+                    }
                     break;
                 case DISCARD:
                     if (state.equals(CHOOSE_PLACEMENT)) {
@@ -71,7 +75,7 @@ public class ClientFSM {
         client.getBoard().notifyObservers();
     }
 
-    public void invalidInput() {
+    void invalidInput() {
         client.getClientUI().showLastScreen();
     }
 
@@ -80,7 +84,7 @@ public class ClientFSM {
      * according to the state of the client
      * @param index index to be elaborated
      */
-    public void evolve(int index) {
+    void evolve(int index) {
         switch (state) {
 
             case CHOOSE_SCHEMA:
@@ -344,7 +348,7 @@ public class ClientFSM {
         return state;
     }
 
-    public void setNotMyTurn() {
+    void setNotMyTurn() {
         synchronized (lockState) {
             state = NOT_MY_TURN;
 
@@ -353,7 +357,7 @@ public class ClientFSM {
         client.getBoard().stateChanged();
     }
 
-    public void setMyTurn(boolean isMyTurn) {
+    void setMyTurn(boolean isMyTurn) {
         synchronized (lockState) {
             assert (state.equals(NOT_MY_TURN));
             state = NOT_MY_TURN.nextState(isMyTurn);
@@ -362,7 +366,7 @@ public class ClientFSM {
         client.getBoard().stateChanged();
     }
 
-    public void endGame() {
+    void endGame() {
         synchronized (lockState) {
             state = GAME_ENDED;
             lockState.notifyAll();

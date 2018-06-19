@@ -31,7 +31,7 @@ public enum UIMsg {
     QUIT_OPTION("quit-option"),
     DISCARD_OPTION("discard-option"),
     END_TURN_OPTION("endturn-option"),
-    BACK_OPTION("quit-option"),
+    BACK_OPTION("back-option"),
     CHOOSE_FROM_DICE_LIST("choose-from-dice-list"),
     PLACE_DIE("place-die"),
     USE_TOOL("use-tool"),

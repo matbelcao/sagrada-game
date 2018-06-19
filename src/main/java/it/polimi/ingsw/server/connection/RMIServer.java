@@ -110,11 +110,14 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void notifyBoardChanged() {
-        try {
-            remoteObj.notifyBoardChanged();
-        } catch (RemoteException e) {
-            user.disconnect();
-        }
+            new Thread(()-> {
+                try {
+                    remoteObj.notifyBoardChanged();
+                } catch (RemoteException e) {
+                    user.disconnect();
+                }
+            }).start();
+
     }
 
     /**

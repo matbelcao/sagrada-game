@@ -234,7 +234,7 @@ public class CLIView {
      * @return the info
      */
     private String buildDraftedSchemaInfo(LightSchemaCard schemaCard, int number) {
-        String indexname= boldify(String.format(cliElements.getElem(DRAFTED_INFO),number ,schemaCard.getName()));
+        String indexname = boldify(String.format(cliElements.getElem(DRAFTED_INFO),number ,schemaCard.getName()));
         return indexname + alignRight(printFavorTokens(schemaCard.getFavorTokens()),SCHEMA_WIDTH-printableLength(indexname));
     }
 
