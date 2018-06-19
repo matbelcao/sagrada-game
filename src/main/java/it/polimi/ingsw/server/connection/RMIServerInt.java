@@ -1,6 +1,8 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.common.immutables.LightPlayer;
+import it.polimi.ingsw.common.serializables.Event;
+import it.polimi.ingsw.common.serializables.LightPlayer;
+import it.polimi.ingsw.common.serializables.RankingEntry;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -12,13 +14,13 @@ public interface RMIServerInt extends Remote {
 
     void notifyGameStart(int n, int id) throws RemoteException;
 
-    public void notifyGameEnd(List<LightPlayer> players) throws RemoteException;
+    public void notifyGameEnd(List<RankingEntry> ranking) throws RemoteException;
 
-    public void notifyRoundEvent(String event,int roundNumber) throws RemoteException;
+    public void notifyRoundEvent(Event event,int roundNumber) throws RemoteException;
 
-    public void notifyTurnEvent(String event,int playerId,int turnNumber) throws RemoteException;
+    public void notifyTurnEvent(Event event,int playerId,int turnNumber) throws RemoteException;
 
-    public void notifyStatusUpdate (String event,int id) throws RemoteException;
+    public void notifyStatusUpdate (Event event, int id) throws RemoteException;
 
     public void notifyBoardChanged() throws RemoteException;
 

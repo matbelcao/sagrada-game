@@ -11,8 +11,8 @@ import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.immutables.LightPrivObj;
-import it.polimi.ingsw.common.immutables.LightSchemaCard;
+import it.polimi.ingsw.common.serializables.LightPrivObj;
+import it.polimi.ingsw.common.serializables.LightSchemaCard;
 
 import java.io.BufferedReader;
 import java.io.Console;
@@ -32,6 +32,7 @@ public class CLI implements ClientUI {
 
     private Client client;
     private UIMessages uimsg;
+    private final Object lockCli;
 
     /**
      * this constructs the object
@@ -39,7 +40,7 @@ public class CLI implements ClientUI {
      * @param lang the set language
      */
     public CLI(Client client,UILanguage lang) {
-
+        this.lockCli=new Object();
         this.console=System.console();
 
         if (console == null) {
@@ -54,12 +55,18 @@ public class CLI implements ClientUI {
         resetScreen();
     }
 
+    private void printToScreen(String stuff){
+        synchronized (lockCli){
+            console.printf(stuff);
+            lockCli.notifyAll();
+        }
+    }
 
     /**
      * this cleans the screen and resets the cursor at the top of the page
      */
     private void resetScreen(){
-        console.printf(CLIViewUtils.resetScreenPosition());
+        printToScreen(CLIViewUtils.resetScreenPosition());
     }
 
     /**
@@ -71,10 +78,10 @@ public class CLI implements ClientUI {
         char [] password;
 
             try {
-                console.printf(view.showLoginUsername());
+                printToScreen(view.showLoginUsername());
                 username = console.readLine().trim();
 
-                console.printf(view.showLoginPassword());
+                printToScreen(view.showLoginPassword());
                 password = Credentials.hash(username, console.readPassword());
 
                 client.setPassword(password);
@@ -95,11 +102,11 @@ public class CLI implements ClientUI {
     public void updateLogin(boolean logged) {
         resetScreen();
         if (logged) {
-            console.printf(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOGIN_OK)), client.getUsername());
+            printToScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOGIN_OK)), client.getUsername()));
             view.setClientInfo(client.getConnMode(),client.getUsername());
 
         } else {
-            console.printf(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOGIN_KO)));
+            printToScreen(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOGIN_KO)));
             showLoginScreen();
         }
 
@@ -110,7 +117,7 @@ public class CLI implements ClientUI {
      */
     @Override
     public void showLastScreen() {
-        console.printf(view.printLatestScreen());
+        printToScreen(view.printLatestScreen());
     }
 
     /**
@@ -119,7 +126,7 @@ public class CLI implements ClientUI {
     @Override
     public void updateConnectionOk() {
         resetScreen();
-        console.printf(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.CONNECTION_OK)));
+        printToScreen(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.CONNECTION_OK)));
 
     }
 
@@ -130,7 +137,7 @@ public class CLI implements ClientUI {
     @Override
     public void updateLobby(int numUsers){
         resetScreen();
-        console.printf(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOBBY_UPDATE)),numUsers);
+        printToScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOBBY_UPDATE)),numUsers));
 
     }
 
@@ -143,7 +150,7 @@ public class CLI implements ClientUI {
     public void updateGameStart(int numUsers, int playerId){
 
         resetScreen();
-        console.printf(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.GAME_START)),numUsers,playerId);
+        printToScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.GAME_START)),numUsers,playerId));
         this.view.setMatchInfo(playerId,numUsers);
 
     }
@@ -158,7 +165,7 @@ public class CLI implements ClientUI {
     public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
         view.updateDraftedSchemas(draftedSchemas);
         view.updatePrivObj(privObj);
-        console.printf(view.printSchemaChoiceView());
+        printToScreen(view.printSchemaChoiceView());
     }
 
     /**
@@ -207,10 +214,9 @@ public class CLI implements ClientUI {
                 break;
         }
 
-        synchronized (client.getLockUI()) {
-            console.printf(view.printMainView(client.getTurnState()));
-            client.getLockUI().notifyAll();
-        }
+
+            printToScreen(view.printMainView(client.getTurnState()));
+
     }
 
 
@@ -218,12 +224,8 @@ public class CLI implements ClientUI {
      * this notifies the client that wanted to quit that his connection has been closed and he has successfully quit
      */
     @Override
-    public void updateConnectionClosed()
-    {
-        synchronized (client.getLockUI()) {
-            console.printf(uimsg.getMessage(UIMsg.CLOSED_CONNECTION));
-            client.getLockUI().notifyAll();
-        }
+    public void updateConnectionClosed() {
+        printToScreen(uimsg.getMessage(UIMsg.CLOSED_CONNECTION));
     }
 
     /**
@@ -231,10 +233,7 @@ public class CLI implements ClientUI {
      */
     @Override
     public void updateConnectionBroken() {
-        synchronized (client.getLockUI()) {
-            console.printf(uimsg.getMessage(UIMsg.BROKEN_CONNECTION));
-            client.getLockUI().notifyAll();
-        }
+        printToScreen(uimsg.getMessage(UIMsg.BROKEN_CONNECTION));
 
     }
 
@@ -245,10 +244,9 @@ public class CLI implements ClientUI {
 
         String msg=String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.WAIT_FOR_GAME_START));
         view.setLatestScreen(msg);
-        synchronized (client.getLockUI()) {
-            console.printf(msg);
-            client.getLockUI().notifyAll();
-        }
+
+        printToScreen(msg);
+
 
     }
 

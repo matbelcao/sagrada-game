@@ -1,7 +1,8 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.server.model.*;
+import it.polimi.ingsw.common.serializables.Event;
+import it.polimi.ingsw.common.serializables.LightPlayer;
+import it.polimi.ingsw.common.serializables.RankingEntry;
 
 import java.util.List;
 
@@ -14,13 +15,13 @@ public interface ServerConn {
 
     void notifyGameStart(int n,int id);
 
-    void notifyStatusUpdate (String event,int id);
+    void notifyStatusUpdate (Event event,int id);
 
-    void notifyGameEnd(List<LightPlayer> players);
+    void notifyGameEnd(List<RankingEntry> ranking);
 
-    void notifyRoundEvent(String event,int roundNumber);
+    void notifyRoundEvent(Event event, int roundNumber);
 
-    void notifyTurnEvent(String event,int playerId,int turnNumber);
+    void notifyTurnEvent(Event event,int playerId,int turnNumber);
 
     void notifyBoardChanged();
 

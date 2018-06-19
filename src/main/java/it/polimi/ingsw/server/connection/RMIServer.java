@@ -1,7 +1,8 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.server.model.Player;
+import it.polimi.ingsw.common.serializables.Event;
+import it.polimi.ingsw.common.serializables.LightPlayer;
+import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.model.User;
 
 import java.rmi.RemoteException;
@@ -46,16 +47,16 @@ public class RMIServer implements ServerConn {
     }
 
     @Override
-    public void notifyGameEnd(List<LightPlayer> players) {
+    public void notifyGameEnd(List<RankingEntry> ranking) {
         try {
-            remoteObj.notifyGameEnd(players);
+            remoteObj.notifyGameEnd(ranking);
         } catch (RemoteException e) {
             user.disconnect();
         }
     }
 
     @Override
-    public void notifyRoundEvent(String event, int roundNumber) {
+    public void notifyRoundEvent(Event event, int roundNumber) {
         try {
             remoteObj.notifyRoundEvent(event,roundNumber);
         } catch (RemoteException e) {
@@ -64,7 +65,7 @@ public class RMIServer implements ServerConn {
     }
 
     @Override
-    public void notifyTurnEvent(String event, int playerId, int turnNumber) {
+    public void notifyTurnEvent(Event event, int playerId, int turnNumber) {
         try {
             remoteObj.notifyTurnEvent(event,playerId,turnNumber);
         } catch (RemoteException e) {
@@ -73,7 +74,7 @@ public class RMIServer implements ServerConn {
     }
 
     @Override
-    public void notifyStatusUpdate(String event, int id) {
+    public void notifyStatusUpdate(Event event, int id) {
         try {
             remoteObj.notifyStatusUpdate(event,id);
         } catch (RemoteException e) {

@@ -1,11 +1,13 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.common.immutables.LightPlayer;
-import it.polimi.ingsw.server.model.Player;
+import it.polimi.ingsw.common.serializables.Event;
+import it.polimi.ingsw.common.serializables.LightPlayer;
+import it.polimi.ingsw.common.serializables.RankingEntry;
 
-import java.rmi.RemoteException;
 import java.util.List;
+
+import static it.polimi.ingsw.common.serializables.Event.*;
 
 public class RMIServerObject  implements RMIServerInt {
     Client client;
@@ -24,40 +26,36 @@ public class RMIServerObject  implements RMIServerInt {
     }
 
     @Override
-    public void notifyGameEnd(List<LightPlayer> players){
-        for(LightPlayer p:players){
-            LightPlayer player=client.getBoard().getPlayerById(p.getPlayerId());
-            player.setPoints(p.getPoints());
-            player.setFinalPosition(p.getFinalPosition());
-        }
+    public void notifyGameEnd(List<RankingEntry> ranking){
+        client.updateGameEnd(ranking);
     }
 
     @Override
-    public void notifyRoundEvent(String event,int roundNumber){
-        if(event.equals("round_start")){
+    public void notifyRoundEvent(Event event, int roundNumber){
+        if(event.equals(ROUND_START)){
             client.updateGameRoundStart(roundNumber);
-        }else if (event.equals("round_end")){
+        }else if (event.equals(ROUND_END)){
             client.updateGameRoundEnd(roundNumber);
         }
     }
 
     @Override
-    public void notifyTurnEvent(String event,int playerId,int turnNumber){
-        if(event.equals("turn_start")){
+    public void notifyTurnEvent(Event event,int playerId,int turnNumber){
+        if(event.equals(TURN_START)){
             client.updateGameTurnStart(playerId,turnNumber==0); //todo change signature
-        }else if (event.equals("turn_end")){
+        }else if (event.equals(TURN_END)){
             client.updateGameTurnEnd(playerId,turnNumber);
         }
     }
 
     @Override
-    public void notifyStatusUpdate (String event,int id){
+    public void notifyStatusUpdate (Event event,int id){
         switch (event) {
-            case "reconnect":
+            case RECONNECT:
                 break;
-            case "disconnect":
+            case DISCONNECT:
                 break;
-            case "quit":
+            case QUIT:
                 break;
         }
     }

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.common.immutables;
+package it.polimi.ingsw.common.serializables;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Constraint;
 import it.polimi.ingsw.server.model.SchemaCard;

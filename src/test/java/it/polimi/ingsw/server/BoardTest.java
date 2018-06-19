@@ -1,16 +1,12 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.enums.UserStatus;
-import it.polimi.ingsw.common.immutables.IndexedCellContent;
-import it.polimi.ingsw.common.immutables.LightPlayer;
+import it.polimi.ingsw.common.serializables.IndexedCellContent;
+import it.polimi.ingsw.common.serializables.LightPlayer;
+import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.model.*;
-import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
-import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
-import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -172,7 +168,7 @@ public class BoardTest {
 
         board.getPlayer(users2.get(0)).setSchema(new SchemaCard(1,false));
         board.getPlayer(users2.get(1)).setSchema(new SchemaCard(2,false));
-        List<LightPlayer> playerScores=board.gameRunningEnd();
+        List<RankingEntry> playerScores=board.gameRunningEnd();
         assertEquals(2,playerScores.size());
     }
 }

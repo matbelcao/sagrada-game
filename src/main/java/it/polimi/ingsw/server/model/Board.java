@@ -4,14 +4,14 @@ import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Commands;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Turn;
-import it.polimi.ingsw.common.immutables.IndexedCellContent;
-import it.polimi.ingsw.common.immutables.LightPlayer;
+import it.polimi.ingsw.common.serializables.IndexedCellContent;
+import it.polimi.ingsw.common.serializables.LightPlayer;
+import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
-import javafx.scene.effect.Light;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -535,8 +535,8 @@ public class Board {
      * Calculates the players scores and returns the ranking inside the LightPlayer object
      * @return the list of players in the match with the updated ranks
      */
-    public List<LightPlayer> gameRunningEnd(){
-        List<LightPlayer> playerScores=new ArrayList<>();
+    public List<RankingEntry> gameRunningEnd(){
+        List<RankingEntry> playerScores=new ArrayList<>();
         int maxScore=0;
         int position=1;
 
@@ -562,19 +562,19 @@ public class Board {
         }
 
         for(Player p:players) {
-            playerScores.add(LightPlayer.toLightPlayer(p));
+            playerScores.add(new RankingEntry(p.getGameId(),p.getScore(),p.getFinalPosition()));
         }
 
         return playerScores;
     }
 
-    public List<LightPlayer> gameInitEnd(){
-        List<LightPlayer> playerScores=new ArrayList<>();
+    public List<RankingEntry> gameInitEnd(){
+        List<RankingEntry> playerScores=new ArrayList<>();
         LightPlayer player;
 
         for(Player p:players){
-            player=new LightPlayer(p.getUsername(),p.getGameId());
-            playerScores.add(player);
+
+            playerScores.add(new RankingEntry(p.getGameId(),p.getScore(),p.getFinalPosition()));
         }
 
         return playerScores;

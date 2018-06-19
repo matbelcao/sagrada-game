@@ -2,7 +2,7 @@ package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.io.IOException;

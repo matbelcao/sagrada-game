@@ -2,7 +2,7 @@ package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.enums.Commands;
-import it.polimi.ingsw.common.immutables.*;
+import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 
 import java.rmi.RemoteException;
