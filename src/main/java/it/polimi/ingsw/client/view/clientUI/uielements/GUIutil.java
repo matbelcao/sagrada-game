@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -132,7 +133,7 @@ public class GUIutil {
     }
 
 
-    public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie) {
+    public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,int favortokens) {
         double cellDim = getMainSceneCellDim(width,height);
         HBox track = new HBox();
         track.setSpacing(10);
@@ -165,13 +166,15 @@ public class GUIutil {
         endTurn.setOnAction(e->cmdWrite.write("e"));
         Button back = new Button("back");
         back.setOnAction(e->cmdWrite.write("b"));
-        Rectangle turnStateIndicator = new Rectangle(100,100);
+        Rectangle turnStateIndicator = new Rectangle(50,50);
         if(turnState.equals(NOT_MY_TURN)){
             turnStateIndicator.setFill(Color.RED);
         }else{
             turnStateIndicator.setFill(Color.GREEN);
         }
-        track.getChildren().addAll(back,endTurn,turnStateIndicator);
+        Label favorT= new Label(""+favortokens);
+        Label turn = new Label(turnState.toString());
+        track.getChildren().addAll(back,endTurn,turnStateIndicator,turn,favorT);
         return new Group(track);
     }
 
@@ -205,50 +208,51 @@ public class GUIutil {
 
 
     public Group drawDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList) {
-        HBox pool = new HBox();
-        pool.setSpacing(10);
-        for(int i = 0 ; i<draftPool.size();i++){
-            Canvas c = new Canvas(dieDim,dieDim);
-            drawDie(draftPool.get(i),c.getGraphicsContext2D(),dieDim);
-            if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)){
-                if(latestPlacementsList.isEmpty()) {
-                    highlight(c, dieDim);
-                    System.out.println("highlighting draftpool for full placement "+ i);
-                }else if (latestPlacementsList.contains(i)){
-                    System.out.println("highlighting draftpool for empty "+ i);
-                    highlight(c, dieDim);
+        ArrayList<Canvas> poolDice = new ArrayList<>();
+        for(int i = 0 ; i<draftPool.size();i++) {
+            Canvas c = new Canvas(dieDim, dieDim);
+            drawDie(draftPool.get(i), c.getGraphicsContext2D(), dieDim);
+            poolDice.add(c);
+        }
+        switch (turnState){
+            case NOT_MY_TURN:
+                for (Canvas c : poolDice) {
+                    c.setOnMouseClicked(e-> System.out.println("clicked not my turn"));
                 }
-            }
-            pool.getChildren().add(c);
-            int finalI = i;
-            c.setOnMouseClicked(e->{
-                switch (turnState){
-                    case NOT_MY_TURN:
-                        System.out.println("clicked not my turn");
-                        break;
-                    case MAIN:
+                break;
+            case MAIN:
+                for (Canvas c : poolDice) {
+                    c.setOnMouseClicked(e->{
                         cmdWrite.write("1");
-                        System.out.println("selected die at position " + finalI + "in draftpool");
-                        cmdWrite.write(finalI +"");
-                        break;
-                    case CHOOSE_PLACEMENT:
+                        System.out.println("selected die at position " + poolDice.indexOf(c) + "in draftpool");
+                        //cmdWrite.write( dice.indexOf(c) + "");
+                    });
+                }
+                break;
+            case CHOOSE_PLACEMENT:
+                for (Canvas c : poolDice) {
+                    c.setOnMouseClicked(e->{
                         cmdWrite.write("b");
                         cmdWrite.write("1");
-                        cmdWrite.write(finalI +"");
-                        break;
-                    case SELECT_DIE:
-                        System.out.println("selected die at position " + finalI + " in draftpool");
-                        cmdWrite.write(finalI +"");
-                        if(latestOptionsList.size()==1 && latestOptionsList.get(0).equals(Actions.REROLL)){
-                            cmdWrite.write(0+"");
-                            System.out.println("draftpool writing 0 because latest option list has 1 option and the action is reroll");
-                        }else if(latestOptionsList.size()==1 && latestOptionsList.get(0).equals(Actions.FLIP)){
-                            cmdWrite.write(0+"");
-                            System.out.println("draftpool writing 0 because latest option list has 1 option and the action is flip");
-                        }
+                        cmdWrite.write(poolDice.indexOf(c) +"");
+                    });
                 }
-            });
+                break;
+            case SELECT_DIE:
+                for (IndexedCellContent activeCell : latestDiceList) {
+                    Canvas c = poolDice.get(activeCell.getPosition());
+                    highlight(c,dieDim);
+                    c.setOnMouseClicked(e->{
+                        System.out.println("selected die at position " + poolDice.indexOf(c) + " in draftpool");
+                        cmdWrite.write(poolDice.indexOf(c) +"");
+                    });
+                }
+
+
         }
+        HBox pool = new HBox();
+        pool.setSpacing(10);
+        pool.getChildren().addAll(poolDice);
         return  new Group(pool);
 
         }

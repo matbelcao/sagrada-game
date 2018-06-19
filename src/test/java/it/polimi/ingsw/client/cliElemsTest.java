@@ -89,6 +89,7 @@ class cliElemsTest {
         player1.setSchema(schema1);
         player2.setSchema(schema2);
         player3.setSchema(schema3);
+        player3.setStatus(LightPlayerStatus.DISCONNECTED);
 
 
             cliview= new CLIView(UILanguage.ita);
