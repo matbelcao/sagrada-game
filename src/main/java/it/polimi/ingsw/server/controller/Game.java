@@ -138,6 +138,7 @@ public class Game extends Thread implements Iterable  {
         timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * (long)1000);
         stopFlow();
 
+        fsm.nextState(Actions.NONE);
         while (round.hasNextRound() && getUsersActive()>1){
             round.nextRound();
             board.getDraftPool().draftDice(users.size());
