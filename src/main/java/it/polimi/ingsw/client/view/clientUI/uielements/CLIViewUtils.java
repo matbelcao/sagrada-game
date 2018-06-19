@@ -4,7 +4,6 @@ import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.SchemaCard;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -63,7 +62,7 @@ public class CLIViewUtils {
     /**
      * this method is used to clean the screen and to make sure the lines of the page are printed starting from the top of the screen
      */
-    public synchronized static  String resetScreenPosition() {
+    public static  String resetScreenPosition() {
 
 
         if(Client.isWindows()){
@@ -115,7 +114,7 @@ public class CLIViewUtils {
     static List<String> padUntil(List<String> toPad,int finalLength, char filler){
         if(toPad==null){ throw new IllegalArgumentException("toPad "+ IS_NULL);}
         List<String> result= new ArrayList<>();
-        List<String> fittedLines= fitInLength(toPad,finalLength);
+        List<String> fittedLines= fitInWidth(toPad,finalLength);
         for (String line : fittedLines) {
             result.add(padUntil(line, finalLength, filler));
         }
@@ -199,7 +198,7 @@ public class CLIViewUtils {
      * @return the aligned string
      */
     static String alignRight(String line, int size){
-        if(line==null||line.length()>size){ throw new IllegalArgumentException();}
+        if(line==null||printableLength(line)>size){ throw new IllegalArgumentException();}
         return padUntil(EMPTY_STRING,size-printableLength(line),SPACE)+line;
     }
 
@@ -347,7 +346,7 @@ public class CLIViewUtils {
         List<String> result=new ArrayList<>();
 
         result.add(boldify(card.getName()+":"));
-        result.addAll(fitInLength(card.getDescription(), width));
+        result.addAll(fitInWidth(card.getDescription(), width));
         return result;
     }
 
@@ -370,7 +369,11 @@ public class CLIViewUtils {
 
 
     static String greyLine(String line){
-        return GREY+line+Color.NONE.getUtf();
+        return GREY+removeColor(line)+Color.NONE.getUtf();
+    }
+
+    private static String removeColor(String line) {
+        return line.replaceAll(ESCAPE,EMPTY_STRING);
     }
 
     static List<String> greyLines(List<String> lines){
@@ -414,16 +417,21 @@ public class CLIViewUtils {
     /**
      * This method creates a list of string with a fixed maximum length that put together represent the original string
      * @param line the string to be split
-     * @param length the desired maximum length
+     * @param width the desired maximum width
      * @return a list of strings that are parts of the original line
      */
-    static List<String> fitInLength(String line, int length ){
-        if(line == null || length <= 0){throw new IllegalArgumentException();}
+    static List<String> fitInWidth(String line, int width ){
+        if(line == null || width <= 0){throw new IllegalArgumentException();}
         List<String> result=new ArrayList<>();
 
         String lineToFit= line;
-        while(printableLength(lineToFit)>length){
-            int i = length;
+        while(printableLength(lineToFit)>width){
+            int i = width;
+
+            while(printableLength(lineToFit.substring(0,i))<width){
+                i++;
+            }
+
             while(lineToFit.charAt(i) != SPACE){
                 i--;
             }
@@ -431,16 +439,16 @@ public class CLIViewUtils {
             lineToFit=lineToFit.substring(i).trim();
         }
         if(printableLength(lineToFit.trim())>=0){
-            result.add(padUntil(lineToFit,length,SPACE));
+            result.add(padUntil(lineToFit,width,SPACE));
         }
         return result;
     }
 
 
-    static List<String> fitInLength(List<String> lines, int length){
+    static List<String> fitInWidth(List<String> lines, int length){
         List<String> result= new ArrayList<>();
         for (int line=0; line<lines.size();line++){
-            result.addAll(fitInLength(lines.get(line),length));
+            result.addAll(fitInWidth(lines.get(line),length));
         }
         return result;
     }
