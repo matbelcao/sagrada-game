@@ -70,8 +70,8 @@ public class Validator {
             case "DISCARD":
                 return checkDiscard(command,parsedResult);
 
-            case "EXIT":
-                return checkExit(command,parsedResult);
+            case "BACK":
+                return checkBack(command,parsedResult);
 
             case "QUIT":
                 return checkQuit(command,parsedResult);
@@ -304,10 +304,10 @@ public class Validator {
      * @param rawCommand the raw string containing all parameters of the command and the command itself
      * @return true iff the parameters are valid
      */
-    public static boolean checkExit(String rawCommand, List<String> parsedResult) {
+    public static boolean checkBack(String rawCommand, List<String> parsedResult) {
         if( rawCommand==null){ return false; }
         String [] command= rawCommand.trim().split("\\s+");
-        if(!command[0].equals("EXIT")){ return false; }
+        if(!command[0].equals("BACK")){ return false; }
 
         parsedResult.clear();
         if(command.length == 1) {

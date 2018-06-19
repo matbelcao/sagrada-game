@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.view;
 
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;
 
 import java.util.*;
@@ -26,7 +26,7 @@ public class LightBoard extends Observable {
     private boolean isFirstTurn;
     private int myPlayerId;
     private List<LightSchemaCard> draftedSchemas;
-    private List<Commands> latestOptionsList;
+    private List<Actions> latestOptionsList;
     private List<IndexedCellContent> latestDiceList;
     private List<Integer> latestPlacementsList;
     private IndexedCellContent latestSelectedDie;
@@ -252,7 +252,7 @@ public class LightBoard extends Observable {
      * this sets a list of commands
      * @param optionsList the new list of options
      */
-    public void setLatestOptionsList(List<Commands> optionsList) {
+    public void setLatestOptionsList(List<Actions> optionsList) {
         this.latestOptionsList = optionsList;
         setChanged();
     }
@@ -260,7 +260,7 @@ public class LightBoard extends Observable {
     /**
      * @return the last set list of options
      */
-    public List<Commands> getLatestOptionsList() {
+    public List<Actions> getLatestOptionsList() {
         return latestOptionsList;
     }
 

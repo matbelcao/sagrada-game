@@ -1,14 +1,12 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.User;
-import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.List;
 
 public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt {
@@ -21,85 +19,42 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     //OK
     @Override
     public List<LightSchemaCard> getSchemaDraft() throws IllegalActionException {
-        List<SchemaCard>  schemas = user.getGame().getDraftedSchemaCards(user);
-        List<LightSchemaCard> lightSchema = new ArrayList<>();
-        for (SchemaCard s : schemas) {
-            lightSchema.add(LightSchemaCard.toLightSchema(s));
-        }
-        return lightSchema;
+        return user.getGame().getDraftedSchemaCards(user);
     }
 
     @Override
     public LightSchemaCard getSchema(int playerId) throws IllegalActionException {
-        return LightSchemaCard.toLightSchema(user.getGame().getUserSchemaCard(playerId));
+        return user.getGame().getUserSchemaCard(playerId);
     }
 
     @Override
     public LightPrivObj getPrivateObject() {
-        return LightPrivObj.toLightPrivObj(user.getGame().getPrivCard(user));
+        return user.getGame().getPrivCard(user);
     }
 
     @Override
     public List<LightCard> getPublicObjects() {
-        List<LightCard> lightCards = new ArrayList<>();
-        List<PubObjectiveCard> cards = user.getGame().getPubCards();
-        for (PubObjectiveCard c : cards) {
-            lightCards.add(LightCard.toLightCard(c));
-        }
-        return lightCards;
+        return user.getGame().getPubCards();
     }
 
     @Override
     public List<LightTool> getTools() {
-        List<ToolCard> toolCards = user.getGame().getToolCards();
-        List<LightTool> lightCards = new ArrayList<>();
-        for (ToolCard c : toolCards) {
-            lightCards.add(LightTool.toLightTool(c));
-        }
-        return lightCards;
+        return user.getGame().getToolCards();
     }
 
     @Override
     public List<LightDie> getDraftPool() throws IllegalActionException {
-        List<Die> draftPool = user.getGame().getDraftedDice();
-        List<LightDie> lightDraftPool=new ArrayList<>();
-        LightDie die;
-        for(Die d:draftPool) {
-            die = new LightDie(d.getShade(), d.getColor());
-            lightDraftPool.add(die);
-        }
-        return lightDraftPool;
+        return user.getGame().getDraftedDice();
     }
 
     @Override
     public List<List<LightDie>> getRoundTrack() throws IllegalActionException {
-        List<List<Die>> trackList = user.getGame().getRoundTrackDice();
-        List<Die> dieList;
-
-        List<List<LightDie>> roundTrack=new ArrayList<>();
-        List<LightDie> container;
-        LightDie die;
-
-        for(int i=0;i<trackList.size();i++){
-            dieList=trackList.get(i);
-            container = new ArrayList<>();
-            for(Die d:dieList){
-                die=new LightDie(d.getShade(),d.getColor());
-                container.add(die);
-            }
-            roundTrack.add(i, container);
-        }
-        return roundTrack;
+        return user.getGame().getRoundTrackDice();
     }
 
     @Override
     public List<LightPlayer> getPlayers() {
-        List<Player> players = user.getGame().getPlayers();
-        List<LightPlayer> lightPlayers = new ArrayList<>();
-        for (Player p : players) {
-            lightPlayers.add(new LightPlayer(p.getUsername(),p.getGameId()));
-        }
-        return lightPlayers;
+        return user.getGame().getPlayers();
     }
 
     @Override
@@ -113,7 +68,7 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     }
 
     @Override
-    public List<Commands> select(int dieIndex) throws IllegalActionException {
+    public List<Actions> select(int dieIndex) throws IllegalActionException {
         return user.getGame().selectDie(dieIndex);
     }
 
@@ -150,9 +105,9 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     }
 
     @Override
-    public void exit() throws IllegalActionException {
+    public void back() throws IllegalActionException {
         if (!user.isMyTurn()) {throw new IllegalActionException();}
-        user.getGame().exit(true);
+        user.getGame().back(true);
     }
 
     @Override

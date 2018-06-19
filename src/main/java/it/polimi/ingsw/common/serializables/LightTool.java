@@ -3,8 +3,9 @@ package it.polimi.ingsw.common.serializables;
 import it.polimi.ingsw.server.model.ToolCard;
 
 import java.io.File;
+import java.io.Serializable;
 
-public class LightTool extends LightCard {
+public class LightTool extends LightCard implements Serializable {
     private static  String imgSrc="src"+ File.separator+"img"+File.separator+"ToolCard"+File.separator;
     private boolean used;
     public LightTool(String name, String description, int id, boolean used) {
@@ -36,6 +37,5 @@ public class LightTool extends LightCard {
     @Override
     public LightTool clone(){
         return new LightTool(this.getName(),this.getDescription(),this.getId(),this.isUsed());
-
     }
 }

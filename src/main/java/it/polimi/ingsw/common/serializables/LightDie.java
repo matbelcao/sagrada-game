@@ -4,10 +4,12 @@ import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.Die;
 
+import java.io.Serializable;
+
 /**
  * This class offers a "lighter" version of the Die by limiting the interaction with the die to the Getters only
  */
-public class LightDie implements CellContent {
+public class LightDie implements CellContent,Serializable {
     private Color color;
     private Shade shade;
 

@@ -9,7 +9,7 @@ import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.serializables.LightPrivObj;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
@@ -197,7 +197,7 @@ public class CLI implements ClientUI {
                 break;
             case SELECT_DIE:
                 if(board.getLatestDiceList().get(0).getPlace().equals(Place.ROUNDTRACK) &&
-                        board.getLatestOptionsList().get(0).equals(Commands.SWAP)){
+                        board.getLatestOptionsList().get(0).equals(Actions.SWAP)){
                     board.getLatestDiceList().add(0,board.getLatestSelectedDie());
                 }
                 view.updateMenuDiceList(board.getLatestDiceList());

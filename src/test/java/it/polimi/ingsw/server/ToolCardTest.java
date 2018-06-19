@@ -38,7 +38,7 @@ class ToolCardTest {
         assertFalse(tool1.isAlreadyUsed());
         assertEquals(Place.DRAFTPOOL,tool1.getPlaceFrom());
         assertEquals(Place.DRAFTPOOL,tool1.getPlaceTo());
-        assertEquals(Commands.INCREASE_DECREASE,tool1.getActions().get(0));
+        assertEquals(Actions.INCREASE_DECREASE,tool1.getActions().get(0));
         assertEquals(IgnoredConstraint.NONE,tool1.getIgnoredConstraint());
 
 
@@ -91,7 +91,7 @@ class ToolCardTest {
         assertEquals(die2.getColor().toString(),internalSchemaDiceList.get(1).getContent().getColor().toString());
 
         tool.internalSelectDie(0);
-        assertEquals(Commands.PLACE_DIE,tool.getActions().get(0));
+        assertEquals(Actions.PLACE_DIE,tool.getActions().get(0));
 
         List<Integer> placements=tool.internalListPlacements();
 
@@ -159,7 +159,7 @@ class ToolCardTest {
         Die die3=new Die("SIX","GREEN");
         List<IndexedCellContent> diceList;
 
-        assertEquals(Commands.INCREASE_DECREASE,tool.getActions().get(0));
+        assertEquals(Actions.INCREASE_DECREASE,tool.getActions().get(0));
 
         diceList=tool.shadeIncreaseDecrease(die1);
         assertEquals(1,diceList.size());
@@ -194,13 +194,13 @@ class ToolCardTest {
         assertTrue(tool.enableToolCard(player,1,Turn.FIRST_TURN,1,schema));
         assertEquals(tokens,player.getFavorTokens()+1);
 
-        assertEquals(Commands.SWAP,tool.getActions().get(0));
+        assertEquals(Actions.SWAP,tool.getActions().get(0));
         tool.selectDie(die1);
         tool.swapDie();
         assertEquals(0,tool.getOldIndexes().size());
         assertTrue(tool.toolCanContinue(player));
 
-        assertEquals(Commands.SWAP,tool.getActions().get(0));
+        assertEquals(Actions.SWAP,tool.getActions().get(0));
         tool.selectDie(die2);
         tool.swapDie();
         assertEquals(0,tool.getOldIndexes().size());
@@ -219,7 +219,7 @@ class ToolCardTest {
         ToolCard tool= new ToolCard(6);
 
         assertTrue(tool.enableToolCard(player,1,Turn.FIRST_TURN,1,schema));
-        assertEquals(Commands.REROLL,tool.getActions().get(0));
+        assertEquals(Actions.REROLL,tool.getActions().get(0));
         assertFalse(tool.isExternalPlacement());
         assertFalse(tool.isRerollAllDiceCard());
 
@@ -249,7 +249,7 @@ class ToolCardTest {
         assertFalse(tool.enableToolCard(player,0,Turn.SECOND_TURN,1,schema));
         assertTrue(tool.enableToolCard(player,0,Turn.SECOND_TURN,0,schema));
 
-        assertEquals(Commands.REROLL,tool.getActions().get(0));
+        assertEquals(Actions.REROLL,tool.getActions().get(0));
         assertFalse(tool.isExternalPlacement());
         assertTrue(tool.isRerollAllDiceCard());
 
@@ -268,7 +268,7 @@ class ToolCardTest {
         ToolCard tool= new ToolCard(10);
 
         assertTrue(tool.enableToolCard(player,1,Turn.FIRST_TURN,1,schema));
-        assertEquals(Commands.FLIP,tool.getActions().get(0));
+        assertEquals(Actions.FLIP,tool.getActions().get(0));
         assertFalse(tool.isExternalPlacement());
         assertFalse(tool.isRerollAllDiceCard());
 
@@ -292,7 +292,7 @@ class ToolCardTest {
         //Not possible to enable...one die yet placed
         assertFalse(tool.enableToolCard(player,1,Turn.FIRST_TURN,1,schema));
         assertTrue(tool.enableToolCard(player,1,Turn.FIRST_TURN,0,schema));
-        assertEquals(Commands.SET_SHADE,tool.getActions().get(0));
+        assertEquals(Actions.SET_SHADE,tool.getActions().get(0));
         assertTrue(tool.isExternalPlacement());
         assertFalse(tool.isInternalSchemaPlacement());
 
@@ -304,7 +304,7 @@ class ToolCardTest {
             assertEquals(i+1,diceList.get(i).getContent().getShade().toInt());
         }
         assertTrue(tool.toolCanContinue(player));
-        assertEquals(Commands.PLACE_DIE,tool.getActions().get(0));
+        assertEquals(Actions.PLACE_DIE,tool.getActions().get(0));
     }
 
     @Test
@@ -332,7 +332,7 @@ class ToolCardTest {
         assertFalse(tool.isExternalPlacement());
 
 
-        assertEquals(Commands.SET_COLOR,tool.getActions().get(0));
+        assertEquals(Actions.SET_COLOR,tool.getActions().get(0));
         assertEquals(Color.NONE,tool.getColorConstraint());
         tool.selectDie(new Die("ONE","BLUE"));
         tool.setColor();

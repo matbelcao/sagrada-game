@@ -2,7 +2,7 @@ package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
@@ -48,7 +48,7 @@ public class ClientFSM {
                     }
                     break;
                 case BACK:
-                    client.getClientConn().exit();
+                    client.getClientConn().back();
                     break;
                 case DISCARD:
                     if (state.equals(CHOOSE_PLACEMENT)) {
@@ -264,7 +264,7 @@ public class ClientFSM {
     private void chooseOptionAction(int index) {
         if(client.getClientConn().choose(index)) {
 
-            if (client.getBoard().getLatestOptionsList().get(index).equals(Commands.PLACE_DIE)) {
+            if (client.getBoard().getLatestOptionsList().get(index).equals(Actions.PLACE_DIE)) {
                 synchronized (lockState) {
                     state=CHOOSE_OPTION.nextState(true);
                     lockState.notifyAll();
@@ -303,7 +303,7 @@ public class ClientFSM {
                     state = SELECT_DIE.nextState(true);
                     lockState.notifyAll();
                 }
-                client.getClientConn().exit();
+                client.getClientConn().back();
             }
         }
 

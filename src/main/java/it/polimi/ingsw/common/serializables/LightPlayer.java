@@ -2,7 +2,9 @@ package it.polimi.ingsw.common.serializables;
 
 import it.polimi.ingsw.server.model.Player;
 
-public class LightPlayer {
+import java.io.Serializable;
+
+public class LightPlayer implements Serializable {
     private String username;
     private int playerId;
     private int points;
@@ -23,13 +25,7 @@ public class LightPlayer {
     public static LightPlayer toLightPlayer(Player player){
         String username = player.getUsername();
         int playerId = player.getGameId();
-        LightPlayer lightPlayer = new LightPlayer(username,playerId);
-        lightPlayer.setPoints(player.getScore());
-        if(player.getSchema()!=null){
-            lightPlayer.setSchema(LightSchemaCard.toLightSchema(player.getSchema()));
-        }
-        lightPlayer.setFinalPosition(player.getFinalPosition());
-        return lightPlayer;
+        return new LightPlayer(username,playerId);
     }
 
     public LightPlayerStatus getStatus(){

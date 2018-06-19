@@ -1,14 +1,15 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
+
 
 import java.rmi.RemoteException;
 import java.util.List;
 
-public class RMIClient implements ClientConn {
+public class RMIClient implements ClientConn{
     private RMIClientInt remoteObj; //user
     private Client client;
 
@@ -134,8 +135,8 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public List<Commands> select(int die_index) {
-        List<Commands> options=null;
+    public List<Actions> select(int die_index) {
+        List<Actions> options=null;
         try{
             options = remoteObj.select(die_index);
         }catch(RemoteException | IllegalActionException e){
@@ -204,9 +205,9 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public void exit() {
+    public void back() {
         try {
-            remoteObj.exit();
+            remoteObj.back();
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (IllegalActionException e) {

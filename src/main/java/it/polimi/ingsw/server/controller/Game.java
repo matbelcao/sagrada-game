@@ -1,10 +1,7 @@
 package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.common.enums.*;
-import it.polimi.ingsw.common.serializables.Event;
-import it.polimi.ingsw.common.serializables.IndexedCellContent;
-import it.polimi.ingsw.common.serializables.LightPlayer;
-import it.polimi.ingsw.common.serializables.RankingEntry;
+import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
@@ -225,7 +222,7 @@ public class Game extends Thread implements Iterable  {
      */
     private void turnFlow() {
         fsm.newTurn(board.getPlayer(userPlaying).getGameId(),round.isFirstTurn());
-        exit(false);
+        back(false);
 
         endLock=false;
 
@@ -258,34 +255,34 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who made the request
      * @return the card requested
      */
-    public PrivObjectiveCard getPrivCard(User user){
-        return board.getPlayer(user).getPrivObjective();
+    public LightPrivObj getPrivCard(User user){
+        return LightPrivObj.toLightPrivObj(board.getPlayer(user).getPrivObjective());
     }
 
     /**
      * Responds to the request by sending three public objective cards to the user of the match
      * @return the list of cards requested
      */
-    public List<PubObjectiveCard> getPubCards(){
-        List<PubObjectiveCard> cards= new ArrayList<>();
+    public List<LightCard> getPubCards(){
+        List<LightCard> lightPubs = new ArrayList<>();
 
         for (int i=0 ; i < Board.NUM_OBJECTIVES ; i++ ) {
-            cards.add(board.getPublicObjective(i));
+            lightPubs.add(LightCard.toLightCard(board.getPublicObjective(i)));
         }
-        return cards;
+        return lightPubs;
     }
 
     /**
      * Responds to the request by sending three tool cards to the user of the match
      * @return the list of cards requested
      */
-    public List<ToolCard> getToolCards(){
-        List<ToolCard> cards=new ArrayList<>();
+    public List<LightTool> getToolCards(){
+        List<LightTool> lightTools = new ArrayList<>();
 
         for (int i = 0; i < Board.NUM_TOOLS; i++) {
-            cards.add(board.getToolCard(i));
+            lightTools.add(LightTool.toLightTool(board.getToolCard(i)));
         }
-        return cards;
+        return lightTools;
     }
 
     /**
@@ -294,13 +291,13 @@ public class Game extends Thread implements Iterable  {
      * @return the list of cards requested
      * @throws IllegalActionException if the schema card is still not instantited
      */
-    public List<SchemaCard> getDraftedSchemaCards(User user) throws IllegalActionException {
+    public List<LightSchemaCard> getDraftedSchemaCards(User user) throws IllegalActionException {
         if(board.getPlayer(user).getSchema()!=null){ throw new IllegalActionException(); }
-        List<SchemaCard> schemas=new ArrayList<>();
+        List<LightSchemaCard>  lightSchemas=new ArrayList<>();
         for (int i=0 ; i < Board.NUM_PLAYER_SCHEMAS ; i++ ){
-            schemas.add(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]);
+            lightSchemas.add(LightSchemaCard.toLightSchema(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]));
         }
-        return schemas;
+        return lightSchemas;
     }
 
     /**
@@ -311,11 +308,12 @@ public class Game extends Thread implements Iterable  {
      * @throws IllegalActionException if the request syntax is wrong, if the schema card is still not instantited, if
      * the index is bigger than the List of dice
      */
-    public SchemaCard getUserSchemaCard(int playerId) throws IllegalActionException {
+    public LightSchemaCard getUserSchemaCard(int playerId) throws IllegalActionException {
         if(playerId>=users.size() || playerId <0){ throw new IllegalActionException(); }
         if(board.getPlayerById(playerId).getSchema()==null){ throw new IllegalActionException(); }
         if(playerId>=0 && playerId<users.size()){
-            return board.getUserSchemaCard(playerId);
+            SchemaCard schemaCard=board.getUserSchemaCard(playerId);
+            return LightSchemaCard.toLightSchema(schemaCard);
         }
         throw new IllegalActionException();
     }
@@ -327,7 +325,7 @@ public class Game extends Thread implements Iterable  {
      * @return the card requested
      * @throws IllegalActionException if the schema card is still not instantited
      */
-    public SchemaCard getUserSchemaCard(User user) throws IllegalActionException {
+    public LightSchemaCard getUserSchemaCard(User user) throws IllegalActionException {
         Player player= board.getPlayer(user);
         if(board.getPlayer(user).getSchema()==null){ throw new IllegalActionException(); }
         return getUserSchemaCard(player.getGameId());
@@ -339,9 +337,16 @@ public class Game extends Thread implements Iterable  {
      * @throws IllegalActionException if the request syntax is wrong, if the fsm state is not correct, if the index is
      * bigger than the List of dice
      */
-    public List<Die> getDraftedDice() throws IllegalActionException {
+    public List<LightDie> getDraftedDice() throws IllegalActionException {
         if(fsm.getCurState().equals(ServerState.INIT)){ throw new IllegalActionException(); }
-        return board.getDraftPool().getDraftedDice();
+        List<Die> draftPool=board.getDraftPool().getDraftedDice();
+        List<LightDie> lightDraftPool=new ArrayList<>();
+
+        for(Die d:draftPool) {
+            lightDraftPool.add(LightDie.toLightDie(d));
+        }
+        return lightDraftPool;
+
     }
 
     /**
@@ -350,21 +355,40 @@ public class Game extends Thread implements Iterable  {
      * @throws IllegalActionException if the request syntax is wrong, if the fsm state is not correct, if the index is
      * bigger than the List of dice
      */
-    public List<List<Die>> getRoundTrackDice() throws IllegalActionException {
+    public List<List<LightDie>> getRoundTrackDice() throws IllegalActionException {
         if(fsm.getCurState().equals(ServerState.INIT)){ throw new IllegalActionException(); }
-        return board.getDraftPool().getRoundTrack().getTrack();
+
+        System.out.println("qui1");
+        List<List<Die>> trackList = board.getDraftPool().getRoundTrack().getTrack();
+        List<Die> dieList;
+
+        List<List<LightDie>> roundTrack=new ArrayList<>();
+        List<LightDie> container;
+
+        for(int i=0;i<trackList.size();i++){
+            dieList=trackList.get(i);
+            container = new ArrayList<>();
+            for(Die d:dieList){
+                container.add(LightDie.toLightDie(d));
+            }
+            roundTrack.add(i, container);
+        }
+        System.out.println("qui2");
+        return roundTrack;
     }
 
     /**
      * Responds to the request by sending the list of the match's players (and their id inside the Player class)
      * @return the list of players in the current match
      */
-    public List<Player> getPlayers(){
+    public List<LightPlayer> getPlayers(){
         List<Player> players= new ArrayList<>();
+        List<LightPlayer> lightPlayers = new ArrayList<>();
         for (User u:users){
-            players.add(board.getPlayer(u));
+            Player player=board.getPlayer(u);
+            lightPlayers.add(new LightPlayer(player.getUsername(),player.getGameId()));
         }
-        return players;
+        return lightPlayers;
     }
 
     /**
@@ -405,7 +429,7 @@ public class Game extends Thread implements Iterable  {
      * @throws IllegalActionException if the request syntax is wrong, if the fsm state is not correct, if the index is
      * bigger than the List of dice
      */
-    public List<Commands> selectDie(int dieIndex) throws IllegalActionException {
+    public List<Actions> selectDie(int dieIndex) throws IllegalActionException {
         if(!fsm.getCurState().equals(ServerState.SELECT) || diceListSize<=dieIndex){throw new IllegalActionException();}
 
         return board.selectDie(dieIndex);
@@ -518,7 +542,7 @@ public class Game extends Thread implements Iterable  {
      * Allows the User to interrupt a multiple-message command (for COMPLEX ACTIONS like die placements, ToolCard usages, ecc)
      * @param notifyBoardChanged if true, this flag will trigger the client's update requests.
      */
-    public void exit(Boolean notifyBoardChanged){
+    public void back(Boolean notifyBoardChanged){
         if(fsm.getCurState().equals(ServerState.INIT)){return;}
 
         board.exit();

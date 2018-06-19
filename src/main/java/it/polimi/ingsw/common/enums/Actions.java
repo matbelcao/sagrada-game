@@ -1,6 +1,6 @@
 package it.polimi.ingsw.common.enums;
 
-public enum Commands {
+public enum Actions {
     INCREASE_DECREASE,
     SWAP,
     REROLL,

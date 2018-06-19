@@ -1,6 +1,8 @@
 package it.polimi.ingsw.common.serializables;
 
-public class RankingEntry {
+import java.io.Serializable;
+
+public class RankingEntry implements Serializable {
     private int playerId;
     private int points;
     private int finalPosition;

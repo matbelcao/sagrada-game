@@ -1,9 +1,8 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.serializables.IndexedCellContent;
-import it.polimi.ingsw.common.serializables.LightPlayer;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
@@ -105,7 +104,7 @@ public class BoardTest {
         assertEquals(die1.getShade(),schemaList1.get(0).getContent().getShade());
         assertEquals(die2.getColor(),schemaList1.get(1).getContent().getColor());
 
-        assertEquals(Commands.PLACE_DIE,board.selectDie(0).get(0));
+        assertEquals(Actions.PLACE_DIE,board.selectDie(0).get(0));
 
         assertFalse(board.chooseOption(1));
         assertTrue(board.chooseOption(0));
@@ -122,7 +121,7 @@ public class BoardTest {
         assertFalse(board.choosePlacement(1));
         assertEquals(null, schema.getCell(11).getDie());
 
-        assertEquals(Commands.PLACE_DIE,board.selectDie(0).get(0));
+        assertEquals(Actions.PLACE_DIE,board.selectDie(0).get(0));
         assertTrue(board.chooseOption(0));
         assertTrue(board.choosePlacement(1));
         assertEquals(die1, schema.getCell(11).getDie());

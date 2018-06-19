@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.common.enums.UserStatus;
+import it.polimi.ingsw.common.serializables.LightSchemaCard;
 import it.polimi.ingsw.server.model.SchemaCard;
 import it.polimi.ingsw.server.model.User;
 import it.polimi.ingsw.server.controller.Game;
@@ -39,7 +40,7 @@ public class GameTest {
         try {
             assertEquals(4,game1.getDraftedSchemaCards(user0).size());
             game1.choose(user0,2);
-            SchemaCard schema = game1.getUserSchemaCard(user0);
+            LightSchemaCard schema = game1.getUserSchemaCard(user0);
             assertEquals(schema,game1.getUserSchemaCard(0));
             assertEquals(3, game1.getPubCards().size());
             assertEquals(3, game1.getToolCards().size());

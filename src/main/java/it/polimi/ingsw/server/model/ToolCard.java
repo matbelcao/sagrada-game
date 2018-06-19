@@ -32,7 +32,7 @@ public class ToolCard extends Card {
     private boolean used;
     private Place from;
     private Place to;
-    private List<Commands> actions;
+    private List<Actions> actions;
     private IgnoredConstraint ignoredConstraint;
     private List<DieQuantity> quantity;
     private Turn turn;
@@ -76,7 +76,7 @@ public class ToolCard extends Card {
 
                     for (int temp2 = 0; temp2 < eElement.getElementsByTagName("command").getLength(); temp2++) {
                         text = eElement.getElementsByTagName("command").item(temp2).getTextContent().toUpperCase();
-                        actions.add(Commands.valueOf(text.toUpperCase().trim()));
+                        actions.add(Actions.valueOf(text.toUpperCase().trim()));
                     }
 
                     if(to.equals(Place.SCHEMA)){
@@ -116,7 +116,7 @@ public class ToolCard extends Card {
      */
     public boolean enableToolCard(Player player,int roundNumber,Turn turnFirstOrSecond, int numDiePlaced , SchemaCard schema) {
         try {
-            if((actions.contains(Commands.SWAP) || actions.contains(Commands.SET_COLOR)) && roundNumber==0){return false;}
+            if((actions.contains(Actions.SWAP) || actions.contains(Actions.SET_COLOR)) && roundNumber==0){return false;}
             if (!turn.equals(Turn.NONE) && !turn.equals(turnFirstOrSecond)) {return false;}
             if(turn.equals(Turn.SECOND_TURN) && numDiePlaced>=1){return false;}
             if(turn.equals(Turn.FIRST_TURN) && numDiePlaced!=1){return false;}
@@ -369,7 +369,7 @@ public class ToolCard extends Card {
      */
     public boolean toolCanContinue(Player player){
         //System.out.println(selectedDice+"  "+oldIndexList);
-        if(actions.get(actionIndex)!=Commands.SWAP && actions.get(actionIndex)!=Commands.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
+        if(actions.get(actionIndex)!=Actions.SWAP && actions.get(actionIndex)!=Actions.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
             selectedDice.remove(0);
         }
         if(isInternalSchemaPlacement() && !oldIndexList.isEmpty()){
@@ -390,7 +390,7 @@ public class ToolCard extends Card {
      * Allows to cancel the selection of a die, and then removes the temporarily stored die
      */
     public void toolDiscard(){
-        if(actions.get(actionIndex)!=Commands.SWAP && actions.get(actionIndex)!=Commands.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
+        if(actions.get(actionIndex)!=Actions.SWAP && actions.get(actionIndex)!=Actions.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
             selectedDice.remove(0);
         }
         if(isInternalSchemaPlacement() && !oldIndexList.isEmpty()){
@@ -444,7 +444,7 @@ public class ToolCard extends Card {
      * @return if the ToolCard expects that all dice will be rolled
      */
     public boolean isRerollAllDiceCard(){
-        return actions.get(actionIndex).equals(Commands.REROLL) && quantity.contains(DieQuantity.ALL);
+        return actions.get(actionIndex).equals(Actions.REROLL) && quantity.contains(DieQuantity.ALL);
     }
 
     /**
@@ -452,7 +452,7 @@ public class ToolCard extends Card {
      * @return if the card expects a color constraint to be selected
      */
     public boolean isSetColorFromRountrackCard(){
-        return actions.get(actionIndex).equals(Commands.SET_COLOR);
+        return actions.get(actionIndex).equals(Actions.SET_COLOR);
     }
 
     /**
@@ -501,8 +501,8 @@ public class ToolCard extends Card {
      * flow of the ToolCard selected
      * @return the List containing the possible actions to perform
      */
-    public List<Commands> getActions(){
-        List<Commands> commands=new ArrayList<>();
+    public List<Actions> getActions(){
+        List<Actions> commands=new ArrayList<>();
         commands.add(actions.get(actionIndex));
         return commands;
     }

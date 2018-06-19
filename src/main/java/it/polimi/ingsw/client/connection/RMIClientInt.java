@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
 
@@ -30,7 +30,7 @@ public interface RMIClientInt extends Remote {
 
     List<IndexedCellContent> getDiceList() throws RemoteException, IllegalActionException;
 
-    List<Commands> select(int dieIndex) throws RemoteException, IllegalActionException;
+    List<Actions> select(int dieIndex) throws RemoteException, IllegalActionException;
 
     List<Integer> getPlacementsList() throws RemoteException, IllegalActionException;
 
@@ -44,7 +44,7 @@ public interface RMIClientInt extends Remote {
 
     void discard() throws RemoteException, IllegalActionException;
 
-    void exit() throws RemoteException, IllegalActionException;
+    void back() throws RemoteException, IllegalActionException;
 
     void quit() throws RemoteException;
 

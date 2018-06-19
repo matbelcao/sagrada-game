@@ -1,7 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Turn;
 import it.polimi.ingsw.common.serializables.IndexedCellContent;
@@ -40,10 +40,10 @@ public class Board {
     private ToolCard selectedTool;
     private Die selectedDie;
     private int oldIndex;
-    private Commands selectedCommand;
+    private Actions selectedCommand;
     private Boolean enableToolList;
     private List<IndexedCellContent> diceList;
-    private List<Commands> commandsList;
+    private List<Actions> actionsList;
     private List<Integer> placements;
 
     /**
@@ -272,7 +272,7 @@ public class Board {
      * @param dieIndex the index of the previously indexed dice List sent to the client
      * @return the indexed List of commands that can be executed
      */
-    public List<Commands> selectDie(int dieIndex){
+    public List<Actions> selectDie(int dieIndex){
 
         Color constraint = Color.NONE;
 
@@ -281,7 +281,7 @@ public class Board {
             constraint = selectedTool.getColorConstraint();
             if(selectedTool.isInternalSchemaPlacement() && enableToolList){
                 selectedDie=selectedTool.internalSelectDie(dieIndex);
-            }else if (selectedCommand.equals(Commands.INCREASE_DECREASE) || selectedCommand.equals(Commands.SET_SHADE)){
+            }else if (selectedCommand.equals(Actions.INCREASE_DECREASE) || selectedCommand.equals(Actions.SET_SHADE)){
                 selectedDie.setColor(diceList.get(dieIndex).getContent().getColor().toString());
                 selectedDie.setShade(diceList.get(dieIndex).getContent().getShade().toInt());
             } else{
@@ -289,18 +289,18 @@ public class Board {
                 oldIndex = getDiePosition(selectedDie);
                 selectedTool.selectDie(selectedDie);
             }
-            commandsList = selectedTool.getActions();
+            actionsList = selectedTool.getActions();
         }else {
             //Toolcard disabled
             selectedDie = getDieSelected(dieIndex, constraint);
             oldIndex = getDiePosition(selectedDie);
-            commandsList=new ArrayList<>();
-            commandsList.add(Commands.PLACE_DIE);
+            actionsList =new ArrayList<>();
+            actionsList.add(Actions.PLACE_DIE);
         }
 
         status=fsm.nextState(selectedCommand);
         enableToolList =false;
-        return commandsList;
+        return actionsList;
     }
 
     /**
@@ -324,8 +324,8 @@ public class Board {
      */
     public boolean chooseOption(int index){
         boolean response=true;
-        if(commandsList.size()<=index){return false;}
-        selectedCommand=commandsList.get(index);
+        if(actionsList.size()<=index){return false;}
+        selectedCommand= actionsList.get(index);
         if(fsm.isToolActive()){
             switch (selectedCommand){
                 case INCREASE_DECREASE:
@@ -383,7 +383,7 @@ public class Board {
      * @return true iff the operation was successful
      */
     public boolean choosePlacement(int index){
-        if(placements.size()<=index || !selectedCommand.equals(Commands.PLACE_DIE) || selectedDie==null){return false;}
+        if(placements.size()<=index || !selectedCommand.equals(Actions.PLACE_DIE) || selectedDie==null){return false;}
         boolean response;
         IgnoredConstraint constraint;
 
@@ -528,7 +528,7 @@ public class Board {
         selectedTool=null;
         selectedDie=null;
         diceList=new ArrayList<>();
-        selectedCommand=Commands.NONE;
+        selectedCommand=Actions.NONE;
     }
 
     /**

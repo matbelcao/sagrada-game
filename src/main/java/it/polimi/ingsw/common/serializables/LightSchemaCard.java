@@ -3,6 +3,7 @@ import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Constraint;
 import it.polimi.ingsw.server.model.SchemaCard;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -10,7 +11,7 @@ import java.util.NoSuchElementException;
 /**
  * This class is a lighter, more efficient but immutable representation of a schema card
  */
-public class LightSchemaCard {
+public class LightSchemaCard implements Serializable {
     private final String name;
     private Map<Integer,CellContent> cells=new HashMap<>(30);
     private int initialFavorTokens;

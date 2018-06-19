@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.common.enums.Commands;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.server.model.enums.ServerState;
 
@@ -89,7 +89,7 @@ public class ServerFSM {
      */
     public ServerState endTool(){
         while(!curState.equals(ServerState.TOOL_CAN_CONTINUE)){
-            curState=nextState(Commands.NONE);
+            curState=nextState(Actions.NONE);
         }
         return curState;
     }
@@ -99,7 +99,7 @@ public class ServerFSM {
      * @param command the action that the player wants to perform
      * @return the new turn's state
      */
-    public ServerState nextState(Commands command){
+    public ServerState nextState(Actions command){
         switch (curState){
             case INIT:
                 curState=ServerState.MAIN;
@@ -118,7 +118,7 @@ public class ServerFSM {
                 curState=ServerState.CHOOSE_OPTION;
                 break;
             case CHOOSE_OPTION:
-                if (command.equals(Commands.PLACE_DIE)){
+                if (command.equals(Actions.PLACE_DIE)){
                     curState=ServerState.GET_PLACEMENTS;
                 }else if(isToolActive()){
                     curState=ServerState.TOOL_CAN_CONTINUE;
