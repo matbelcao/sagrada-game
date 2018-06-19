@@ -13,10 +13,7 @@ import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMode;
 import it.polimi.ingsw.common.enums.UserStatus;
-import it.polimi.ingsw.common.serializables.LightPlayer;
-import it.polimi.ingsw.common.serializables.LightPlayerStatus;
-import it.polimi.ingsw.common.serializables.LightTool;
-import it.polimi.ingsw.common.serializables.RankingEntry;
+import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIServerInt;
 import it.polimi.ingsw.server.connection.RMIServerObject;
@@ -498,7 +495,21 @@ public class Client {
     }
 
 
-    public void updatePlayerStatus(int playerId, LightPlayerStatus status){
+    public void updatePlayerStatus(int playerId, Event event){
+        LightPlayerStatus status;
+        switch (event){
+            case QUIT:
+                status=LightPlayerStatus.QUITTED;
+                break;
+            case RECONNECT:
+                status=LightPlayerStatus.PLAYING;
+                break;
+            case DISCONNECT:
+                status=LightPlayerStatus.DISCONNECTED;
+                break;
+            default:
+                status=LightPlayerStatus.PLAYING;
+        }
 
         board.getPlayerById(playerId)
                 .setStatus(status);

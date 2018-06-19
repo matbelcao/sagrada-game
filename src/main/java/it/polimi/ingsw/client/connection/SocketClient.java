@@ -63,20 +63,8 @@ public class SocketClient implements ClientConn {
                         if (ClientParser.parse(inSocket.readln(), result)) {
                             if (ClientParser.isStatus(inSocket.readln())) {
                                 inSocket.pop();
-                                switch (result.get(1)) {    //todo
-                                    case "check":
-                                        pong();
-                                        break;
-                                    case "reconnect":
-                                        client.updatePlayerStatus(Integer.parseInt(result.get(2)),LightPlayerStatus.PLAYING);
-                                        break;
-                                    case "disconnect":
-                                        client.updatePlayerStatus(Integer.parseInt(result.get(2)),LightPlayerStatus.DISCONNECTED);
-                                        break;
-                                    case "quit":
-                                        client.updatePlayerStatus(Integer.parseInt(result.get(2)),LightPlayerStatus.QUITTED);
-                                        break;
-                                }
+                                client.updatePlayerStatus(Integer.parseInt(result.get(2)), Event.valueOf(result.get(1).toUpperCase()));
+
                             } else if (ClientParser.isLobby(inSocket.readln())) {
                                 inSocket.pop();
                                 updateLobby(result.get(1));

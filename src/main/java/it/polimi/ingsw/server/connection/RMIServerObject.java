@@ -50,14 +50,8 @@ public class RMIServerObject  implements RMIServerInt {
 
     @Override
     public void notifyStatusUpdate (Event event,int id){
-        switch (event) {
-            case RECONNECT:
-                break;
-            case DISCONNECT:
-                break;
-            case QUIT:
-                break;
-        }
+
+        client.updatePlayerStatus(id,event);
     }
 
     @Override

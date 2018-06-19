@@ -1,7 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.serializables.Event;
-import it.polimi.ingsw.common.serializables.LightPlayer;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.model.User;
 
@@ -13,7 +12,7 @@ public class RMIServer implements ServerConn {
         private User user;
 
 
-    public RMIServer(RMIServerInt remoteObj,User user){
+    RMIServer(RMIServerInt remoteObj, User user){
         this.remoteObj = remoteObj;
         this.user = user;
     }
@@ -41,11 +40,13 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void notifyGameStart(int n, int id) {
-        try {
-            remoteObj.notifyGameStart(n, id);
-        } catch (RemoteException e) {
-            user.disconnect();
-        }
+        new Thread(()-> {
+            try {
+                remoteObj.notifyGameStart(n, id);
+            } catch (RemoteException e) {
+                user.disconnect();
+            }
+        }).start();
     }
 
     /**
@@ -69,11 +70,13 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void notifyRoundEvent(Event event, int roundNumber) {
-        try {
-            remoteObj.notifyRoundEvent(event,roundNumber);
-        } catch (RemoteException e) {
-            user.disconnect();
-        }
+        new Thread(()-> {
+            try {
+                remoteObj.notifyRoundEvent(event, roundNumber);
+            } catch (RemoteException e) {
+                user.disconnect();
+            }
+        }).start();
     }
 
     /**
@@ -84,11 +87,14 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void notifyTurnEvent(Event event, int playerId, int turnNumber) {
-        try {
-            remoteObj.notifyTurnEvent(event,playerId,turnNumber);
-        } catch (RemoteException e) {
-            user.disconnect();
+        new Thread(()-> {
+            try {
+                remoteObj.notifyTurnEvent(event, playerId, turnNumber);
+            } catch (RemoteException e) {
+                user.disconnect();
+            }
         }
+        ).start();
     }
 
     /**
@@ -110,13 +116,13 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void notifyBoardChanged() {
-            new Thread(()-> {
-                try {
-                    remoteObj.notifyBoardChanged();
-                } catch (RemoteException e) {
-                    user.disconnect();
-                }
-            }).start();
+        new Thread(()-> {
+            try {
+                remoteObj.notifyBoardChanged();
+            } catch (RemoteException e) {
+                user.disconnect();
+            }
+        }).start();
 
     }
 
