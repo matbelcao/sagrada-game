@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.view.clientUI.uielements;
 import it.polimi.ingsw.client.clientController.CmdWriter;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.clientUI.GUI;
+import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.serializables.*;
 import javafx.geometry.Insets;
@@ -30,8 +31,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.ingsw.client.clientFSM.ClientFSMState.MAIN;
-import static it.polimi.ingsw.client.clientFSM.ClientFSMState.NOT_MY_TURN;
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
 
 public class GUIutil {
     private final CmdWriter cmdWrite;
@@ -132,7 +132,7 @@ public class GUIutil {
     }
 
 
-    public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie) {
+    public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie) {
         double cellDim = getMainSceneCellDim(width,height);
         HBox track = new HBox();
         track.setSpacing(10);
@@ -148,6 +148,14 @@ public class GUIutil {
                         drawDie(roundTrack.get(i).get(1), gc,cellDim/2,0, cellDim);
                     }else {
                         drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                    }
+                    if (turnState.equals(CHOOSE_PLACEMENT) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)){
+                        highlight(p);
+                        int finalI = i;
+                        p.setOnMouseClicked(e->{
+                            cmdWrite.write(finalI +"");
+                            System.out.println("......... ..... ......... .......SELECETED DIE "+ finalI);
+                        });
                     }
                     p.getChildren().add(c);
                 }
@@ -196,12 +204,21 @@ public class GUIutil {
     }
 
 
-    public Group drawDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState) {
+    public Group drawDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList) {
         HBox pool = new HBox();
         pool.setSpacing(10);
         for(int i = 0 ; i<draftPool.size();i++){
             Canvas c = new Canvas(dieDim,dieDim);
             drawDie(draftPool.get(i),c.getGraphicsContext2D(),dieDim);
+            if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)){
+                if(latestPlacementsList.isEmpty()) {
+                    highlight(c, dieDim);
+                    System.out.println("highlighting draftpool for full placement "+ i);
+                }else if (latestPlacementsList.contains(i)){
+                    System.out.println("highlighting draftpool for empty "+ i);
+                    highlight(c, dieDim);
+                }
+            }
             pool.getChildren().add(c);
             int finalI = i;
             c.setOnMouseClicked(e->{
@@ -218,6 +235,17 @@ public class GUIutil {
                         cmdWrite.write("b");
                         cmdWrite.write("1");
                         cmdWrite.write(finalI +"");
+                        break;
+                    case SELECT_DIE:
+                        System.out.println("selected die at position " + finalI + " in draftpool");
+                        cmdWrite.write(finalI +"");
+                        if(latestOptionsList.size()==1 && latestOptionsList.get(0).equals(Actions.REROLL)){
+                            cmdWrite.write(0+"");
+                            System.out.println("draftpool writing 0 because latest option list has 1 option and the action is reroll");
+                        }else if(latestOptionsList.size()==1 && latestOptionsList.get(0).equals(Actions.FLIP)){
+                            cmdWrite.write(0+"");
+                            System.out.println("draftpool writing 0 because latest option list has 1 option and the action is flip");
+                        }
                 }
             });
         }
@@ -252,6 +280,7 @@ public class GUIutil {
                 int position = i*NUM_COLS+j;
                 if(turnState.equals(ClientFSMState.CHOOSE_PLACEMENT)&& latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)&& latestPlacementsList.contains(position)){
                     highlight(cell,cellDIm);
+                    System.out.println("highlighting schema because i'm in choose placement and latest selected die is draftpool");
                     cell.setOnMouseClicked(e->{
                         cmdWrite.write(latestPlacementsList.indexOf(position) +"");
                         System.out.println("selected position " + position);
@@ -298,13 +327,12 @@ public class GUIutil {
                         System.out.println(".................selected tool "+ tools.indexOf(toolCard)+"..........");
                         cmdWrite.write(tools.indexOf(toolCard)+"");
                     }
-
                 });
                 cards.add(c);
             }
             cardContainer.getChildren().setAll(cards);
         });
-        pub.fire();
+        tool.fire();
         return new Group(primaryContainer);
 
     }
@@ -314,6 +342,10 @@ public class GUIutil {
         gc.setStroke(Color.ORANGE);
         gc.setLineWidth(cellDim*LINE_TO_CELL);
         gc.strokeRect(0,0,cellDim,cellDim);
+    }
+
+    private void highlight(StackPane p) {
+        highlight((Canvas) p.getChildren().get(1), 100);
     }
 
     private Canvas whiteCanvas(double dim){
