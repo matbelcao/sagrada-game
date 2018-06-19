@@ -559,6 +559,7 @@ public class SocketClient implements ClientConn {
     /**
      * This function can be invoked to select one die of a previously GET_DICE_LIST command and obtain
      * a list of to options to manipulate it
+     * @param dieIndex the index of the die to select
      * @return and immutable and indexed list containing the dice
      */
     @Override

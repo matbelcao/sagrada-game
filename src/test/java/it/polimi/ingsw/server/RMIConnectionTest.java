@@ -16,16 +16,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RMIConnectionTest {
-    private static MasterServer server=MasterServer.getMasterServer();
-    @BeforeAll
-    static void beforeAllTests(){
-        server.startRMI();
-        //MasterServer.getMasterServer().startSocket();
-    }
+
     //This test logs 9 clients and verifies if they get properly saved by the master server
     @Disabled
     @Test
     public void orderedConnection() {
+        MasterServer server=MasterServer.getMasterServer();
+        server.startRMI();
+
         ArrayList<User> users;
         Client c1 = new Client(UIMode.CLI,ConnectionMode.RMI,"127.0.0.1",1099,UILanguage.ita);
         Client c2 = new Client(UIMode.CLI,ConnectionMode.RMI,"127.0.0.1",1099,UILanguage.ita);
