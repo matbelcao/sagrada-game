@@ -28,6 +28,4 @@ public interface ServerConn {
 
     boolean ping();
 
-
-
 }

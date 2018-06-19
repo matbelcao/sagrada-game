@@ -145,6 +145,4 @@ public interface ClientConn {
      */
     boolean pong() throws RemoteException;
 
-    //ONLY FOR DEBUG PURPOSES
-    void sendDebugMessage(String message);
 }

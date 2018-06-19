@@ -22,16 +22,26 @@ public class RMIClient implements ClientConn {
         return false;
     }
 
-    /**
-     * Tells the server the client is quitting the game
-     */
     @Override
-    public void quit() {
+    public List<LightSchemaCard> getSchemaDraft() {
+        List <LightSchemaCard>result = null;
         try {
-            remoteObj.quit();
-        } catch (RemoteException e) {
-            //do nothing already disconnecting
+            result = remoteObj.getSchemaDraft();
+        } catch (RemoteException | IllegalActionException e) {
+            e.printStackTrace();
         }
+        return result;
+    }
+
+    @Override
+    public LightSchemaCard getSchema(int playerId) {
+        LightSchemaCard schema=null;
+        try {
+            schema = remoteObj.getSchema(playerId);
+        } catch (RemoteException | IllegalActionException e) {
+            e.printStackTrace();
+        }
+        return schema;
     }
 
     @Override
@@ -80,7 +90,14 @@ public class RMIClient implements ClientConn {
 
     @Override
     public List<List<LightDie>> getRoundtrack() {
-        return null;
+        List<List<LightDie>> roundTrack=null;
+        try {
+            roundTrack = remoteObj.getRoundTrack();
+        } catch (RemoteException | IllegalActionException e) {
+            e.printStackTrace();
+        }
+        return roundTrack;
+
     }
 
     @Override
@@ -95,7 +112,7 @@ public class RMIClient implements ClientConn {
     }
 
     @Override
-    public int getFavorTokens(int playerId) { //TODO check if it should throw exception
+    public int getFavorTokens(int playerId) {
         int favorTokens = 0;
         try{
             favorTokens = remoteObj.getFavorTokens(playerId);
@@ -107,75 +124,106 @@ public class RMIClient implements ClientConn {
 
     @Override
     public List<IndexedCellContent> getDiceList() {
-        return null;
+        List<IndexedCellContent> diceList=null;
+        try{
+            diceList = remoteObj.getDiceList();
+        }catch(RemoteException | IllegalActionException e){
+            e.printStackTrace();
+        }
+        return diceList;
     }
 
     @Override
     public List<Commands> select(int die_index) {
-        return null;
+        List<Commands> options=null;
+        try{
+            options = remoteObj.select(die_index);
+        }catch(RemoteException | IllegalActionException e){
+            e.printStackTrace();
+        }
+        return options;
     }
 
     @Override
     public List<Integer> getPlacementsList() {
-        return null;
-    }
-
-    @Override
-    public LightSchemaCard getSchema(int playerId) {
-        LightSchemaCard returnedCard=null;
-        try {
-            returnedCard = remoteObj.getSchema(playerId);
-        } catch (RemoteException e) {
-            e.printStackTrace(); //TODO handle lost connection
-            return null;
-        } catch (IllegalActionException e) {
+        List<Integer> placements=null;
+        try{
+            placements = remoteObj.getPlacementsList();
+        }catch(RemoteException | IllegalActionException e){
             e.printStackTrace();
         }
-        return returnedCard;
+        return placements;
     }
-
-    @Override
-    public void endTurn() {
-
-    }
-
-    @Override
-    public List<LightSchemaCard> getSchemaDraft() {
-        List <LightSchemaCard>result = null;
-        try {
-           result = remoteObj.getSchemaDraft();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (IllegalActionException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
 
     @Override
     public boolean choose(int index) {
+        try{
+            return remoteObj.choose(index);
+        }catch(RemoteException | IllegalActionException e){
+            e.printStackTrace();
+        }
         return false;
     }
 
     @Override
     public boolean enableTool(int tool_index) {
+        try{
+            return remoteObj.enableTool(tool_index);
+        }catch(RemoteException | IllegalActionException e){
+            e.printStackTrace();
+        }
         return false;
     }
 
     @Override
     public boolean toolCanContinue() {
+        try{
+            return remoteObj.toolCanContinue();
+        }catch(RemoteException | IllegalActionException e){
+            e.printStackTrace();
+        }
         return false;
     }
 
     @Override
-    public void discard() {
+    public void endTurn() {
+        try {
+            remoteObj.endTurn();
+        } catch (RemoteException | IllegalActionException e) {
+            e.printStackTrace();
+        }
+    }
 
+    @Override
+    public void discard() {
+        try {
+            remoteObj.discard();
+        } catch (RemoteException | IllegalActionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void exit() {
+        try {
+            remoteObj.exit();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (IllegalActionException e) {
+            e.printStackTrace();
+        }
+    }
 
+    /**
+     * Tells the server the client is quitting the game
+     */
+    @Override
+    public void quit() {
+        try {
+            remoteObj.quit();
+        } catch (RemoteException e) {
+            //do nothing already disconnecting
+        }
     }
 
     @Override
@@ -183,9 +231,5 @@ public class RMIClient implements ClientConn {
         return false;
     }
 
-    @Override
-    public void sendDebugMessage(String message) {
-
-    }
 }
 

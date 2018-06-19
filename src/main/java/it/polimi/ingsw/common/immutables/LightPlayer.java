@@ -25,7 +25,9 @@ public class LightPlayer {
         int playerId = player.getGameId();
         LightPlayer lightPlayer = new LightPlayer(username,playerId);
         lightPlayer.setPoints(player.getScore());
-        lightPlayer.setSchema(LightSchemaCard.toLightSchema(player.getSchema()));
+        if(player.getSchema()!=null){
+            lightPlayer.setSchema(LightSchemaCard.toLightSchema(player.getSchema()));
+        }
         lightPlayer.setFinalPosition(player.getFinalPosition());
         return lightPlayer;
     }

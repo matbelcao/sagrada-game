@@ -429,7 +429,6 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends to the client a text list of possible placements in his schema card (with an unique INDEX)
      */
     private void sendPlacementList() throws IllegalActionException {
-        System.out.println("QUIXXXXX");// TODO: 13/06/2018 delete
         List<Integer> placements=user.getGame().getPlacements();
 
         outSocket.print("LIST_PLACEMENTS");
@@ -442,10 +441,10 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Allows the user to select the die of the previous list received, then sends the relative list of allowed positions
-     * @param index the index of the die previously received by the client
+     * @param dieIndex the index of the die previously received by the client
      */
-    private void selectDie(int index) throws IllegalActionException {
-        List<Commands> options = user.getGame().selectDie(index);
+    private void selectDie(int dieIndex) throws IllegalActionException {
+        List<Commands> options = user.getGame().selectDie(dieIndex);
 
         outSocket.print("LIST_OPTIONS");
         for(int i=0;i<options.size();i++){
@@ -457,12 +456,12 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Allows the user to put the die contained in the previous list received, then sends an answer about the action
-     * @param index the index of the die previously selected
+     * @param optionIndex the index of the option received
      */
-    private void choose(int index) throws IllegalActionException {
+    private void choose(int optionIndex) throws IllegalActionException {
         if(user.getGame()==null){throw new IllegalActionException();}
 
-        Boolean result=user.getGame().choose(user,index);
+        Boolean result=user.getGame().choose(user,optionIndex);
         if(result){
             outSocket.println("CHOICE ok");
         }else{
@@ -471,9 +470,9 @@ public class SocketServer extends Thread implements ServerConn  {
         outSocket.flush();
     }
 
-    private void toolEnable(int index) throws IllegalActionException {
+    private void toolEnable(int toolIndex) throws IllegalActionException {
         Boolean used;
-        used=user.getGame().activeTool(index);
+        used=user.getGame().activeTool(toolIndex);
         if(used){
             outSocket.println("TOOL ok");
         }else{

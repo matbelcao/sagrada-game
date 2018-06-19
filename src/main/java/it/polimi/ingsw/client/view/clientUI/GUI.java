@@ -130,11 +130,8 @@ public class GUI extends Application implements ClientUI {
             Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(), sceneCreator.getLoginWidth());
 
             button.setOnAction(e -> {
-            synchronized (client.getLockCredentials()) {
                 client.setUsername(usernameField.getText());
                 client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
-                client.getLockCredentials().notifyAll();
-            }
         });
         usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //delete
         primaryStage.setTitle("Login");
