@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
@@ -286,9 +287,7 @@ public class RMIClient implements ClientConn{
     public void back() {
         try {
             remoteObj.back();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (IllegalActionException e) {
+        } catch (RemoteException | IllegalActionException e) {
             e.printStackTrace();
         }
     }
@@ -305,6 +304,15 @@ public class RMIClient implements ClientConn{
         }
     }
 
+    @Override
+    public void newMatch() {
+        try {
+            remoteObj.newMatch();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Tests if the client is still connected
      * @return true if the client is connected
@@ -313,7 +321,7 @@ public class RMIClient implements ClientConn{
     public void pong(){
         new Thread(() -> {
             boolean ping=true;
-            while(ping) {
+            while(ping && client.isLogged()) {
                 try {
                     ping = remoteObj.pong();
                     try {
@@ -321,11 +329,11 @@ public class RMIClient implements ClientConn{
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    System.out.println("PING RMI");
+                    //System.out.println("PONG RMI");
                 } catch (RemoteException e) {
                     client.disconnect();
-                    System.out.println("CONNECTION TIMEOUT!");
                     ping=false;
+                    System.out.println("CONNECTION TIMEOUT!");
                 }
             }
         }).start();

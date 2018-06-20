@@ -176,4 +176,16 @@
         <eng>Temporarily disconnected</eng>
         <ita>Temporaneamente disconnesso</ita>
     </disconnected>
+    <game-end>
+        <eng>The match has finished, we hope you enjoyed it!</eng>
+        <ita>La partita è finita, spero ti sia divertito!</ita>
+    </game-end>
+    <score>
+        <eng>Here are the final scores:</eng>
+        <ita>Ecco i punteggi finali:</ita>
+    </score>
+    <player-score>
+        <eng> score</eng>
+        <ita> punti</ita>
+    </player-score>
 </messages>

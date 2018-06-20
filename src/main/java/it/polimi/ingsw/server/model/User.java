@@ -63,12 +63,6 @@ public class User{
         }
     }
 
-    public void closeConnection(){
-        game=null;
-        status=UserStatus.DISCONNECTED;
-        getServerConn().close();
-    }
-
     /**
      * Sets the user connection status (CONNECTED, PLAYING,....)
      * @param status the connection status to be set
@@ -136,6 +130,14 @@ public class User{
             return false;
         }
         return this.equals(game.getUserPlaying());
+    }
+
+    public void newMatch(){
+        if(game.isGameEnded()){
+            status=UserStatus.CONNECTED;
+            MasterServer.getMasterServer().updateConnected(this);
+            System.out.println("New match for: "+username);
+        }
     }
     
 }

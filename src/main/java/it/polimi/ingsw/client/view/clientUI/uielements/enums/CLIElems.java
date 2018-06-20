@@ -17,7 +17,8 @@ public enum CLIElems {
     SAGRADA_WALL("sagrada-wall"),
     LOGIN_LINE("login-line"),
     LOBBY("lobby"),
-    DRAFTED_INFO("drafted-info");
+    DRAFTED_INFO("drafted-info"),
+    POINTS("points");
 
     private String clielem;
     CLIElems(String clielem){

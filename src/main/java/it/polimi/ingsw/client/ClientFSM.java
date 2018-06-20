@@ -127,18 +127,13 @@ public class ClientFSM {
     }
 
     private void manageNewGameChoice(int index) {
-        if(index==1){
-            newGame();
-        }else if(index==0){
-            client.quit();
+        if(index==0){
+            client.reset();
         }else{
             client.getClientUI().showLastScreen();
         }
     }
 
-    private void newGame() {
-        client.reset();
-    }
 
     /**
      * this allows the user to choose the schema to play with at the beginning of the match
@@ -201,6 +196,9 @@ public class ClientFSM {
                     state=CHOOSE_TOOL.nextState(true);
                     lockState.notifyAll();
                 }
+                int myId=client.getBoard().getMyPlayerId();
+                client.getBoard().updateFavorTokens(myId,client.getClientConn().getFavorTokens(myId));
+
                 client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
                 if(client.getBoard().getLatestDiceList().isEmpty()){
                     synchronized (lockState) {
@@ -311,7 +309,7 @@ public class ClientFSM {
             }
         }
 
-        client.getBoard().notifyObservers();
+        client.getUpdates();
     }
 
 
@@ -337,8 +335,9 @@ public class ClientFSM {
             }
             if(state.equals(TOOL_CAN_CONTINUE)){
                 toolContinue();
+            }else {
+                client.getUpdates();
             }
-            client.getBoard().notifyObservers();
         }else{
             client.getClientUI().showLastScreen();
         }

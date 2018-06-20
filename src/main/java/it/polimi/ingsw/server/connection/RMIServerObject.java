@@ -44,7 +44,7 @@ public class RMIServerObject  implements RMIServerInt {
         if(event.equals(TURN_START)){
             client.updateGameTurnStart(playerId,turnNumber==0); //todo change signature
         }else if (event.equals(TURN_END)){
-            client.updateGameTurnEnd(playerId,turnNumber);
+            client.updateGameTurnEnd(playerId);
         }
     }
 
@@ -57,11 +57,6 @@ public class RMIServerObject  implements RMIServerInt {
     @Override
     public void notifyBoardChanged(){
         client.getUpdates();
-    }
-
-    @Override
-    public void close(){
-
     }
 
     @Override

@@ -48,5 +48,7 @@ public interface RMIClientInt extends Remote {
 
     void quit() throws RemoteException;
 
+    void newMatch() throws RemoteException;
+
     boolean pong() throws RemoteException;
 }

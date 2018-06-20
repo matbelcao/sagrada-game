@@ -11,29 +11,39 @@ public enum ClientFSMState {
     CHOOSE_SCHEMA {//the game start message was just received and the client is choosing the schema among the drafted ones
 
         /**
-         * this method is called when the user has chosen a certain schema or has tried to
-         * @param hasChosen this tells if the choice of the schema was performed correctly
+         * this method is useless
+         * @param nothingToDo this has no effect here
          * @param back this has no effect here
          * @param endTurn this has no effect here
          * @param discard this has no effect here
          * @return the next state
          */
         @Override
-        public synchronized ClientFSMState nextState(boolean hasChosen, boolean back, boolean endTurn, boolean discard){
+        public synchronized ClientFSMState nextState(boolean nothingToDo, boolean back, boolean endTurn, boolean discard){
 
-            if(hasChosen){
-                return NOT_MY_TURN;
-            }
-            return CHOOSE_SCHEMA;
+
+            return SCHEMA_CHOSEN;
         }
+
         /**
-         * this method is called when the user has chosen a certain schema or has tried to
-         * @param hasChosen this tells if the choice of the schema was performed correctly
+         * this method is useless
+         * @param nothingToDo this has no effect here
          * @return the next state
          */
         @Override
-        public ClientFSMState nextState(boolean hasChosen){
-            return nextState(hasChosen,false,false,false);
+        public ClientFSMState nextState(boolean nothingToDo){
+            return nextState(nothingToDo,false,false,false);
+        }
+    },
+    SCHEMA_CHOSEN{
+        @Override
+        public ClientFSMState nextState(boolean stateSpecific, boolean back, boolean endTurn, boolean discard) {
+            return null;
+        }
+
+        @Override
+        public ClientFSMState nextState(boolean stateSpecific) {
+            return null;
         }
     },
 

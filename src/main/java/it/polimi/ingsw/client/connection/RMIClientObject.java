@@ -114,6 +114,9 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     public void quit() { user.quit(); }
 
     @Override
+    public void newMatch() throws RemoteException { user.newMatch(); }
+
+    @Override
     public boolean pong() {
         user.getClass();
         return true;

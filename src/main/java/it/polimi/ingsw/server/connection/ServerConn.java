@@ -61,11 +61,6 @@ public interface ServerConn {
     void notifyBoardChanged();
 
     /**
-     * Closes the connection with the client
-     */
-    void close();
-
-    /**
      * Tests if the client is still connected
      */
     void ping();

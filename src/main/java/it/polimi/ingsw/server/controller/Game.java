@@ -170,15 +170,20 @@ public class Game extends Thread implements Iterable  {
         List<RankingEntry> ranking;
 
         ranking=board.gameRunningEnd();
+        fsm.endGame();
+        System.out.println(fsm.getCurState());
 
         for(User u:users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
                 u.getServerConn().notifyGameEnd(ranking);
                 board.getPlayer(u).quitMatch();
-                u.closeConnection();
                 System.out.println("End match: "+u.getUsername());
             }
         }
+    }
+
+    public boolean isGameEnded(){
+        return fsm.getCurState().equals(ServerState.GAME_ENDED);
     }
 
     /**
@@ -207,9 +212,9 @@ public class Game extends Thread implements Iterable  {
      * Notifies to the connected clients that the current player's action has changed some Board parameters.
      * This message will trigger the client's update requests.
      */
-    private void notifyBoardChanged(){
+    private void notifyBoardChanged(User user){
         for(User u:users){
-            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this) && !u.equals(user)) {
                 u.getServerConn().notifyBoardChanged();
             }
         }
@@ -227,7 +232,9 @@ public class Game extends Thread implements Iterable  {
 
         //Notify to all the users the starting of the turn
         for(User u:users){
-            u.getServerConn().notifyTurnEvent(Event.TURN_START,board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                u.getServerConn().notifyTurnEvent(Event.TURN_START, board.getPlayer(userPlaying).getGameId(), round.isFirstTurn() ? 0 : 1);
+            }
         }
 
         timer = new Timer();
@@ -236,7 +243,9 @@ public class Game extends Thread implements Iterable  {
 
         //Notify to all the users the ending of the turn
         for(User u:users){
-            u.getServerConn().notifyTurnEvent(Event.TURN_END,board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                u.getServerConn().notifyTurnEvent(Event.TURN_END, board.getPlayer(userPlaying).getGameId(), round.isFirstTurn() ? 0 : 1);
+            }
         }
     }
 
@@ -465,7 +474,7 @@ public class Game extends Thread implements Iterable  {
                 if(!user.equals(userPlaying)){throw new IllegalActionException();}
                 response=board.choosePlacement(index);
                 if(response){
-                    notifyBoardChanged();
+                    notifyBoardChanged(user);
                 }
                 break;
             default:
@@ -504,7 +513,7 @@ public class Game extends Thread implements Iterable  {
         Boolean toolEnabled=board.activeTool(index,turn,roundNumber);
 
         if(toolEnabled){
-            notifyBoardChanged();
+            notifyBoardChanged(userPlaying);
         }
         return toolEnabled;
     }
@@ -520,7 +529,7 @@ public class Game extends Thread implements Iterable  {
 
         boolean response = board.toolStatus();
 
-        notifyBoardChanged();
+        notifyBoardChanged(userPlaying);
 
         return response;
     }
@@ -545,7 +554,11 @@ public class Game extends Thread implements Iterable  {
         board.exit();
 
         if(notifyBoardChanged){
-            notifyBoardChanged();
+            for(User u:users){
+                if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                    u.getServerConn().notifyBoardChanged();
+                }
+            }
         }
     }
 

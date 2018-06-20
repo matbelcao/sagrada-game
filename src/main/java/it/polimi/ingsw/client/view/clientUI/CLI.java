@@ -1,7 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.LightBoardEvents;
 import it.polimi.ingsw.client.view.clientUI.uielements.CLIView;
@@ -18,6 +17,7 @@ import it.polimi.ingsw.common.serializables.LightSchemaCard;
 
 import java.io.BufferedReader;
 import java.io.Console;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
@@ -175,79 +175,83 @@ public class CLI implements ClientUI {
      * this method updates the view to the latest changes in the lightboard and/or state of the client
      * @param board the board
      */
-    private void updateBoard(LightBoard board) {
-        synchronized (view) {
-            if (board == null) {
-                throw new IllegalArgumentException();
-            }
-            for(Integer change : board.getChanges()) {
-                switch (change) {
-                    case LightBoardEvents.PrivObj:
-                        view.updatePrivObj(board.getPrivObj());
-                        break;
-                    case LightBoardEvents.Tools:
-                        view.updateTools(board.getTools());
-                        break;
-                    case  LightBoardEvents.PubObjs:
-                        view.updateObjectives(board.getPubObjs(), board.getPrivObj());
-                        break;
-                    case LightBoardEvents.DraftPool:
-                        view.updateDraftPool(board.getDraftPool());
-                        break;
-                    case LightBoardEvents.RoundTrack:
-                        view.updateRoundTrack(board.getRoundTrack());
-                        break;
-                    case LightBoardEvents.Schema:
-                        for (int i = 0; i < board.getNumPlayers(); i++) {
-                            view.updateSchema(board.getPlayerById(i));
-                        }
-                        break;
-                    case LightBoardEvents.NowPlaying:
-                        view.updateRoundTurn(board.getRoundNumber(), board.getIsFirstTurn(), board.getNowPlaying());
-                        break;
-                    default:
-                        break;
-                }
-            }
-            switch (client.getTurnState()) {
-                case CHOOSE_SCHEMA:
-                    break;
-                case NOT_MY_TURN:
-                    view.updateMenuNotMyTurn(board.getPlayerById(board.getNowPlaying()).getUsername());
-                    printToScreen(view.printMainView(NOT_MY_TURN));
-                    break;
-                case MAIN:
-                    view.updateMenuMain();
-                    printToScreen(view.printMainView(MAIN));
-                    break;
-                case SELECT_DIE:
-                    if (board.getLatestDiceList().get(0).getPlace().equals(Place.ROUNDTRACK) &&
-                            board.getLatestOptionsList().get(0).equals(Actions.SWAP)) {
-                        board.getLatestDiceList().add(0, board.getLatestSelectedDie());
-                    }
-                    view.updateMenuDiceList(board.getLatestDiceList());
-                    printToScreen(view.printMainView(SELECT_DIE));
-                    break;
-                case CHOOSE_OPTION:
-                    break;
-                case CHOOSE_TOOL:
-                    view.updateMenuListTools(board.getTools());
-                    printToScreen(view.printMainView(CHOOSE_TOOL));
-                    break;
-                case CHOOSE_PLACEMENT:
-                    view.updateMenuListPlacements(board.getLatestPlacementsList(), board.getLatestSelectedDie().getContent());
-                    printToScreen(view.printMainView(CHOOSE_PLACEMENT));
-                    break;
-                case TOOL_CAN_CONTINUE:
-                    break;
-                case GAME_ENDED:
-                    // TODO: 20/06/2018 implement
-                    break;
-            }
+    private synchronized void updateBoard(LightBoard board) {
 
-            board.clearChanges();
-
+        if (board == null) {
+            throw new IllegalArgumentException();
         }
+        List<Integer> changes=new ArrayList<>(board.getChanges());
+        for(Integer change : changes) {
+            switch (change) {
+                case LightBoardEvents.PrivObj:
+                    view.updatePrivObj(board.getPrivObj());
+                    break;
+                case LightBoardEvents.Tools:
+                    view.updateTools(board.getTools());
+                    break;
+                case  LightBoardEvents.PubObjs:
+                    view.updateObjectives(board.getPubObjs(), board.getPrivObj());
+                    break;
+                case LightBoardEvents.DraftPool:
+                    view.updateDraftPool(board.getDraftPool());
+                    break;
+                case LightBoardEvents.RoundTrack:
+                    view.updateRoundTrack(board.getRoundTrack());
+                    break;
+                case LightBoardEvents.Status:
+                case LightBoardEvents.Schema:
+                    for (int i = 0; i < board.getNumPlayers(); i++) {
+                        view.updateSchema(board.getPlayerById(i));
+                    }
+                    break;
+                case LightBoardEvents.NowPlaying:
+                    view.updateRoundTurn(board.getRoundNumber(), board.getIsFirstTurn(), board.getNowPlaying());
+                    break;
+                default:
+                    break;
+            }
+        }
+        switch (client.getTurnState()) {
+            case CHOOSE_SCHEMA:
+                break;
+
+            case NOT_MY_TURN:
+                view.updateMenuNotMyTurn(board.getPlayerById(board.getNowPlaying()).getUsername());
+                printToScreen(view.printMainView(NOT_MY_TURN));
+                break;
+            case MAIN:
+                view.updateMenuMain();
+                printToScreen(view.printMainView(MAIN));
+                break;
+            case SELECT_DIE:
+                if (board.getLatestDiceList().get(0).getPlace().equals(Place.ROUNDTRACK) &&
+                        board.getLatestOptionsList().get(0).equals(Actions.SWAP)) {
+                    board.getLatestDiceList().add(0, board.getLatestSelectedDie());
+                }
+                view.updateMenuDiceList(board.getLatestDiceList());
+                printToScreen(view.printMainView(SELECT_DIE));
+                break;
+            case CHOOSE_OPTION:
+                break;
+            case CHOOSE_TOOL:
+                view.updateMenuListTools(board.getTools());
+                printToScreen(view.printMainView(CHOOSE_TOOL));
+                break;
+            case CHOOSE_PLACEMENT:
+                view.updateMenuListPlacements(board.getLatestPlacementsList(), board.getLatestSelectedDie().getContent());
+                printToScreen(view.printMainView(CHOOSE_PLACEMENT));
+                break;
+            case TOOL_CAN_CONTINUE:
+                break;
+            case GAME_ENDED:
+                view.updateGameRanking(board.sortFinalPositions());
+                printToScreen(view.printGameEndScreen());
+                break;
+        }
+
+        board.clearChanges();
+
+
     }
 
 
