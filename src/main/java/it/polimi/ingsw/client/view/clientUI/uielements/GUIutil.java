@@ -232,14 +232,10 @@ public class GUIutil {
                 }
                 break;
             case CHOOSE_PLACEMENT:
-               /* for (Canvas c : poolDice) {
-                    c.setOnMouseClicked(e->{
-                        cmdWrite.write("b");
-                        cmdWrite.write("1");
-                        cmdWrite.write(poolDice.indexOf(c) +"");
-                    });
-                }*/
-                break; //possible bug
+               if(latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)){
+                   highlightBlue(poolDice.get(latestSelectedDie.getPosition()),dieDim);
+            }
+                break;
             case SELECT_DIE:
                 if(!latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE)){
                     //do  todo delete remove windowed approach
@@ -284,29 +280,29 @@ public class GUIutil {
 
     public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,List<Actions> latestOptionsList) {
         double dieDim = width/NUM_COLS;
-        ArrayList<Canvas> schemaCells = new ArrayList<>();
+        ArrayList<Canvas> gridCells = new ArrayList<>();
 
         for(int i = 0; i< NUM_COLS*NUM_ROWS; i++){
             Canvas cell;
             if(lightSchemaCard.hasConstraintAt(i)){
                 cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i),dieDim);
-                schemaCells.add(cell);
+                gridCells.add(cell);
             }else if(lightSchemaCard.hasDieAt(i)){  //todo change it with active cell object
                 cell = lightDieToCanvas(lightSchemaCard.getDieAt(i),dieDim);
-                schemaCells.add(cell);
+                gridCells.add(cell);
             }else{
                 cell = whiteCanvas(dieDim);
-                schemaCells.add(cell);
+                gridCells.add(cell);
             }
         }
 
         switch (turnState){
             case CHOOSE_PLACEMENT:
                 if(latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)|| !latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)){
-                    for(Canvas c : schemaCells){
-                        if(latestPlacementsList.contains(schemaCells.indexOf(c))){
+                    for(Canvas c : gridCells){
+                        if(latestPlacementsList.contains(gridCells.indexOf(c))){
                             highlight(c,dieDim);
-                            c.setOnMouseClicked(e->cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(c))+""));
+                            c.setOnMouseClicked(e->cmdWrite.write(latestPlacementsList.indexOf(gridCells.indexOf(c))+""));
                         }
                     }
                 }
@@ -314,10 +310,10 @@ public class GUIutil {
             case SELECT_DIE:
                 if(!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.SCHEMA)){
                     for (IndexedCellContent activeCell : latestDiceList){
-                        Canvas c = schemaCells.get(activeCell.getPosition());
+                        Canvas c = gridCells.get(activeCell.getPosition());
                         highlight(c, dieDim);
                         c.setOnMouseClicked(e -> {
-                            System.out.println("selected die at position " + schemaCells.indexOf(c) + " in schema");
+                            System.out.println("selected die at position " + gridCells.indexOf(c) + " in schema");
                             cmdWrite.write(latestDiceList.indexOf(activeCell) + "");
                         });
                     }
@@ -327,7 +323,7 @@ public class GUIutil {
         GridPane grid = new GridPane();
         for(int row = 0; row<NUM_ROWS; row++){
             for(int col = 0; col<NUM_COLS;col++){
-                grid.add(schemaCells.get(row*NUM_COLS+col),col,row);
+                grid.add(gridCells.get(row*NUM_COLS+col),col,row);
             }
         }
         Insets padding = new Insets(10, 10, 10, 10);
@@ -415,6 +411,14 @@ public class GUIutil {
         gc.setLineWidth(cellDim*LINE_TO_CELL);
         gc.strokeRect(0,0,cellDim,cellDim);
     }
+
+    private void highlightBlue(Canvas cell, double cellDim) {
+        GraphicsContext gc = cell.getGraphicsContext2D();
+        gc.setStroke(Color.BLUE);
+        gc.setLineWidth(cellDim*LINE_TO_CELL);
+        gc.strokeRect(0,0,cellDim,cellDim);
+    }
+
 
     private void highlight(StackPane p) {
         highlight((Canvas) p.getChildren().get(1), 100);
