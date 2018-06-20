@@ -25,6 +25,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -230,24 +232,42 @@ public class GUIutil {
                 }
                 break;
             case CHOOSE_PLACEMENT:
-                for (Canvas c : poolDice) {
+               /* for (Canvas c : poolDice) {
                     c.setOnMouseClicked(e->{
                         cmdWrite.write("b");
                         cmdWrite.write("1");
                         cmdWrite.write(poolDice.indexOf(c) +"");
                     });
-                }
-                break;
+                }*/
+                break; //possible bug
             case SELECT_DIE:
-                for (IndexedCellContent activeCell : latestDiceList) {
-                    Canvas c = poolDice.get(activeCell.getPosition());
-                    highlight(c,dieDim);
-                    c.setOnMouseClicked(e->{
-                        System.out.println("selected die at position " + poolDice.indexOf(c) + " in draftpool");
-                        cmdWrite.write(poolDice.indexOf(c) +"");
+                if(!latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE)){
+                    //do  todo delete remove windowed approach
+                    Stage window = new Stage();
+                    window.initModality(Modality.APPLICATION_MODAL);
+                    Button decrease = new Button("decrease");
+                    Button increase = new Button("increase");
+                    decrease.setOnAction(e->{
+                        cmdWrite.write("0");
+                        window.close();
                     });
+                    increase.setOnAction(e->{
+                        cmdWrite.write("1");
+                        window.close();
+                    });
+                    Scene s = new Scene(new HBox(decrease,increase),300,300);
+                    window.setScene(s);
+                    window.showAndWait();
+                }else if(!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)) {
+                    for (IndexedCellContent activeCell : latestDiceList) {
+                        Canvas c = poolDice.get(activeCell.getPosition());
+                        highlight(c, dieDim);
+                        c.setOnMouseClicked(e -> {
+                            System.out.println("selected die at position " + poolDice.indexOf(c) + " in draftpool");
+                            cmdWrite.write(poolDice.indexOf(c) + "");
+                        });
+                    }
                 }
-
 
         }
         HBox pool = new HBox();
@@ -257,19 +277,72 @@ public class GUIutil {
 
         }
 
-    public Group drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie) {
-        GridPane g = schemaToGrid(schema,dieDim*NUM_COLS,dieDim*NUM_ROWS,turnState,latestPlacementsList,latestSelectedDie);
+    public Group drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,List<Actions> latestOptionsList) {
+        GridPane g = schemaToGrid(schema,dieDim*NUM_COLS,dieDim*NUM_ROWS,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList);
         return new Group(g);
     }
 
-    public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie){
+    public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,List<Actions> latestOptionsList) {
+        double dieDim = width/NUM_COLS;
+        ArrayList<Canvas> schemaCells = new ArrayList<>();
+
+        for(int i = 0; i< NUM_COLS*NUM_ROWS; i++){
+            Canvas cell;
+            if(lightSchemaCard.hasConstraintAt(i)){
+                cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i),dieDim);
+                schemaCells.add(cell);
+            }else if(lightSchemaCard.hasDieAt(i)){  //todo change it with active cell object
+                cell = lightDieToCanvas(lightSchemaCard.getDieAt(i),dieDim);
+                schemaCells.add(cell);
+            }else{
+                cell = whiteCanvas(dieDim);
+                schemaCells.add(cell);
+            }
+        }
+
+        switch (turnState){
+            case CHOOSE_PLACEMENT:
+                if(latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)|| !latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)){
+                    for(Canvas c : schemaCells){
+                        if(latestPlacementsList.contains(schemaCells.indexOf(c))){
+                            highlight(c,dieDim);
+                            c.setOnMouseClicked(e->cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(c))+""));
+                        }
+                    }
+                }
+                break;
+            case SELECT_DIE:
+                if(!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.SCHEMA)){
+                    for (IndexedCellContent activeCell : latestDiceList){
+                        Canvas c = schemaCells.get(activeCell.getPosition());
+                        highlight(c, dieDim);
+                        c.setOnMouseClicked(e -> {
+                            System.out.println("selected die at position " + schemaCells.indexOf(c) + " in schema");
+                            cmdWrite.write(latestDiceList.indexOf(activeCell) + "");
+                        });
+                    }
+                }
+                break;
+                }
+        GridPane grid = new GridPane();
+        for(int row = 0; row<NUM_ROWS; row++){
+            for(int col = 0; col<NUM_COLS;col++){
+                grid.add(schemaCells.get(row*NUM_COLS+col),col,row);
+            }
+        }
+        Insets padding = new Insets(10, 10, 10, 10);
+        grid.setPadding(padding);
+        return grid;
+    }
+
+    /* public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie){
         GridPane grid = new GridPane();
         Insets padding = new Insets(10,10,10,10);
         grid.setPadding(padding);
         double cellDIm = width/NUM_COLS;
         for(int i = 0; i < NUM_ROWS; i++){
             for(int j = 0; j < NUM_COLS; j++){
-                Canvas cell = new Canvas(cellDIm,cellDIm);
+                Canvas cell;
                 if(lightSchemaCard.hasConstraintAt(i,j)){
                     cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i,j),cellDIm);
                     grid.add(cell,j,i);
@@ -282,6 +355,8 @@ public class GUIutil {
                     grid.add(cell,j,i);
                 }
                 int position = i*NUM_COLS+j;
+
+
                 if(turnState.equals(ClientFSMState.CHOOSE_PLACEMENT)&& latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)&& latestPlacementsList.contains(position)){
                     highlight(cell,cellDIm);
                     System.out.println("highlighting schema because i'm in choose placement and latest selected die is draftpool");
@@ -291,17 +366,10 @@ public class GUIutil {
                     });
                     continue;
                 }
-                cell.setOnMouseClicked(e->{
-                    switch (turnState){
-                        case NOT_MY_TURN:
-                            System.out.println("clicked not my turn");
-                            break;
-                    }
-                });
             }
         }
         return grid;
-    }
+    }*/
 
     public Group drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState) {
         Button priv = new Button("Private Objective");

@@ -287,7 +287,7 @@ public class GUI extends Application implements ClientUI {
             double cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
             ClientFSMState turnState = client.getTurnState();
             roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(),board.getLatestSelectedDie(), board.getPlayerById(board.getMyPlayerId()).getFavorTokens()));
-            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState,board.getLatestPlacementsList(),board.getLatestSelectedDie()));
+            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(),board.getLatestSelectedDie(),board.getLatestOptionsList()));
             draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(), board.getLatestSelectedDie(),board.getLatestOptionsList()));
             cards.getChildren().setAll(sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState));
 
