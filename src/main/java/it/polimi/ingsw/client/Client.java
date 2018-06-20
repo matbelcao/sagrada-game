@@ -64,7 +64,6 @@ public class Client {
 
     private boolean ready;
     private final Object lockReady = new Object();
-    private final Object lockUI = new Object();
 
 
     /**
@@ -222,14 +221,6 @@ public class Client {
     public String getUsername() { return username; }
 
     /**
-     * this method allows to change the status of the user
-     * @param status the new  user status
-     */
-    public void setUserStatus(UserStatus status){
-        this.userStatus=status;
-    }
-
-    /**
      * @return the connection mode of the user
      */
     public ConnectionMode getConnMode() {
@@ -320,6 +311,9 @@ public class Client {
                 lockStatus.notifyAll();
             }
 
+            //ENABLE PONG
+            clientConn.pong();
+
         } catch (IOException | NotBoundException e) {
             synchronized (lockStatus) {
                 userStatus = UserStatus.DISCONNECTED;
@@ -369,11 +363,6 @@ public class Client {
         clientUI.updateLogin(false);
         return false;
     }
-
-    /**
-     * @return the lock on the user's credentials
-     */
-    public Object getLockCredentials(){ return lockCredentials;  }
 
     /**
      * @return true iff the user is still connected to the server
@@ -485,7 +474,7 @@ public class Client {
 
     }
 
-    public void updateGameTurnEnd(int playerTurnId, int firstOrSecond){
+    public void updateGameTurnEnd(int playerTurnId){
         board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
 
         board.notifyObservers();

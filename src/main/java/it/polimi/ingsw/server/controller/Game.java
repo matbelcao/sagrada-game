@@ -227,7 +227,9 @@ public class Game extends Thread implements Iterable  {
 
         //Notify to all the users the starting of the turn
         for(User u:users){
-            u.getServerConn().notifyTurnEvent(Event.TURN_START,board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                u.getServerConn().notifyTurnEvent(Event.TURN_START, board.getPlayer(userPlaying).getGameId(), round.isFirstTurn() ? 0 : 1);
+            }
         }
 
         timer = new Timer();
@@ -236,7 +238,9 @@ public class Game extends Thread implements Iterable  {
 
         //Notify to all the users the ending of the turn
         for(User u:users){
-            u.getServerConn().notifyTurnEvent(Event.TURN_END,board.getPlayer(userPlaying).getGameId(),round.isFirstTurn()?0:1);
+            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                u.getServerConn().notifyTurnEvent(Event.TURN_END, board.getPlayer(userPlaying).getGameId(), round.isFirstTurn() ? 0 : 1);
+            }
         }
     }
 

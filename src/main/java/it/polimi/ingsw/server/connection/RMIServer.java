@@ -11,11 +11,13 @@ import java.util.List;
 public class RMIServer implements ServerConn {
         private RMIServerInt remoteObj; //client
         private User user;
+        private boolean connectionOk;
 
 
     RMIServer(RMIServerInt remoteObj, User user){
         this.remoteObj = remoteObj;
         this.user = user;
+        connectionOk=true;
     }
 
     /**
@@ -132,11 +134,7 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void close() {
-        try {
-            remoteObj.close() ;
-        } catch (RemoteException e) {
-            user.disconnect();
-        }
+        connectionOk=false;
     }
 
 
@@ -147,7 +145,7 @@ public class RMIServer implements ServerConn {
     public void ping(){
         new Thread(() -> {
             boolean ping=true;
-            while(ping) {
+            while(ping && connectionOk) {
                 try {
                     ping = remoteObj.ping();
                     try {
