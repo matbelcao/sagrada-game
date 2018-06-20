@@ -38,9 +38,7 @@ import java.util.List;
 import java.util.Observable;
 
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
-import static javafx.geometry.Pos.BOTTOM_CENTER;
-import static javafx.geometry.Pos.CENTER;
-import static javafx.geometry.Pos.TOP_CENTER;
+import static javafx.geometry.Pos.*;
 
 public class GUI extends Application implements ClientUI {
     private GUIutil sceneCreator;
@@ -239,9 +237,10 @@ public class GUI extends Application implements ClientUI {
             }
             MainSceneGroup root = new MainSceneGroup(board);
             Scene scene = new Scene(root);
+            root.setStyle("-fx-background-color: black;"); //todo change
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(600);
-            primaryStage.setMinHeight(750);
+            primaryStage.setMinHeight(600);
             primaryStage.sizeToScene();
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
@@ -256,10 +255,12 @@ public class GUI extends Application implements ClientUI {
         });
     }
 
-    class MainSceneGroup extends Group{
+    class MainSceneGroup extends Pane{
+        BorderPane frontPane;
+        BorderPane backPane;
         LightBoard board;
-        BorderPane b;
         HBox roundTrack;
+        HBox dummyTrack;
         Group schema;
         HBox draftpool;
         VBox schemaVbox;
@@ -267,27 +268,38 @@ public class GUI extends Application implements ClientUI {
         Group cards;
         MainSceneGroup(LightBoard board){
             this.board = board;
-            this.b = new BorderPane();
             this.roundTrack = new HBox();
+            this.dummyTrack = new HBox();
             this.schema = new Group();
             this.draftpool = new HBox();
             this.schemaVbox = new VBox(schema);
             this.cards = new Group();
             this.cardsVbox = new VBox(cards,draftpool);
+            this.frontPane = new BorderPane();
+            this.backPane = new BorderPane();
+            frontPane.setTop(dummyTrack);
+            frontPane.setLeft(schemaVbox);
+            frontPane.setRight(cardsVbox);
             draftpool.setAlignment(BOTTOM_CENTER);
-            b.setTop(roundTrack);
-            roundTrack.setAlignment(TOP_CENTER);
-            b.setLeft(schemaVbox);
-            b.setRight(cardsVbox);
-            this.getChildren().add(b);
+            dummyTrack.setAlignment(TOP_LEFT);
+            cardsVbox.setAlignment(CENTER_LEFT);
+            frontPane.setStyle("-fx-background-color: #f5dc70;");
+            backPane.setTop(roundTrack);
+            roundTrack.setAlignment(TOP_LEFT);
+            this.getChildren().addAll(frontPane,backPane);
+            dummyTrack.setOnMouseClicked(e->backPane.toFront());
+            roundTrack.setOnMouseClicked(e->frontPane.toFront());
+
             redraw(200,200);
         }
+        
 
         void redraw(double newWidth, double newHeight) {
             double cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
             ClientFSMState turnState = client.getTurnState();
+            dummyTrack.getChildren().setAll(sceneCreator.drawDummyTrack(board.getRoundTrack(),newWidth,newHeight,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(),board.getLatestSelectedDie(), board.getPlayerById(board.getMyPlayerId()).getFavorTokens()));
             roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(),board.getLatestSelectedDie(), board.getPlayerById(board.getMyPlayerId()).getFavorTokens()));
-            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(),board.getLatestSelectedDie(),board.getLatestOptionsList()));
+            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(),board.getLatestSelectedDie(),board.getLatestOptionsList(),board.getPlayerById(board.getMyPlayerId()).getFavorTokens()));
             draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(), board.getLatestSelectedDie(),board.getLatestOptionsList()));
             cards.getChildren().setAll(sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState));
 

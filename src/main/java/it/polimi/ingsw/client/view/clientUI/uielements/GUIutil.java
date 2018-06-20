@@ -16,10 +16,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -133,7 +130,29 @@ public class GUIutil {
         double schemaWidth = drawingWidth*SCHEMA_W_TO_DRAFTED_W;
         return LINE_TO_CELL*CELL_TO_SCHEMA_W*schemaWidth;
     }
+    public Group drawDummyTrack(List<List<LightDie>> roundTrack, double newWidth, double newHeight, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
+        double cellDim = getMainSceneCellDim(newWidth,newHeight);
+        HBox track = new HBox();
+        track.setSpacing(10);
 
+        for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
+            StackPane p = fullRoundTrackCell(i,cellDim);
+            if(i<roundTrack.size()) {
+                Canvas c = new Canvas(cellDim, cellDim);
+                GraphicsContext gc = c.getGraphicsContext2D();
+                if(roundTrack.get(i).size()>1){
+                    //draw to dice in a cell
+                    drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                    drawDie(roundTrack.get(i).get(1), gc,cellDim/2,0, cellDim);
+                }else {
+                    drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                }
+                p.getChildren().add(c);
+            }
+            track.getChildren().add(p);
+        }
+        return new Group(track);
+    }
 
     public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,int favortokens) {
         double cellDim = getMainSceneCellDim(width,height);
@@ -164,19 +183,6 @@ public class GUIutil {
                 }
                 track.getChildren().add(p);
             }
-        Button endTurn = new Button("end turn");
-        endTurn.setOnAction(e->cmdWrite.write("e"));
-        Button back = new Button("back");
-        back.setOnAction(e->cmdWrite.write("b"));
-        Rectangle turnStateIndicator = new Rectangle(50,50);
-        if(turnState.equals(NOT_MY_TURN)){
-            turnStateIndicator.setFill(Color.RED);
-        }else{
-            turnStateIndicator.setFill(Color.GREEN);
-        }
-        Label favorT= new Label(""+favortokens);
-        Label turn = new Label(turnState.toString());
-        track.getChildren().addAll(back,endTurn,turnStateIndicator,turn,favorT);
         return new Group(track);
     }
 
@@ -191,6 +197,20 @@ public class GUIutil {
         Rectangle outerRect = new Rectangle(0,0,cellDim,cellDim);
         Rectangle innerRect = new Rectangle(lineWidth,lineWidth,innerCellDim,innerCellDim);
         innerRect.setFill(Color.WHITE);
+        return new StackPane(outerRect,innerRect,t);
+    }
+
+    private StackPane fullRoundTrackCell(int i, double cellDim) {
+        int displayedIndex = i + 1;
+        double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL*cellDim;
+        Text t = new Text(displayedIndex+"");
+        t.setFont(Font.font ("Verdana", textSize));
+        t.setFill(Color.GREEN);
+        double lineWidth = cellDim*LINE_TO_CELL;
+        double innerCellDim = cellDim - lineWidth;
+        Rectangle outerRect = new Rectangle(0,0,cellDim,cellDim);
+        Rectangle innerRect = new Rectangle(lineWidth,lineWidth,innerCellDim,innerCellDim);
+        innerRect.setFill(Color.PINK);
         return new StackPane(outerRect,innerRect,t);
     }
 
@@ -273,9 +293,24 @@ public class GUIutil {
 
         }
 
-    public Group drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,List<Actions> latestOptionsList) {
+    public Group drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,List<Actions> latestOptionsList, int favortokens) {
         GridPane g = schemaToGrid(schema,dieDim*NUM_COLS,dieDim*NUM_ROWS,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList);
-        return new Group(g);
+        //todo delete
+        Button endTurn = new Button("end turn");
+        endTurn.setOnAction(e->cmdWrite.write("e"));
+        Button back = new Button("back");
+        back.setOnAction(e->cmdWrite.write("b"));
+        Rectangle turnStateIndicator = new Rectangle(50,50);
+        if(turnState.equals(NOT_MY_TURN)){
+            turnStateIndicator.setFill(Color.RED);
+        }else{
+            turnStateIndicator.setFill(Color.GREEN);
+        }
+        Label favorT= new Label(""+favortokens);
+        Label turn = new Label(turnState.toString());
+        HBox h = new HBox();
+        h.getChildren().addAll(back,endTurn,turnStateIndicator,turn,favorT);
+        return new Group(new VBox(g,h));
     }
 
     public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,List<Actions> latestOptionsList) {
@@ -459,6 +494,7 @@ public class GUIutil {
     public double getMainSceneCellDim(double newWidth, double newHeight) {
         return 100;
     }
+
 
 
     /* private void drawSchema(LightSchemaCard lightSchemaCard, GraphicsContext gc) {
