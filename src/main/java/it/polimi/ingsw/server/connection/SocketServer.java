@@ -504,13 +504,18 @@ public class SocketServer extends Thread implements ServerConn  {
     public void pingThread(){
         new Thread(() -> {
             while(connectionOk) {
-                outSocket.println("PING");
-                outSocket.flush();
+                synchronized (pingLock) {
+                    if (pingTimer == null && connectionOk) {
+                        outSocket.println("PING");
+                        outSocket.flush();
 
-                pingTimer = new Timer();
-                pingTimer.schedule(new connectionTimeout(), 5000);
+                        pingTimer = new Timer();
+                        pingTimer.schedule(new connectionTimeout(), 5000);
+                    }
+                    pingLock.notifyAll();
+                }
                 try {
-                    Thread.sleep(5200);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -538,6 +543,7 @@ public class SocketServer extends Thread implements ServerConn  {
     private void pong(){
         synchronized (pingLock) {
             pingTimer.cancel();
+            pingTimer=null;
             pingLock.notifyAll();
         }
     }

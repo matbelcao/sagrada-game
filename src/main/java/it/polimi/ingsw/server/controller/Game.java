@@ -357,7 +357,6 @@ public class Game extends Thread implements Iterable  {
     public List<List<LightDie>> getRoundTrackDice() throws IllegalActionException {
         if(fsm.getCurState().equals(ServerState.INIT)){ throw new IllegalActionException(); }
 
-        System.out.println("qui1");
         List<List<Die>> trackList = board.getDraftPool().getRoundTrack().getTrack();
         List<Die> dieList;
 
@@ -372,7 +371,6 @@ public class Game extends Thread implements Iterable  {
             }
             roundTrack.add(i, container);
         }
-        System.out.println("qui2");
         return roundTrack;
     }
 

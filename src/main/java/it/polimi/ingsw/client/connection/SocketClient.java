@@ -31,6 +31,7 @@ public class SocketClient implements ClientConn {
     private final Object lockin=new Object();
     private Timer pingTimer;
     private final Object pingLock=new Object();
+    private boolean connectionOk;
 
     /**
      * Thi is the class constructor, it instantiates the new socket and the input/output buffers for the communications
@@ -47,6 +48,7 @@ public class SocketClient implements ClientConn {
         inSocket.add();
 
         inSocket.pop();
+        connectionOk=true;
         client.getClientUI().updateConnectionOk();
     }
 
@@ -58,14 +60,14 @@ public class SocketClient implements ClientConn {
 
         new Thread(() -> {
 
-            while(!socket.isClosed()) {
+            while(!socket.isClosed() && connectionOk) {
                 ArrayList<String> result= new ArrayList<>();
                 try {
 
                     synchronized (lockin) {
                         inSocket.waitForLine();
 
-                        if (ClientParser.parse(inSocket.readln(), result)) {
+                        if (ClientParser.parse(inSocket.readln(), result) && connectionOk) {
                             if (ClientParser.isStatus(inSocket.readln())) {
                                 inSocket.pop();
                                 client.updatePlayerStatus(Integer.parseInt(result.get(2)), Event.valueOf(result.get(1).toUpperCase()));
@@ -102,7 +104,7 @@ public class SocketClient implements ClientConn {
                     client.setUserStatus(UserStatus.DISCONNECTED);
                 }
             }
-            System.out.println("QUITTED");
+            System.out.println("QUITTED(1)");
         }).start();
     }
 
@@ -165,6 +167,8 @@ public class SocketClient implements ClientConn {
                     ranking.add(new RankingEntry(Integer.parseInt(param[0]),Integer.parseInt(param[1]),Integer.parseInt(param[2])));
                 }
                 client.updateGameEnd(ranking);
+                System.out.println("<--<----<----<-----<---<---GAME END (CLASSIFICA)---->----->--->--->---->--->-->");
+                connectionOk = false;
                 break;
             case "round_start":
                 client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)));
@@ -734,11 +738,15 @@ public class SocketClient implements ClientConn {
     public void quit(){
         outSocket.println("QUIT");
         outSocket.flush();
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        connectionOk = false;
+        if(!socket.isClosed()){
+            try {
+                socket.close();
+            } catch (IOException e) {
+                System.out.println("already closed");
+            }
         }
+        System.out.println("QUITTED(2)");
     }
 
     /**
@@ -753,7 +761,7 @@ public class SocketClient implements ClientConn {
             synchronized (pingLock) {
                 pingTimer.cancel();
                 pingTimer = new Timer();
-                pingTimer.schedule(new connectionTimeout(), 5100);
+                pingTimer.schedule(new connectionTimeout(), 5000);
                 pingLock.notifyAll();
             }
         } catch (Exception e) {
@@ -770,8 +778,8 @@ public class SocketClient implements ClientConn {
         public void run(){
             synchronized (pingLock) {
                 System.out.println("CONNECTION TIMEOUT!");
-                    quit();
-                    pingLock.notifyAll();
+                connectionOk = false;
+                pingLock.notifyAll();
             }
         }
     }
