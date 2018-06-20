@@ -285,9 +285,9 @@ public class SocketServer extends Thread implements ServerConn  {
     private void draftSchemaCards() throws IllegalActionException {
         Game game= user.getGame();
         List<LightSchemaCard> lightSchemas=game.getDraftedSchemaCards(user);
-        StringBuilder builder= new StringBuilder();
+
         for(LightSchemaCard s: lightSchemas){
-            builder.append("SEND schema "+s.getName().replaceAll(" ","_")+" "+s.getFavorTokens());
+            StringBuilder builder= new StringBuilder("SEND schema "+s.getName().replaceAll(" ","_")+" "+s.getFavorTokens());
             for (int index=0; index < SchemaCard.NUM_ROWS*SchemaCard.NUM_COLS ; index++) {
                 if (s.hasConstraintAt(index)) {
                     builder.append(" C,"+index+"," + s.getConstraintAt(index).toString());
