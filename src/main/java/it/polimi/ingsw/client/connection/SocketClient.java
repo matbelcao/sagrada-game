@@ -31,6 +31,7 @@ public class SocketClient implements ClientConn {
     private final Object pingLock=new Object();
     private boolean connectionOk;
     private boolean timerActive;
+    private final Object lockOutSocket;
 
     /**
      * Thi is the class constructor, it instantiates the new socket and the input/output buffers for the communications
@@ -45,11 +46,19 @@ public class SocketClient implements ClientConn {
         inSocket = new QueuedBufferedReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
         outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
         inSocket.add();
-
+        lockOutSocket= new Object();
         inSocket.pop();
         connectionOk=true;
         this.timerActive=false;
         client.getClientUI().updateConnectionOk();
+    }
+
+    private void syncedSocketWrite(String message){
+        synchronized (lockOutSocket){
+            outSocket.println(message);
+            outSocket.flush();
+            lockOutSocket.notifyAll();
+        }
     }
 
     /**
@@ -127,8 +136,7 @@ public class SocketClient implements ClientConn {
     public boolean login(String username, char [] password) {
         ArrayList<String> parsedResult = new ArrayList<>();
 
-        outSocket.println("LOGIN " + username + " " + Credentials.toString(password));
-        outSocket.flush();
+        syncedSocketWrite("LOGIN " + username + " " + Credentials.toString(password));
 
 
         try {
@@ -206,8 +214,8 @@ public class SocketClient implements ClientConn {
         List<LightSchemaCard> lightSchemaCards=new ArrayList<>();
         LightSchemaCard lightSchema;
 
-        outSocket.println("GET schema draft");
-        outSocket.flush();
+        syncedSocketWrite("GET schema draft");
+
 
         int i=0;
         while(i<NUM_DRAFTED_SCHEMAS){
@@ -259,8 +267,8 @@ public class SocketClient implements ClientConn {
         ArrayList<String> result= new ArrayList<>();
         LightSchemaCard lightSchema=null;
 
-        outSocket.println("GET schema "+playerId);
-        outSocket.flush();
+        syncedSocketWrite("GET schema "+playerId);
+
         synchronized (lockin) {
             try {
                 inSocket.waitForLine();
@@ -288,8 +296,8 @@ public class SocketClient implements ClientConn {
         ArrayList<String> result= new ArrayList<>();
         LightPrivObj lightObjCard=null;
 
-        outSocket.println("GET priv");
-        outSocket.flush();
+        syncedSocketWrite("GET priv");
+
         synchronized (lockin) {
             try {
                 inSocket.waitForLine();
@@ -319,8 +327,8 @@ public class SocketClient implements ClientConn {
             List<LightCard> pubObjCards=new ArrayList<>();
             LightCard lightObjCard;
 
-            outSocket.println("GET pub");
-            outSocket.flush();
+            syncedSocketWrite("GET pub");
+
 
             int i=0;
             while(i<NUM_CARDS){
@@ -355,8 +363,8 @@ public class SocketClient implements ClientConn {
         List<LightTool> toolCards=new ArrayList<>();
         LightTool lightTool;
 
-        outSocket.println("GET tool");
-        outSocket.flush();
+        syncedSocketWrite("GET tool");
+
 
         int i=0;
         while(i<NUM_CARDS){
@@ -392,8 +400,8 @@ public class SocketClient implements ClientConn {
         LightDie die;
         String args[];
 
-        outSocket.println("GET draftpool");
-        outSocket.flush();
+        syncedSocketWrite("GET draftpool");
+
         synchronized (lockin) {
             try {
                 inSocket.waitForLine();
@@ -429,8 +437,8 @@ public class SocketClient implements ClientConn {
         int index=-1;
         String args[];
 
-        outSocket.println("GET roundtrack");
-        outSocket.flush();
+        syncedSocketWrite("GET roundtrack");
+
         synchronized (lockin) {
             try {
                 inSocket.waitForLine();
@@ -469,8 +477,8 @@ public class SocketClient implements ClientConn {
         List<LightPlayer> playerList=new ArrayList<>();
         String [] args;
 
-        outSocket.println("GET players");
-        outSocket.flush();
+        syncedSocketWrite("GET players");
+
         synchronized (lockin) {
             try {
                 inSocket.waitForLine();
@@ -502,8 +510,8 @@ public class SocketClient implements ClientConn {
         ArrayList<String> result= new ArrayList<>();
         int favorTokens=0;
 
-        outSocket.println("GET favor_tokens "+playerId);
-        outSocket.flush();
+        syncedSocketWrite("GET favor_tokens "+playerId);
+
         synchronized (lockin) {
             try {
                 inSocket.waitForLine();
@@ -533,7 +541,7 @@ public class SocketClient implements ClientConn {
         IndexedCellContent indexedDie;
         String[] args;
 
-        outSocket.println("GET_DICE_LIST");
+        syncedSocketWrite("GET_DICE_LIST");
         outSocket.flush();
         synchronized (lockin) {
             try {
@@ -570,7 +578,7 @@ public class SocketClient implements ClientConn {
         ArrayList<String> result= new ArrayList<>();
         List<Actions> options=new ArrayList<>();
 
-        outSocket.println("SELECT "+dieIndex);
+        syncedSocketWrite("SELECT "+dieIndex);
         outSocket.flush();
         synchronized (lockin) {
             try {
@@ -604,7 +612,7 @@ public class SocketClient implements ClientConn {
         ArrayList<String> result= new ArrayList<>();
         ArrayList<Integer> positions=new ArrayList<>();
 
-        outSocket.println("GET_PLACEMENTS_LIST");
+        syncedSocketWrite("GET_PLACEMENTS_LIST");
         outSocket.flush();
         synchronized (lockin) {
             try {
@@ -636,7 +644,7 @@ public class SocketClient implements ClientConn {
     public boolean choose(int optionIndex){
         ArrayList<String> result=new ArrayList<>();
 
-        outSocket.println("CHOOSE "+optionIndex);
+        syncedSocketWrite("CHOOSE "+optionIndex);
         outSocket.flush();
 
         synchronized (lockin) {
@@ -665,7 +673,7 @@ public class SocketClient implements ClientConn {
     public boolean enableTool(int toolIndex){
         ArrayList<String> result=new ArrayList<>();
 
-        outSocket.println("TOOL enable "+toolIndex);
+        syncedSocketWrite("TOOL enable "+toolIndex);
         outSocket.flush();
         synchronized (lockin) {
             try {
@@ -691,7 +699,7 @@ public class SocketClient implements ClientConn {
     public boolean toolCanContinue() {
         ArrayList<String> result = new ArrayList<>();
 
-        outSocket.println("TOOL can_continue");
+        syncedSocketWrite("TOOL can_continue");
         outSocket.flush();
         synchronized (lockin) {
             try {
@@ -713,7 +721,7 @@ public class SocketClient implements ClientConn {
      */
     @Override
     public void endTurn(){
-        outSocket.println("GAME end_turn");
+        syncedSocketWrite("GAME end_turn");
         outSocket.flush();
     }
 
@@ -723,7 +731,7 @@ public class SocketClient implements ClientConn {
      */
     @Override
     public void discard(){
-        outSocket.println("DISCARD");
+        syncedSocketWrite("DISCARD");
         outSocket.flush();
     }
 
@@ -733,7 +741,7 @@ public class SocketClient implements ClientConn {
      */
     @Override
     public void back(){
-        outSocket.println("BACK");
+        syncedSocketWrite("BACK");
         outSocket.flush();
     }
 
@@ -742,7 +750,7 @@ public class SocketClient implements ClientConn {
      */
     @Override
     public void quit(){
-        outSocket.println("QUIT");
+        syncedSocketWrite("QUIT");
         outSocket.flush();
         connectionOk = false;
         if(!socket.isClosed()){
@@ -763,7 +771,7 @@ public class SocketClient implements ClientConn {
 
     @Override
     public void newMatch() {
-        outSocket.println("GAME new_match");
+        syncedSocketWrite("GAME new_match");
         outSocket.flush();
     }
 
@@ -777,7 +785,7 @@ public class SocketClient implements ClientConn {
 
     private boolean socketPong(){
         try{
-            outSocket.println("PONG");
+            syncedSocketWrite("PONG");
             outSocket.flush();
             //System.out.println("PONG");
             synchronized (pingLock) {

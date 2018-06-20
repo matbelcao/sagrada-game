@@ -77,8 +77,7 @@ public class SocketServer extends Thread implements ServerConn  {
                     if (Validator.isValid(command, parsedResult)) {
                         playing = execute(command,parsedResult);
                     }else{
-                        outSocket.println("INVALID message");
-                        outSocket.flush();
+                        syncedSocketWrite("INVALID message");
                     }
                 }
             } catch (IllegalArgumentException e) {
