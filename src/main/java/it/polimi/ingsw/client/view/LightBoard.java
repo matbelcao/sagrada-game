@@ -13,7 +13,6 @@ public class LightBoard extends Observable {
     public static final int NUM_TOOLS=3;
     public static final int NUM_PUB_OBJ=3;
     public static final int MAX_PLAYERS=4;
-
     private List<LightTool> tools;
     private List<LightCard> pubObj;
     private int numPlayers;
@@ -30,6 +29,7 @@ public class LightBoard extends Observable {
     private List<IndexedCellContent> latestDiceList;
     private List<Integer> latestPlacementsList;
     private IndexedCellContent latestSelectedDie;
+    private List<Integer> changes;
 
     /**
      * this builds the lightboard and initializes the number of players of the match
@@ -45,6 +45,7 @@ public class LightBoard extends Observable {
         latestOptionsList = new ArrayList<>();
         latestPlacementsList = new ArrayList<>();
         latestDiceList = new ArrayList<>();
+        changes=new ArrayList<>();
         nowPlaying = -1;
         roundNumber = -1;
     }
@@ -63,6 +64,7 @@ public class LightBoard extends Observable {
      */
     public void setDraftedSchemas(List<LightSchemaCard> draftedSchemas) {
         this.draftedSchemas = draftedSchemas;
+        changes.add(LightBoardEvents.DraftedSchemas);
         setChanged();
     }
 
@@ -79,6 +81,7 @@ public class LightBoard extends Observable {
      */
     public void setMyPlayerId(int myPlayerId) {
         this.myPlayerId = myPlayerId;
+        changes.add(LightBoardEvents.MyPlayerId);
         setChanged();
     }
 
@@ -95,6 +98,7 @@ public class LightBoard extends Observable {
      */
     public void setNowPlaying(int nowPlaying) {
         this.nowPlaying = nowPlaying;
+        changes.add(LightBoardEvents.NowPlaying);
         setChanged();
     }
 
@@ -121,6 +125,7 @@ public class LightBoard extends Observable {
      */
     public void setPrivObj(LightPrivObj privObj) {
         this.privObj = privObj;
+        changes.add(LightBoardEvents.PrivObj);
         setChanged();
     }
 
@@ -130,9 +135,19 @@ public class LightBoard extends Observable {
      */
     public void setTools(List<LightTool> tools){
         this.tools=tools;
+        changes.add(LightBoardEvents.Tools);
         setChanged();
     }
 
+    /**
+     * this sets ne public objectives
+     * @param pubObjs the public objectives
+     */
+    public void setPubObjs(List<LightCard> pubObjs){
+        this.pubObj=pubObjs;
+        changes.add(LightBoardEvents.PubObjs);
+        setChanged();
+    }
 
     /**
      * @return the list of public objectives for the match
@@ -169,6 +184,7 @@ public class LightBoard extends Observable {
      */
     public void setDraftPool(List<LightDie> draftPool) {
         this.draftPool=draftPool;
+        changes.add(LightBoardEvents.DraftPool);
         setChanged();
 
     }
@@ -188,17 +204,11 @@ public class LightBoard extends Observable {
     public void setRoundTrack(List<List<LightDie>> roundTrack, int numRound) {
         this.roundTrack = roundTrack;
         this.roundNumber = numRound;
+        changes.add(LightBoardEvents.RoundTrack);
         setChanged();
     }
 
-    /**
-     * this sets ne public objectives
-     * @param pubObjs the public objectives
-     */
-    public void setPubObjs(List<LightCard> pubObjs){
-        this.pubObj=pubObjs;
-        setChanged();
-    }
+
 
     /**
      * this updates the schema of a certain player
@@ -207,8 +217,33 @@ public class LightBoard extends Observable {
      */
     public void updateSchema(int playerId, LightSchemaCard schema){
         players.get(playerId).setSchema(schema);
+        changes.add(LightBoardEvents.Schema);
         setChanged();
     }
+
+    /**
+     * this updates the favor tokens of a certain player
+     * @param playerId the id of said player
+     * @param favorTokens the remaining favor tokens
+     */
+    public void updateFavorTokens(int playerId, int favorTokens){
+        players.get(playerId).setFavorTokens(favorTokens);
+        changes.add(LightBoardEvents.FavorTokens);
+        setChanged();
+    }
+
+    /**
+     * this updates the status of a certain player
+     * @param playerId the id of said player
+     * @param status the new status
+     */
+    public void updatestatus(int playerId, LightPlayerStatus status){
+        players.get(playerId).setStatus(status);
+        changes.add(LightBoardEvents.Status);
+        setChanged();
+    }
+
+
 
     /**
      * this returns a player of a certain id
@@ -234,11 +269,13 @@ public class LightBoard extends Observable {
      */
     public void setIsFirstTurn(boolean isFirstTurn) {
         this.isFirstTurn = isFirstTurn;
+        changes.add(LightBoardEvents.IsFirstTurn);
         setChanged();
     }
 
 
     public void stateChanged(){
+        changes.add(LightBoardEvents.StateChanged);
         setChanged();
     }
     /**
@@ -254,6 +291,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestOptionsList(List<Actions> optionsList) {
         this.latestOptionsList = optionsList;
+        changes.add(LightBoardEvents.Option);
         setChanged();
     }
 
@@ -277,6 +315,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestDiceList(List<IndexedCellContent> latestDiceList) {
         this.latestDiceList = latestDiceList;
+        changes.add(LightBoardEvents.DiceList);
         setChanged();
     }
 
@@ -286,6 +325,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestPlacementsList(List<Integer> placementsList) {
         this.latestPlacementsList = placementsList;
+        changes.add(LightBoardEvents.PlacementsList);
         setChanged();
     }
 
@@ -302,8 +342,18 @@ public class LightBoard extends Observable {
      */
     public void setLatestSelectedDie(IndexedCellContent  latestSelectedDie) {
         this.latestSelectedDie = latestSelectedDie;
+        changes.add(LightBoardEvents.SelectedDie);
         setChanged();
     }
+
+    public List<Integer> getChanges() {
+        return changes;
+    }
+
+    public void clearChanges(){
+        changes.clear();
+    }
+
 
     /**
      * @return the latest die that was selected

@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Actions;
+import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.controller.Game;
 import it.polimi.ingsw.server.controller.Validator;
@@ -14,6 +15,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * This class is the implementation of the SOCKET server-side connection methods
@@ -39,7 +41,7 @@ public class SocketServer extends Thread implements ServerConn  {
         this.pingLock = new Object();
         this.connectionOk=true;
         start();
-        //pingThread();
+        pingThread();
     }
 
     /**
@@ -133,6 +135,7 @@ public class SocketServer extends Thread implements ServerConn  {
                     user.quit();
                     return false;
                 case "PONG":
+                    pong();
                     break;
                 default:
                     return true;
@@ -498,36 +501,39 @@ public class SocketServer extends Thread implements ServerConn  {
 
 
 
-    /*public void pingThread(){
+    public void pingThread(){
         new Thread(() -> {
             while(connectionOk) {
-                outSocket.println("STATUS check");
+                outSocket.println("PING");
                 outSocket.flush();
 
                 pingTimer = new Timer();
-                pingTimer.schedule(new connectionTimeout(), 2000);
+                pingTimer.schedule(new connectionTimeout(), 5000);
                 try {
-                    Thread.sleep(2100);
+                    Thread.sleep(5200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            user.disconnect();
         }).start();
-    }*/
+    }
 
     /**
      * Timeot connection
      */
-    /*private class connectionTimeout extends TimerTask {
+    private class connectionTimeout extends TimerTask {
         @Override
         public void run(){
             synchronized (pingLock) {
-                connectionOk = false;
-                pingLock.notifyAll();
+                if(user.getStatus()!=UserStatus.DISCONNECTED){
+                    connectionOk = false;
+                    pingLock.notifyAll();
+                    user.disconnect();
+                    System.out.println("CONNECTION TIMEOUT!");
+                }
             }
         }
-    }*/
+    }
 
     private void pong(){
         synchronized (pingLock) {

@@ -20,9 +20,6 @@ public class  Player {
     private boolean quitted;
 
 
-
-    private Die chosenDie;
-
     public Player(String username,int gameId, Board board, PrivObjectiveCard privObjective){
         this.username = username;
         this.gameId=gameId;
@@ -138,20 +135,22 @@ public class  Player {
      * Calculates and sets the score of the player
      */
     public void calculateScore(){
-        List<Die> schemaDie=schema.getSchemaDiceList(Color.NONE);
+        if(schema!=null) {
+            List<Die> schemaDie = schema.getSchemaDiceList(Color.NONE);
 
-        if (this.score != 0) {
-            this.score = 0;
-        }
-        for (int i = 0; i < 3; i++) {
-            this.score += this.board.getPublicObjective(i).getCardScore(this.schema);
-        }
-        this.score += this.favorTokens;
-        this.score += this.privObjective.getCardScore(this.schema);
-        this.score -= (SchemaCard.NUM_ROWS * SchemaCard.NUM_COLS) - schemaDie.size();
+            if (this.score != 0) {
+                this.score = 0;
+            }
+            for (int i = 0; i < 3; i++) {
+                this.score += this.board.getPublicObjective(i).getCardScore(this.schema);
+            }
+            this.score += this.favorTokens;
+            this.score += this.privObjective.getCardScore(this.schema);
+            this.score -= (SchemaCard.NUM_ROWS * SchemaCard.NUM_COLS) - schemaDie.size();
 
-        if(this.score<0){
-            this.score=0;
+            if (this.score < 0) {
+                this.score = 0;
+            }
         }
     }
 

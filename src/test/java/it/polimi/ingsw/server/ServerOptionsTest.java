@@ -7,6 +7,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This test class performs general tests of the command line configurations
+ */
 class ServerOptionsTest {
     List<String> result=new ArrayList<>();
 

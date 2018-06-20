@@ -37,7 +37,7 @@ public class QueuedBufferedReader implements QueuedReader {
                 }
 
                 //debug
-                System.out.println("\t\t\t\t\t"+temp);
+                //System.out.println("\t\t\t\t\t"+temp);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

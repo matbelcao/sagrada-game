@@ -46,6 +46,7 @@ public class CLIView {
     private int playerId;
     private int turnNumber;
     private String latestScreen =EMPTY_STRING;
+    private List<String> gameRanking=new ArrayList<>();
 
     /**
      * this sets the language for the cli and resets some objects
@@ -59,7 +60,7 @@ public class CLIView {
     /**
      * @return  the line to be printed as a prompt for the username
      */
-    public String showLoginUsername() {
+    public String printLoginUsername() {
         StringBuilder result= new StringBuilder();
 
         result.append(String.format(cliElements.getElem(LOGIN_LINE),uiMsg.getMessage(LOGIN_USERNAME)));
@@ -69,10 +70,68 @@ public class CLIView {
     /**
      * @return  the line to be printed as a prompt for the password
      */
-    public String showLoginPassword() {
+    public String printLoginPassword() {
         return String.format(cliElements.getElem(LOGIN_LINE),uiMsg.getMessage(LOGIN_PASSWORD));
     }
 
+
+    /**
+     * @return the string containing the la
+     */
+    public String printLatestScreen(){
+        return resetScreenPosition()+ latestScreen;
+    }
+
+    /**
+     * this completes the building of the schema's choice screen
+     * @return the string that represents this
+     */
+    public String printSchemaChoiceView(){
+        StringBuilder builder=new StringBuilder();
+        List<String> priv = new ArrayList<>(privObj);
+        List<String> drafted = new ArrayList<>(buildDraftedSchemas());
+        priv.add(0,boldify(uiMsg.getMessage(PRIVATE_OBJ)));
+        priv.add(EMPTY_STRING);
+        builder.append(NEW_LINE+NEW_LINE+NEW_LINE+NEW_LINE);
+        builder.append(printList(appendRows(appendRows(buildWall(drafted.size(), SCHEMA_WIDTH+10, SPACE),drafted),priv))).append(NEW_LINE+NEW_LINE+NEW_LINE);
+        builder.append(uiMsg.getMessage(CHOOSE_SCHEMA)).append(NEW_LINE+NEW_LINE);
+        builder.append(getPrompt(ClientFSMState.CHOOSE_SCHEMA));
+        latestScreen =builder.toString();
+        schemas.clear();
+        return latestScreen;
+    }
+
+
+    /**
+     * this builds the main game view according to the state of the players
+     * @param state the state of the player
+     * @return the string containing the whole screen
+     */
+    public String printMainView(ClientFSMState state){
+        StringBuilder builder=new StringBuilder();
+        builder.append(resetScreenPosition());
+        builder.append(printList(buildRoundTrack())).append(SPACE+SEPARATOR+NEW_LINE);
+
+
+        builder.append(printList(buildTopSection()));
+
+
+        builder.append(printList(buildDraftPool())).append(SPACE+SEPARATOR+NEW_LINE);
+
+        builder.append(printList(buildBottomSection())).append(NEW_LINE);
+
+        builder.append(getPrompt(state));
+        latestScreen =builder.toString();
+        return latestScreen;
+    }
+
+
+    public String printGameEndScreen(){
+        StringBuilder builder=new StringBuilder();
+        builder.append(printList(gameRanking));
+        latestScreen =builder.toString();
+        return latestScreen;
+    }
 
     /**
      * this method sets the schemas that were drafted and their representation
@@ -240,13 +299,6 @@ public class CLIView {
 
 
     /**
-     * @return the string containing the la
-     */
-    public String printLatestScreen(){
-        return resetScreenPosition()+ latestScreen;
-    }
-
-    /**
      * this allow to set a screen to be printed when the method printLatestScreen is called (note that this may be overwritten by other methods)
      * @param msg the message to be set
      */
@@ -254,28 +306,7 @@ public class CLIView {
         latestScreen =msg;
     }
 
-    /**
-     * this builds the main game view according to the state of the players
-     * @param state the state of the player
-     * @return the string containing the whole screen
-     */
-    public String printMainView(ClientFSMState state){
-        StringBuilder builder=new StringBuilder();
-        builder.append(resetScreenPosition());
-        builder.append(printList(buildRoundTrack())).append(SPACE+SEPARATOR+NEW_LINE);
 
-
-        builder.append(printList(buildTopSection()));
-
-
-        builder.append(printList(buildDraftPool())).append(SPACE+SEPARATOR+NEW_LINE);
-
-        builder.append(printList(buildBottomSection())).append(NEW_LINE);
-
-        builder.append(getPrompt(state));
-        latestScreen =builder.toString();
-        return latestScreen;
-    }
 
     /**
      * this builds the prompt according to the state of the client
@@ -286,24 +317,6 @@ public class CLIView {
         return String.format(cliElements.getElem(PROMPT), buildPromptOptions(state));
     }
 
-    /**
-     * this completes the building of the schema's choice screen
-     * @return the string that represents this
-     */
-    public String printSchemaChoiceView(){
-        StringBuilder builder=new StringBuilder();
-        List<String> priv = new ArrayList<>(privObj);
-        List<String> drafted = new ArrayList<>(buildDraftedSchemas());
-        priv.add(0,boldify(uiMsg.getMessage(PRIVATE_OBJ)));
-        priv.add(EMPTY_STRING);
-        builder.append(NEW_LINE+NEW_LINE+NEW_LINE+NEW_LINE);
-        builder.append(printList(appendRows(appendRows(buildWall(drafted.size(), SCHEMA_WIDTH+10, SPACE),drafted),priv))).append(NEW_LINE+NEW_LINE+NEW_LINE);
-        builder.append(uiMsg.getMessage(CHOOSE_SCHEMA)).append(NEW_LINE+NEW_LINE);
-        builder.append(getPrompt(ClientFSMState.CHOOSE_SCHEMA));
-        latestScreen =builder.toString();
-        schemas.clear();
-        return latestScreen;
-    }
 
 
     /**
@@ -458,6 +471,7 @@ public class CLIView {
         StringBuilder promptLine= new StringBuilder();
 
         switch (state){
+
             case CHOOSE_PLACEMENT:
                 promptLine.append(discardOption());
                 promptLine.append(backOption());
@@ -477,8 +491,6 @@ public class CLIView {
                 promptLine.append(endTurnOption());
                 promptLine.append(quitOption());
                 break;
-
-
 
             case NOT_MY_TURN:
             case CHOOSE_SCHEMA:
@@ -570,9 +582,11 @@ public class CLIView {
             list.add(EMPTY_STRING);
         }
         for(int column=0;column<MAX_MENULIST_COLUMNS && numAddedDice<dice.size();column++) {
-            for (int i = 0; i <  Math.min(dice.size(), (SCHEMA_HEIGHT)) && numAddedDice<dice.size(); i++) {
-                list.set(i,list.get(i) +String.format(cliElements.getElem(LIST_ELEMENT), numAddedDice, buildDiceListEntry(dice.get(numAddedDice))));
-                numAddedDice++;
+            for (int i = 0; i <  Math.min(dice.size(), (SCHEMA_HEIGHT)) && numAddedDice<dice.size(); i++,numAddedDice++) {
+                list.set(i,
+                        list.get(i)
+                                + String.format(
+                                        cliElements.getElem(LIST_ELEMENT), numAddedDice, buildDiceListEntry(dice.get(numAddedDice))));
             }
         }
 
@@ -590,8 +604,10 @@ public class CLIView {
         entry.append(CLIViewUtils.buildSmallDie(die.getContent())).append(SPACE);
         if(die.getPlace().equals(Place.SCHEMA)){
             entry.append(rowColmumn(die.getPosition()));
+
         } else if(die.getPlace().equals(Place.ROUNDTRACK)){
             entry.append(String.format(cliElements.getElem(INDEX),uiMsg.getMessage(ROUND_NUMBER),die.getPosition()));
+
         }else{
             entry.append(String.format(cliElements.getElem(INDEX),uiMsg.getMessage(POS),die.getPosition()));
         }
@@ -605,14 +621,13 @@ public class CLIView {
      */
     private List<String> buildCoordinatesList(List<Integer> indexes) {
         List<String> list= new ArrayList<>();
-        for(int i=0;i<Math.min(indexes.size(),SCHEMA_HEIGHT - 1);i++){
+        for(int i=0;i<Math.min(indexes.size(),SCHEMA_HEIGHT);i++){
             list.add(EMPTY_STRING);
         }
         int numAddedIndexes=0;
         for(int column=0;column<MAX_MENULIST_COLUMNS && numAddedIndexes<indexes.size();column++) {
-            for (int i = 0; i <  Math.min(indexes.size(), (SCHEMA_HEIGHT - 2)) && numAddedIndexes<indexes.size(); i++) {
+            for (int i = 0; i <  Math.min(indexes.size(), (SCHEMA_HEIGHT )) && numAddedIndexes<indexes.size(); i++,numAddedIndexes++) {
                 list.set(i,list.get(i) + String.format(cliElements.getElem(LIST_ELEMENT), numAddedIndexes, rowColmumn(indexes.get(numAddedIndexes))));
-                numAddedIndexes++;
             }
         }
 

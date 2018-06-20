@@ -99,9 +99,8 @@ public class Client {
             this.userStatus = UserStatus.DISCONNECTED;
         }
 
-        boolean logged;
         try {
-            logged=login();
+            login();
         } catch (RemoteException | MalformedURLException | NotBoundException e) {
             e.printStackTrace();
             System.err.println(ERR.toString()+COULDNT_LOG_BACK_IN.toString());
@@ -439,7 +438,7 @@ public class Client {
                     board.updateSchema(i, clientConn.getSchema(i));
 
                     //set favor tokens
-                    board.getPlayerById(i).setFavorTokens(clientConn.getFavorTokens(i));
+                    board.updateFavorTokens(i,clientConn.getFavorTokens(i));
                 }
                 //get tools
                 board.setTools(clientConn.getTools());
@@ -511,9 +510,7 @@ public class Client {
                 status=LightPlayerStatus.PLAYING;
         }
 
-        board.getPlayerById(playerId)
-                .setStatus(status);
-        board.stateChanged();
+        board.updatestatus(playerId, status);
         board.notifyObservers();
     }
 
@@ -522,12 +519,12 @@ public class Client {
      */
     public void getUpdates(){
 
-            board.setDraftPool(clientConn.getDraftPool());
-            board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
-            board.getPlayerById(board.getNowPlaying()).setSchema(clientConn.getSchema(board.getNowPlaying()));
-            board.setTools(clientConn.getTools());
-            board.getPlayerById(board.getNowPlaying()).setFavorTokens(clientConn.getFavorTokens(board.getNowPlaying()));
-            board.notifyObservers();
+        board.setDraftPool(clientConn.getDraftPool());
+        board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
+        board.updateSchema(board.getNowPlaying(),clientConn.getSchema(board.getNowPlaying()));
+        board.setTools(clientConn.getTools());
+        board.updateFavorTokens(board.getNowPlaying(),clientConn.getFavorTokens(board.getNowPlaying()));
+        board.notifyObservers();
     }
 
 
