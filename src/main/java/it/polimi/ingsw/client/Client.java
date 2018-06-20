@@ -98,13 +98,7 @@ public class Client {
             this.userStatus = UserStatus.DISCONNECTED;
         }
 
-        try {
-            login();
-        } catch (RemoteException | MalformedURLException | NotBoundException e) {
-            e.printStackTrace();
-            System.err.println(ERR.toString()+COULDNT_LOG_BACK_IN.toString());
-            System.exit(1);// TODO: 19/06/2018 add to ERRMsg a code for system exits
-        }
+
         synchronized (lockStatus) {
             this.userStatus = UserStatus.CONNECTED;
         }
