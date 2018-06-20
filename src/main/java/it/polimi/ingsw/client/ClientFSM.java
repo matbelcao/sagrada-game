@@ -196,6 +196,9 @@ public class ClientFSM {
                     state=CHOOSE_TOOL.nextState(true);
                     lockState.notifyAll();
                 }
+                int myId=client.getBoard().getMyPlayerId();
+                client.getBoard().updateFavorTokens(myId,client.getClientConn().getFavorTokens(myId));
+
                 client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
                 if(client.getBoard().getLatestDiceList().isEmpty()){
                     synchronized (lockState) {
@@ -306,7 +309,7 @@ public class ClientFSM {
             }
         }
 
-        client.getBoard().notifyObservers();
+        client.getUpdates();
     }
 
 
@@ -332,8 +335,9 @@ public class ClientFSM {
             }
             if(state.equals(TOOL_CAN_CONTINUE)){
                 toolContinue();
+            }else {
+                client.getUpdates();
             }
-            client.getBoard().notifyObservers();
         }else{
             client.getClientUI().showLastScreen();
         }
