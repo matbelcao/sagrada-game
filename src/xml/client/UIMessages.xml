@@ -185,7 +185,7 @@
         <ita>Ecco i punteggi finali:</ita>
     </score>
     <player-score>
-        <eng> score: </eng>
-        <ita> punti: </ita>
+        <eng> score</eng>
+        <ita> punti</ita>
     </player-score>
 </messages>

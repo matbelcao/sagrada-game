@@ -94,10 +94,6 @@ public class Client {
     }
 
     void reset() {
-        synchronized (lockStatus) {
-            this.userStatus = UserStatus.DISCONNECTED;
-        }
-
 
         synchronized (lockStatus) {
             this.userStatus = UserStatus.CONNECTED;

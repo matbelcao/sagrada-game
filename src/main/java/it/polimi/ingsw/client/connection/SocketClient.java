@@ -4,9 +4,7 @@ import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Actions;
-import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
-import it.polimi.ingsw.server.connection.SocketServer;
 
 import java.io.*;
 import java.net.Socket;
@@ -469,8 +467,7 @@ public class SocketClient implements ClientConn {
     public List<LightPlayer> getPlayers() {
         ArrayList<String> result= new ArrayList<>();
         List<LightPlayer> playerList=new ArrayList<>();
-        LightPlayer player;
-        String args[];
+        String [] args;
 
         outSocket.println("GET players");
         outSocket.flush();
@@ -503,7 +500,7 @@ public class SocketClient implements ClientConn {
     @Override
     public int getFavorTokens(int playerId) {
         ArrayList<String> result= new ArrayList<>();
-        int favor_tokens=0;
+        int favorTokens=0;
 
         outSocket.println("GET favor_tokens "+playerId);
         outSocket.flush();
@@ -520,8 +517,8 @@ public class SocketClient implements ClientConn {
             inSocket.pop();
             lockin.notifyAll();
         }
-        favor_tokens=Integer.parseInt(result.get(2));
-        return favor_tokens;
+        favorTokens=Integer.parseInt(result.get(2));
+        return favorTokens;
     }
 
     /**
@@ -752,9 +749,8 @@ public class SocketClient implements ClientConn {
             try {
                 socket.close();
             } catch (IOException e) {
-                System.out.println("already closed");
+
             }
-            System.out.println("QUITTED(2)");
         }
         synchronized (pingLock){
             if(timerActive){

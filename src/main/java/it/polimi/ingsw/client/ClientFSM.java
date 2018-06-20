@@ -128,16 +128,12 @@ public class ClientFSM {
 
     private void manageNewGameChoice(int index) {
         if(index==0){
-            newGame();
+            client.reset();
         }else{
             client.getClientUI().showLastScreen();
         }
     }
 
-    private void newGame() {
-        client.reset();
-
-    }
 
     /**
      * this allows the user to choose the schema to play with at the beginning of the match
