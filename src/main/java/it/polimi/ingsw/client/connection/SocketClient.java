@@ -763,7 +763,7 @@ public class SocketClient implements ClientConn {
 
     @Override
     public void newMatch() {
-        outSocket.println("GEME new_match");
+        outSocket.println("GAME new_match");
         outSocket.flush();
     }
 
@@ -779,6 +779,7 @@ public class SocketClient implements ClientConn {
         try{
             outSocket.println("PONG");
             outSocket.flush();
+            //System.out.println("PONG");
             synchronized (pingLock) {
                 pingTimer.cancel();
                 pingTimer = new Timer();
