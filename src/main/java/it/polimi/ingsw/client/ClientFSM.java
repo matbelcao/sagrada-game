@@ -127,10 +127,8 @@ public class ClientFSM {
     }
 
     private void manageNewGameChoice(int index) {
-        if(index==1){
+        if(index==0){
             newGame();
-        }else if(index==0){
-            client.quit();
         }else{
             client.getClientUI().showLastScreen();
         }
@@ -138,6 +136,7 @@ public class ClientFSM {
 
     private void newGame() {
         client.reset();
+
     }
 
     /**

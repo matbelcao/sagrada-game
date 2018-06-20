@@ -1,7 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.LightBoardEvents;
 import it.polimi.ingsw.client.view.clientUI.uielements.CLIView;
@@ -175,8 +174,8 @@ public class CLI implements ClientUI {
      * this method updates the view to the latest changes in the lightboard and/or state of the client
      * @param board the board
      */
-    private void updateBoard(LightBoard board) {
-        synchronized (view) {
+    private synchronized void updateBoard(LightBoard board) {
+
             if (board == null) {
                 throw new IllegalArgumentException();
             }
@@ -241,13 +240,14 @@ public class CLI implements ClientUI {
                 case TOOL_CAN_CONTINUE:
                     break;
                 case GAME_ENDED:
-                    // TODO: 20/06/2018 implement
+                    view.updateGameRanking(board.sortFinalPositions());
+                    printToScreen(view.printGameEndScreen());
                     break;
             }
 
             board.clearChanges();
 
-        }
+
     }
 
 

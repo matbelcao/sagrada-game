@@ -361,4 +361,17 @@ public class LightBoard extends Observable {
     public IndexedCellContent getLatestSelectedDie() {
         return latestSelectedDie;
     }
+
+    public List<LightPlayer> sortFinalPositions(){
+        List<LightPlayer> players= new ArrayList<>();
+        for(int i=0;i<this.players.size();i++){
+            players.add(this.players.get(i));
+        }
+
+        players.sort(Comparator.comparing(LightPlayer::getFinalPosition));
+
+        return players;
+    }
+
+
 }

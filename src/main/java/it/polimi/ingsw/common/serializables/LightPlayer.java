@@ -1,14 +1,16 @@
 package it.polimi.ingsw.common.serializables;
 
 import it.polimi.ingsw.server.model.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 public class LightPlayer implements Serializable {
     private String username;
-    private int playerId;
-    private int points;
-    private int finalPosition;
+    private Integer playerId;
+    private Integer points;
+    private Integer finalPosition;
     private LightSchemaCard schema;
     private int favorTokens;
     private LightPlayerStatus status;
@@ -62,7 +64,7 @@ public class LightPlayer implements Serializable {
 
     public void setFinalPosition(int position){this.finalPosition=position;}
 
-    public int getFinalPosition(){return finalPosition;}
+    public Integer getFinalPosition(){return finalPosition;}
 
     public LightSchemaCard getSchema() {
         return schema;
@@ -75,5 +77,7 @@ public class LightPlayer implements Serializable {
     public void setStatus(LightPlayerStatus status) {
         this.status=status;
     }
+
+
 }
 

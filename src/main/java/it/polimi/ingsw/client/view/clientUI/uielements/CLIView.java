@@ -102,6 +102,8 @@ public class CLIView {
     }
 
 
+
+
     /**
      * this builds the main game view according to the state of the players
      * @param state the state of the player
@@ -127,10 +129,17 @@ public class CLIView {
 
 
     public String printGameEndScreen(){
-        StringBuilder builder=new StringBuilder();
-        builder.append(printList(gameRanking));
-        latestScreen =builder.toString();
+
+        StringBuilder builder=new StringBuilder(resetScreenPosition());
+        builder.append(printList(buildGameRanking()));
+        builder.append(getPrompt(ClientFSMState.GAME_ENDED));
+        latestScreen = builder.toString();
         return latestScreen;
+    }
+
+
+    private List<String> buildGameRanking() {
+        return gameRanking;
     }
 
     /**
@@ -283,6 +292,19 @@ public class CLIView {
         }
         this.tools.remove(this.tools.size()-1);
 
+    }
+
+    public void updateGameRanking(List<LightPlayer> players){
+        gameRanking.clear();
+        gameRanking.add(EMPTY_STRING);
+        gameRanking.add(uiMsg.getMessage(GAME_END));
+        gameRanking.add(EMPTY_STRING);
+        for(int position=1; position<=players.size(); position++){
+            gameRanking.add(
+                    String.format(cliElements.getElem(LIST_ELEMENT),position,players.get(position-1).getUsername())+
+                            String.format(cliElements.getElem(POINTS),uiMsg.getMessage(PLAYER_SCORE),players.get(position-1).getPoints())
+            );
+        }
     }
 
 
@@ -491,7 +513,7 @@ public class CLIView {
                 promptLine.append(endTurnOption());
                 promptLine.append(quitOption());
                 break;
-
+            case GAME_ENDED:
             case NOT_MY_TURN:
             case CHOOSE_SCHEMA:
             case TOOL_CAN_CONTINUE:

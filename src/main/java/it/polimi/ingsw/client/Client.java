@@ -112,6 +112,7 @@ public class Client {
             this.ready = false;
         }
 
+        clientConn.newMatch();
     }
 
     /**
