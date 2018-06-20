@@ -100,11 +100,12 @@ public class SocketClient implements ClientConn {
                         } catch (IOException e1) {
                             System.err.println("ERR: error while closing the socket");
                         }
+                        System.out.println("QUITTED(1)");
                     }
                     client.setUserStatus(UserStatus.DISCONNECTED);
                 }
             }
-            System.out.println("QUITTED(1)");
+            System.out.println("EXIT LISTENING THREAD");
         }).start();
     }
 
@@ -745,8 +746,9 @@ public class SocketClient implements ClientConn {
             } catch (IOException e) {
                 System.out.println("already closed");
             }
+            System.out.println("QUITTED(2)");
         }
-        System.out.println("QUITTED(2)");
+        client.setUserStatus(UserStatus.DISCONNECTED);
     }
 
     /**
