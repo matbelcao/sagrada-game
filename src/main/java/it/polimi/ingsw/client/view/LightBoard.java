@@ -30,6 +30,7 @@ public class LightBoard extends Observable {
     private List<Integer> latestPlacementsList;
     private IndexedCellContent latestSelectedDie;
     private List<Integer> changes;
+    private final Object lockChanges;
 
     /**
      * this builds the lightboard and initializes the number of players of the match
@@ -46,6 +47,7 @@ public class LightBoard extends Observable {
         latestPlacementsList = new ArrayList<>();
         latestDiceList = new ArrayList<>();
         changes=new ArrayList<>();
+        lockChanges=new Object();
         nowPlaying = -1;
         roundNumber = -1;
     }
@@ -58,13 +60,20 @@ public class LightBoard extends Observable {
 
     }
 
+    private void addToChanges(int event){
+        synchronized (lockChanges){
+            changes.add(event);
+            lockChanges.notifyAll();
+        }
+    }
+
     /**
      * this sets the drafted schemas for the initial choice
      * @param draftedSchemas the drafted schemas
      */
     public void setDraftedSchemas(List<LightSchemaCard> draftedSchemas) {
         this.draftedSchemas = draftedSchemas;
-        changes.add(LightBoardEvents.DraftedSchemas);
+        addToChanges(LightBoardEvents.DraftedSchemas);
         setChanged();
     }
 
@@ -81,7 +90,7 @@ public class LightBoard extends Observable {
      */
     public void setMyPlayerId(int myPlayerId) {
         this.myPlayerId = myPlayerId;
-        changes.add(LightBoardEvents.MyPlayerId);
+        addToChanges(LightBoardEvents.MyPlayerId);
         setChanged();
     }
 
@@ -98,7 +107,7 @@ public class LightBoard extends Observable {
      */
     public void setNowPlaying(int nowPlaying) {
         this.nowPlaying = nowPlaying;
-        changes.add(LightBoardEvents.NowPlaying);
+        addToChanges(LightBoardEvents.NowPlaying);
         setChanged();
     }
 
@@ -125,7 +134,7 @@ public class LightBoard extends Observable {
      */
     public void setPrivObj(LightPrivObj privObj) {
         this.privObj = privObj;
-        changes.add(LightBoardEvents.PrivObj);
+        addToChanges(LightBoardEvents.PrivObj);
         setChanged();
     }
 
@@ -135,7 +144,7 @@ public class LightBoard extends Observable {
      */
     public void setTools(List<LightTool> tools){
         this.tools=tools;
-        changes.add(LightBoardEvents.Tools);
+        addToChanges(LightBoardEvents.Tools);
         setChanged();
     }
 
@@ -145,7 +154,7 @@ public class LightBoard extends Observable {
      */
     public void setPubObjs(List<LightCard> pubObjs){
         this.pubObj=pubObjs;
-        changes.add(LightBoardEvents.PubObjs);
+        addToChanges(LightBoardEvents.PubObjs);
         setChanged();
     }
 
@@ -184,7 +193,7 @@ public class LightBoard extends Observable {
      */
     public void setDraftPool(List<LightDie> draftPool) {
         this.draftPool=draftPool;
-        changes.add(LightBoardEvents.DraftPool);
+        addToChanges(LightBoardEvents.DraftPool);
         setChanged();
 
     }
@@ -204,7 +213,7 @@ public class LightBoard extends Observable {
     public void setRoundTrack(List<List<LightDie>> roundTrack, int numRound) {
         this.roundTrack = roundTrack;
         this.roundNumber = numRound;
-        changes.add(LightBoardEvents.RoundTrack);
+        addToChanges(LightBoardEvents.RoundTrack);
         setChanged();
     }
 
@@ -217,7 +226,7 @@ public class LightBoard extends Observable {
      */
     public void updateSchema(int playerId, LightSchemaCard schema){
         players.get(playerId).setSchema(schema);
-        changes.add(LightBoardEvents.Schema);
+        addToChanges(LightBoardEvents.Schema);
         setChanged();
     }
 
@@ -228,7 +237,7 @@ public class LightBoard extends Observable {
      */
     public void updateFavorTokens(int playerId, int favorTokens){
         players.get(playerId).setFavorTokens(favorTokens);
-        changes.add(LightBoardEvents.FavorTokens);
+        addToChanges(LightBoardEvents.FavorTokens);
         setChanged();
     }
 
@@ -239,7 +248,7 @@ public class LightBoard extends Observable {
      */
     public void updatestatus(int playerId, LightPlayerStatus status){
         players.get(playerId).setStatus(status);
-        changes.add(LightBoardEvents.Status);
+        addToChanges(LightBoardEvents.Status);
         setChanged();
     }
 
@@ -269,13 +278,13 @@ public class LightBoard extends Observable {
      */
     public void setIsFirstTurn(boolean isFirstTurn) {
         this.isFirstTurn = isFirstTurn;
-        changes.add(LightBoardEvents.IsFirstTurn);
+        addToChanges(LightBoardEvents.IsFirstTurn);
         setChanged();
     }
 
 
     public void stateChanged(){
-        changes.add(LightBoardEvents.StateChanged);
+        addToChanges(LightBoardEvents.StateChanged);
         setChanged();
     }
     /**
@@ -291,7 +300,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestOptionsList(List<Actions> optionsList) {
         this.latestOptionsList = optionsList;
-        changes.add(LightBoardEvents.Option);
+        addToChanges(LightBoardEvents.Option);
         setChanged();
     }
 
@@ -315,7 +324,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestDiceList(List<IndexedCellContent> latestDiceList) {
         this.latestDiceList = latestDiceList;
-        changes.add(LightBoardEvents.DiceList);
+        addToChanges(LightBoardEvents.DiceList);
         setChanged();
     }
 
@@ -325,7 +334,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestPlacementsList(List<Integer> placementsList) {
         this.latestPlacementsList = placementsList;
-        changes.add(LightBoardEvents.PlacementsList);
+        addToChanges(LightBoardEvents.PlacementsList);
         setChanged();
     }
 
@@ -342,16 +351,20 @@ public class LightBoard extends Observable {
      */
     public void setLatestSelectedDie(IndexedCellContent  latestSelectedDie) {
         this.latestSelectedDie = latestSelectedDie;
-        changes.add(LightBoardEvents.SelectedDie);
+        addToChanges(LightBoardEvents.SelectedDie);
         setChanged();
     }
 
-    public List<Integer> getChanges() {
-        return changes;
+    public  List<Integer> getChanges() {
+
+            return changes;
     }
 
     public void clearChanges(){
-        changes.clear();
+        synchronized (lockChanges) {
+            changes.clear();
+            lockChanges.notifyAll();
+        }
     }
 
 

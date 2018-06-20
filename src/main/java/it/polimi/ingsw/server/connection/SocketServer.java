@@ -28,6 +28,7 @@ public class SocketServer extends Thread implements ServerConn  {
     private Timer pingTimer;
     private final Object pingLock;
     private boolean connectionOk;
+    private final Object lockOutSocket;
     private boolean timerActive;
 
     /**
@@ -37,12 +38,21 @@ public class SocketServer extends Thread implements ServerConn  {
     SocketServer(Socket socket, User user, QueuedBufferedReader inSocket, PrintWriter outSocket){
         this.inSocket=inSocket;
         this.outSocket=outSocket;
+        this.lockOutSocket=new Object();
         this.user = user;
         this.socket = socket;
         this.pingLock = new Object();
         this.connectionOk=true;
         this.timerActive=false;
         start();
+    }
+
+    private void syncedSocketWrite(String message){
+        synchronized (lockOutSocket){
+            outSocket.println(message);
+            outSocket.flush();
+            lockOutSocket.notifyAll();
+        }
     }
 
     /**
@@ -133,8 +143,8 @@ public class SocketServer extends Thread implements ServerConn  {
                     return true;
             }
         } catch (IllegalActionException e) {
-            outSocket.println("ILLEGAL ACTION!!");
-            outSocket.flush();
+            syncedSocketWrite("ILLEGAL ACTION!!");
+
         }
         return true;
     }
@@ -199,8 +209,8 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     @Override
     public void notifyLobbyUpdate(int n){
-        outSocket.println("LOBBY "+n);
-        outSocket.flush();
+        syncedSocketWrite("LOBBY "+n);
+
     }
 
     /**
@@ -210,8 +220,7 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     @Override
     public void notifyGameStart(int n,int id){
-        outSocket.println("GAME start "+n+" "+id);
-        outSocket.flush();
+        syncedSocketWrite("GAME start "+n+" "+id);
     }
 
     /**
@@ -221,12 +230,11 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     @Override
     public void notifyGameEnd(List<RankingEntry> ranking){
-        outSocket.print("GAME end");
+        StringBuilder builder= new StringBuilder("GAME end");
         for(RankingEntry e : ranking){
-            outSocket.print(" "+e.getPlayerId()+","+e.getPoints()+","+e.getFinalPosition());
+            builder.append(" "+e.getPlayerId()+","+e.getPoints()+","+e.getFinalPosition());
         }
-        outSocket.println("");
-        outSocket.flush();
+        syncedSocketWrite(builder.toString());
     }
 
     /**
@@ -236,8 +244,8 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     @Override
     public void notifyRoundEvent(Event event, int roundNumber){
-        outSocket.println("GAME "+event.toString().toLowerCase()+" "+roundNumber);
-        outSocket.flush();
+        syncedSocketWrite("GAME "+event.toString().toLowerCase()+" "+roundNumber);
+
     }
 
     /**
@@ -248,8 +256,8 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     @Override
     public void notifyTurnEvent(Event event,int playerId,int turnNumber){
-        outSocket.println("GAME "+event.toString().toLowerCase()+" "+playerId+" "+turnNumber);
-        outSocket.flush();
+        syncedSocketWrite("GAME "+event.toString().toLowerCase()+" "+playerId+" "+turnNumber);
+
     }
 
     /**
@@ -259,8 +267,8 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     @Override
     public void notifyStatusUpdate (Event event,int id){
-        outSocket.println("STATUS "+event.toString().toLowerCase()+" "+id);
-        outSocket.flush();
+        syncedSocketWrite("STATUS "+event.toString().toLowerCase()+" "+id);
+
     }
 
     /**
@@ -268,8 +276,8 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     @Override
     public void notifyBoardChanged(){
-        outSocket.println("GAME "+Event.BOARD_CHANGED.toString().toLowerCase());
-        outSocket.flush();
+        syncedSocketWrite("GAME "+Event.BOARD_CHANGED.toString().toLowerCase());
+
     }
 
     /**
@@ -278,19 +286,18 @@ public class SocketServer extends Thread implements ServerConn  {
     private void draftSchemaCards() throws IllegalActionException {
         Game game= user.getGame();
         List<LightSchemaCard> lightSchemas=game.getDraftedSchemaCards(user);
-
+        StringBuilder builder= new StringBuilder();
         for(LightSchemaCard s: lightSchemas){
-            outSocket.print("SEND schema "+s.getName().replaceAll(" ","_")+" "+s.getFavorTokens());
+            builder.append("SEND schema "+s.getName().replaceAll(" ","_")+" "+s.getFavorTokens());
             for (int index=0; index < SchemaCard.NUM_ROWS*SchemaCard.NUM_COLS ; index++) {
                 if (s.hasConstraintAt(index)) {
-                    outSocket.print(" C,"+index+"," + s.getConstraintAt(index).toString());
+                    builder.append(" C,"+index+"," + s.getConstraintAt(index).toString());
                 }
                 if (s.hasDieAt(index)) {
-                    outSocket.print(" D,"+index+"," + s.getDieAt(index).getColor().toString() + "," + s.getDieAt(index).getShade().toString());
+                    builder.append(" D,"+index+"," + s.getDieAt(index).getColor().toString() + "," + s.getDieAt(index).getShade().toString());
                 }
             }
-            outSocket.println("");
-            outSocket.flush();
+            syncedSocketWrite(builder.toString());
         }
     }
 
@@ -300,25 +307,24 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void sendUserSchemaCard(int playerId) throws IllegalActionException {
         LightSchemaCard lightSchema = user.getGame().getUserSchemaCard(playerId);
-
-        outSocket.print("SEND schema "+lightSchema.getName().replaceAll(" ","_")+" "+lightSchema.getFavorTokens());
+        StringBuilder builder=new StringBuilder();
+        builder.append("SEND schema "+lightSchema.getName().replaceAll(" ","_")+" "+lightSchema.getFavorTokens());
         for (int index=0; index < SchemaCard.NUM_ROWS*SchemaCard.NUM_COLS ; index++) {
             if (lightSchema.hasDieAt(index)) {
-                outSocket.print(" D," + index + "," + lightSchema.getDieAt(index).getColor().toString() + "," + lightSchema.getDieAt(index).getShade().toString());
+                builder.append(" D," + index + "," + lightSchema.getDieAt(index).getColor().toString() + "," + lightSchema.getDieAt(index).getShade().toString());
             }else if (lightSchema.hasConstraintAt(index)) {
-                outSocket.print(" C," + index + "," + lightSchema.getConstraintAt(index).toString());
+                builder.append(" C," + index + "," + lightSchema.getConstraintAt(index).toString());
             }
         }
-        outSocket.println("");
-        outSocket.flush();
+        syncedSocketWrite(builder.toString());
     }
 
     /**
      * Sends the client a text containing his amount of favor tokens
      */
     public void sendFavorTokens(int playerId) {
-        outSocket.println("SEND favor_tokens "+user.getGame().getFavorTokens(playerId));
-        outSocket.flush();
+        syncedSocketWrite("SEND favor_tokens "+user.getGame().getFavorTokens(playerId));
+
     }
 
 
@@ -328,9 +334,9 @@ public class SocketServer extends Thread implements ServerConn  {
     private void sendPrivateObjectiveCard(){
         LightPrivObj privObjectiveCard=user.getGame().getPrivCard(user);
 
-        outSocket.println("SEND priv "+privObjectiveCard.getId()+" "+privObjectiveCard.getName().replaceAll(" ", "_")
+        syncedSocketWrite("SEND priv "+privObjectiveCard.getId()+" "+privObjectiveCard.getName().replaceAll(" ", "_")
                 +" "+privObjectiveCard.getDescription().replaceAll(" ", "_")+" "+privObjectiveCard.getColor().toString());
-        outSocket.flush();
+
     }
 
     /**
@@ -340,8 +346,8 @@ public class SocketServer extends Thread implements ServerConn  {
         List<LightCard> pubObjectiveCards= user.getGame().getPubCards();
 
         for(LightCard p:pubObjectiveCards){
-            outSocket.println("SEND pub "+p.getId()+" "+p.getName().replaceAll(" ", "_")+" "+p.getDescription().replaceAll(" ", "_"));
-            outSocket.flush();
+            syncedSocketWrite("SEND pub "+p.getId()+" "+p.getName().replaceAll(" ", "_")+" "+p.getDescription().replaceAll(" ", "_"));
+
         }
     }
 
@@ -352,8 +358,7 @@ public class SocketServer extends Thread implements ServerConn  {
         List<LightTool> toolCards= user.getGame().getToolCards();
 
         for (LightTool t:toolCards){
-            outSocket.println("SEND tool "+t.getId()+" "+t.getName().replaceAll(" ", "_")+" "+t.getDescription().replaceAll(" ", "_") +" "+t.isUsed());
-            outSocket.flush();
+            syncedSocketWrite("SEND tool "+t.getId()+" "+t.getName().replaceAll(" ", "_")+" "+t.getDescription().replaceAll(" ", "_") +" "+t.isUsed());
         }
     }
 
@@ -361,15 +366,13 @@ public class SocketServer extends Thread implements ServerConn  {
      * Sends the client a textual list of the dice in the DraftPool
      */
     private void sendDraftPoolDice() throws IllegalActionException {
-        Die die;
         List<LightDie> draftPool= user.getGame().getDraftedDice();
 
-        outSocket.print("SEND draftpool");
+        StringBuilder builder=new StringBuilder("SEND draftpool");
         for (int i=0;i<draftPool.size();i++){
-            outSocket.print(" "+i+","+draftPool.get(i).getColor().toString()+","+draftPool.get(i).getShade().toString());
+            builder.append(" "+i+","+draftPool.get(i).getColor().toString()+","+draftPool.get(i).getShade().toString());
         }
-        outSocket.println("");
-        outSocket.flush();
+        syncedSocketWrite(builder.toString());
 
     }
 
@@ -380,15 +383,14 @@ public class SocketServer extends Thread implements ServerConn  {
         List<List<LightDie>> trackList = user.getGame().getRoundTrackDice();
         List<LightDie> dieList;
 
-        outSocket.print("SEND roundtrack");
+        StringBuilder builder=new StringBuilder("SEND roundtrack");
         for(int i=0;i<trackList.size();i++){
             dieList= trackList.get(i);
             for(LightDie d:dieList){
-                outSocket.print(" "+i+","+d.getColor().toString()+","+d.getShade().toString());
+                builder.append(" "+i+","+d.getColor().toString()+","+d.getShade().toString());
             }
         }
-        outSocket.println("");
-        outSocket.flush();
+        syncedSocketWrite(builder.toString());
     }
 
     /**
@@ -398,12 +400,11 @@ public class SocketServer extends Thread implements ServerConn  {
     private void sendPlayers(){
         List<LightPlayer> players= user.getGame().getPlayers();
 
-        outSocket.print("SEND players");
+        StringBuilder builder=new StringBuilder("SEND players");
         for (LightPlayer p:players){
-            outSocket.print(" "+p.getPlayerId()+","+p.getUsername());
+            builder.append(" "+p.getPlayerId()+","+p.getUsername());
         }
-        outSocket.println("");
-        outSocket.flush();
+        syncedSocketWrite(builder.toString());
     }
 
     /**
@@ -411,18 +412,17 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     private void sendDiceList() throws IllegalActionException {
         List<IndexedCellContent> dice=user.getGame().getDiceList();
-
+        StringBuilder builder= new StringBuilder();
         if(dice.size()>0){
-            outSocket.print("LIST_DICE "+dice.get(0).getPlace().toString().toLowerCase());
+            builder.append("LIST_DICE "+dice.get(0).getPlace().toString().toLowerCase());
             for(int index=0;index<dice.size();index++){
-                outSocket.print(" "+dice.get(index).getPosition()+","+dice.get(index).getContent().getShade().toString()
+                builder.append(" "+dice.get(index).getPosition()+","+dice.get(index).getContent().getShade().toString()
                         +"," +dice.get(index).getContent().getColor().toString());
             }
         }else{
-            outSocket.print("LIST_DICE");
+            builder.append("LIST_DICE");
         }
-        outSocket.println("");
-        outSocket.flush();
+        syncedSocketWrite(builder.toString());
     }
 
     /**
@@ -431,12 +431,11 @@ public class SocketServer extends Thread implements ServerConn  {
     private void sendPlacementList() throws IllegalActionException {
         List<Integer> placements=user.getGame().getPlacements();
 
-        outSocket.print("LIST_PLACEMENTS");
+        StringBuilder builder=new StringBuilder("LIST_PLACEMENTS");
         for(int i=0;i<placements.size();i++){
-            outSocket.print(" "+placements.get(i));
+            builder.append(" "+placements.get(i));
         }
-        outSocket.println("");
-        outSocket.flush();
+        syncedSocketWrite(builder.toString());
     }
 
     /**
@@ -446,12 +445,11 @@ public class SocketServer extends Thread implements ServerConn  {
     private void selectDie(int dieIndex) throws IllegalActionException {
         List<Actions> options = user.getGame().selectDie(dieIndex);
 
-        outSocket.print("LIST_OPTIONS");
+        StringBuilder builder=new StringBuilder("LIST_OPTIONS");
         for(int i=0;i<options.size();i++){
-            outSocket.print(" "+i+ ","+options.get(i).toString());
+            builder.append(" "+i+ ","+options.get(i).toString());
         }
-        outSocket.println("");
-        outSocket.flush();
+        syncedSocketWrite(builder.toString());
     }
 
     /**
@@ -463,11 +461,11 @@ public class SocketServer extends Thread implements ServerConn  {
 
         Boolean result=user.getGame().choose(user,optionIndex);
         if(result){
-            outSocket.println("CHOICE ok");
+            syncedSocketWrite("CHOICE ok");
         }else{
-            outSocket.println("CHOICE ko");
+            syncedSocketWrite("CHOICE ko");
         }
-        outSocket.flush();
+
     }
 
     /**
@@ -479,11 +477,11 @@ public class SocketServer extends Thread implements ServerConn  {
         Boolean used;
         used=user.getGame().activeTool(toolIndex);
         if(used){
-            outSocket.println("TOOL ok");
+            syncedSocketWrite("TOOL ok");
         }else{
-            outSocket.println("TOOL ko");
+            syncedSocketWrite("TOOL ko");
         }
-        outSocket.flush();
+
     }
 
     /**
@@ -494,11 +492,11 @@ public class SocketServer extends Thread implements ServerConn  {
         Boolean isActive=null;
         isActive=user.getGame().toolStatus();
         if(isActive){
-            outSocket.println("TOOL ok");
+            syncedSocketWrite("TOOL ok");
         }else{
-            outSocket.println("TOOL ko");
+            syncedSocketWrite("TOOL ko");
         }
-        outSocket.flush();
+
     }
 
 
@@ -536,8 +534,7 @@ public class SocketServer extends Thread implements ServerConn  {
             while(connectionOk) {
                 synchronized (pingLock) {
                     if (pingTimer==null && connectionOk) {
-                        outSocket.println("PING");
-                        outSocket.flush();
+                        syncedSocketWrite("PING");
 
                         System.out.println("PING SOCKET");
 
