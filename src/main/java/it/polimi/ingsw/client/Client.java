@@ -43,7 +43,7 @@ import static it.polimi.ingsw.common.enums.ErrMsg.*;
  */
 public class Client {
 
-
+    private static final String EMPTY_STRING="";
 
     private UIMode uiMode;
     private ConnectionMode connMode;
@@ -273,7 +273,7 @@ public class Client {
             do{
                 
                 synchronized (lockCredentials) {
-                    while (username == null || password == null) {
+                    while (username == null|| password == null) {
                         lockCredentials.wait();
                     }
                 }
@@ -315,6 +315,7 @@ public class Client {
     }
 
     private boolean login() throws RemoteException, MalformedURLException, NotBoundException {
+        if(this.username.equals(EMPTY_STRING)){return false;}
         boolean logged;
         if (connMode.equals(ConnectionMode.RMI)) {
             logged = loginRMI();
@@ -370,7 +371,7 @@ public class Client {
     public void updateGameStart(int numPlayers, int playerId){
 
         this.board= new LightBoard(numPlayers);
-        board.addObserver(clientUI);
+
 
         List<LightPlayer> players = clientConn.getPlayers();
         for (int i = 0; i < board.getNumPlayers(); i++) {
@@ -387,6 +388,8 @@ public class Client {
         board.setPrivObj(clientConn.getPrivateObject());
 
         board.setDraftedSchemas(clientConn.getSchemaDraft());
+
+        board.addObserver(clientUI);
 
         clientUI.updateGameStart(numPlayers,playerId);
 
@@ -475,23 +478,25 @@ public class Client {
 
 
     public void updatePlayerStatus(int playerId, Event event){
-        LightPlayerStatus status;
-        switch (event){
-            case QUIT:
-                status=LightPlayerStatus.QUITTED;
-                break;
-            case RECONNECT:
-                status=LightPlayerStatus.PLAYING;
-                break;
-            case DISCONNECT:
-                status=LightPlayerStatus.DISCONNECTED;
-                break;
-            default:
-                status=LightPlayerStatus.PLAYING;
-        }
+        if(!fsm.getState().equals(ClientFSMState.SCHEMA_CHOSEN)) {
+            LightPlayerStatus status;
+            switch (event) {
+                case QUIT:
+                    status = LightPlayerStatus.QUITTED;
+                    break;
+                case RECONNECT:
+                    status = LightPlayerStatus.PLAYING;
+                    break;
+                case DISCONNECT:
+                    status = LightPlayerStatus.DISCONNECTED;
+                    break;
+                default:
+                    status = LightPlayerStatus.PLAYING;
+            }
 
-        board.updatestatus(playerId, status);
-        board.notifyObservers();
+            board.updatestatus(playerId, status);
+            board.notifyObservers();
+        }
     }
 
     /**

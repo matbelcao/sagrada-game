@@ -196,6 +196,7 @@ public class CLI implements ClientUI {
                     case LightBoardEvents.RoundTrack:
                         view.updateRoundTrack(board.getRoundTrack());
                         break;
+                    case LightBoardEvents.Status:
                     case LightBoardEvents.Schema:
                         for (int i = 0; i < board.getNumPlayers(); i++) {
                             view.updateSchema(board.getPlayerById(i));
@@ -211,6 +212,7 @@ public class CLI implements ClientUI {
             switch (client.getTurnState()) {
                 case CHOOSE_SCHEMA:
                     break;
+
                 case NOT_MY_TURN:
                     view.updateMenuNotMyTurn(board.getPlayerById(board.getNowPlaying()).getUsername());
                     printToScreen(view.printMainView(NOT_MY_TURN));
