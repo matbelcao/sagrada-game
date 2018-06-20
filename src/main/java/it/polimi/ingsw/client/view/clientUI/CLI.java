@@ -1,7 +1,9 @@
 package it.polimi.ingsw.client.view.clientUI;
 
 import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
+import it.polimi.ingsw.client.view.LightBoardEvents;
 import it.polimi.ingsw.client.view.clientUI.uielements.CLIView;
 import it.polimi.ingsw.client.view.clientUI.uielements.CLIViewUtils;
 import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
@@ -19,6 +21,7 @@ import java.io.Console;
 import java.util.List;
 import java.util.Observable;
 
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
 import static it.polimi.ingsw.common.enums.ErrMsg.ERR;
 import static it.polimi.ingsw.common.enums.ErrMsg.ERROR_RETRIEVING_CONSOLE;
 
@@ -78,10 +81,10 @@ public class CLI implements ClientUI {
         char [] password;
 
             try {
-                printToScreen(view.showLoginUsername());
+                printToScreen(view.printLoginUsername());
                 username = console.readLine().trim();
 
-                printToScreen(view.showLoginPassword());
+                printToScreen(view.printLoginPassword());
                 password = Credentials.hash(username, console.readPassword());
 
                 client.setPassword(password);
@@ -177,28 +180,45 @@ public class CLI implements ClientUI {
             if (board == null) {
                 throw new IllegalArgumentException();
             }
-            view.updateTools(board.getTools());
-            view.updatePrivObj(board.getPrivObj());
-            view.updateObjectives(board.getPubObjs(), board.getPrivObj());
-
-
-            for (int i = 0; i < board.getNumPlayers(); i++) {
-                view.updateSchema(board.getPlayerById(i));
+            for(Integer change : board.getChanges()) {
+                switch (change) {
+                    case LightBoardEvents.PrivObj:
+                        view.updatePrivObj(board.getPrivObj());
+                        break;
+                    case LightBoardEvents.Tools:
+                        view.updateTools(board.getTools());
+                        break;
+                    case  LightBoardEvents.PubObjs:
+                        view.updateObjectives(board.getPubObjs(), board.getPrivObj());
+                        break;
+                    case LightBoardEvents.DraftPool:
+                        view.updateDraftPool(board.getDraftPool());
+                        break;
+                    case LightBoardEvents.RoundTrack:
+                        view.updateRoundTrack(board.getRoundTrack());
+                        break;
+                    case LightBoardEvents.Schema:
+                        for (int i = 0; i < board.getNumPlayers(); i++) {
+                            view.updateSchema(board.getPlayerById(i));
+                        }
+                        break;
+                    case LightBoardEvents.NowPlaying:
+                        view.updateRoundTurn(board.getRoundNumber(), board.getIsFirstTurn(), board.getNowPlaying());
+                        break;
+                    default:
+                        break;
+                }
             }
-            if (board.getNowPlaying() != -1) {
-                view.updateRoundTurn(board.getRoundNumber(), board.getIsFirstTurn(), board.getNowPlaying());
-            }
-            view.updateRoundTrack(board.getRoundTrack());
-            view.updateDraftPool(board.getDraftPool());
-
             switch (client.getTurnState()) {
                 case CHOOSE_SCHEMA:
                     break;
                 case NOT_MY_TURN:
                     view.updateMenuNotMyTurn(board.getPlayerById(board.getNowPlaying()).getUsername());
+                    printToScreen(view.printMainView(NOT_MY_TURN));
                     break;
                 case MAIN:
                     view.updateMenuMain();
+                    printToScreen(view.printMainView(MAIN));
                     break;
                 case SELECT_DIE:
                     if (board.getLatestDiceList().get(0).getPlace().equals(Place.ROUNDTRACK) &&
@@ -206,14 +226,17 @@ public class CLI implements ClientUI {
                         board.getLatestDiceList().add(0, board.getLatestSelectedDie());
                     }
                     view.updateMenuDiceList(board.getLatestDiceList());
+                    printToScreen(view.printMainView(SELECT_DIE));
                     break;
                 case CHOOSE_OPTION:
                     break;
                 case CHOOSE_TOOL:
                     view.updateMenuListTools(board.getTools());
+                    printToScreen(view.printMainView(CHOOSE_TOOL));
                     break;
                 case CHOOSE_PLACEMENT:
                     view.updateMenuListPlacements(board.getLatestPlacementsList(), board.getLatestSelectedDie().getContent());
+                    printToScreen(view.printMainView(CHOOSE_PLACEMENT));
                     break;
                 case TOOL_CAN_CONTINUE:
                     break;
@@ -222,8 +245,8 @@ public class CLI implements ClientUI {
                     break;
             }
 
+            board.clearChanges();
 
-            printToScreen(view.printMainView(client.getTurnState()));
         }
     }
 
@@ -270,4 +293,5 @@ public class CLI implements ClientUI {
     public void update(Observable o, Object arg) {
         updateBoard((LightBoard)o);
     }
+
 }
