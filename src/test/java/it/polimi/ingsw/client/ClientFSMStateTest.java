@@ -15,8 +15,12 @@ class ClientFSMStateTest {
         ClientFSMState state= ClientFSMState.CHOOSE_SCHEMA;
 
         state=state.nextState(true,false,false,false);
-        assertEquals(ClientFSMState.NOT_MY_TURN,state);
+        assertEquals(ClientFSMState.SCHEMA_CHOSEN,state);
 
+        state= ClientFSMState.NOT_MY_TURN;
+
+        state=state.nextState(false,false,false,false);
+        assertEquals(ClientFSMState.NOT_MY_TURN,state);
 
         state=state.nextState(true,false,false,false);
         assertEquals(ClientFSMState.MAIN,state);
