@@ -67,8 +67,7 @@ public interface ServerConn {
 
     /**
      * Tests if the client is still connected
-     * @return true if the client is connected
      */
-    boolean ping();
+    void ping();
 
 }

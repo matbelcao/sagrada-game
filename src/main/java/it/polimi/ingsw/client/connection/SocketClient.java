@@ -32,6 +32,7 @@ public class SocketClient implements ClientConn {
     private Timer pingTimer;
     private final Object pingLock=new Object();
     private boolean connectionOk;
+    private boolean timerActive;
 
     /**
      * Thi is the class constructor, it instantiates the new socket and the input/output buffers for the communications
@@ -49,6 +50,7 @@ public class SocketClient implements ClientConn {
 
         inSocket.pop();
         connectionOk=true;
+        this.timerActive=false;
         client.getClientUI().updateConnectionOk();
     }
 
@@ -82,7 +84,7 @@ public class SocketClient implements ClientConn {
 
                             } else if (ClientParser.isPing(inSocket.readln())) {
                                 inSocket.pop();
-                                pong();
+                                socketPong();
                             } else if (ClientParser.isInvalid(inSocket.readln())) {
                                 inSocket.pop();
                                 System.out.println("INVALID message");
@@ -102,7 +104,14 @@ public class SocketClient implements ClientConn {
                         }
                         System.out.println("QUITTED(1)");
                     }
-                    client.setUserStatus(UserStatus.DISCONNECTED);
+                    synchronized (pingLock){
+                        if(timerActive){
+                            pingTimer.cancel();
+                            timerActive=false;
+                            pingTimer.notifyAll();
+                        }
+                    }
+                    client.disconnect();
                 }
             }
             System.out.println("EXIT LISTENING THREAD");
@@ -748,15 +757,24 @@ public class SocketClient implements ClientConn {
             }
             System.out.println("QUITTED(2)");
         }
-        client.setUserStatus(UserStatus.DISCONNECTED);
+        synchronized (pingLock){
+            if(timerActive){
+                pingTimer.cancel();
+                timerActive=false;
+                pingTimer.notifyAll();
+            }
+        }
     }
 
     /**
-     * This method provides the ping functionality for the client-side hearthBreath thread
-     * @return false iff the connection has broken
+     * Disabled for socket
      */
     @Override
-    public boolean pong() {
+    public void pong() {
+        return;
+    }
+
+    private boolean socketPong(){
         try{
             outSocket.println("PONG");
             outSocket.flush();
@@ -764,6 +782,7 @@ public class SocketClient implements ClientConn {
                 pingTimer.cancel();
                 pingTimer = new Timer();
                 pingTimer.schedule(new connectionTimeout(), 5000);
+                timerActive=true;
                 pingLock.notifyAll();
             }
         } catch (Exception e) {
@@ -781,6 +800,8 @@ public class SocketClient implements ClientConn {
             synchronized (pingLock) {
                 System.out.println("CONNECTION TIMEOUT!");
                 connectionOk = false;
+                timerActive=false;
+                client.disconnect();
                 pingLock.notifyAll();
             }
         }

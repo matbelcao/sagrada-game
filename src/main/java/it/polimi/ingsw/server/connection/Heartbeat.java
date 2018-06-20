@@ -1,4 +1,4 @@
-package it.polimi.ingsw.server.connection;
+/*package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.controller.MasterServer;
@@ -31,4 +31,4 @@ public class Heartbeat extends Thread{
             }
         }
     }
-}
+}*/

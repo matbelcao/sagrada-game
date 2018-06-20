@@ -3,7 +3,7 @@ package it.polimi.ingsw.server.controller;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.ServerOptions;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
-import it.polimi.ingsw.server.connection.Heartbeat;
+//import it.polimi.ingsw.server.connection.Heartbeat;
 import it.polimi.ingsw.server.connection.RMIAuthenticator;
 import it.polimi.ingsw.server.connection.SocketAuthenticator;
 import it.polimi.ingsw.server.model.User;
@@ -216,6 +216,9 @@ public class MasterServer{
                     }
                 }
             }
+
+            //PING ENABLE
+            user.getServerConn().ping();
         }
     }
 
@@ -282,8 +285,8 @@ public class MasterServer{
      * Starts the HeartBeat service to detect the broken connections
      */
     private void startHeartBeat(){
-        Heartbeat heartbeat = new Heartbeat();
-        heartbeat.start();
+        //Heartbeat heartbeat = new Heartbeat();
+        //heartbeat.start();
     }
 
     /**
@@ -427,7 +430,7 @@ public class MasterServer{
         }
         server.startRMI();
         server.startSocket();
-        server.startHeartBeat();
+        //server.startHeartBeat();
     }
 
 

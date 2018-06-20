@@ -144,6 +144,6 @@ public interface ClientConn {
      * This method provides the ping functionality for the client-side hearthBreath thread
      * @return false iff the connection has broken
      */
-    boolean pong() throws RemoteException;
+    void pong();
 
 }

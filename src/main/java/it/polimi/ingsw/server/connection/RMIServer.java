@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
+import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.Event;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.model.User;
@@ -141,16 +142,28 @@ public class RMIServer implements ServerConn {
 
     /**
      * Tests if the client is still connected
-     * @return true if the client is connected
      */
     @Override
-    public boolean ping(){
-        boolean result;
-        try {
-            result = remoteObj.ping();
-        } catch (RemoteException e) {
-            return false;
-        }
-        return result;
+    public void ping(){
+        new Thread(() -> {
+            boolean ping=true;
+            while(ping) {
+                try {
+                    ping = remoteObj.ping();
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("PING RMI");
+                } catch (RemoteException e) {
+                    if(user.getStatus()!=UserStatus.DISCONNECTED){
+                        user.disconnect();
+                        System.out.println("CONNECTION TIMEOUT!");
+                    }
+                    ping=false;
+                }
+            }
+        }).start();
     }
 }

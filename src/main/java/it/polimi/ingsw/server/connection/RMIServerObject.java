@@ -66,6 +66,7 @@ public class RMIServerObject  implements RMIServerInt {
 
     @Override
     public boolean ping() {
+        client.getClass();
         return true;
     }
 }

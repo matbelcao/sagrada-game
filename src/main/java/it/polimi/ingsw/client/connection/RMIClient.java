@@ -306,12 +306,29 @@ public class RMIClient implements ClientConn{
     }
 
     /**
-     * This method provides the ping functionality for the client-side hearthBreath thread
-     * @return false iff the connection has broken
+     * Tests if the client is still connected
+     * @return true if the client is connected
      */
     @Override
-    public boolean pong() {
-        return false;
+    public void pong(){
+        new Thread(() -> {
+            boolean ping=true;
+            while(ping) {
+                try {
+                    ping = remoteObj.pong();
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("PING RMI");
+                } catch (RemoteException e) {
+                    client.disconnect();
+                    System.out.println("CONNECTION TIMEOUT!");
+                    ping=false;
+                }
+            }
+        }).start();
     }
 
     /*

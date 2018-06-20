@@ -28,6 +28,7 @@ public class SocketServer extends Thread implements ServerConn  {
     private Timer pingTimer;
     private final Object pingLock;
     private boolean connectionOk;
+    private boolean timerActive;
 
     /**
      * This is the constructor of the class, it starts a thread linked to an open socket
@@ -40,8 +41,8 @@ public class SocketServer extends Thread implements ServerConn  {
         this.socket = socket;
         this.pingLock = new Object();
         this.connectionOk=true;
+        this.timerActive=false;
         start();
-        pingThread();
     }
 
     /**
@@ -500,29 +501,6 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
 
-
-    public void pingThread(){
-        new Thread(() -> {
-            while(connectionOk) {
-                synchronized (pingLock) {
-                    if (pingTimer == null && connectionOk) {
-                        outSocket.println("PING");
-                        outSocket.flush();
-
-                        pingTimer = new Timer();
-                        pingTimer.schedule(new connectionTimeout(), 5000);
-                    }
-                    pingLock.notifyAll();
-                }
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
     /**
      * Timeot connection
      */
@@ -550,34 +528,30 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Tests if the client is still connected
-     * @return true if the client is connected
      */
     @Override
-    public boolean ping() {
-        List<String> result= new ArrayList<>();
-        try{
-            //outSocket.println("PING");
-            //outSocket.flush();
-            //debug
-            //System.out.println(inSocket.isEmpty());
-            while(inSocket.isEmpty()){
-                Thread.sleep(50);
-            }
-            if(Validator.isValid(inSocket.readln(),result) ){
-                if(Validator.checkPong(inSocket.readln(),result)){
-                    inSocket.pop();
-                }
-                return true;
-            }
-        } catch (Exception e) {
-            try {
-                socket.close();
-            } catch (IOException x) {
-                e.printStackTrace();
-            }
+    public void ping() {
+        new Thread(() -> {
+            while(connectionOk) {
+                synchronized (pingLock) {
+                    if (pingTimer==null && connectionOk) {
+                        outSocket.println("PING");
+                        outSocket.flush();
 
-        }
-        return false;
+                        System.out.println("PING SOCKET");
+
+                        pingTimer = new Timer();
+                        pingTimer.schedule(new connectionTimeout(), 5000);
+                    }
+                    pingLock.notifyAll();
+                }
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
 }

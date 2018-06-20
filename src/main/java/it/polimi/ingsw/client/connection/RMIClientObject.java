@@ -115,6 +115,7 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
 
     @Override
     public boolean pong() {
+        user.getClass();
         return true;
     }
 }
