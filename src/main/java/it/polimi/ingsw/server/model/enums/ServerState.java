@@ -8,5 +8,6 @@ public enum ServerState {
     CHOOSE_OPTION,
     GET_PLACEMENTS,
     CHOOSE_PLACEMENT,
-    TOOL_CAN_CONTINUE;
+    TOOL_CAN_CONTINUE,
+    GAME_ENDED;
 }

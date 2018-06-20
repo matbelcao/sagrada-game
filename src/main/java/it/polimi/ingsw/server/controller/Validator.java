@@ -126,6 +126,9 @@ public class Validator {
                 case "end_turn":
                     parsedResult.addAll(Arrays.asList(command));
                     return true;
+                case "new_match":
+                    parsedResult.addAll(Arrays.asList(command));
+                    return true;
                 default:
                     return false;
             }

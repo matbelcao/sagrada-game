@@ -140,6 +140,9 @@ public interface ClientConn {
      */
     void quit();
 
+
+    void newMatch();
+
     /**
      * This method provides the ping functionality for the client-side hearthBreath thread
      * @return false iff the connection has broken

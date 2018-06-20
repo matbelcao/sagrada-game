@@ -94,6 +94,11 @@ public class ServerFSM {
         return curState;
     }
 
+    public synchronized ServerState endGame(){
+        curState=ServerState.GAME_ENDED;
+        return curState;
+    }
+
     /**
      * Computes the next state, determining it using the class flags and the previous state of the FSM
      * @param command the action that the player wants to perform

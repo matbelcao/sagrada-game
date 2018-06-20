@@ -178,7 +178,6 @@ public class SocketClient implements ClientConn {
                 }
                 client.updateGameEnd(ranking);
                 System.out.println("<--<----<----<-----<---<---GAME END (CLASSIFICA)---->----->--->--->---->--->-->");
-                connectionOk = false;
                 break;
             case "round_start":
                 client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)));
@@ -764,6 +763,12 @@ public class SocketClient implements ClientConn {
                 pingTimer.notifyAll();
             }
         }
+    }
+
+    @Override
+    public void newMatch() {
+        outSocket.println("GEME new_match");
+        outSocket.flush();
     }
 
     /**

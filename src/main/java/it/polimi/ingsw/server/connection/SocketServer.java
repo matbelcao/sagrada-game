@@ -84,14 +84,6 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     * Closes the connection with the client
-     */
-    @Override
-    public void close(){
-        connectionOk=false;
-    }
-
-    /**
      * This method provides the socket messages interpretation logic
      * @param command the socket's message received
      * @return true if the connection has to be closed
@@ -100,8 +92,7 @@ public class SocketServer extends Thread implements ServerConn  {
         try {
             switch (parsedResult.get(0)) {
                 case "GAME":
-                    if(!user.isMyTurn()){ throw new IllegalActionException(); }
-                    user.getGame().startFlow();
+                    gameCommand(parsedResult.get(1));
                     break;
                 case "GET":
                     getCommands(parsedResult);
@@ -146,6 +137,16 @@ public class SocketServer extends Thread implements ServerConn  {
             outSocket.flush();
         }
         return true;
+    }
+
+    private void gameCommand(String command) throws IllegalActionException {
+        System.out.println("new_match");
+        if(command.equals("new_match")){
+            user.newMatch();
+            return;
+        }
+        if(!user.isMyTurn()){ throw new IllegalActionException(); }
+        user.getGame().startFlow();
     }
 
     private void toolCommand(ArrayList<String> parsedResult) throws IllegalActionException {

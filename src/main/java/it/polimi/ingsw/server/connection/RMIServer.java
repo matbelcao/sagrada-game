@@ -130,15 +130,6 @@ public class RMIServer implements ServerConn {
     }
 
     /**
-     * Closes the connection with the client
-     */
-    @Override
-    public void close() {
-        connectionOk=false;
-    }
-
-
-    /**
      * Tests if the client is still connected
      */
     @Override

@@ -304,6 +304,15 @@ public class RMIClient implements ClientConn{
         }
     }
 
+    @Override
+    public void newMatch() {
+        try {
+            remoteObj.newMatch();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Tests if the client is still connected
      * @return true if the client is connected
