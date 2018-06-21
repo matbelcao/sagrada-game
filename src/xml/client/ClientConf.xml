@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <conf>
-    <address>127.0.0.1</address>
+    <address>192.168.1.81</address>
     <connectionMode>SOCKET</connectionMode>
     <UI>CLI</UI>
     <portRMI>1099</portRMI>

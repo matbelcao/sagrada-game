@@ -410,6 +410,35 @@ public class Client {
         board.notifyObservers();
     }
 
+    private void retrieveBoardOnReconnection(){
+        LightGameStatus gameStatus=clientConn.getGameStatus();
+
+        board= new LightBoard(gameStatus.getNumPlayers());
+        List<LightPlayer> players = clientConn.getPlayers();
+
+        for (int i = 0; i < board.getNumPlayers(); i++) {
+            board.addPlayer(players.get(i));
+        }
+        board.setPrivObj(clientConn.getPrivateObject());
+
+        if(!gameStatus.isInit()) {
+            board.setIsFirstTurn(gameStatus.getIsFirstTurn());
+            board.setRoundTrack(clientConn.getRoundtrack(), gameStatus.getNumRound());
+            board.setNowPlaying(gameStatus.getNowPlaying());
+
+            for (int i = 0; i < board.getNumPlayers(); i++) {
+                board.updateSchema(i, clientConn.getSchema(i));
+                board.updateFavorTokens(i, clientConn.getFavorTokens(i));
+            }
+
+            board.setTools(clientConn.getTools());
+            board.setPubObjs(clientConn.getPublicObjects());
+            board.setDraftPool(clientConn.getDraftPool());
+        }else{
+            board.setDraftedSchemas(clientConn.getSchemaDraft());
+        }
+    }
+
     public void updateGameRoundStart(int numRound){
         board.setRoundTrack(clientConn.getRoundtrack(),numRound);
         if(numRound==0) {
@@ -477,8 +506,7 @@ public class Client {
     }
 
 
-    public void updatePlayerStatus(int playerId, Event event){
-
+    public void updatePlayerStatus(int playerId, Event event, String username){
 
             System.out.println(fsm.getState().toString());
             LightPlayerStatus status;
@@ -497,6 +525,8 @@ public class Client {
                     status = LightPlayerStatus.PLAYING;
             }
             board.updatestatus(playerId, status);
+
+
         if(!(fsm.getState().equals(ClientFSMState.SCHEMA_CHOSEN)
                 ||fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)
                 ||fsm.getState().equals(ClientFSMState.GAME_ENDED))) {

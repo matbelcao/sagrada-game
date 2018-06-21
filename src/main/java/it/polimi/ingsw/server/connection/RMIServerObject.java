@@ -2,7 +2,6 @@ package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.common.serializables.Event;
-import it.polimi.ingsw.common.serializables.LightPlayer;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 
 import java.util.List;
@@ -51,7 +50,7 @@ public class RMIServerObject  implements RMIServerInt {
     @Override
     public void notifyStatusUpdate (Event event,int id){
 
-        client.updatePlayerStatus(id,event);
+        client.updatePlayerStatus(id,event, );
     }
 
     @Override

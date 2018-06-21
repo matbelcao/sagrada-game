@@ -197,6 +197,9 @@ public class ClientParser {
         if(parsedResult.get(1).equals("schema") && parsedResult.size()>4) {
             return checkSendSchema(parsedResult);
         }
+        if(parsedResult.get(1).equals("game_status")) {
+            return true;
+        }
         if(parsedResult.get(1).equals("favor_tokens") && parsedResult.size()==3){return true;}
         if(parsedResult.get(1).equals("priv")||parsedResult.get(1).equals("tool")){
             return parsedResult.size() == 6 ;
