@@ -33,7 +33,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.MAIN;
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.NOT_MY_TURN;
 
 public class GUIutil {
     private final CmdWriter cmdWrite;
@@ -139,18 +140,6 @@ public class GUIutil {
 
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             StackPane p = fullRoundTrackCell(i,cellDim);
-            if(i<roundTrack.size()) {
-                Canvas c = new Canvas(cellDim, cellDim);
-                GraphicsContext gc = c.getGraphicsContext2D();
-                if(roundTrack.get(i).size()>1){
-                    //draw to dice in a cell
-                    drawDie(roundTrack.get(i).get(0), gc, cellDim);
-                    drawDie(roundTrack.get(i).get(1), gc,cellDim/2,0, cellDim);
-                }else {
-                    drawDie(roundTrack.get(i).get(0), gc, cellDim);
-                }
-                p.getChildren().add(c);
-            }
             track.getChildren().add(p);
         }
         return track;
@@ -170,17 +159,19 @@ public class GUIutil {
                         //draw to dice in a cell
                         drawDie(roundTrack.get(i).get(0), gc, cellDim);
                         drawDie(roundTrack.get(i).get(1), gc,cellDim/2,0, cellDim);
+                        highlight(c,cellDim);
                     }else {
                         drawDie(roundTrack.get(i).get(0), gc, cellDim);
                     }
-                    if (turnState.equals(CHOOSE_PLACEMENT) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)){
+                   /* if (turnState.equals(CHOOSE_PLACEMENT) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)){
                         highlight(p);
                         int finalI = i;
                         p.setOnMouseClicked(e->{
                             cmdWrite.write(finalI +"");
                             System.out.println("......... ..... ......... .......SELECETED DIE "+ finalI);
                         });
-                    }
+                    }*/
+                    //c.addEventHandler(MouseEvent.MOUSE_ENTERED, e->new ActionEvent(p, ));
                     p.getChildren().add(c);
                 }
                 track.getChildren().add(p);

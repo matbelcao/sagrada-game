@@ -1,11 +1,10 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Actions;
+import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Turn;
 import it.polimi.ingsw.common.serializables.IndexedCellContent;
-import it.polimi.ingsw.common.serializables.LightPlayer;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
@@ -86,8 +85,8 @@ public class Board {
             toolCards[i]=new ToolCard(id);
         }*/
         toolCards[0]=new ToolCard(1);
-        toolCards[1]=new ToolCard(6);
-        toolCards[2]=new ToolCard(10);
+        toolCards[1]=new ToolCard(11);
+        toolCards[2]=new ToolCard(12);
         return toolCards;
     }
 
