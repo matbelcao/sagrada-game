@@ -240,6 +240,6 @@ public class ClientParserTest {
         assertEquals("1",parsedResult.get(2));
 
         assertFalse(ClientParser.parse("STATUS", parsedResult));
-        assertFalse(ClientParser.parse("STATUS quit 1 3", parsedResult));
+        assertFalse(ClientParser.parse("STTUS", parsedResult));
     }
 }
