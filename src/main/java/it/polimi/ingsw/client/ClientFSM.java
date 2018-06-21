@@ -358,7 +358,7 @@ public class ClientFSM {
 
     void setMyTurn(boolean isMyTurn) {
         synchronized (lockState) {
-            assert (state.equals(NOT_MY_TURN));
+
             state = NOT_MY_TURN.nextState(isMyTurn);
             lockState.notifyAll();
         }
@@ -379,10 +379,7 @@ public class ClientFSM {
                 lockState.notifyAll();
             }
         }else{
-            synchronized (lockState) {
-                state = NOT_MY_TURN;
-                lockState.notifyAll();
-            }
+            setNotMyTurn();
         }
     }
 }
