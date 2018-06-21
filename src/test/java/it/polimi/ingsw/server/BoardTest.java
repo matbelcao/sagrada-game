@@ -135,7 +135,7 @@ public class BoardTest {
 
         Player player0 = board.getPlayer(users1.get(0));
         assertTrue(board.chooseSchemaCard(users1.get(0),1));
-        assertFalse(board.chooseSchemaCard(users1.get(0),1));
+        assertTrue(board.chooseSchemaCard(users1.get(1),1));
 
         Player player1 = board.getPlayer(users1.get(1));
         SchemaCard schema=new SchemaCard(1,false);

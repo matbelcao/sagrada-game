@@ -136,17 +136,16 @@ public class ClientParserTest {
 
         assertTrue(ClientParser.parse("SEND favor_tokens 2", parsedResult));
 
-        assertTrue(ClientParser.parse("SEND players 1,3", parsedResult));
+        assertTrue(ClientParser.parse("SEND players 1,M,CONNECTED", parsedResult));
         assertEquals("SEND",parsedResult.get(0));
         assertEquals("players",parsedResult.get(1));
-        assertEquals("1,3",parsedResult.get(2));
+        assertEquals("1,M,CONNECTED",parsedResult.get(2));
 
-        assertTrue(ClientParser.parse("SEND players 1,3 2,4 3,1", parsedResult));
+        assertTrue(ClientParser.parse("SEND players 1,M,CONNECTED 2,B,DISCONNECTED", parsedResult));
         assertEquals("SEND",parsedResult.get(0));
         assertEquals("players",parsedResult.get(1));
-        assertEquals("1,3",parsedResult.get(2));
-        assertEquals("2,4",parsedResult.get(3));
-        assertEquals("3,1",parsedResult.get(4));
+        assertEquals("1,M,CONNECTED",parsedResult.get(2));
+        assertEquals("2,B,DISCONNECTED",parsedResult.get(3));
 
         assertFalse(ClientParser.parse("SEND", parsedResult));
         assertFalse(ClientParser.parse("SEND schema name D,1,RED", parsedResult));
