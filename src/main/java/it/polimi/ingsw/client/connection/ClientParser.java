@@ -211,7 +211,7 @@ public class ClientParser {
             return checkCommaParametersLength(3,parsedResult);
         }
         if(parsedResult.get(1).equals("players")){
-            return checkCommaParametersLength(2,parsedResult);
+            return checkCommaParametersLength(3,parsedResult);
         }
         return false;
     }

@@ -1,6 +1,8 @@
 package it.polimi.ingsw.common.serializables;
 
-public class LightGameStatus {
+import java.io.Serializable;
+
+public class LightGameStatus implements Serializable {
     private int numPlayers;
     private int numRound;
     private boolean isFirstTurn;

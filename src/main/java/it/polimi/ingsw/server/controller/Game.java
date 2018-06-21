@@ -384,11 +384,16 @@ public class Game extends Thread implements Iterable  {
      * @return the list of players in the current match
      */
     public List<LightPlayer> getPlayers(){
-        List<Player> players= new ArrayList<>();
         List<LightPlayer> lightPlayers = new ArrayList<>();
         for (User u:users){
             Player player=board.getPlayer(u);
-            lightPlayers.add(new LightPlayer(player.getUsername(),player.getGameId()));
+            LightPlayer lightPlayer=new LightPlayer(player.getUsername(),player.getGameId());
+            if(u.getStatus().equals(UserStatus.PLAYING) && !u.getGame().equals(this)) {
+                lightPlayer.setStatus(LightPlayerStatus.DISCONNECTED);
+            }else{
+                lightPlayer.setStatus(LightPlayerStatus.toLightPlayerStatus(u.getStatus()));
+            }
+            lightPlayers.add(lightPlayer);
         }
         return lightPlayers;
     }

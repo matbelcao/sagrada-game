@@ -404,7 +404,7 @@ public class SocketServer extends Thread implements ServerConn  {
 
         StringBuilder builder=new StringBuilder("SEND players");
         for (LightPlayer p:players){
-            builder.append(" "+p.getPlayerId()+","+p.getUsername());
+            builder.append(" "+p.getPlayerId()+","+p.getUsername()+","+p.getStatus());
         }
         syncedSocketWrite(builder.toString());
     }

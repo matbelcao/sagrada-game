@@ -495,7 +495,9 @@ public class SocketClient implements ClientConn {
         }
         for(int i=COMMA_PARAMS_START;i<result.size();i++) {
             args = result.get(i).split(",");
-            playerList.add( new LightPlayer(args[1], Integer.parseInt(args[0])));
+            LightPlayer lightPlayer=new LightPlayer(args[1], Integer.parseInt(args[0]));
+            lightPlayer.setStatus(LightPlayerStatus.valueOf(args[2]));
+            playerList.add( lightPlayer);
         }
         return playerList;
     }
