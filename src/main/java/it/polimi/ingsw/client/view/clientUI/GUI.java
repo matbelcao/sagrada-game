@@ -238,7 +238,7 @@ public class GUI extends Application implements ClientUI {
                     System.out.println("tool can continue------------------------------------------------------------------");
                     break;
             }
-            Scene scene = new Scene(drawFrontPane(200,200,board));
+            Scene scene = new Scene(drawMainPane(200,200,board));
             //root.setStyle("-fx-background-color: black;"); //todo change
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(600);
@@ -247,17 +247,25 @@ public class GUI extends Application implements ClientUI {
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
-                scene.setRoot(drawFrontPane(200,200,board));
+                scene.setRoot(drawMainPane(newWidth,newHeight,board));
             });
             scene.heightProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
-                scene.setRoot(drawFrontPane(200,200,board));
+                scene.setRoot(drawMainPane(newWidth,newHeight,board));
             });
         });
     }
 
-    BorderPane drawFrontPane(double newWidth, double newHeight, LightBoard board){
+    StackPane drawMainPane(double newWidth, double newHeight, LightBoard board){
+        BorderPane frontPane = drawFrontPane(newWidth,newHeight,board);
+        BorderPane backPane = drawBackPane(newWidth,newHeight,board);
+        //return new StackPane(frontPane,backPane);
+        return new StackPane(backPane,frontPane);
+
+    }
+
+    BorderPane drawBackPane(double newWidth, double newHeight, LightBoard board){
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
@@ -269,10 +277,30 @@ public class GUI extends Application implements ClientUI {
         int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
         ClientFSMState              turnState = client.getTurnState();
 
-        BorderPane frontPane = new BorderPane();
+        BorderPane backPane = new BorderPane();
         HBox dummyTrack = sceneCreator.drawDummyTrack(roundTrack,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
-        frontPane.setTop(dummyTrack);
+        backPane.setTop(dummyTrack);
         dummyTrack.setAlignment(TOP_LEFT);
+        return backPane;
+
+    }
+
+    BorderPane drawFrontPane(double newWidth, double newHeight, LightBoard board){
+        double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
+        List <List<LightDie>>       roundTrackList = board.getRoundTrack();
+        List <LightDie> draftPool = board.getDraftPool();
+        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
+        List <Integer>              latestPlacementsList = board.getLatestPlacementsList();
+        IndexedCellContent          latestSelectedDie = board.getLatestSelectedDie();
+        List <Actions>              latestOptionsList = board.getLatestOptionsList();
+        LightSchemaCard             schemaCard = board.getPlayerById(playerId).getSchema();
+        int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
+        ClientFSMState              turnState = client.getTurnState();
+
+        BorderPane frontPane = new BorderPane();
+        HBox roundTrack = sceneCreator.drawRoundTrack(roundTrackList,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        frontPane.setTop(roundTrack);
+        roundTrack.setAlignment(TOP_LEFT);
 
         GridPane schema = sceneCreator.drawSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
         frontPane.setLeft(schema);

@@ -9,7 +9,6 @@ import it.polimi.ingsw.common.serializables.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -157,7 +156,7 @@ public class GUIutil {
         return track;
     }
 
-    public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,int favortokens) {
+    public HBox drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,int favortokens) {
         double cellDim = getMainSceneCellDim(width,height);
         HBox track = new HBox();
         track.setSpacing(10);
@@ -186,7 +185,7 @@ public class GUIutil {
                 }
                 track.getChildren().add(p);
             }
-        return new Group(track);
+        return track;
     }
 
     private StackPane emptyRoundTrackCell(int i, double cellDim) {
