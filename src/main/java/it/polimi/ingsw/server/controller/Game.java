@@ -593,11 +593,13 @@ public class Game extends Thread implements Iterable  {
      */
     public void disconnectUser(User user){
         user.setStatus(UserStatus.DISCONNECTED);
-        for(User u : users){
-            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)){
-                u.getServerConn().notifyStatusUpdate(Event.DISCONNECT,users.indexOf(user));
+        //if(!fsm.getCurState().equals(ServerState.INIT)) {
+            for (User u : users) {
+                if (u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                    u.getServerConn().notifyStatusUpdate(Event.DISCONNECT, users.indexOf(user));
+                }
             }
-        }
+        //}
         if((userPlaying!=null && userPlaying.equals(user))||getUsersActive()<=1){
             startFlow();
         }
@@ -609,13 +611,15 @@ public class Game extends Thread implements Iterable  {
      */
     public void quitUser(User user){
         user.setStatus(UserStatus.DISCONNECTED);
-        // add control for number of players still in the game...
-        for(User u : users){
-            if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)){
-                u.getServerConn().notifyStatusUpdate(Event.QUIT,users.indexOf(user));
-            }
-        }
         board.getPlayer(user).quitMatch();
+        // add control for number of players still in the game...
+        //if(!fsm.getCurState().equals(ServerState.INIT)) {
+            for (User u : users) {
+                if (u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                    u.getServerConn().notifyStatusUpdate(Event.QUIT, users.indexOf(user));
+                }
+            }
+        //}
         if((userPlaying!=null && userPlaying.equals(user))||(getUsersActive()<=1)){
             startFlow();
         }
