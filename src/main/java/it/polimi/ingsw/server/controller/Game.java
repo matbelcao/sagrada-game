@@ -36,7 +36,7 @@ public class Game extends Thread implements Iterable  {
      * @param additionalSchemas true if additional are wanted by the user
      */
     public Game(List<User> users,boolean additionalSchemas){
-        this.users= users;
+        this.users= new ArrayList<>(users);
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         this.draftedSchemas = board.draftSchemas();
@@ -44,25 +44,9 @@ public class Game extends Thread implements Iterable  {
         for(User u : users){
             u.setStatus(UserStatus.PLAYING);
             u.setGame(this);
-            u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
         }
     }
 
-    /**
-     * Constructs the class and sets the players list
-     * @param users the players of the match
-     */
-    public Game(List<User> users){
-        this.additionalSchemas=false;
-        this.users= users;
-        this.board=new Board(users,additionalSchemas);
-        this.lockRun = new Object();
-        draftedSchemas = board.draftSchemas();
-        fsm=board.getFSM();
-        for(User u : users){
-            u.setStatus(UserStatus.PLAYING);
-        }
-    }
 
     /**
      * Assigns to the users who have not chosen any schema card, the first one that was proposed them before
@@ -136,17 +120,19 @@ public class Game extends Thread implements Iterable  {
 
         timer = new Timer();
         timer.schedule(new DefaultSchemaAssignment(), MasterServer.getMasterServer().getTurnTime() * (long)1000);
+
+        notifyGameStart();
         stopFlow();
-
         fsm.nextState(Actions.NONE);
-        while (round.hasNextRound() && getUsersActive()>1){
-            round.nextRound();
-            board.getDraftPool().draftDice(users.size());
 
+        while (round.hasNextRound() && getActiveUsers()>1){
+
+            round.nextRound();
+            board.getDraftPool().draftDice(getNotQuittedUsers());
             //Notify to all the users the starting of the round
             notifyRoundStart();
 
-            while(round.hasNext() && getUsersActive()>1){
+            while(round.hasNext() && getActiveUsers()>1){
                 userPlaying = round.next();
                 Player curPlayer= board.getPlayer(userPlaying);
 
@@ -164,6 +150,17 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
+     * Notifies the start of the match to all users of this match
+     */
+    private void notifyGameStart(){
+        for(User u : users) {
+            if (u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                u.getServerConn().notifyGameStart(users.size(), users.indexOf(u));
+            }
+        }
+
+    }
+    /**
      * Notifies to the connected clients the ending of the current match
      */
     private void notifyGameEnd() {
@@ -171,7 +168,6 @@ public class Game extends Thread implements Iterable  {
 
         ranking=board.gameRunningEnd();
         fsm.endGame();
-        System.out.println(fsm.getCurState());
 
         for(User u:users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
@@ -600,7 +596,7 @@ public class Game extends Thread implements Iterable  {
                 }
             }
         //}
-        if((userPlaying!=null && userPlaying.equals(user))||getUsersActive()<=1){
+        if((userPlaying!=null && userPlaying.equals(user))|| getActiveUsers()<=1){
             startFlow();
         }
     }
@@ -612,6 +608,14 @@ public class Game extends Thread implements Iterable  {
     public void quitUser(User user){
         user.setStatus(UserStatus.DISCONNECTED);
         board.getPlayer(user).quitMatch();
+
+        if(fsm.getCurState().equals(ServerState.INIT)){
+            try {
+                choose(user,1);
+            } catch (IllegalActionException e) {
+                e.printStackTrace();
+            }
+        }
         // add control for number of players still in the game...
         //if(!fsm.getCurState().equals(ServerState.INIT)) {
             for (User u : users) {
@@ -620,7 +624,7 @@ public class Game extends Thread implements Iterable  {
                 }
             }
         //}
-        if((userPlaying!=null && userPlaying.equals(user))||(getUsersActive()<=1)){
+        if((userPlaying!=null && userPlaying.equals(user))||(getActiveUsers()<=1)){
             startFlow();
         }
     }
@@ -629,10 +633,24 @@ public class Game extends Thread implements Iterable  {
      * Returns the numbers users that are connected and are currently playing the game
      * @return the number of users connected
      */
-    public int getUsersActive(){
+    public int getActiveUsers(){
         int num=0;
         for(User u : users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)){
+                num++;
+            }
+        }
+        return num;
+    }
+
+    /**
+     * Returns the numbers users that are connected aor have lost the connection
+     * @return the number of users
+     */
+    private int getNotQuittedUsers(){
+        int num=0;
+        for(User u : users){
+            if(!board.getPlayer(u).hasQuitted() && u.getGame().equals(this)){
                 num++;
             }
         }

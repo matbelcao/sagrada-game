@@ -127,10 +127,10 @@ public class CLI implements ClientUI {
      * this notifies the successful connection towards the server
      */
     @Override
-    public void updateConnectionOk() {
+    public synchronized void updateConnectionOk() {
         resetScreen();
-        printToScreen(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.CONNECTION_OK)));
-
+        view .setLatestScreen(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.CONNECTION_OK)));
+        printToScreen(view.printLatestScreen());
     }
 
     /**
@@ -138,10 +138,10 @@ public class CLI implements ClientUI {
      * @param numUsers the number of connected players at the moment
      */
     @Override
-    public void updateLobby(int numUsers){
+    public synchronized void updateLobby(int numUsers){
         resetScreen();
-        printToScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOBBY_UPDATE)),numUsers));
-
+        view .setLatestScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOBBY_UPDATE)),numUsers));
+        printToScreen(view.printLatestScreen());
     }
 
     /**
@@ -150,10 +150,11 @@ public class CLI implements ClientUI {
      * @param playerId the id of the user
      */
     @Override
-    public void updateGameStart(int numUsers, int playerId){
+    public synchronized void updateGameStart(int numUsers, int playerId){
 
         resetScreen();
-        printToScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.GAME_START)),numUsers,playerId));
+        view .setLatestScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.GAME_START)),numUsers,playerId));
+        printToScreen(view.printLatestScreen());
         this.view.setMatchInfo(playerId,numUsers);
 
     }

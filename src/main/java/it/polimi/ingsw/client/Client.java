@@ -478,8 +478,11 @@ public class Client {
 
 
     public void updatePlayerStatus(int playerId, Event event){
-        if(!fsm.getState().equals(ClientFSMState.SCHEMA_CHOSEN)) {
+
+
+            System.out.println(fsm.getState().toString());
             LightPlayerStatus status;
+
             switch (event) {
                 case QUIT:
                     status = LightPlayerStatus.QUITTED;
@@ -493,8 +496,10 @@ public class Client {
                 default:
                     status = LightPlayerStatus.PLAYING;
             }
-
             board.updatestatus(playerId, status);
+        if(!(fsm.getState().equals(ClientFSMState.SCHEMA_CHOSEN)
+                ||fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)
+                ||fsm.getState().equals(ClientFSMState.GAME_ENDED))) {
             board.notifyObservers();
         }
     }
