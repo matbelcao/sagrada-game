@@ -243,7 +243,7 @@ public class GUI extends Application implements ClientUI {
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(600);
             primaryStage.setMinHeight(600);
-            primaryStage.sizeToScene();
+            //primaryStage.sizeToScene();
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
@@ -260,8 +260,10 @@ public class GUI extends Application implements ClientUI {
     StackPane drawMainPane(double newWidth, double newHeight, LightBoard board){
         BorderPane frontPane = drawFrontPane(newWidth,newHeight,board);
         BorderPane backPane = drawBackPane(newWidth,newHeight,board);
+        StackPane p = new StackPane(backPane,frontPane);
+
         //return new StackPane(frontPane,backPane);
-        return new StackPane(backPane,frontPane);
+        return p;
 
     }
 
