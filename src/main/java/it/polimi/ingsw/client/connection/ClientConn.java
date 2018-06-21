@@ -68,6 +68,9 @@ public interface ClientConn {
      */
     List<LightPlayer> getPlayers();
 
+
+    LightGameStatus getGameStatus();
+
     /**
      * This function can be invoked to get the number of tokens remaining to the specified player.
      * @param playerId the id of the player (0 to 3)

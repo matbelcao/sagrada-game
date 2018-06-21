@@ -506,12 +506,12 @@ public class Client {
     }
 
 
-    public void updatePlayerStatus(int playerId, Event event, String username){
+    public void updatePlayerStatus(int playerId, GameEvent gameEvent, String username){
 
             System.out.println(fsm.getState().toString());
             LightPlayerStatus status;
 
-            switch (event) {
+            switch (gameEvent) {
                 case QUIT:
                     status = LightPlayerStatus.QUITTED;
                     break;

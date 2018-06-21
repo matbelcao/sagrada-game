@@ -26,6 +26,8 @@ public interface RMIClientInt extends Remote {
 
     List<LightPlayer> getPlayers() throws RemoteException;
 
+    LightGameStatus getGameStatus() throws RemoteException;
+
     int getFavorTokens(int playerId) throws RemoteException;
 
     List<IndexedCellContent> getDiceList() throws RemoteException, IllegalActionException;

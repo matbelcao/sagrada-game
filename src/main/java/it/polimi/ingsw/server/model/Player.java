@@ -94,9 +94,6 @@ public class  Player {
      * @return true iff the schema will be set
      */
      public boolean setSchema(SchemaCard schema){
-        if(this.schema!=null){
-            return false;
-        }
         this.schema=schema;
         this.favorTokens=this.schema.getFavorTokens();
         return true;

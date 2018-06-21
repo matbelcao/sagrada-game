@@ -197,6 +197,9 @@ public class SocketServer extends Thread implements ServerConn  {
             case "players":
                 sendPlayers();
                 break;
+            case "game_status":
+                sendGameStatus();
+                break;
         }
     }
 
@@ -238,35 +241,35 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * This message is sent whenever a round is about to begin or has just ended.
-     * @param event the event that has occurred (start/end)
+     * @param gameEvent the gameEvent that has occurred (start/end)
      * @param roundNumber the number of the round (0 to 9)
      */
     @Override
-    public void notifyRoundEvent(Event event, int roundNumber){
-        syncedSocketWrite("GAME "+event.toString().toLowerCase()+" "+roundNumber);
+    public void notifyRoundEvent(GameEvent gameEvent, int roundNumber){
+        syncedSocketWrite("GAME "+ gameEvent.toString().toLowerCase()+" "+roundNumber);
 
     }
 
     /**
      * Notifies the beginning/ending of a turn
-     * @param event the event that has occurred (start/end)
+     * @param gameEvent the gameEvent that has occurred (start/end)
      * @param playerId the player's identifier (0 to 3)
      * @param turnNumber the number of the turn within the single round (0 to 1)
      */
     @Override
-    public void notifyTurnEvent(Event event,int playerId,int turnNumber){
-        syncedSocketWrite("GAME "+event.toString().toLowerCase()+" "+playerId+" "+turnNumber);
+    public void notifyTurnEvent(GameEvent gameEvent, int playerId, int turnNumber){
+        syncedSocketWrite("GAME "+ gameEvent.toString().toLowerCase()+" "+playerId+" "+turnNumber);
 
     }
 
     /**
      * Notifies to all connected users that the status of a certain player has been changed
-     * @param event the new status of the player (reconnect|disconnect|quit)
+     * @param gameEvent the new status of the player (reconnect|disconnect|quit)
      * @param id the id of the interested player
      */
     @Override
-    public void notifyStatusUpdate (Event event,int id){
-        syncedSocketWrite("STATUS "+event.toString().toLowerCase()+" "+id);
+    public void notifyStatusUpdate (GameEvent gameEvent, int id, String userName){
+        syncedSocketWrite("STATUS "+ gameEvent.toString().toLowerCase()+" "+id+" "+userName);
 
     }
 
@@ -275,7 +278,7 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     @Override
     public void notifyBoardChanged(){
-        syncedSocketWrite("GAME "+Event.BOARD_CHANGED.toString().toLowerCase());
+        syncedSocketWrite("GAME "+GameEvent.BOARD_CHANGED.toString().toLowerCase());
 
     }
 
@@ -403,6 +406,14 @@ public class SocketServer extends Thread implements ServerConn  {
         for (LightPlayer p:players){
             builder.append(" "+p.getPlayerId()+","+p.getUsername());
         }
+        syncedSocketWrite(builder.toString());
+    }
+
+    private void sendGameStatus(){
+        LightGameStatus gameStatus=user.getGame().getGameStatus();
+        StringBuilder builder=new StringBuilder("SEND game_status "+gameStatus.isInit()+" "+gameStatus.getNumPlayers()+" "
+                +gameStatus.getNumRound()+" "+ gameStatus.getIsFirstTurn()+" "+gameStatus.getNowPlaying());
+
         syncedSocketWrite(builder.toString());
     }
 

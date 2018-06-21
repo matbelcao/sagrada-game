@@ -3,7 +3,7 @@
 <!-- server configuration file -->
 
 <conf>
-	<address>127.0.0.1</address>
+	<address>192.168.1.81</address>
 	<portRMI>1099</portRMI>
 	<portSocket>3000</portSocket>
     <timeLobby>5</timeLobby>

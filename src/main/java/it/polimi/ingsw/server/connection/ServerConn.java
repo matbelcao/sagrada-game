@@ -1,7 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.common.serializables.Event;
-import it.polimi.ingsw.common.serializables.LightPlayer;
+import it.polimi.ingsw.common.serializables.GameEvent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 
 import java.util.List;
@@ -35,25 +34,25 @@ public interface ServerConn {
 
     /**
      * This message is sent whenever a round is about to begin or has just ended.
-     * @param event the event that has occurred (start/end)
+     * @param gameEvent the gameEvent that has occurred (start/end)
      * @param roundNumber the number of the round (0 to 9)
      */
-    void notifyRoundEvent(Event event, int roundNumber);
+    void notifyRoundEvent(GameEvent gameEvent, int roundNumber);
 
     /**
      * Notifies the beginning/ending of a turn
-     * @param event the event that has occurred (start/end)
+     * @param gameEvent the gameEvent that has occurred (start/end)
      * @param playerId the player's identifier (0 to 3)
      * @param turnNumber the number of the turn within the single round (0 to 1)
      */
-    void notifyTurnEvent(Event event,int playerId,int turnNumber);
+    void notifyTurnEvent(GameEvent gameEvent, int playerId, int turnNumber);
 
     /**
      * Notifies to all connected users that the status of a certain player has been changed
-     * @param event the new status of the player (reconnect|disconnect|quit)
+     * @param gameEvent the new status of the player (reconnect|disconnect|quit)
      * @param id the id of the interested player
      */
-    void notifyStatusUpdate (Event event,int id);
+    void notifyStatusUpdate (GameEvent gameEvent, int id, String username);
 
     /**
      * Notifies that some parameter in the board has changed. Triggers the update request of the receiving client

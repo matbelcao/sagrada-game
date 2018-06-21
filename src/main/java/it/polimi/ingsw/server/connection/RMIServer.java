@@ -1,7 +1,7 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.enums.UserStatus;
-import it.polimi.ingsw.common.serializables.Event;
+import it.polimi.ingsw.common.serializables.GameEvent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.model.User;
 
@@ -71,14 +71,14 @@ public class RMIServer implements ServerConn {
 
     /**
      * This message is sent whenever a round is about to begin or has just ended.
-     * @param event the event that has occurred (start/end)
+     * @param gameEvent the gameEvent that has occurred (start/end)
      * @param roundNumber the number of the round (0 to 9)
      */
     @Override
-    public void notifyRoundEvent(Event event, int roundNumber) {
+    public void notifyRoundEvent(GameEvent gameEvent, int roundNumber) {
         new Thread(()-> {
             try {
-                remoteObj.notifyRoundEvent(event, roundNumber);
+                remoteObj.notifyRoundEvent(gameEvent, roundNumber);
             } catch (RemoteException e) {
                 user.disconnect();
                 connectionOk=false;
@@ -88,15 +88,15 @@ public class RMIServer implements ServerConn {
 
     /**
      * Notifies the beginning/ending of a turn
-     * @param event the event that has occurred (start/end)
+     * @param gameEvent the gameEvent that has occurred (start/end)
      * @param playerId the player's identifier (0 to 3)
      * @param turnNumber the number of the turn within the single round (0 to 1)
      */
     @Override
-    public void notifyTurnEvent(Event event, int playerId, int turnNumber) {
+    public void notifyTurnEvent(GameEvent gameEvent, int playerId, int turnNumber) {
         new Thread(()-> {
             try {
-                remoteObj.notifyTurnEvent(event, playerId, turnNumber);
+                remoteObj.notifyTurnEvent(gameEvent, playerId, turnNumber);
             } catch (RemoteException e) {
                 user.disconnect();
                 connectionOk=false;
@@ -107,13 +107,13 @@ public class RMIServer implements ServerConn {
 
     /**
      * Notifies to all connected users that the status of a certain player has been changed
-     * @param event the new status of the player (reconnect|disconnect|quit)
+     * @param gameEvent the new status of the player (reconnect|disconnect|quit)
      * @param id the id of the interested player
      */
     @Override
-    public void notifyStatusUpdate(Event event, int id) {
+    public void notifyStatusUpdate(GameEvent gameEvent, int id, String userName) {
         try {
-            remoteObj.notifyStatusUpdate(event,id);
+            remoteObj.notifyStatusUpdate(gameEvent,id,userName);
         } catch (RemoteException e) {
             user.disconnect();
             connectionOk=false;

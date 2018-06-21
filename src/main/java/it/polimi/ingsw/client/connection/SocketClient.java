@@ -79,7 +79,7 @@ public class SocketClient implements ClientConn {
                         if (ClientParser.parse(inSocket.readln(), result) && connectionOk) {
                             if (ClientParser.isStatus(inSocket.readln())) {
                                 inSocket.pop();
-                                client.updatePlayerStatus(Integer.parseInt(result.get(2)), Event.valueOf(result.get(1).toUpperCase()));
+                                client.updatePlayerStatus(Integer.parseInt(result.get(2)), GameEvent.valueOf(result.get(1).toUpperCase()),result.get(3));
 
                             } else if (ClientParser.isLobby(inSocket.readln())) {
                                 inSocket.pop();
@@ -498,6 +498,34 @@ public class SocketClient implements ClientConn {
             playerList.add( new LightPlayer(args[1], Integer.parseInt(args[0])));
         }
         return playerList;
+    }
+
+    @Override
+    public LightGameStatus getGameStatus(){
+        LightGameStatus gameStatus=null;
+        ArrayList<String> result= new ArrayList<>();
+
+        syncedSocketWrite("GET game_status");
+
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("game_status"))) {
+                waitForTheRightOne();
+            }
+
+            inSocket.pop();
+            lockin.notifyAll();
+        }
+        for(int i=COMMA_PARAMS_START;i<result.size();i++) {
+            gameStatus=new LightGameStatus(Boolean.parseBoolean(result.get(2)),Integer.parseInt(result.get(3)),Integer.parseInt(result.get(4)),
+                    Boolean.parseBoolean(result.get(5)),Integer.parseInt(result.get(6)));
+        }
+        return gameStatus;
     }
 
     /**
