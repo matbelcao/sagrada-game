@@ -164,7 +164,7 @@ public class MasterServer{
                 games.add(game);
                 game.start();
                 lobby.removeAll(players);
-                players.clear();
+                players=new ArrayList<>();
                 lobbyChanged = true;
 
             }

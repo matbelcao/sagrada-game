@@ -181,7 +181,7 @@ public class CLI implements ClientUI {
         if (board == null) {
             throw new IllegalArgumentException();
         }
-        List<Integer> changes=new ArrayList<>(board.getChanges());
+        List<Integer> changes=board.getChanges();
         for(Integer change : changes) {
             switch (change) {
                 case LightBoardEvents.PrivObj:

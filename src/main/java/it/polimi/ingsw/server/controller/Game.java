@@ -26,7 +26,7 @@ public class Game extends Thread implements Iterable  {
 
     private ServerFSM fsm;
 
-    private User userPlaying;
+    private User nowPlayingUser;
     private int diceListSize;
 
 
@@ -36,7 +36,7 @@ public class Game extends Thread implements Iterable  {
      * @param additionalSchemas true if additional are wanted by the user
      */
     public Game(List<User> users,boolean additionalSchemas){
-        this.users= new ArrayList<>(users);
+        this.users= users;
         this.board=new Board(users,additionalSchemas);
         this.lockRun = new Object();
         this.draftedSchemas = board.draftSchemas();
@@ -133,10 +133,10 @@ public class Game extends Thread implements Iterable  {
             notifyRoundStart();
 
             while(round.hasNext() && getActiveUsers()>1){
-                userPlaying = round.next();
-                Player curPlayer= board.getPlayer(userPlaying);
+                nowPlayingUser = round.next();
+                Player curPlayer= board.getPlayer(nowPlayingUser);
 
-                if(userPlaying.getStatus().equals(UserStatus.PLAYING) && userPlaying.getGame().equals(this) && !curPlayer.isSkippingTurn()) {
+                if(nowPlayingUser.getStatus().equals(UserStatus.PLAYING) && nowPlayingUser.getGame().equals(this) && !curPlayer.isSkippingTurn()) {
                     turnFlow();
                 }
             }
@@ -217,11 +217,11 @@ public class Game extends Thread implements Iterable  {
     }
 
     /**
-     *It contains the code for the correct flow of the enabled player's turn. Inside it is instatitiated a timer
+     *It contains the code for the correct flow of the enabled player's turn. Inside it is instantiated a timer
      * to limit the maximum time of each turn.
      */
     private void turnFlow() {
-        fsm.newTurn(board.getPlayer(userPlaying).getGameId(),round.isFirstTurn());
+        fsm.newTurn(board.getPlayer(nowPlayingUser).getGameId(),round.isFirstTurn());
         back(false);
 
         endLock=false;
@@ -229,7 +229,7 @@ public class Game extends Thread implements Iterable  {
         //Notify to all the users the starting of the turn
         for(User u:users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
-                u.getServerConn().notifyTurnEvent(GameEvent.TURN_START, board.getPlayer(userPlaying).getGameId(), round.isFirstTurn() ? 0 : 1);
+                u.getServerConn().notifyTurnEvent(GameEvent.TURN_START, board.getPlayer(nowPlayingUser).getGameId(), round.isFirstTurn() ? 0 : 1);
             }
         }
 
@@ -240,7 +240,7 @@ public class Game extends Thread implements Iterable  {
         //Notify to all the users the ending of the turn
         for(User u:users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
-                u.getServerConn().notifyTurnEvent(GameEvent.TURN_END, board.getPlayer(userPlaying).getGameId(), round.isFirstTurn() ? 0 : 1);
+                u.getServerConn().notifyTurnEvent(GameEvent.TURN_END, board.getPlayer(nowPlayingUser).getGameId(), round.isFirstTurn() ? 0 : 1);
             }
         }
     }
@@ -249,8 +249,8 @@ public class Game extends Thread implements Iterable  {
      * Responds to the request by sending the user that is currently playing his turn
      * @return the user that is currently playing
      */
-    public User getUserPlaying(){
-        return userPlaying;
+    public User getNowPlayingUser(){
+        return nowPlayingUser;
     }
 
 
@@ -412,7 +412,7 @@ public class Game extends Thread implements Iterable  {
 
     public  LightGameStatus getGameStatus(){
         boolean isInit=fsm.getCurState().equals(ServerState.INIT);
-        return new LightGameStatus(isInit,users.size(),isInit?0:round.getRoundNumber(), !isInit && round.isFirstTurn(),isInit?-1:board.getPlayer(userPlaying).getGameId());
+        return new LightGameStatus(isInit,users.size(),isInit?-1:round.getRoundNumber(), !isInit && round.isFirstTurn(),isInit?-1:board.getPlayer(nowPlayingUser).getGameId());
     }
 
     /**
@@ -473,11 +473,11 @@ public class Game extends Thread implements Iterable  {
                 }
                 return response;
             case CHOOSE_OPTION:
-                if(!user.equals(userPlaying)){throw new IllegalActionException();}
+                if(!user.equals(nowPlayingUser)){throw new IllegalActionException();}
                 response=board.chooseOption(index);
                 break;
             case CHOOSE_PLACEMENT:
-                if(!user.equals(userPlaying)){throw new IllegalActionException();}
+                if(!user.equals(nowPlayingUser)){throw new IllegalActionException();}
                 response=board.choosePlacement(index);
                 if(response){
                     notifyBoardChanged(user);
@@ -519,7 +519,7 @@ public class Game extends Thread implements Iterable  {
         Boolean toolEnabled=board.activeTool(index,turn,roundNumber);
 
         if(toolEnabled){
-            notifyBoardChanged(userPlaying);
+            notifyBoardChanged(nowPlayingUser);
         }
         return toolEnabled;
     }
@@ -535,7 +535,7 @@ public class Game extends Thread implements Iterable  {
 
         boolean response = board.toolStatus();
 
-        notifyBoardChanged(userPlaying);
+        notifyBoardChanged(nowPlayingUser);
 
         return response;
     }
@@ -606,7 +606,7 @@ public class Game extends Thread implements Iterable  {
                 }
             }
         //}
-        if((userPlaying!=null && userPlaying.equals(user))|| getActiveUsers()<=1){
+        if((nowPlayingUser !=null && nowPlayingUser.equals(user))|| getActiveUsers()<=1){
             startFlow();
         }
     }
@@ -634,7 +634,7 @@ public class Game extends Thread implements Iterable  {
                 }
             }
         //}
-        if((userPlaying!=null && userPlaying.equals(user))||(getActiveUsers()<=1)){
+        if((nowPlayingUser !=null && nowPlayingUser.equals(user))||(getActiveUsers()<=1)){
             startFlow();
         }
     }

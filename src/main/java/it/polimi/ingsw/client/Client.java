@@ -413,39 +413,45 @@ public class Client {
     }
 
     private void retrieveBoardOnReconnection(int myPlayerId){
-        LightGameStatus gameStatus=clientConn.getGameStatus();
+        synchronized (lockReady) {
+            LightGameStatus gameStatus = clientConn.getGameStatus();
 
-        board= new LightBoard(gameStatus.getNumPlayers());
-        board.addObserver(clientUI);
-        board.setMyPlayerId(myPlayerId);
+            board = new LightBoard(gameStatus.getNumPlayers());
 
-        List<LightPlayer> players = clientConn.getPlayers();
+            board.setMyPlayerId(myPlayerId);
 
-        for (int i = 0; i < board.getNumPlayers(); i++) {
-            board.addPlayer(players.get(i));
-        }
-        board.setPrivObj(clientConn.getPrivateObject());
-
-        if(!gameStatus.isInit()) {
-            board.setIsFirstTurn(gameStatus.getIsFirstTurn());
-            board.setRoundTrack(clientConn.getRoundtrack(), gameStatus.getNumRound());
-            board.setNowPlaying(gameStatus.getNowPlaying());
+            List<LightPlayer> players = clientConn.getPlayers();
 
             for (int i = 0; i < board.getNumPlayers(); i++) {
-                board.updateSchema(i, clientConn.getSchema(i));
-                board.updateFavorTokens(i, clientConn.getFavorTokens(i));
+                board.addPlayer(players.get(i));
             }
+            board.setPrivObj(clientConn.getPrivateObject());
 
-            board.setTools(clientConn.getTools());
-            board.setPubObjs(clientConn.getPublicObjects());
-            board.setDraftPool(clientConn.getDraftPool());
-        }else{
-            board.setDraftedSchemas(clientConn.getSchemaDraft());
+            if (!gameStatus.isInit()) {
+                board.setIsFirstTurn(gameStatus.getIsFirstTurn());
+                board.setRoundTrack(clientConn.getRoundtrack(), gameStatus.getNumRound());
+                board.setNowPlaying(gameStatus.getNowPlaying());
+
+                for (int i = 0; i < board.getNumPlayers(); i++) {
+                    board.updateSchema(i, clientConn.getSchema(i));
+                    board.updateFavorTokens(i, clientConn.getFavorTokens(i));
+                }
+
+                board.setTools(clientConn.getTools());
+                board.setPubObjs(clientConn.getPublicObjects());
+                board.setDraftPool(clientConn.getDraftPool());
+            } else {
+                board.setDraftedSchemas(clientConn.getSchemaDraft());
+            }
+            board.addObserver(clientUI);
+            ready=true;
+            lockReady.notifyAll();
         }
     }
 
     public void updateGameRoundStart(int numRound){
         board.setRoundTrack(clientConn.getRoundtrack(),numRound);
+        fsm.setNotMyTurn();
         if(numRound==0) {
             //get players
             synchronized (lockReady) {
@@ -459,7 +465,6 @@ public class Client {
                 board.setTools(clientConn.getTools());
 
                 board.setPubObjs(clientConn.getPublicObjects());
-
 
                 ready=true;
                 lockReady.notifyAll();
@@ -492,7 +497,7 @@ public class Client {
         board.setIsFirstTurn(isFirstTurn);
         board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
 
-        fsm.setNotMyTurn();
+
         fsm.setMyTurn(playerId==board.getMyPlayerId());
 
         board.notifyObservers();
@@ -501,9 +506,6 @@ public class Client {
 
     public void updateGameTurnEnd(int playerTurnId){
         board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
-
-        board.notifyObservers();
-
 
     }
 
