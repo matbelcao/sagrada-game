@@ -11,6 +11,9 @@ import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedReader;
+import it.polimi.ingsw.common.enums.Actions;
+import it.polimi.ingsw.common.serializables.IndexedCellContent;
+import it.polimi.ingsw.common.serializables.LightDie;
 import it.polimi.ingsw.common.serializables.LightPrivObj;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
 import javafx.application.Application;
@@ -235,9 +238,8 @@ public class GUI extends Application implements ClientUI {
                     System.out.println("tool can continue------------------------------------------------------------------");
                     break;
             }
-            MainSceneGroup root = new MainSceneGroup(board);
-            Scene scene = new Scene(root);
-            root.setStyle("-fx-background-color: black;"); //todo change
+            Scene scene = new Scene(drawFrontPane(200,200,board));
+            //root.setStyle("-fx-background-color: black;"); //todo change
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(600);
             primaryStage.setMinHeight(600);
@@ -245,65 +247,51 @@ public class GUI extends Application implements ClientUI {
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
-                root.redraw(newWidth,newHeight);
+                scene.setRoot(drawFrontPane(200,200,board));
             });
             scene.heightProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
-                root.redraw(newWidth,newHeight);
+                scene.setRoot(drawFrontPane(200,200,board));
             });
         });
     }
 
-    class MainSceneGroup extends Pane{
-        BorderPane frontPane;
-        BorderPane backPane;
-        LightBoard board;
-        HBox roundTrack;
-        HBox dummyTrack;
-        Group schema;
-        HBox draftpool;
-        VBox schemaVbox;
-        VBox cardsVbox;
-        Group cards;
-        MainSceneGroup(LightBoard board){
-            this.board = board;
-            this.roundTrack = new HBox();
-            this.dummyTrack = new HBox();
-            this.schema = new Group();
-            this.draftpool = new HBox();
-            this.schemaVbox = new VBox(schema);
-            this.cards = new Group();
-            this.cardsVbox = new VBox(cards,draftpool);
-            this.frontPane = new BorderPane();
-            this.backPane = new BorderPane();
-            frontPane.setTop(dummyTrack);
-            frontPane.setLeft(schemaVbox);
-            frontPane.setRight(cardsVbox);
-            draftpool.setAlignment(BOTTOM_CENTER);
-            dummyTrack.setAlignment(TOP_LEFT);
-            cardsVbox.setAlignment(CENTER_LEFT);
-            frontPane.setStyle("-fx-background-color: #f5dc70;");
-            backPane.setTop(roundTrack);
-            roundTrack.setAlignment(TOP_LEFT);
-            this.getChildren().addAll(frontPane,backPane);
-            dummyTrack.setOnMouseClicked(e->backPane.toFront());
-            roundTrack.setOnMouseClicked(e->frontPane.toFront());
+    BorderPane drawFrontPane(double newWidth, double newHeight, LightBoard board){
+        double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
+        List <List<LightDie>>       roundTrack = board.getRoundTrack();
+        List <LightDie> draftPool = board.getDraftPool();
+        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
+        List <Integer>              latestPlacementsList = board.getLatestPlacementsList();
+        IndexedCellContent          latestSelectedDie = board.getLatestSelectedDie();
+        List <Actions>              latestOptionsList = board.getLatestOptionsList();
+        LightSchemaCard             schemaCard = board.getPlayerById(playerId).getSchema();
+        int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
+        ClientFSMState              turnState = client.getTurnState();
 
-            redraw(200,200);
-        }
-        
+        BorderPane frontPane = new BorderPane();
+        HBox dummyTrack = sceneCreator.drawDummyTrack(roundTrack,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        frontPane.setTop(dummyTrack);
+        dummyTrack.setAlignment(TOP_LEFT);
 
-        void redraw(double newWidth, double newHeight) {
-            double cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
-            ClientFSMState turnState = client.getTurnState();
-            dummyTrack.getChildren().setAll(sceneCreator.drawDummyTrack(board.getRoundTrack(),newWidth,newHeight,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(),board.getLatestSelectedDie(), board.getPlayerById(board.getMyPlayerId()).getFavorTokens()));
-            roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(),board.getLatestSelectedDie(), board.getPlayerById(board.getMyPlayerId()).getFavorTokens()));
-            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(),board.getLatestSelectedDie(),board.getLatestOptionsList(),board.getPlayerById(board.getMyPlayerId()).getFavorTokens()));
-            draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(), board.getLatestSelectedDie(),board.getLatestOptionsList()));
-            cards.getChildren().setAll(sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState));
+        GridPane schema = sceneCreator.drawSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
+        frontPane.setLeft(schema);
+        schema.setAlignment(CENTER);
 
-        }
+        VBox cards = sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState);
+        frontPane.setRight(cards);
+        cards.setAlignment(CENTER_LEFT);
+
+        HBox menuButtons = sceneCreator.getMenuButtons(turnState,favorTokens);
+        HBox draftpool = sceneCreator.drawDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
+        Region divider = new Region();
+        HBox bottomContainer = new HBox(menuButtons,divider,draftpool);
+        HBox.setHgrow(divider,Priority.ALWAYS);
+        menuButtons.setAlignment(BOTTOM_LEFT);
+        draftpool.setAlignment(BOTTOM_RIGHT);
+        frontPane.setBottom(bottomContainer);
+
+        return frontPane;
     }
 
 

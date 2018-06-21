@@ -16,7 +16,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -130,7 +133,7 @@ public class GUIutil {
         double schemaWidth = drawingWidth*SCHEMA_W_TO_DRAFTED_W;
         return LINE_TO_CELL*CELL_TO_SCHEMA_W*schemaWidth;
     }
-    public Group drawDummyTrack(List<List<LightDie>> roundTrack, double newWidth, double newHeight, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
+    public HBox drawDummyTrack(List<List<LightDie>> roundTrack, double newWidth, double newHeight, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         double cellDim = getMainSceneCellDim(newWidth,newHeight);
         HBox track = new HBox();
         track.setSpacing(10);
@@ -151,7 +154,7 @@ public class GUIutil {
             }
             track.getChildren().add(p);
         }
-        return new Group(track);
+        return track;
     }
 
     public Group drawRoundTrack(List<List<LightDie>> roundTrack,double width,double height, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,int favortokens) {
@@ -229,7 +232,7 @@ public class GUIutil {
     }
 
 
-    public Group drawDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList) {
+    public HBox drawDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList) {
         ArrayList<Canvas> poolDice = new ArrayList<>();
         for(int i = 0 ; i<draftPool.size();i++) {
             Canvas c = new Canvas(dieDim, dieDim);
@@ -289,13 +292,17 @@ public class GUIutil {
         HBox pool = new HBox();
         pool.setSpacing(10);
         pool.getChildren().addAll(poolDice);
-        return  new Group(pool);
+        return  pool;
 
         }
 
-    public Group drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,List<Actions> latestOptionsList, int favortokens) {
+        //todo update
+    public GridPane drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,List<Actions> latestOptionsList, int favortokens) {
         GridPane g = schemaToGrid(schema,dieDim*NUM_COLS,dieDim*NUM_ROWS,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList);
-        //todo delete
+        return g;
+    }
+
+    public HBox getMenuButtons(ClientFSMState turnState, int favortokens) {
         Button endTurn = new Button("end turn");
         endTurn.setOnAction(e->cmdWrite.write("e"));
         Button back = new Button("back");
@@ -310,7 +317,7 @@ public class GUIutil {
         Label turn = new Label(turnState.toString());
         HBox h = new HBox();
         h.getChildren().addAll(back,endTurn,turnStateIndicator,turn,favorT);
-        return new Group(new VBox(g,h));
+        return h;
     }
 
     public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,List<Actions> latestOptionsList) {
@@ -402,7 +409,7 @@ public class GUIutil {
         return grid;
     }*/
 
-    public Group drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState) {
+    public VBox drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState) {
         Button priv = new Button("Private Objective");
         Button pub = new Button("Public Objectives");
         Button tool = new Button("Tools");
@@ -436,7 +443,7 @@ public class GUIutil {
             cardContainer.getChildren().setAll(cards);
         });
         tool.fire();
-        return new Group(primaryContainer);
+        return primaryContainer;
 
     }
 
