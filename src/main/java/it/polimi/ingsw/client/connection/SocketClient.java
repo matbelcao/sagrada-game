@@ -90,9 +90,9 @@ public class SocketClient implements ClientConn {
                                 updateLobby(result.get(1));
                             } else if (ClientParser.isGame(inSocket.readln())) {
                                 inSocket.pop();
-
-                                (new Thread(() -> updateMessages( result))).start();
-
+                                new Thread(()->
+                                    updateMessages( result)
+                                ).start();
                             } else if (ClientParser.isPing(inSocket.readln())) {
                                 inSocket.pop();
                                 socketPong();
@@ -178,7 +178,9 @@ public class SocketClient implements ClientConn {
         int i;
         switch(outcomes.get(1)){
             case "start":
+
                 client.updateGameStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
+
                 break;
             case "end":
                 List<RankingEntry> ranking= new ArrayList<>();
@@ -187,10 +189,12 @@ public class SocketClient implements ClientConn {
                     ranking.add(new RankingEntry(Integer.parseInt(param[0]),Integer.parseInt(param[1]),Integer.parseInt(param[2])));
                 }
                 client.updateGameEnd(ranking);
-                System.out.println("<--<----<----<-----<---<---GAME END (CLASSIFICA)---->----->--->--->---->--->-->");
+
                 break;
             case "round_start":
+
                 client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)));
+
                 break;
             case "round_end":
                 client.updateGameRoundEnd(Integer.parseInt(outcomes.get(2)));
@@ -202,6 +206,7 @@ public class SocketClient implements ClientConn {
                 client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)));
                 break;
             case "board_changed":
+
                 client.getUpdates();
         }
     }

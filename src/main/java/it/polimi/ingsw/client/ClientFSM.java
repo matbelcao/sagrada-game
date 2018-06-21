@@ -64,7 +64,7 @@ public class ClientFSM {
                     break;
 
                 default:
-                    client.getClientUI().showLastScreen();
+                    invalidInput();
                     return;
             }
             //state update
@@ -72,7 +72,9 @@ public class ClientFSM {
             state=state.nextState(false, option==BACK, option==END_TURN, option==DISCARD);
             lockState.notifyAll();
         }
-        client.getBoard().notifyObservers();
+        if(!(option==END_TURN||option==QUIT)) {
+            client.getBoard().notifyObservers();
+        }
     }
 
     void invalidInput() {
@@ -121,7 +123,7 @@ public class ClientFSM {
                 manageNewGameChoice(index);
                 break;
             default:
-                client.getClientUI().showLastScreen();
+                invalidInput();
                 break;
         }
     }
@@ -207,14 +209,16 @@ public class ClientFSM {
                     }
                     toolContinue();
                 }
+                client.getBoard().notifyObservers();
             } else {
                 synchronized (lockState) {
                     state=CHOOSE_TOOL.nextState(false);//back to MAIN
                     lockState.notifyAll();
                 }
                 client.getBoard().stateChanged();
+                client.getBoard().notifyObservers();
             }
-            client.getBoard().notifyObservers();
+
         } else {
             client.getClientUI().showLastScreen();
         }

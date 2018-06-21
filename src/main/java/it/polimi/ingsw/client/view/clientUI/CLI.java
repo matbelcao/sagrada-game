@@ -140,7 +140,7 @@ public class CLI implements ClientUI {
     @Override
     public synchronized void updateLobby(int numUsers){
         resetScreen();
-        view .setLatestScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOBBY_UPDATE)),numUsers));
+        view.setLatestScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.LOBBY_UPDATE)),numUsers));
         printToScreen(view.printLatestScreen());
     }
 
@@ -201,6 +201,12 @@ public class CLI implements ClientUI {
                     break;
                 case LightBoardEvents.Status:
                     view.setMatchInfo(board.getMyPlayerId(),board.getNumPlayers());
+                    if(client.isPlayingTurns()) {
+                        for (int i = 0; i < board.getNumPlayers(); i++) {
+                            view.updateSchema(board.getPlayerById(i));
+                        }
+                    }
+                    break;
                 case LightBoardEvents.Schema:
                     for (int i = 0; i < board.getNumPlayers(); i++) {
                         view.updateSchema(board.getPlayerById(i));

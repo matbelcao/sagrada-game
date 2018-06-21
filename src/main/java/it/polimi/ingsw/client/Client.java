@@ -401,6 +401,7 @@ public class Client {
 
     }
 
+
     public void updateGameEnd(List<RankingEntry> ranking){
         for(RankingEntry entry : ranking){
             LightPlayer player=board.getPlayerById(entry.getPlayerId());
@@ -451,6 +452,7 @@ public class Client {
 
     public void updateGameRoundStart(int numRound){
         board.setRoundTrack(clientConn.getRoundtrack(),numRound);
+        board.setDraftPool(clientConn.getDraftPool());
         fsm.setNotMyTurn();
         if(numRound==0) {
             //get players
@@ -492,11 +494,9 @@ public class Client {
                 }
             }
         }
-        board.setDraftPool(clientConn.getDraftPool());
+
         board.setNowPlaying(playerId);
         board.setIsFirstTurn(isFirstTurn);
-        board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
-
 
         fsm.setMyTurn(playerId==board.getMyPlayerId());
 
@@ -535,13 +535,17 @@ public class Client {
         board.updatestatus(playerId, status);
 
         System.out.println(fsm.getState());
-        if(!(fsm.getState().equals(ClientFSMState.SCHEMA_CHOSEN)
-                ||fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)
-                ||fsm.getState().equals(ClientFSMState.GAME_ENDED))) {
+        if(isPlayingTurns()) {
             board.notifyObservers();
         }else if(fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)){
             clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
         }
+    }
+
+    public boolean isPlayingTurns() {
+        return !(fsm.getState().equals(ClientFSMState.SCHEMA_CHOSEN)
+                ||fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)
+                ||fsm.getState().equals(ClientFSMState.GAME_ENDED));
     }
 
     /**
