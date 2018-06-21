@@ -112,12 +112,14 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void notifyStatusUpdate(GameEvent gameEvent, int id, String userName) {
-        try {
-            remoteObj.notifyStatusUpdate(gameEvent,id,userName);
-        } catch (RemoteException e) {
-            user.disconnect();
-            connectionOk=false;
-        }
+        new Thread(()-> {
+            try {
+                remoteObj.notifyStatusUpdate(gameEvent, id, userName);
+            } catch (RemoteException e) {
+                user.disconnect();
+                connectionOk = false;
+            }
+        }).start();
     }
 
     /**
