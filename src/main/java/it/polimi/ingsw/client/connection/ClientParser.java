@@ -286,6 +286,6 @@ public class ClientParser {
     }
 
     private static boolean checkStatus(List<String> parsedResult) {
-        return parsedResult.size() == 2||parsedResult.size() == 3;
+        return parsedResult.size()>=2;
     }
 }

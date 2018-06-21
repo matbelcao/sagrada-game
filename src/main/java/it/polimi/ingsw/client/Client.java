@@ -280,7 +280,6 @@ public class Client {
 
                 logged = login();
 
-
                 if(!logged) {
                     synchronized (lockCredentials) {
                         username = null;
@@ -294,6 +293,10 @@ public class Client {
             }while(!logged);
 
             this.fsm=new ClientFSM(this);
+            if(connMode.equals(ConnectionMode.RMI)){
+                AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
+                authenticator.updateConnected(username);
+            }
             //start collecting commands from ui
             commandManager();
 
@@ -349,7 +352,6 @@ public class Client {
             authenticator.setRemoteReference(remoteRef,username);
             clientUI.updateConnectionOk();
             clientUI.updateLogin(true);
-            authenticator.updateConnected(username);
             return true;
         }
         clientUI.updateLogin(false);
@@ -410,10 +412,13 @@ public class Client {
         board.notifyObservers();
     }
 
-    private void retrieveBoardOnReconnection(){
+    private void retrieveBoardOnReconnection(int myPlayerId){
         LightGameStatus gameStatus=clientConn.getGameStatus();
 
         board= new LightBoard(gameStatus.getNumPlayers());
+        board.addObserver(clientUI);
+        board.setMyPlayerId(myPlayerId);
+
         List<LightPlayer> players = clientConn.getPlayers();
 
         for (int i = 0; i < board.getNumPlayers(); i++) {
@@ -446,13 +451,11 @@ public class Client {
             synchronized (lockReady) {
                 for (int i = 0; i < board.getNumPlayers(); i++) {
 
-                    //get players schema
                     board.updateSchema(i, clientConn.getSchema(i));
 
-                    //set favor tokens
                     board.updateFavorTokens(i,clientConn.getFavorTokens(i));
                 }
-                //get tools
+
                 board.setTools(clientConn.getTools());
 
                 board.setPubObjs(clientConn.getPublicObjects());
@@ -492,7 +495,6 @@ public class Client {
         fsm.setNotMyTurn();
         fsm.setMyTurn(playerId==board.getMyPlayerId());
 
-
         board.notifyObservers();
 
     }
@@ -508,29 +510,35 @@ public class Client {
 
     public void updatePlayerStatus(int playerId, GameEvent gameEvent, String username){
 
-            System.out.println(fsm.getState().toString());
-            LightPlayerStatus status;
+        LightPlayerStatus status;
 
-            switch (gameEvent) {
-                case QUIT:
-                    status = LightPlayerStatus.QUITTED;
-                    break;
-                case RECONNECT:
-                    status = LightPlayerStatus.PLAYING;
-                    break;
-                case DISCONNECT:
-                    status = LightPlayerStatus.DISCONNECTED;
-                    break;
-                default:
-                    status = LightPlayerStatus.PLAYING;
-            }
-            board.updatestatus(playerId, status);
+        switch (gameEvent) {
+            case QUIT:
+                status = LightPlayerStatus.QUITTED;
+                break;
+            case RECONNECT:
+                status = LightPlayerStatus.PLAYING;
+                if(username.equals(this.username)){
+                    retrieveBoardOnReconnection(playerId);
+                    fsm.resetState();
+                    board.stateChanged();
+                }
+                break;
+            case DISCONNECT:
+                status = LightPlayerStatus.DISCONNECTED;
+                break;
+            default:
+                status = LightPlayerStatus.PLAYING;
+        }
+        board.updatestatus(playerId, status);
 
-
+        System.out.println(fsm.getState());
         if(!(fsm.getState().equals(ClientFSMState.SCHEMA_CHOSEN)
                 ||fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)
                 ||fsm.getState().equals(ClientFSMState.GAME_ENDED))) {
             board.notifyObservers();
+        }else if(fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)){
+            clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
         }
     }
 
@@ -538,12 +546,12 @@ public class Client {
      * this method updates the board with the changes regarding the user that is currently playing
      */
     public void getUpdates(){
-
         board.setDraftPool(clientConn.getDraftPool());
         board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
         board.updateSchema(board.getNowPlaying(),clientConn.getSchema(board.getNowPlaying()));
         board.setTools(clientConn.getTools());
         board.updateFavorTokens(board.getNowPlaying(),clientConn.getFavorTokens(board.getNowPlaying()));
+
         board.notifyObservers();
     }
 

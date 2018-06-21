@@ -412,7 +412,7 @@ public class Game extends Thread implements Iterable  {
 
     public  LightGameStatus getGameStatus(){
         boolean isInit=fsm.getCurState().equals(ServerState.INIT);
-        return new LightGameStatus(isInit,users.size(),round.getRoundNumber(),round.isFirstTurn(),board.getPlayer(userPlaying).getGameId());
+        return new LightGameStatus(isInit,users.size(),isInit?0:round.getRoundNumber(), !isInit && round.isFirstTurn(),isInit?-1:board.getPlayer(userPlaying).getGameId());
     }
 
     /**

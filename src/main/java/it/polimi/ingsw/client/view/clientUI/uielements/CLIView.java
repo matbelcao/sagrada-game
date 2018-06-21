@@ -55,6 +55,7 @@ public class CLIView {
     public CLIView(UILanguage lang) {
         uiMsg=new UIMessages(lang);
         updateRoundTrack(new ArrayList<>());
+        updateDraftPool(new HashMap<>());
     }
 
     /**
@@ -588,7 +589,7 @@ public class CLIView {
     public synchronized void setMatchInfo(int playerId, int numPlayers) {
         this.playerId=playerId;
         this.numPlayers=numPlayers;
-        updateDraftPool(new HashMap<>());
+
     }
 
     /**

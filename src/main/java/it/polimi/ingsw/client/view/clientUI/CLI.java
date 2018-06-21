@@ -129,7 +129,7 @@ public class CLI implements ClientUI {
     @Override
     public synchronized void updateConnectionOk() {
         resetScreen();
-        view .setLatestScreen(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.CONNECTION_OK)));
+        view.setLatestScreen(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.CONNECTION_OK)));
         printToScreen(view.printLatestScreen());
     }
 
@@ -153,9 +153,9 @@ public class CLI implements ClientUI {
     public synchronized void updateGameStart(int numUsers, int playerId){
 
         resetScreen();
-        view .setLatestScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.GAME_START)),numUsers,playerId));
+        view.setLatestScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.GAME_START)),numUsers,playerId));
         printToScreen(view.printLatestScreen());
-        this.view.setMatchInfo(playerId,numUsers);
+        view.setMatchInfo(playerId,numUsers);
 
     }
 
@@ -200,6 +200,7 @@ public class CLI implements ClientUI {
                     view.updateRoundTrack(board.getRoundTrack());
                     break;
                 case LightBoardEvents.Status:
+                    view.setMatchInfo(board.getMyPlayerId(),board.getNumPlayers());
                 case LightBoardEvents.Schema:
                     for (int i = 0; i < board.getNumPlayers(); i++) {
                         view.updateSchema(board.getPlayerById(i));

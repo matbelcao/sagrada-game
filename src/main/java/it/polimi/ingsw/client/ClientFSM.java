@@ -371,4 +371,18 @@ public class ClientFSM {
             lockState.notifyAll();
         }
     }
+
+    public void resetState() {
+        if(client.getBoard().isInit()){
+            synchronized (lockState) {
+                state = CHOOSE_SCHEMA;
+                lockState.notifyAll();
+            }
+        }else{
+            synchronized (lockState) {
+                state = NOT_MY_TURN;
+                lockState.notifyAll();
+            }
+        }
+    }
 }
