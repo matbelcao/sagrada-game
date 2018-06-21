@@ -789,11 +789,13 @@ public class SocketClient implements ClientConn {
             outSocket.flush();
             //System.out.println("PONG");
             synchronized (pingLock) {
-                pingTimer.cancel();
-                pingTimer = new Timer();
-                pingTimer.schedule(new connectionTimeout(), 5000);
-                timerActive=true;
-                pingLock.notifyAll();
+                if(connectionOk) {
+                    pingTimer.cancel();
+                    pingTimer = new Timer();
+                    pingTimer.schedule(new connectionTimeout(), 5000);
+                    timerActive = true;
+                    pingLock.notifyAll();
+                }
             }
         } catch (Exception e) {
             return false;
@@ -808,11 +810,13 @@ public class SocketClient implements ClientConn {
         @Override
         public void run(){
             synchronized (pingLock) {
-                System.out.println("CONNECTION TIMEOUT!");
-                connectionOk = false;
-                timerActive=false;
-                client.disconnect();
-                pingLock.notifyAll();
+                if(connectionOk) {
+                    System.out.println("CONNECTION TIMEOUT!");
+                    connectionOk = false;
+                    timerActive = false;
+                    client.disconnect();
+                    pingLock.notifyAll();
+                }
             }
         }
     }

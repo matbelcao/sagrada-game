@@ -32,6 +32,7 @@ public class RMIServer implements ServerConn {
             remoteObj.notifyLobbyUpdate(n);
         } catch (RemoteException e) {
             user.disconnect();
+            connectionOk=false;
         }
 
     }
@@ -48,6 +49,7 @@ public class RMIServer implements ServerConn {
                 remoteObj.notifyGameStart(n, id);
             } catch (RemoteException e) {
                 user.disconnect();
+                connectionOk=false;
             }
         }).start();
     }
@@ -63,6 +65,7 @@ public class RMIServer implements ServerConn {
             remoteObj.notifyGameEnd(ranking);
         } catch (RemoteException e) {
             user.disconnect();
+            connectionOk=false;
         }
     }
 
@@ -78,6 +81,7 @@ public class RMIServer implements ServerConn {
                 remoteObj.notifyRoundEvent(event, roundNumber);
             } catch (RemoteException e) {
                 user.disconnect();
+                connectionOk=false;
             }
         }).start();
     }
@@ -95,6 +99,7 @@ public class RMIServer implements ServerConn {
                 remoteObj.notifyTurnEvent(event, playerId, turnNumber);
             } catch (RemoteException e) {
                 user.disconnect();
+                connectionOk=false;
             }
         }
         ).start();
@@ -111,6 +116,7 @@ public class RMIServer implements ServerConn {
             remoteObj.notifyStatusUpdate(event,id);
         } catch (RemoteException e) {
             user.disconnect();
+            connectionOk=false;
         }
     }
 
@@ -124,6 +130,7 @@ public class RMIServer implements ServerConn {
                 remoteObj.notifyBoardChanged();
             } catch (RemoteException e) {
                 user.disconnect();
+                connectionOk=false;
             }
         }).start();
 
