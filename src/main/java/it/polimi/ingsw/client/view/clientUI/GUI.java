@@ -11,6 +11,9 @@ import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedReader;
+import it.polimi.ingsw.common.enums.Actions;
+import it.polimi.ingsw.common.serializables.IndexedCellContent;
+import it.polimi.ingsw.common.serializables.LightDie;
 import it.polimi.ingsw.common.serializables.LightPrivObj;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
 import javafx.application.Application;
@@ -38,9 +41,7 @@ import java.util.List;
 import java.util.Observable;
 
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
-import static javafx.geometry.Pos.BOTTOM_CENTER;
-import static javafx.geometry.Pos.CENTER;
-import static javafx.geometry.Pos.TOP_CENTER;
+import static javafx.geometry.Pos.*;
 
 public class GUI extends Application implements ClientUI {
     private GUIutil sceneCreator;
@@ -237,61 +238,88 @@ public class GUI extends Application implements ClientUI {
                     System.out.println("tool can continue------------------------------------------------------------------");
                     break;
             }
-            MainSceneGroup root = new MainSceneGroup(board);
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(drawMainPane(200,200,board));
+            //root.setStyle("-fx-background-color: black;"); //todo change
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(600);
-            primaryStage.setMinHeight(750);
+            primaryStage.setMinHeight(600);
             primaryStage.sizeToScene();
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
-                root.redraw(newWidth,newHeight);
+                scene.setRoot(drawMainPane(newWidth,newHeight,board));
             });
             scene.heightProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
-                root.redraw(newWidth,newHeight);
+                scene.setRoot(drawMainPane(newWidth,newHeight,board));
             });
         });
     }
 
-    class MainSceneGroup extends Group{
-        LightBoard board;
-        BorderPane b;
-        HBox roundTrack;
-        Group schema;
-        HBox draftpool;
-        VBox schemaVbox;
-        VBox cardsVbox;
-        Group cards;
-        MainSceneGroup(LightBoard board){
-            this.board = board;
-            this.b = new BorderPane();
-            this.roundTrack = new HBox();
-            this.schema = new Group();
-            this.draftpool = new HBox();
-            this.schemaVbox = new VBox(schema);
-            this.cards = new Group();
-            this.cardsVbox = new VBox(cards,draftpool);
-            draftpool.setAlignment(BOTTOM_CENTER);
-            b.setTop(roundTrack);
-            roundTrack.setAlignment(TOP_CENTER);
-            b.setLeft(schemaVbox);
-            b.setRight(cardsVbox);
-            this.getChildren().add(b);
-            redraw(200,200);
-        }
+    StackPane drawMainPane(double newWidth, double newHeight, LightBoard board){
+        BorderPane frontPane = drawFrontPane(newWidth,newHeight,board);
+        BorderPane backPane = drawBackPane(newWidth,newHeight,board);
+        //return new StackPane(frontPane,backPane);
+        return new StackPane(backPane,frontPane);
 
-        void redraw(double newWidth, double newHeight) {
-            double cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
-            ClientFSMState turnState = client.getTurnState();
-            roundTrack.getChildren().setAll(sceneCreator.drawRoundTrack(board.getRoundTrack(),newWidth,newHeight,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(),board.getLatestSelectedDie(), board.getPlayerById(board.getMyPlayerId()).getFavorTokens()));
-            schema.getChildren().add(sceneCreator.drawSchema(board.getPlayerById(playerId).getSchema(),cellDim,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(),board.getLatestSelectedDie(),board.getLatestOptionsList()));
-            draftpool.getChildren().setAll(sceneCreator.drawDraftPool(board.getDraftPool(),cellDim,turnState,board.getLatestDiceList(),board.getLatestPlacementsList(), board.getLatestSelectedDie(),board.getLatestOptionsList()));
-            cards.getChildren().setAll(sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState));
+    }
 
-        }
+    BorderPane drawBackPane(double newWidth, double newHeight, LightBoard board){
+        double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
+        List <List<LightDie>>       roundTrack = board.getRoundTrack();
+        List <LightDie> draftPool = board.getDraftPool();
+        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
+        List <Integer>              latestPlacementsList = board.getLatestPlacementsList();
+        IndexedCellContent          latestSelectedDie = board.getLatestSelectedDie();
+        List <Actions>              latestOptionsList = board.getLatestOptionsList();
+        LightSchemaCard             schemaCard = board.getPlayerById(playerId).getSchema();
+        int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
+        ClientFSMState              turnState = client.getTurnState();
+
+        BorderPane backPane = new BorderPane();
+        HBox dummyTrack = sceneCreator.drawDummyTrack(roundTrack,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        backPane.setTop(dummyTrack);
+        dummyTrack.setAlignment(TOP_LEFT);
+        return backPane;
+
+    }
+
+    BorderPane drawFrontPane(double newWidth, double newHeight, LightBoard board){
+        double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
+        List <List<LightDie>>       roundTrackList = board.getRoundTrack();
+        List <LightDie> draftPool = board.getDraftPool();
+        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
+        List <Integer>              latestPlacementsList = board.getLatestPlacementsList();
+        IndexedCellContent          latestSelectedDie = board.getLatestSelectedDie();
+        List <Actions>              latestOptionsList = board.getLatestOptionsList();
+        LightSchemaCard             schemaCard = board.getPlayerById(playerId).getSchema();
+        int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
+        ClientFSMState              turnState = client.getTurnState();
+
+        BorderPane frontPane = new BorderPane();
+        HBox roundTrack = sceneCreator.drawRoundTrack(roundTrackList,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        frontPane.setTop(roundTrack);
+        roundTrack.setAlignment(TOP_LEFT);
+
+        GridPane schema = sceneCreator.drawSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
+        frontPane.setLeft(schema);
+        schema.setAlignment(CENTER);
+
+        VBox cards = sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState);
+        frontPane.setRight(cards);
+        cards.setAlignment(CENTER_LEFT);
+
+        HBox menuButtons = sceneCreator.getMenuButtons(turnState,favorTokens);
+        HBox draftpool = sceneCreator.drawDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
+        Region divider = new Region();
+        HBox bottomContainer = new HBox(menuButtons,divider,draftpool);
+        HBox.setHgrow(divider,Priority.ALWAYS);
+        menuButtons.setAlignment(BOTTOM_LEFT);
+        draftpool.setAlignment(BOTTOM_RIGHT);
+        frontPane.setBottom(bottomContainer);
+
+        return frontPane;
     }
 
 
