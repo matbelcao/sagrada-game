@@ -72,7 +72,7 @@ public class ClientFSM {
             state=state.nextState(false, option==BACK, option==END_TURN, option==DISCARD);
             lockState.notifyAll();
         }
-        if(!(option==END_TURN||option==QUIT)) {
+        if(!(option==QUIT)) {
             client.getBoard().notifyObservers();
         }
     }

@@ -361,12 +361,13 @@ public class LightBoard extends Observable {
 
     public  List<Integer> getChanges() {
         Collections.sort(changes);
-        return changes;
+
+        return new ArrayList<>(changes);
     }
 
     public void clearChanges(){
         synchronized (lockChanges) {
-            changes.clear();
+            changes=new ArrayList<>();
             lockChanges.notifyAll();
         }
     }

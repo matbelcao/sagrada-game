@@ -497,7 +497,7 @@ public class Client {
 
         board.setNowPlaying(playerId);
         board.setIsFirstTurn(isFirstTurn);
-
+        fsm.setNotMyTurn();
         fsm.setMyTurn(playerId==board.getMyPlayerId());
 
         board.notifyObservers();
