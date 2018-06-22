@@ -170,9 +170,9 @@ public class Game extends Thread implements Iterable  {
         fsm.endGame();
 
         for(User u:users){
+            board.getPlayer(u).quitMatch();
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
                 u.getServerConn().notifyGameEnd(ranking);
-                board.getPlayer(u).quitMatch();
                 System.out.println("End match: "+u.getUsername());
             }
         }
@@ -599,13 +599,21 @@ public class Game extends Thread implements Iterable  {
      */
     public void disconnectUser(User user){
         user.setStatus(UserStatus.DISCONNECTED);
-        //if(!fsm.getCurState().equals(ServerState.INIT)) {
-            for (User u : users) {
-                if (u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
-                    u.getServerConn().notifyStatusUpdate(GameEvent.DISCONNECT, users.indexOf(user),user.getUsername());
-                }
+
+        if(fsm.getCurState().equals(ServerState.INIT)){
+            try {
+                choose(user,1);
+            } catch (IllegalActionException e) {
+                e.printStackTrace();
             }
-        //}
+        }
+
+        for (User u : users) {
+            if (u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                u.getServerConn().notifyStatusUpdate(GameEvent.DISCONNECT, users.indexOf(user), user.getUsername());
+            }
+        }
+
         if((nowPlayingUser !=null && nowPlayingUser.equals(user))|| getActiveUsers()<=1){
             startFlow();
         }
@@ -615,25 +623,24 @@ public class Game extends Thread implements Iterable  {
      * Notifies to the active players that an user has left the game
      * @param user the user who has quitted the match
      */
-    public void quitUser(User user){
+    public void quitUser(User user) {
         user.setStatus(UserStatus.DISCONNECTED);
         board.getPlayer(user).quitMatch();
 
-        if(fsm.getCurState().equals(ServerState.INIT)){
+        if (fsm.getCurState().equals(ServerState.INIT)) {
             try {
-                choose(user,1);
+                choose(user, 1);
             } catch (IllegalActionException e) {
                 e.printStackTrace();
             }
         }
-        // add control for number of players still in the game...
-        //if(!fsm.getCurState().equals(ServerState.INIT)) {
-            for (User u : users) {
-                if (u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
-                    u.getServerConn().notifyStatusUpdate(GameEvent.QUIT, users.indexOf(user),user.getUsername());
-                }
+
+        for (User u : users) {
+            if (u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
+                u.getServerConn().notifyStatusUpdate(GameEvent.QUIT, users.indexOf(user), user.getUsername());
             }
-        //}
+        }
+
         if((nowPlayingUser !=null && nowPlayingUser.equals(user))||(getActiveUsers()<=1)){
             startFlow();
         }
