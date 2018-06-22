@@ -2,6 +2,7 @@ package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
+import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.IndexedCellContent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.model.*;
@@ -164,10 +165,31 @@ public class BoardTest {
         board.getDraftPool().clearDraftPool(0);
         assertEquals(9,board.getDiceList().size());
         assertEquals(Place.ROUNDTRACK,board.getDiceList().get(0).getPlace());
+    }
+
+    @Test
+    void testFinalScore(){
+        //It's not possible to test the final score != 0 because the public objectives are random
+        Board board=new Board(users2, additionalSchemas);
 
         board.getPlayer(users2.get(0)).setSchema(new SchemaCard(1,false));
-        board.getPlayer(users2.get(1)).setSchema(new SchemaCard(2,false));
-        List<RankingEntry> playerScores=board.gameRunningEnd();
+        board.getPlayer(users2.get(1)).setSchema(new SchemaCard(5,false));
+        List<RankingEntry> playerScores=board.gameRunningEnd(users2);
+
+        assertEquals(4,board.getPlayer(users2.get(0)).getFavorTokens());
+        assertEquals(6,board.getPlayer(users2.get(1)).getFavorTokens());
+
         assertEquals(2,playerScores.size());
+        assertEquals(1,playerScores.get(0).getPlayerId());
+        assertEquals(0,playerScores.get(1).getPlayerId());
+
+        board.getPlayer(users2.get(1)).quitMatch();
+        playerScores=board.gameRunningEnd(users2);
+        assertEquals(1,playerScores.size());
+        assertEquals(0,playerScores.get(0).getPlayerId());
+
+        users2.get(0).setStatus(UserStatus.DISCONNECTED);
+        playerScores=board.gameRunningEnd(users2);
+        assertEquals(0,playerScores.size());
     }
 }

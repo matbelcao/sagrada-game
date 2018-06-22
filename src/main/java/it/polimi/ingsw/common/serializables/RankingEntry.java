@@ -39,4 +39,12 @@ public class RankingEntry implements Serializable {
     public int getFinalPosition() {
         return finalPosition;
     }
+
+    /**
+     * Sets the final position of the entry
+     * @param position the position to set
+     */
+    public void setFinalPosition(int position){
+        finalPosition=position;
+    }
 }
