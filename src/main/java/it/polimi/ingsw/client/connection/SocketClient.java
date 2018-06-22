@@ -79,11 +79,12 @@ public class SocketClient implements ClientConn {
                         if (ClientParser.parse(inSocket.readln(), result) && connectionOk) {
                             if (ClientParser.isStatus(inSocket.readln())) {
                                 inSocket.pop();
-                                (new Thread(() ->
+                                client.addUpdateTask(new Thread(()->
                                         client.updatePlayerStatus(
                                                 Integer.parseInt(result.get(2)),
                                                 GameEvent.valueOf(result.get(1).toUpperCase()),
-                                                result.get(3)))).start();
+                                                result.get(3))
+                                ));
 
                             } else if (ClientParser.isLobby(inSocket.readln())) {
                                 inSocket.pop();

@@ -21,36 +21,49 @@ public class RMIServerObject  implements RMIServerInt {
 
     @Override
     public void notifyGameStart(int n, int id) {
-        client.updateGameStart(n,id);
+        client.addUpdateTask(new Thread(()->
+        client.updateGameStart(n,id)
+        ));
     }
 
     @Override
     public void notifyGameEnd(List<RankingEntry> ranking){
-        client.updateGameEnd(ranking);
+        client.addUpdateTask(new Thread(()->
+        client.updateGameEnd(ranking)
+        ));
     }
 
     @Override
     public void notifyRoundEvent(GameEvent gameEvent, int roundNumber){
         if(gameEvent.equals(ROUND_START)){
-            client.updateGameRoundStart(roundNumber);
+            client.addUpdateTask(new Thread(()->
+            client.updateGameRoundStart(roundNumber)
+            ));
         }else if (gameEvent.equals(ROUND_END)){
-            client.updateGameRoundEnd(roundNumber);
+            client.addUpdateTask(new Thread(()->
+            client.updateGameRoundEnd(roundNumber)
+            ));
         }
     }
 
     @Override
     public void notifyTurnEvent(GameEvent gameEvent, int playerId, int turnNumber){
         if(gameEvent.equals(TURN_START)){
-            client.updateGameTurnStart(playerId,turnNumber==0); //todo change signature
+            client.addUpdateTask(new Thread(()->
+            client.updateGameTurnStart(playerId,turnNumber==0) //todo change signature
+            ));
         }else if (gameEvent.equals(TURN_END)){
-            client.updateGameTurnEnd(playerId);
+            client.addUpdateTask(new Thread(()->
+            client.updateGameTurnEnd(playerId)
+            ));
         }
     }
 
     @Override
     public void notifyStatusUpdate (GameEvent gameEvent, int id, String userName){
-
-        client.updatePlayerStatus(id, gameEvent,userName);
+        client.addUpdateTask(new Thread(()->
+        client.updatePlayerStatus(id, gameEvent,userName)
+        ));
     }
 
     @Override

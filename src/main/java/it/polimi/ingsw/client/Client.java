@@ -557,6 +557,7 @@ public class Client {
 
         LightPlayerStatus status;
 
+
         switch (gameEvent) {
             case QUIT:
                 status = LightPlayerStatus.QUITTED;
@@ -564,6 +565,10 @@ public class Client {
             case RECONNECT:
                 status = LightPlayerStatus.PLAYING;
                 if(username.equals(this.username)){
+                    synchronized (lockStatus){
+                        this.userStatus=UserStatus.PLAYING;
+                        lockStatus.notifyAll();
+                    }
                     retrieveBoardOnReconnection(playerId);
                     fsm.resetState();
                     board.stateChanged();
