@@ -173,9 +173,9 @@ public class GUIutil {
             Rectangle dummyCell= dummyRoundTrackCell(cellDim);
             track.getChildren().add(dummyCell);
             if(i < roundTrack.size() && roundTrack.get(i).size()>1){
-                Event myEvent = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+                Event showMultipleDice = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
                 dummyCell.setOnMouseEntered(e->{
-                    dummyCell.fireEvent(myEvent);
+                    dummyCell.fireEvent(showMultipleDice);
                 });
             }
         }
@@ -190,15 +190,10 @@ public class GUIutil {
         List<LightDie> multipleDiceList = roundTrack.get(selectedTrackCellIndex);
         int multipleDiceListSize = multipleDiceList.size();
         int startingIndex = selectedTrackCellIndex - (int) Math.round( (multipleDiceListSize/2));
+        if(startingIndex + multipleDiceListSize > ROUNDTRACK_SIZE){
+            startingIndex = ROUNDTRACK_SIZE - multipleDiceListSize;
+        }
 
-        /*if(startingIndex < 0){
-            for(int i = 0; i<multipleDiceListSize;i++){
-                Canvas c = new Canvas(cellDim, cellDim);
-                GraphicsContext gc = c.getGraphicsContext2D();
-                drawDie(multipleDiceList.get(i), gc, cellDim);
-                multipleDiceTrack.getChildren().add(c);
-            }
-        }*/
         for(int i = 0 ; i < startingIndex; i++){
             Canvas c = new Canvas(cellDim,cellDim);
             multipleDiceTrack.getChildren().add(c);
