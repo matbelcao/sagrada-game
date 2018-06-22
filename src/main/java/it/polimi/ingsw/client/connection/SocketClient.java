@@ -90,9 +90,9 @@ public class SocketClient implements ClientConn {
                                 updateLobby(result.get(1));
                             } else if (ClientParser.isGame(inSocket.readln())) {
                                 inSocket.pop();
-                                new Thread(()->
-                                    updateMessages( result)
-                                ).start();
+
+                                updateMessages( result);
+
                             } else if (ClientParser.isPing(inSocket.readln())) {
                                 inSocket.pop();
                                 socketPong();
@@ -178,9 +178,9 @@ public class SocketClient implements ClientConn {
         int i;
         switch(outcomes.get(1)){
             case "start":
-
-                client.updateGameStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
-
+                client.addUpdateTask(new Thread(()->
+                client.updateGameStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)))
+                ));
                 break;
             case "end":
                 List<RankingEntry> ranking= new ArrayList<>();
@@ -188,26 +188,35 @@ public class SocketClient implements ClientConn {
                     param=outcomes.get(i).split(",");
                     ranking.add(new RankingEntry(Integer.parseInt(param[0]),Integer.parseInt(param[1]),Integer.parseInt(param[2])));
                 }
-                client.updateGameEnd(ranking);
+                client.addUpdateTask(new Thread(()->
+                client.updateGameEnd(ranking)
+                ));
 
                 break;
             case "round_start":
-
-                client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)));
-
+                client.addUpdateTask(new Thread(()->
+                client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)))
+                ));
                 break;
             case "round_end":
-                client.updateGameRoundEnd(Integer.parseInt(outcomes.get(2)));
+                client.addUpdateTask(new Thread(()->
+                client.updateGameRoundEnd(Integer.parseInt(outcomes.get(2)))
+                ));
                 break;
             case "turn_start":
-                client.updateGameTurnStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3))==0);
+                client.addUpdateTask(new Thread(()->
+                client.updateGameTurnStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3))==0)
+                ));
                 break;
             case "turn_end":
-                client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)));
+                client.addUpdateTask(new Thread(()->
+                client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)))
+                ));
                 break;
             case "board_changed":
-
-                client.getUpdates();
+                client.addUpdateTask(new Thread(()->
+                client.getUpdates()
+                ));
         }
     }
 

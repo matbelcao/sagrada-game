@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.client.clientController.QueuedCmdReader;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.clientUI.CLI;
 import it.polimi.ingsw.client.view.clientUI.ClientUI;
@@ -64,6 +65,8 @@ public class Client {
 
     private boolean ready;
     private final Object lockReady = new Object();
+    private final List<Thread> updateQueue;
+
 
 
     /**
@@ -91,6 +94,7 @@ public class Client {
         this.lang = lang;
         this.userStatus = UserStatus.DISCONNECTED;
         this.ready = false;
+        this.updateQueue=new ArrayList<>();
     }
 
     void reset() {
@@ -304,6 +308,7 @@ public class Client {
                 userStatus = UserStatus.LOBBY;
                 lockStatus.notifyAll();
             }
+            turnRoundMessagesManager();
 
             //ENABLE PONG
             clientConn.pong();
@@ -363,6 +368,42 @@ public class Client {
      */
     public boolean isLogged(){
         return userStatus.equals(UserStatus.LOBBY)||userStatus.equals(UserStatus.PLAYING);
+    }
+
+    private void turnRoundMessagesManager(){
+        new Thread(()-> {
+            while(isLogged()) {
+                synchronized (updateQueue) {
+                    while (updateQueue.isEmpty()) {
+                        try {
+                            updateQueue.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            System.exit(2);
+                        }
+                    }
+                    updateQueue.notifyAll();
+                }
+                    updateQueue.get(0).start();
+                    try {
+                        updateQueue.get(0).join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        System.exit(2);
+                    }
+                    updateQueue.remove(0);
+
+
+            }
+        }
+        ).start();
+    }
+
+    public void addUpdateTask(Thread newUpdate){
+        synchronized (updateQueue){
+            updateQueue.add(newUpdate);
+            updateQueue.notifyAll();
+        }
     }
 
     /**
@@ -451,12 +492,13 @@ public class Client {
     }
 
     public void updateGameRoundStart(int numRound){
-        synchronized (lockReady) {
+
         board.setRoundTrack(clientConn.getRoundtrack(),numRound);
         board.setDraftPool(clientConn.getDraftPool());
         fsm.setNotMyTurn();
+        board.stateChanged();
         if(numRound==0) {
-
+            synchronized (lockReady) {
 
                 for (int i = 0; i < board.getNumPlayers(); i++) {
 
@@ -467,19 +509,17 @@ public class Client {
                 board.setTools(clientConn.getTools());
                 board.setPubObjs(clientConn.getPublicObjects());
 
+                ready=true;
+                lockReady.notifyAll();
             }
-            ready=true;
-            lockReady.notifyAll();
-        }
 
+        }
+        board.notifyObservers();
 
     }
 
     public void updateGameRoundEnd(int numRound){
-        synchronized (lockReady) {
-            ready=false;
-            lockReady.notifyAll();
-        }
+
 
     }
 
@@ -496,7 +536,7 @@ public class Client {
                 }
             }
         }
-
+        board.setDraftPool(clientConn.getDraftPool());
         board.setNowPlaying(playerId);
         board.setIsFirstTurn(isFirstTurn);
         fsm.setNotMyTurn();
@@ -508,6 +548,7 @@ public class Client {
 
     public void updateGameTurnEnd(int playerTurnId){
         board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
+        board.notifyObservers();
 
     }
 
