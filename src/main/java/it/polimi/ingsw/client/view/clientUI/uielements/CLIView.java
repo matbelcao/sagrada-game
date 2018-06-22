@@ -44,7 +44,6 @@ public class CLIView {
     private static UIMessages uiMsg;
     private int numPlayers;
     private int playerId;
-    private int turnNumber;
     private String latestScreen =EMPTY_STRING;
     private List<String> gameRanking=new ArrayList<>();
 

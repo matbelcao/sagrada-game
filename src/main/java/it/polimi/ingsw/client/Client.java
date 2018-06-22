@@ -301,13 +301,14 @@ public class Client {
                 AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
                 authenticator.updateConnected(username);
             }
-            //start collecting commands from ui
-            commandManager();
+
 
             synchronized (lockStatus) {
                 userStatus = UserStatus.LOBBY;
                 lockStatus.notifyAll();
             }
+            //start collecting commands from ui
+            commandManager();
             turnRoundMessagesManager();
 
             //ENABLE PONG

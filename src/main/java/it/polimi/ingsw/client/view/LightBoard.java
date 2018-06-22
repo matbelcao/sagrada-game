@@ -218,6 +218,7 @@ public class LightBoard extends Observable {
         this.roundTrack = roundTrack;
         this.roundNumber = numRound;
         addToChanges(LightBoardEvents.RoundTrack);
+        addToChanges(LightBoardEvents.NowPlaying);
         setChanged();
     }
 
@@ -360,16 +361,14 @@ public class LightBoard extends Observable {
     }
 
     public  List<Integer> getChanges() {
-        Collections.sort(changes);
-
-        return new ArrayList<>(changes);
-    }
-
-    public void clearChanges(){
+        List<Integer> copy;
         synchronized (lockChanges) {
+            copy = new ArrayList<>(changes);
+
             changes=new ArrayList<>();
             lockChanges.notifyAll();
         }
+        return copy;
     }
 
 
