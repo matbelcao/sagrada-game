@@ -415,7 +415,10 @@ public class Client {
     public void updateGameStart(int numPlayers, int playerId){
 
         this.board= new LightBoard(numPlayers);
-
+        synchronized (lockStatus){
+            userStatus=UserStatus.PLAYING;
+            lockStatus.notifyAll();
+        }
 
         List<LightPlayer> players = clientConn.getPlayers();
         for (int i = 0; i < board.getNumPlayers(); i++) {
@@ -424,10 +427,7 @@ public class Client {
 
         board.setMyPlayerId(playerId);
 
-        synchronized (lockStatus){
-            userStatus=UserStatus.PLAYING;
-            lockStatus.notifyAll();
-        }
+
 
         board.setPrivObj(clientConn.getPrivateObject());
 
