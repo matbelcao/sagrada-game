@@ -301,8 +301,8 @@ public class GUI extends Application implements ClientUI {
         BorderPane backPane = new BorderPane();
         HBox d1 = sceneCreator.buildDummyTrack(roundTrack,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
         HBox d2 = sceneCreator.buildMultipleDiceBar(selectedTrackCellIndex,roundTrack,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
-        d1.setSpacing(20);//todo add dynamic spacing??
         VBox vbox =new VBox(d1,d2);
+        vbox.setSpacing(10); //todo make dynamic?
         Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
         vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
         backPane.setTop(vbox);
