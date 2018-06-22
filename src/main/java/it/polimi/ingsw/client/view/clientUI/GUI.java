@@ -18,6 +18,7 @@ import it.polimi.ingsw.common.serializables.LightPrivObj;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -40,6 +41,7 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.Observable;
 
+import static it.polimi.ingsw.client.view.clientUI.MyEvent.MOUSE_EXITED_BACK_PANE;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;
 
@@ -238,36 +240,53 @@ public class GUI extends Application implements ClientUI {
                     System.out.println("tool can continue------------------------------------------------------------------");
                     break;
             }
-            Scene scene = new Scene(drawMainPane(200,200,board));
+            Scene scene = new Scene(buildFrontPane(200,200,board));
             //root.setStyle("-fx-background-color: black;"); //todo change
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(600);
             primaryStage.setMinHeight(600);
-            //primaryStage.sizeToScene();
+            primaryStage.sizeToScene();
+
+            scene.addEventHandler(MOUSE_EXITED_BACK_PANE , event -> {
+                scene.setRoot(buildFrontPane(200,200,board));
+            });
+            scene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL , event -> {
+                scene.setRoot(bulidMainPaneBack(event.getCellIndex(),200,200,board));
+                System.out.println("clicked " + event.getCellIndex());
+            });
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
-                scene.setRoot(drawMainPane(newWidth,newHeight,board));
+                scene.setRoot(buildFrontPane(newWidth,newHeight,board));
             });
             scene.heightProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
                 double newHeight = scene.getHeight();
-                scene.setRoot(drawMainPane(newWidth,newHeight,board));
+                scene.setRoot(buildFrontPane(newWidth,newHeight,board));
             });
         });
     }
 
-    StackPane drawMainPane(double newWidth, double newHeight, LightBoard board){
-        BorderPane frontPane = drawFrontPane(newWidth,newHeight,board);
-        BorderPane backPane = drawBackPane(newWidth,newHeight,board);
+    StackPane bulidMainPaneBack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
+        BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
+        BorderPane backPane = buildBackPane(selectedTrackCellIndex,newWidth,newHeight,board);
         StackPane p = new StackPane(backPane,frontPane);
-
-        //return new StackPane(frontPane,backPane);
+        backPane.toFront();
         return p;
-
     }
 
-    BorderPane drawBackPane(double newWidth, double newHeight, LightBoard board){
+    StackPane bulidMainPaneFront(double newWidth, double newHeight, LightBoard board){
+        BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
+        BorderPane backPane = buildBackPane(0,newWidth,newHeight,board); // todo fix
+        StackPane p = new StackPane(backPane,frontPane);
+        /*frontPane.addEventHandler(MyEvent.CLICKED_FRONT , event -> {
+            backPane.toFront();
+        });*/
+        //return new StackPane(frontPane,backPane)
+        return p;
+    }
+
+    BorderPane buildBackPane(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
@@ -280,14 +299,19 @@ public class GUI extends Application implements ClientUI {
         ClientFSMState              turnState = client.getTurnState();
 
         BorderPane backPane = new BorderPane();
-        HBox dummyTrack = sceneCreator.drawDummyTrack(roundTrack,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
-        backPane.setTop(dummyTrack);
-        dummyTrack.setAlignment(TOP_LEFT);
+        HBox d1 = sceneCreator.buildDummyTrack(roundTrack,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        HBox d2 = sceneCreator.buildMultipleDiceBar(selectedTrackCellIndex,roundTrack,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        d1.setSpacing(20);//todo add dynamic spacing??
+        VBox vbox =new VBox(d1,d2);
+        Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
+        vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
+        backPane.setTop(vbox);
+        vbox.setAlignment(TOP_LEFT);
+        backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
         return backPane;
-
     }
 
-    BorderPane drawFrontPane(double newWidth, double newHeight, LightBoard board){
+    BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board){
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
@@ -300,7 +324,7 @@ public class GUI extends Application implements ClientUI {
         ClientFSMState              turnState = client.getTurnState();
 
         BorderPane frontPane = new BorderPane();
-        HBox roundTrack = sceneCreator.drawRoundTrack(roundTrackList,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackList,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
         frontPane.setTop(roundTrack);
         roundTrack.setAlignment(TOP_LEFT);
 
@@ -313,21 +337,15 @@ public class GUI extends Application implements ClientUI {
         cards.setAlignment(CENTER_LEFT);
 
         HBox menuButtons = sceneCreator.getMenuButtons(turnState,favorTokens);
-        HBox draftpool = sceneCreator.drawDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
+        HBox draftpool = sceneCreator.buildDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
         Region divider = new Region();
         HBox bottomContainer = new HBox(menuButtons,divider,draftpool);
         HBox.setHgrow(divider,Priority.ALWAYS);
         menuButtons.setAlignment(BOTTOM_LEFT);
         draftpool.setAlignment(BOTTOM_RIGHT);
         frontPane.setBottom(bottomContainer);
-
         return frontPane;
     }
-
-
-
-
-
 
     @Override
     public void updateConnectionClosed() {
