@@ -31,7 +31,7 @@ public class CLIView {
     static final String NEW_LINE ="%n" ;
     static final String SEPARATOR ="|" ;
 
-    private String bottomInfo=EMPTY_STRING;
+    private String clientInfo =EMPTY_STRING;
     private String turnRoundinfo=EMPTY_STRING;
     private final HashMap<Integer,List<String>> schemas= new HashMap<>();
     private List<String> objectives= new ArrayList<>();
@@ -86,13 +86,15 @@ public class CLIView {
      * this completes the building of the schema's choice screen
      * @return the string that represents this
      */
-    public synchronized String printSchemaChoiceView(){
+    public  String printSchemaChoiceView(){
         StringBuilder builder=new StringBuilder();
         List<String> priv = new ArrayList<>(privObj);
         List<String> drafted = new ArrayList<>(buildDraftedSchemas());
         priv.add(0,boldify(uiMsg.getMessage(PRIVATE_OBJ)));
         priv.add(EMPTY_STRING);
-        builder.append(NEW_LINE+NEW_LINE+NEW_LINE+NEW_LINE);
+        builder.append(NEW_LINE+NEW_LINE);
+        builder.append(clientInfo);
+        builder.append(NEW_LINE+NEW_LINE);
         builder.append(printList(appendRows(appendRows(buildWall(drafted.size(), SCHEMA_WIDTH+10, SPACE),drafted),priv))).append(NEW_LINE+NEW_LINE+NEW_LINE);
         builder.append(uiMsg.getMessage(CHOOSE_SCHEMA)).append(NEW_LINE+NEW_LINE);
         builder.append(getPrompt(ClientFSMState.CHOOSE_SCHEMA));
@@ -109,7 +111,7 @@ public class CLIView {
      * @param state the state of the player
      * @return the string containing the whole screen
      */
-    public synchronized String printMainView(ClientFSMState state){
+    public  String printMainView(ClientFSMState state){
         StringBuilder builder=new StringBuilder();
         builder.append(resetScreenPosition());
         builder.append(printList(buildRoundTrack())).append(SPACE+SEPARATOR+NEW_LINE);
@@ -128,10 +130,12 @@ public class CLIView {
     }
 
 
-    public synchronized String printGameEndScreen(){
+    public  String printGameEndScreen(){
 
         StringBuilder builder=new StringBuilder(resetScreenPosition());
         builder.append(printList(buildGameRanking()));
+
+        builder.append(NEW_LINE);
         builder.append(getPrompt(ClientFSMState.GAME_ENDED));
         latestScreen = builder.toString();
         return latestScreen;
@@ -145,7 +149,7 @@ public class CLIView {
      * this method sets the schemas that were drafted and their representation
      * @param schemaCards the drafted schemas
      */
-    public synchronized void  updateDraftedSchemas(List<LightSchemaCard> schemaCards){
+    public  void  updateDraftedSchemas(List<LightSchemaCard> schemaCards){
         schemas.clear();
         for(int i=0; i<schemaCards.size();i++){
             List<String> schema=new ArrayList<>();
@@ -166,7 +170,7 @@ public class CLIView {
     }
 
 
-    public synchronized void updatePrivObj(LightPrivObj priv){
+    public  void updatePrivObj(LightPrivObj priv){
         this.privObj=buildPrivObj(priv,OBJ_LENGTH);
     }
 
@@ -175,7 +179,7 @@ public class CLIView {
      * @param pubObj the list of public objectives
      * @param privObj the private objective
      */
-    public synchronized void updateObjectives(List<LightCard> pubObj, LightPrivObj privObj){
+    public  void updateObjectives(List<LightCard> pubObj, LightPrivObj privObj){
         this.objectives= buildObjectives(pubObj,privObj);
     }
 
@@ -184,7 +188,7 @@ public class CLIView {
      * updates the draftpool representation
      * @param draftPool the new draftpool
      */
-    public synchronized void updateDraftPool(List<LightDie> draftPool){
+    public  void updateDraftPool(List<LightDie> draftPool){
 
         updateDraftPool(toMap(draftPool));
 
@@ -195,7 +199,7 @@ public class CLIView {
      * updates the draftpool representation
      * @param draftPool the new draftpool
      */
-    public synchronized void updateDraftPool(Map<Integer,LightDie> draftPool){
+    public  void updateDraftPool(Map<Integer,LightDie> draftPool){
 
         this.draftPool= buildDiceRow( draftPool,0,numPlayers*2+1);
         this.draftPool.add(padUntil(EMPTY_STRING,SCREEN_WIDTH,DASH));
@@ -207,7 +211,7 @@ public class CLIView {
      * @param roundTrack the updated roundtrack
      */
 
-    public synchronized void updateRoundTrack(List<List<LightDie>> roundTrack){
+    public  void updateRoundTrack(List<List<LightDie>> roundTrack){
         List<String> result=new ArrayList<>();
         int maxLength=0;
 
@@ -247,7 +251,7 @@ public class CLIView {
      * creates the representation of the player's schema and puts it into the map
      * @param player the player whose schema we want to create/update
      */
-    public synchronized void updateSchema(LightPlayer player){
+    public  void updateSchema(LightPlayer player){
         this.schemas.put(player.getPlayerId(), buildPlayerSchema(player));
         if(player.getPlayerId()==playerId) {
             this.schemas.get(playerId).set(0, boldify(schemas.get(playerId).get(0)));
@@ -261,7 +265,7 @@ public class CLIView {
      * @param isFirstTurn wheter it is or not the first turn in the round
      * @param nowPlaying the user playing the turn
      */
-    public synchronized void updateRoundTurn(int roundNumber, boolean isFirstTurn, int nowPlaying){
+    public  void updateRoundTurn(int roundNumber, boolean isFirstTurn, int nowPlaying){
         turnRoundinfo= String.format(cliElements.getElem(ROUND_TURN),
                 uiMsg.getMessage(ROUND),
                 roundNumber,
@@ -281,7 +285,7 @@ public class CLIView {
      * Updates the tools following a change in the used state of them
      * @param tools the list of the match tools
      */
-    public synchronized void updateTools(List<LightTool> tools){
+    public  void updateTools(List<LightTool> tools){
         this.tools.clear();
         this.tools.add(uiMsg.getMessage(TOOLS));
         for(int i=0;i<LightBoard.NUM_TOOLS;i++) {
@@ -293,7 +297,7 @@ public class CLIView {
 
     }
 
-    public synchronized void updateGameRanking(List<LightPlayer> players){
+    public  void updateGameRanking(List<LightPlayer> players){
         gameRanking.clear();
         gameRanking.add(EMPTY_STRING);
         gameRanking.add(uiMsg.getMessage(GAME_END));
@@ -323,7 +327,7 @@ public class CLIView {
      * this allow to set a screen to be printed when the method printLatestScreen is called (note that this may be overwritten by other methods)
      * @param msg the message to be set
      */
-    public synchronized void setLatestScreen(String msg) {
+    public  void setLatestScreen(String msg) {
         latestScreen =msg;
     }
 
@@ -355,7 +359,7 @@ public class CLIView {
      * this sets the menu to display inf about whose turn it is
      * @param nowPlaying the name of the player
      */
-    public synchronized void updateMenuNotMyTurn(String nowPlaying) {
+    public  void updateMenuNotMyTurn(String nowPlaying) {
         clearMenu();
         menuList.add(EMPTY_STRING);
         menuList.add(String.format(uiMsg.getMessage(NOT_MY_TURN),nowPlaying));
@@ -367,7 +371,7 @@ public class CLIView {
      * this shows the list of names of the tools to allow for one to be chosen
      * @param tools the tools to be displayed
      */
-    public synchronized void updateMenuListTools(List<LightTool> tools){
+    public  void updateMenuListTools(List<LightTool> tools){
         clearMenu();
         menuList.add(uiMsg.getMessage(CHOOSE_TOOL));
         for(int i=0; i<LightBoard.NUM_TOOLS;i++) {
@@ -381,7 +385,7 @@ public class CLIView {
     /**
      * this sets the menu so it displays the main choice options (tool/placement)
      */
-    public synchronized void updateMenuMain(){
+    public  void updateMenuMain(){
         clearMenu();
         menuList.add(EMPTY_STRING);
         menuList.add(uiMsg.getMessage(MAIN_CHOICE));
@@ -397,7 +401,7 @@ public class CLIView {
      * this method sets the menu to display info about a dice list
      * @param dice the list of dice
      */
-    public synchronized void updateMenuDiceList(List<IndexedCellContent> dice){
+    public  void updateMenuDiceList(List<IndexedCellContent> dice){
         clearMenu();
         if(dice.size()>1 && !dice.get(0).getPlace().equals(dice.get(1).getPlace())){
             menuList.addAll(buildCell(dice.get(0).getContent()));
@@ -422,7 +426,7 @@ public class CLIView {
      * @param placements the list of placements
      * @param die the die to be placed
      */
-    public synchronized void updateMenuListPlacements(List<Integer> placements, CellContent die){
+    public  void updateMenuListPlacements(List<Integer> placements, CellContent die){
 
         List<String> msg = new ArrayList<>(buildWall(CELL_HEIGHT - 1, 1, SPACE));
         msg.add(boldify(uiMsg.getMessage(CAN_BE_PLACED)));
@@ -436,7 +440,7 @@ public class CLIView {
         fillMenu();
     }
 
-    private synchronized void clearMenu() {
+    private  void clearMenu() {
         menuList.clear();
     }
 
@@ -512,18 +516,26 @@ public class CLIView {
                 promptLine.append(endTurnOption());
                 promptLine.append(quitOption());
                 break;
-            case GAME_ENDED:
+
             case NOT_MY_TURN:
             case CHOOSE_SCHEMA:
             case TOOL_CAN_CONTINUE:
                 promptLine.append(quitOption());
                 break;
-
+            case GAME_ENDED:
+                promptLine.append(newGameOption());
+                promptLine.append(quitOption());
+                break;
             default:
                 break;
         }
         return promptLine.toString();
     }
+
+    /**
+     * @return a string that contains a message regarding the new-game option
+     */
+    private String newGameOption() { return uiMsg.getMessage(NEW_GAME_OPTION)+SPACE+SEPARATOR+SPACE; }
 
     /**
      * @return a string that contains a message regarding the back option
@@ -569,10 +581,10 @@ public class CLIView {
      * @param mode the type of connection the user is using
      * @param username the username
      */
-    public synchronized void setClientInfo(ConnectionMode mode, String username){
+    public  void setClientInfo(ConnectionMode mode, String username){
         if(mode==null||username==null){ throw new IllegalArgumentException();}
 
-        bottomInfo = String.format(cliElements.getElem(PLAYER_INFO),
+        clientInfo = String.format(cliElements.getElem(CLIENT_INFO),
                 username,
                 uiMsg.getMessage(CONNECTED_VIA),
                 mode);
@@ -585,7 +597,7 @@ public class CLIView {
      * @param numPlayers the number of players of the match
      */
 
-    public synchronized void setMatchInfo(int playerId, int numPlayers) {
+    public void setMatchInfo(int playerId, int numPlayers) {
         this.playerId=playerId;
         this.numPlayers=numPlayers;
 
@@ -692,7 +704,7 @@ public class CLIView {
             result.set(CELL_HEIGHT - 1,
                     result.get(CELL_HEIGHT - 1) +
                             boldify(String.format(cliElements.getElem(POINT_LEFT), uiMsg.getMessage(DRAFTPOOL)))+replicate(SPACE+EMPTY_STRING,9)+ boldify(turnRoundinfo));
-            result.set(CELL_HEIGHT - 1, result.get(CELL_HEIGHT - 1)  + alignRight(boldify(bottomInfo), SCREEN_WIDTH - printableLength(result.get(CELL_HEIGHT - 1))));
+            result.set(CELL_HEIGHT - 1, result.get(CELL_HEIGHT - 1)  + alignRight(boldify(clientInfo), SCREEN_WIDTH - printableLength(result.get(CELL_HEIGHT - 1))));
             result = appendRows(buildSeparator(draftPool.size()), result);
         }
         return result;

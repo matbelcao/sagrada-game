@@ -13,14 +13,14 @@ public class UICommandController extends Thread {
     private final ClientFSM clientFSM;
     private final QueuedReader commandQueue;
     private static final String INDEX = "([0-9]|([1-9][0-9]))";
-    private static final String VALID_OPTION = "(["+BACK+QUIT+DISCARD+END_TURN+"])";
+    private static final String VALID_OPTION = "(["+BACK+QUIT+DISCARD+END_TURN+NEW_GAME+"])";
 
     /**
      * the constructor sets the needed parameters for the controller to work properly
      * @param clientFSM the fsm of the client
      * @param commandQueue the queue of commands that will need to be managed
      */
-    public UICommandController(ClientFSM clientFSM, QueuedReader commandQueue){
+    UICommandController(ClientFSM clientFSM, QueuedReader commandQueue){
         this.clientFSM = clientFSM;
         this.commandQueue=commandQueue;
     }

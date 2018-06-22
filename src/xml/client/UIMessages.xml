@@ -124,6 +124,10 @@
         <eng>b › go back to tool/placement choice</eng>
         <ita>b › torna alla scelta tool/piazzamento</ita>
     </back-option>
+    <newgame-option>
+        <eng>n › start a new game</eng>
+        <ita>n › inizia una nuova partita</ita>
+    </newgame-option>
     <choose-from-dice-list>
         <eng>Choose one of the dice from the %s :</eng>
         <ita>Scegli uno dei dadi da %s :</ita>
@@ -177,13 +181,17 @@
         <ita>Temporaneamente disconnesso</ita>
     </disconnected>
     <game-end>
-        <eng>The match has finished, we hope you enjoyed it!</eng>
-        <ita>La partita è finita, spero ti sia divertito!</ita>
+        <eng>The match is finished!</eng>
+        <ita>La partita è finita!</ita>
     </game-end>
     <score>
         <eng>Here are the final scores:</eng>
         <ita>Ecco i punteggi finali:</ita>
     </score>
+    <player-score>
+        <eng> score</eng>
+        <ita> punti</ita>
+    </player-score>
     <player-score>
         <eng> score</eng>
         <ita> punti</ita>
