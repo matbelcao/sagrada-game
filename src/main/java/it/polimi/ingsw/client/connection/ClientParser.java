@@ -197,6 +197,9 @@ public class ClientParser {
         if(parsedResult.get(1).equals("schema") && parsedResult.size()>4) {
             return checkSendSchema(parsedResult);
         }
+        if(parsedResult.get(1).equals("game_status")) {
+            return true;
+        }
         if(parsedResult.get(1).equals("favor_tokens") && parsedResult.size()==3){return true;}
         if(parsedResult.get(1).equals("priv")||parsedResult.get(1).equals("tool")){
             return parsedResult.size() == 6 ;
@@ -208,7 +211,7 @@ public class ClientParser {
             return checkCommaParametersLength(3,parsedResult);
         }
         if(parsedResult.get(1).equals("players")){
-            return checkCommaParametersLength(2,parsedResult);
+            return checkCommaParametersLength(3,parsedResult);
         }
         return false;
     }
@@ -283,6 +286,6 @@ public class ClientParser {
     }
 
     private static boolean checkStatus(List<String> parsedResult) {
-        return parsedResult.size() == 2||parsedResult.size() == 3;
+        return parsedResult.size()>=2;
     }
 }

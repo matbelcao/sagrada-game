@@ -144,6 +144,17 @@ public class RMIClient implements ClientConn{
         return players;
     }
 
+    @Override
+    public LightGameStatus getGameStatus() {
+        LightGameStatus status=null;
+        try {
+            status = remoteObj.getGameStatus();
+        } catch (RemoteException e) {
+            client.disconnect();
+        }
+        return status;
+    }
+
     /**
      * This function can be invoked to get the number of tokens remaining to the specified player.
      * @param playerId the id of the player (0 to 3)

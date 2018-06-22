@@ -175,6 +175,7 @@ public class Validator {
                 case "tool":
                 case "draftpool":
                 case "roundtrack":
+                case "game_status":
                 case "players":
                     if (command.length == 2) {
                         parsedResult.addAll(Arrays.asList(command));
@@ -185,7 +186,6 @@ public class Validator {
                     return false;
             }
         }
-
         return false;
     }
 

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.common.serializables;
 
-public enum Event {
+public enum GameEvent {
     ROUND_START,
     ROUND_END,
     TURN_START,

@@ -280,7 +280,6 @@ public class Client {
 
                 logged = login();
 
-
                 if(!logged) {
                     synchronized (lockCredentials) {
                         username = null;
@@ -294,6 +293,10 @@ public class Client {
             }while(!logged);
 
             this.fsm=new ClientFSM(this);
+            if(connMode.equals(ConnectionMode.RMI)){
+                AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
+                authenticator.updateConnected(username);
+            }
             //start collecting commands from ui
             commandManager();
 
@@ -349,7 +352,6 @@ public class Client {
             authenticator.setRemoteReference(remoteRef,username);
             clientUI.updateConnectionOk();
             clientUI.updateLogin(true);
-            authenticator.updateConnected(username);
             return true;
         }
         clientUI.updateLogin(false);
@@ -399,6 +401,7 @@ public class Client {
 
     }
 
+
     public void updateGameEnd(List<RankingEntry> ranking){
         for(RankingEntry entry : ranking){
             LightPlayer player=board.getPlayerById(entry.getPlayerId());
@@ -410,24 +413,60 @@ public class Client {
         board.notifyObservers();
     }
 
+    private void retrieveBoardOnReconnection(int myPlayerId){
+        synchronized (lockReady) {
+            LightGameStatus gameStatus = clientConn.getGameStatus();
+
+            board = new LightBoard(gameStatus.getNumPlayers());
+
+            board.setMyPlayerId(myPlayerId);
+
+            List<LightPlayer> players = clientConn.getPlayers();
+
+            for (int i = 0; i < board.getNumPlayers(); i++) {
+                board.addPlayer(players.get(i));
+            }
+            board.setPrivObj(clientConn.getPrivateObject());
+
+            if (!gameStatus.isInit()) {
+                board.setIsFirstTurn(gameStatus.getIsFirstTurn());
+                board.setRoundTrack(clientConn.getRoundtrack(), gameStatus.getNumRound());
+                board.setNowPlaying(gameStatus.getNowPlaying());
+
+                for (int i = 0; i < board.getNumPlayers(); i++) {
+                    board.updateSchema(i, clientConn.getSchema(i));
+                    board.updateFavorTokens(i, clientConn.getFavorTokens(i));
+                }
+
+                board.setTools(clientConn.getTools());
+                board.setPubObjs(clientConn.getPublicObjects());
+                board.setDraftPool(clientConn.getDraftPool());
+            } else {
+                board.setDraftedSchemas(clientConn.getSchemaDraft());
+            }
+            board.addObserver(clientUI);
+            ready=true;
+            lockReady.notifyAll();
+        }
+    }
+
     public void updateGameRoundStart(int numRound){
         board.setRoundTrack(clientConn.getRoundtrack(),numRound);
+        board.setDraftPool(clientConn.getDraftPool());
+        fsm.setNotMyTurn();
         if(numRound==0) {
             //get players
             synchronized (lockReady) {
                 for (int i = 0; i < board.getNumPlayers(); i++) {
 
-                    //get players schema
                     board.updateSchema(i, clientConn.getSchema(i));
 
-                    //set favor tokens
                     board.updateFavorTokens(i,clientConn.getFavorTokens(i));
                 }
-                //get tools
+
                 board.setTools(clientConn.getTools());
 
                 board.setPubObjs(clientConn.getPublicObjects());
-
 
                 ready=true;
                 lockReady.notifyAll();
@@ -455,14 +494,11 @@ public class Client {
                 }
             }
         }
-        board.setDraftPool(clientConn.getDraftPool());
+
         board.setNowPlaying(playerId);
         board.setIsFirstTurn(isFirstTurn);
-        board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
-
         fsm.setNotMyTurn();
         fsm.setMyTurn(playerId==board.getMyPlayerId());
-
 
         board.notifyObservers();
 
@@ -471,44 +507,57 @@ public class Client {
     public void updateGameTurnEnd(int playerTurnId){
         board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
 
-        board.notifyObservers();
-
-
     }
 
 
-    public void updatePlayerStatus(int playerId, Event event){
-        if(!fsm.getState().equals(ClientFSMState.SCHEMA_CHOSEN)) {
-            LightPlayerStatus status;
-            switch (event) {
-                case QUIT:
-                    status = LightPlayerStatus.QUITTED;
-                    break;
-                case RECONNECT:
-                    status = LightPlayerStatus.PLAYING;
-                    break;
-                case DISCONNECT:
-                    status = LightPlayerStatus.DISCONNECTED;
-                    break;
-                default:
-                    status = LightPlayerStatus.PLAYING;
-            }
+    public void updatePlayerStatus(int playerId, GameEvent gameEvent, String username){
 
-            board.updatestatus(playerId, status);
-            board.notifyObservers();
+        LightPlayerStatus status;
+
+        switch (gameEvent) {
+            case QUIT:
+                status = LightPlayerStatus.QUITTED;
+                break;
+            case RECONNECT:
+                status = LightPlayerStatus.PLAYING;
+                if(username.equals(this.username)){
+                    retrieveBoardOnReconnection(playerId);
+                    fsm.resetState();
+                    board.stateChanged();
+                }
+                break;
+            case DISCONNECT:
+                status = LightPlayerStatus.DISCONNECTED;
+                break;
+            default:
+                status = LightPlayerStatus.PLAYING;
         }
+        board.updatestatus(playerId, status);
+
+        System.out.println(fsm.getState());
+        if(isPlayingTurns()) {
+            board.notifyObservers();
+        }else if(fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)){
+            clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
+        }
+    }
+
+    public boolean isPlayingTurns() {
+        return !(fsm.getState().equals(ClientFSMState.SCHEMA_CHOSEN)
+                ||fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)
+                ||fsm.getState().equals(ClientFSMState.GAME_ENDED));
     }
 
     /**
      * this method updates the board with the changes regarding the user that is currently playing
      */
     public void getUpdates(){
-
         board.setDraftPool(clientConn.getDraftPool());
         board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
         board.updateSchema(board.getNowPlaying(),clientConn.getSchema(board.getNowPlaying()));
         board.setTools(clientConn.getTools());
         board.updateFavorTokens(board.getNowPlaying(),clientConn.getFavorTokens(board.getNowPlaying()));
+
         board.notifyObservers();
     }
 

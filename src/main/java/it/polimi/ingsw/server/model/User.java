@@ -12,6 +12,7 @@ import it.polimi.ingsw.server.controller.Game;
 public class User{
     private String username;
     private char [] password;
+    private final Object lockStatus;
     private UserStatus status;
     private ConnectionMode connectionMode;
     private ServerConn serverConn;
@@ -26,6 +27,7 @@ public class User{
        this.username = username;
        this.password = password;
        this.status = UserStatus.CONNECTED;
+       this.lockStatus=new Object();
     }
 
     /**
@@ -67,19 +69,28 @@ public class User{
      * Sets the user connection status (CONNECTED, PLAYING,....)
      * @param status the connection status to be set
      */
-    public synchronized void setStatus(UserStatus status) { this.status=status; }
+    public void setStatus(UserStatus status) {
+        synchronized (lockStatus) {
+            this.status = status;
+            lockStatus.notifyAll();
+        }
+    }
 
     /**
      * Returns the user connection status (CONNECTED, PLAYING,....)
      * @return the user's connection status
      */
-    public synchronized UserStatus getStatus() { return status; }
+    public UserStatus getStatus() {
+        synchronized (lockStatus) {
+            return status;
+        }
+    }
 
     /**
      * Sets the user connection mode ( RMI or SOCKET )
      * @param connectionMode the connection mode to be set
      */
-    public synchronized void setConnectionMode(ConnectionMode connectionMode){
+    public void setConnectionMode(ConnectionMode connectionMode){
         this.connectionMode=connectionMode;
     }
 
@@ -87,7 +98,7 @@ public class User{
      * Returns the user's connection mode ( RMI or SOCKET )
      * @return the user's connection mode
      */
-    public synchronized ConnectionMode getConnectionMode() {
+    public ConnectionMode getConnectionMode() {
         return connectionMode;
     }
 
@@ -95,7 +106,7 @@ public class User{
      * Sets the user's connection class used for the communication
      * @param serverConn the user's connection
      */
-    public synchronized void setServerConn(ServerConn serverConn){
+    public void setServerConn(ServerConn serverConn){
         this.serverConn=serverConn;
     }
 
@@ -103,7 +114,7 @@ public class User{
      * Returns the user's connection class used for the communication
      * @return the user's connection
      */
-    public synchronized ServerConn getServerConn() {
+    public ServerConn getServerConn() {
         return serverConn;
     }
 
@@ -129,7 +140,7 @@ public class User{
         if(!game.gameStarted()){
             return false;
         }
-        return this.equals(game.getUserPlaying());
+        return this.equals(game.getNowPlayingUser());
     }
 
     public void newMatch(){

@@ -52,6 +52,7 @@ public class SocketAuthenticator extends Thread {
                 if (Validator.checkLoginParams(command, params)) {
                     if (master.login(params.get(1), params.get(2).toCharArray())) {
                         outSocket.println("LOGIN ok");
+                        outSocket.flush();
                         logged = true;
                         //Setting Socket specific parameters
                         User user = master.getUser(params.get(1));
@@ -60,9 +61,9 @@ public class SocketAuthenticator extends Thread {
                         master.updateConnected(user);
                     } else {
                         outSocket.println("LOGIN ko");
+                        outSocket.flush();
                         logged = false;
                     }
-                    outSocket.flush();
                 }else{
                     outSocket.println("LOGIN ko");
                 }

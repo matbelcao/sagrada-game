@@ -58,6 +58,11 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     }
 
     @Override
+    public LightGameStatus getGameStatus() throws RemoteException {
+        return user.getGame().getGameStatus();
+    }
+
+    @Override
     public int getFavorTokens(int playerId) {
         return user.getGame().getFavorTokens(playerId);
     }

@@ -64,7 +64,7 @@ public class ClientFSM {
                     break;
 
                 default:
-                    client.getClientUI().showLastScreen();
+                    invalidInput();
                     return;
             }
             //state update
@@ -72,7 +72,9 @@ public class ClientFSM {
             state=state.nextState(false, option==BACK, option==END_TURN, option==DISCARD);
             lockState.notifyAll();
         }
-        client.getBoard().notifyObservers();
+        if(!(option==QUIT)) {
+            client.getBoard().notifyObservers();
+        }
     }
 
     void invalidInput() {
@@ -121,7 +123,7 @@ public class ClientFSM {
                 manageNewGameChoice(index);
                 break;
             default:
-                client.getClientUI().showLastScreen();
+                invalidInput();
                 break;
         }
     }
@@ -207,14 +209,16 @@ public class ClientFSM {
                     }
                     toolContinue();
                 }
+                client.getBoard().notifyObservers();
             } else {
                 synchronized (lockState) {
                     state=CHOOSE_TOOL.nextState(false);//back to MAIN
                     lockState.notifyAll();
                 }
                 client.getBoard().stateChanged();
+                client.getBoard().notifyObservers();
             }
-            client.getBoard().notifyObservers();
+
         } else {
             client.getClientUI().showLastScreen();
         }
@@ -358,7 +362,7 @@ public class ClientFSM {
 
     void setMyTurn(boolean isMyTurn) {
         synchronized (lockState) {
-            assert (state.equals(NOT_MY_TURN));
+
             state = NOT_MY_TURN.nextState(isMyTurn);
             lockState.notifyAll();
         }
@@ -369,6 +373,17 @@ public class ClientFSM {
         synchronized (lockState) {
             state = GAME_ENDED;
             lockState.notifyAll();
+        }
+    }
+
+    public void resetState() {
+        if(client.getBoard().isInit()){
+            synchronized (lockState) {
+                state = CHOOSE_SCHEMA;
+                lockState.notifyAll();
+            }
+        }else{
+            setNotMyTurn();
         }
     }
 }

@@ -149,7 +149,7 @@ public class CLIViewUtils {
             throw new IllegalArgumentException("list "+ IS_NULL);
         }
         HashMap<Integer, LightDie> map = new HashMap<>();
-        for (int i = 0; i<list.size();i++){
+        for (int i = 0; i<list.size(); i++){
             map.put(i,list.get(i));
         }
         return map;

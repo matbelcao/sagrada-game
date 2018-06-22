@@ -1,13 +1,12 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.common.serializables.Event;
-import it.polimi.ingsw.common.serializables.LightPlayer;
+import it.polimi.ingsw.common.serializables.GameEvent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 
 import java.util.List;
 
-import static it.polimi.ingsw.common.serializables.Event.*;
+import static it.polimi.ingsw.common.serializables.GameEvent.*;
 
 public class RMIServerObject  implements RMIServerInt {
     Client client;
@@ -31,27 +30,27 @@ public class RMIServerObject  implements RMIServerInt {
     }
 
     @Override
-    public void notifyRoundEvent(Event event, int roundNumber){
-        if(event.equals(ROUND_START)){
+    public void notifyRoundEvent(GameEvent gameEvent, int roundNumber){
+        if(gameEvent.equals(ROUND_START)){
             client.updateGameRoundStart(roundNumber);
-        }else if (event.equals(ROUND_END)){
+        }else if (gameEvent.equals(ROUND_END)){
             client.updateGameRoundEnd(roundNumber);
         }
     }
 
     @Override
-    public void notifyTurnEvent(Event event,int playerId,int turnNumber){
-        if(event.equals(TURN_START)){
+    public void notifyTurnEvent(GameEvent gameEvent, int playerId, int turnNumber){
+        if(gameEvent.equals(TURN_START)){
             client.updateGameTurnStart(playerId,turnNumber==0); //todo change signature
-        }else if (event.equals(TURN_END)){
+        }else if (gameEvent.equals(TURN_END)){
             client.updateGameTurnEnd(playerId);
         }
     }
 
     @Override
-    public void notifyStatusUpdate (Event event,int id){
+    public void notifyStatusUpdate (GameEvent gameEvent, int id, String userName){
 
-        client.updatePlayerStatus(id,event);
+        client.updatePlayerStatus(id, gameEvent,userName);
     }
 
     @Override

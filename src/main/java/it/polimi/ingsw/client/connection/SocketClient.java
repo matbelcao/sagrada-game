@@ -79,16 +79,20 @@ public class SocketClient implements ClientConn {
                         if (ClientParser.parse(inSocket.readln(), result) && connectionOk) {
                             if (ClientParser.isStatus(inSocket.readln())) {
                                 inSocket.pop();
-                                client.updatePlayerStatus(Integer.parseInt(result.get(2)), Event.valueOf(result.get(1).toUpperCase()));
+                                (new Thread(() ->
+                                        client.updatePlayerStatus(
+                                                Integer.parseInt(result.get(2)),
+                                                GameEvent.valueOf(result.get(1).toUpperCase()),
+                                                result.get(3)))).start();
 
                             } else if (ClientParser.isLobby(inSocket.readln())) {
                                 inSocket.pop();
                                 updateLobby(result.get(1));
                             } else if (ClientParser.isGame(inSocket.readln())) {
                                 inSocket.pop();
-
-                                (new Thread(() -> updateMessages( result))).start();
-
+                                new Thread(()->
+                                    updateMessages( result)
+                                ).start();
                             } else if (ClientParser.isPing(inSocket.readln())) {
                                 inSocket.pop();
                                 socketPong();
@@ -174,7 +178,9 @@ public class SocketClient implements ClientConn {
         int i;
         switch(outcomes.get(1)){
             case "start":
+
                 client.updateGameStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)));
+
                 break;
             case "end":
                 List<RankingEntry> ranking= new ArrayList<>();
@@ -183,10 +189,12 @@ public class SocketClient implements ClientConn {
                     ranking.add(new RankingEntry(Integer.parseInt(param[0]),Integer.parseInt(param[1]),Integer.parseInt(param[2])));
                 }
                 client.updateGameEnd(ranking);
-                System.out.println("<--<----<----<-----<---<---GAME END (CLASSIFICA)---->----->--->--->---->--->-->");
+
                 break;
             case "round_start":
+
                 client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)));
+
                 break;
             case "round_end":
                 client.updateGameRoundEnd(Integer.parseInt(outcomes.get(2)));
@@ -198,6 +206,7 @@ public class SocketClient implements ClientConn {
                 client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)));
                 break;
             case "board_changed":
+
                 client.getUpdates();
         }
     }
@@ -495,9 +504,39 @@ public class SocketClient implements ClientConn {
         }
         for(int i=COMMA_PARAMS_START;i<result.size();i++) {
             args = result.get(i).split(",");
-            playerList.add( new LightPlayer(args[1], Integer.parseInt(args[0])));
+            LightPlayer lightPlayer=new LightPlayer(args[1], Integer.parseInt(args[0]));
+            lightPlayer.setStatus(LightPlayerStatus.valueOf(args[2]));
+            playerList.add( lightPlayer);
         }
         return playerList;
+    }
+
+    @Override
+    public LightGameStatus getGameStatus(){
+        LightGameStatus gameStatus=null;
+        ArrayList<String> result= new ArrayList<>();
+
+        syncedSocketWrite("GET game_status");
+
+        synchronized (lockin) {
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals("game_status"))) {
+                waitForTheRightOne();
+            }
+
+            inSocket.pop();
+            lockin.notifyAll();
+        }
+        for(int i=COMMA_PARAMS_START;i<result.size();i++) {
+            gameStatus=new LightGameStatus(Boolean.parseBoolean(result.get(2)),Integer.parseInt(result.get(3)),Integer.parseInt(result.get(4)),
+                    Boolean.parseBoolean(result.get(5)),Integer.parseInt(result.get(6)));
+        }
+        return gameStatus;
     }
 
     /**

@@ -2,7 +2,6 @@ package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
-import it.polimi.ingsw.server.model.SchemaCard;
 import it.polimi.ingsw.server.model.User;
 import it.polimi.ingsw.server.controller.Game;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
@@ -23,17 +22,17 @@ public class GameTest {
         users.add(new User("Giovanni", "5678".toCharArray()));
         users.add(new User("Giacomo", "8765".toCharArray()));
 
-        Game game1 = new Game(users);
+        Game game1 = new Game(users,false);
         for (User u:users){
             u.setGame(game1);
         }
-        assertEquals(4,game1.getUsersActive());
+        assertEquals(4,game1.getActiveUsers());
 
         users = (ArrayList<User>) game1.getUsers();
-        assertEquals(4,game1.getUsersActive());
+        assertEquals(4,game1.getActiveUsers());
 
         users.get(3).setStatus(UserStatus.DISCONNECTED);
-        assertEquals(3,game1.getUsersActive());
+        assertEquals(3,game1.getActiveUsers());
 
         User user0 = users.get(0);
         User user1 = users.get(1);
