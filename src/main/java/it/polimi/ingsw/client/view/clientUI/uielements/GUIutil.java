@@ -151,7 +151,6 @@ public class GUIutil {
                         //draw to dice in a cell
                         drawDie(roundTrack.get(i).get(0), gc, cellDim);
                         drawDie(roundTrack.get(i).get(1), gc,cellDim/2,0, cellDim);
-                        highlight(c,cellDim);
                         Event myEvent = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
                         cell.setOnMouseEntered(e->{
                             cell.fireEvent(myEvent);
@@ -170,10 +169,15 @@ public class GUIutil {
         double cellDim = getMainSceneCellDim(newWidth,newHeight);
         HBox track = new HBox();
         track.setSpacing(10); ////todo dynamic spacing??
-
-
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
-            track.getChildren().add(dummyRoundTrackCell(cellDim));
+            Rectangle dummyCell= dummyRoundTrackCell(cellDim);
+            track.getChildren().add(dummyCell);
+            if(i < roundTrack.size() && roundTrack.get(i).size()>1){
+                Event myEvent = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+                dummyCell.setOnMouseEntered(e->{
+                    dummyCell.fireEvent(myEvent);
+                });
+            }
         }
         return track;
     }
@@ -185,17 +189,25 @@ public class GUIutil {
 
         List<LightDie> multipleDiceList = roundTrack.get(selectedTrackCellIndex);
         int multipleDiceListSize = multipleDiceList.size();
-        int startingIndex = selectedTrackCellIndex - (int) Math.round( (multipleDiceListSize/2) + .5);
+        int startingIndex = selectedTrackCellIndex - (int) Math.round( (multipleDiceListSize/2));
 
-        if(startingIndex < 0){
+        /*if(startingIndex < 0){
             for(int i = 0; i<multipleDiceListSize;i++){
                 Canvas c = new Canvas(cellDim, cellDim);
                 GraphicsContext gc = c.getGraphicsContext2D();
                 drawDie(multipleDiceList.get(i), gc, cellDim);
                 multipleDiceTrack.getChildren().add(c);
             }
-        }else{
-            //implement;
+        }*/
+        for(int i = 0 ; i < startingIndex; i++){
+            Canvas c = new Canvas(cellDim,cellDim);
+            multipleDiceTrack.getChildren().add(c);
+        }
+        for(int i = 0; i<multipleDiceListSize; i++){
+            Canvas c = new Canvas(cellDim, cellDim);
+            GraphicsContext gc = c.getGraphicsContext2D();
+            drawDie(multipleDiceList.get(i), gc, cellDim);
+            multipleDiceTrack.getChildren().add(c);
         }
         return multipleDiceTrack;
     }
