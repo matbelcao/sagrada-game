@@ -44,14 +44,14 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void notifyGameStart(int n, int id) {
-        new Thread(()-> {
-            try {
-                remoteObj.notifyGameStart(n, id);
-            } catch (RemoteException e) {
-                user.disconnect();
-                connectionOk=false;
-            }
-        }).start();
+
+        try {
+            remoteObj.notifyGameStart(n, id);
+        } catch (RemoteException e) {
+            user.disconnect();
+            connectionOk = false;
+        }
+
     }
 
     /**
@@ -76,14 +76,13 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void notifyRoundEvent(GameEvent gameEvent, int roundNumber) {
-        new Thread(()-> {
-            try {
-                remoteObj.notifyRoundEvent(gameEvent, roundNumber);
-            } catch (RemoteException e) {
-                user.disconnect();
-                connectionOk=false;
-            }
-        }).start();
+
+        try {
+            remoteObj.notifyRoundEvent(gameEvent, roundNumber);
+        } catch (RemoteException e) {
+            user.disconnect();
+            connectionOk = false;
+        }
     }
 
     /**
@@ -94,15 +93,15 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void notifyTurnEvent(GameEvent gameEvent, int playerId, int turnNumber) {
-        new Thread(()-> {
-            try {
-                remoteObj.notifyTurnEvent(gameEvent, playerId, turnNumber);
-            } catch (RemoteException e) {
-                user.disconnect();
-                connectionOk=false;
-            }
+
+        try {
+            remoteObj.notifyTurnEvent(gameEvent, playerId, turnNumber);
+        } catch (RemoteException e) {
+            user.disconnect();
+            connectionOk = false;
         }
-        ).start();
+
+
     }
 
     /**
@@ -112,14 +111,14 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void notifyStatusUpdate(GameEvent gameEvent, int id, String userName) {
-        new Thread(()-> {
-            try {
-                remoteObj.notifyStatusUpdate(gameEvent, id, userName);
-            } catch (RemoteException e) {
-                user.disconnect();
-                connectionOk = false;
-            }
-        }).start();
+
+        try {
+            remoteObj.notifyStatusUpdate(gameEvent, id, userName);
+        } catch (RemoteException e) {
+            user.disconnect();
+            connectionOk = false;
+        }
+
     }
 
     /**
@@ -127,14 +126,14 @@ public class RMIServer implements ServerConn {
      */
     @Override
     public void notifyBoardChanged() {
-        new Thread(()-> {
-            try {
-                remoteObj.notifyBoardChanged();
-            } catch (RemoteException e) {
-                user.disconnect();
-                connectionOk=false;
-            }
-        }).start();
+
+        try {
+            remoteObj.notifyBoardChanged();
+        } catch (RemoteException e) {
+            user.disconnect();
+            connectionOk = false;
+        }
+
 
     }
 
