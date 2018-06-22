@@ -132,7 +132,7 @@ public class ClientFSM {
         if(index==0){
             client.reset();
         }else{
-            client.getClientUI().showLastScreen();
+            invalidInput();
         }
     }
 
@@ -163,7 +163,6 @@ public class ClientFSM {
                 if(isPlacedDie()){
                     client.getClientUI().showLastScreen();
                     return;
-
                 }
                 client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
                 synchronized (lockState) {
@@ -209,18 +208,17 @@ public class ClientFSM {
                     }
                     toolContinue();
                 }
-                client.getBoard().notifyObservers();
             } else {
                 synchronized (lockState) {
                     state=CHOOSE_TOOL.nextState(false);//back to MAIN
                     lockState.notifyAll();
                 }
                 client.getBoard().stateChanged();
-                client.getBoard().notifyObservers();
-            }
 
+            }
+            client.getBoard().notifyObservers();
         } else {
-            client.getClientUI().showLastScreen();
+            invalidInput();
         }
     }
 
@@ -362,7 +360,7 @@ public class ClientFSM {
 
     void setMyTurn(boolean isMyTurn) {
         synchronized (lockState) {
-
+            assert (state.equals(NOT_MY_TURN));
             state = NOT_MY_TURN.nextState(isMyTurn);
             lockState.notifyAll();
         }
@@ -376,7 +374,7 @@ public class ClientFSM {
         }
     }
 
-    public void resetState() {
+    void resetState() {
         if(client.getBoard().isInit()){
             synchronized (lockState) {
                 state = CHOOSE_SCHEMA;

@@ -182,43 +182,37 @@ public class CLI implements ClientUI {
             throw new IllegalArgumentException();
         }
         List<Integer> changes=board.getChanges();
-        for(Integer change : changes) {
-            switch (change) {
-                case LightBoardEvents.PrivObj:
+
+                if(changes.contains(LightBoardEvents.PrivObj))
                     view.updatePrivObj(board.getPrivObj());
-                    break;
-                case LightBoardEvents.Tools:
+
+                if(changes.contains(LightBoardEvents.Tools))
                     view.updateTools(board.getTools());
-                    break;
-                case  LightBoardEvents.PubObjs:
+
+                if(changes.contains(LightBoardEvents.PubObjs))
                     view.updateObjectives(board.getPubObjs(), board.getPrivObj());
-                    break;
-                case LightBoardEvents.DraftPool:
+
+                if(changes.contains(LightBoardEvents.DraftPool))
                     view.updateDraftPool(board.getDraftPool());
-                    break;
-                case LightBoardEvents.RoundTrack:
+
+                if(changes.contains(LightBoardEvents.RoundTrack))
                     view.updateRoundTrack(board.getRoundTrack());
-                    break;
-                case LightBoardEvents.Status:
-                    view.setMatchInfo(board.getMyPlayerId(),board.getNumPlayers());
-                    if(client.isPlayingTurns()) {
+
+                if(changes.contains(LightBoardEvents.Status)
+                        || changes.contains(LightBoardEvents.StateChanged)
+                        || changes.contains(LightBoardEvents.FavorTokens)
+                        || changes.contains(LightBoardEvents.Schema)) {
+                    view.setMatchInfo(board.getMyPlayerId(), board.getNumPlayers());
+                    if (client.isPlayingTurns()) {
                         for (int i = 0; i < board.getNumPlayers(); i++) {
                             view.updateSchema(board.getPlayerById(i));
                         }
                     }
-                    break;
-                case LightBoardEvents.Schema:
-                    for (int i = 0; i < board.getNumPlayers(); i++) {
-                        view.updateSchema(board.getPlayerById(i));
-                    }
-                    break;
-                case LightBoardEvents.NowPlaying:
+                }
+
+                if(changes.contains(LightBoardEvents.NowPlaying))
                     view.updateRoundTurn(board.getRoundNumber(), board.getIsFirstTurn(), board.getNowPlaying());
-                    break;
-                default:
-                    break;
-            }
-        }
+
         switch (client.getTurnState()) {
             case CHOOSE_SCHEMA:
                 break;

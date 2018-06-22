@@ -451,33 +451,35 @@ public class Client {
     }
 
     public void updateGameRoundStart(int numRound){
+        synchronized (lockReady) {
         board.setRoundTrack(clientConn.getRoundtrack(),numRound);
         board.setDraftPool(clientConn.getDraftPool());
         fsm.setNotMyTurn();
         if(numRound==0) {
-            //get players
-            synchronized (lockReady) {
+
+
                 for (int i = 0; i < board.getNumPlayers(); i++) {
 
                     board.updateSchema(i, clientConn.getSchema(i));
-
                     board.updateFavorTokens(i,clientConn.getFavorTokens(i));
                 }
 
                 board.setTools(clientConn.getTools());
-
                 board.setPubObjs(clientConn.getPublicObjects());
 
-                ready=true;
-                lockReady.notifyAll();
             }
-
+            ready=true;
+            lockReady.notifyAll();
         }
 
 
     }
 
     public void updateGameRoundEnd(int numRound){
+        synchronized (lockReady) {
+            ready=false;
+            lockReady.notifyAll();
+        }
 
     }
 
@@ -499,7 +501,7 @@ public class Client {
         board.setIsFirstTurn(isFirstTurn);
         fsm.setNotMyTurn();
         fsm.setMyTurn(playerId==board.getMyPlayerId());
-
+        board.stateChanged();
         board.notifyObservers();
 
     }

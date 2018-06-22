@@ -9,9 +9,9 @@ public class LightBoardEvents {
     public static final int PubObjs=5;
     public static final int Status=6;
     public static final int RoundTrack=7;
-    public static final int NowPlaying=8;
+    public static final int NowPlaying=10;
     public static final int IsFirstTurn=9;
-    public static final int StateChanged=10;
+    public static final int StateChanged=8;
     public static final int Option=11;
     public static final int DiceList=12;
     public static final int PlacementsList=13;
