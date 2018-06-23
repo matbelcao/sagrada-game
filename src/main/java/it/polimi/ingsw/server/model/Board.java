@@ -1,9 +1,6 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.common.enums.Actions;
-import it.polimi.ingsw.common.enums.Color;
-import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.enums.Turn;
+import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.serializables.IndexedCellContent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.controller.MasterServer;
@@ -12,10 +9,7 @@ import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Random;
+import java.util.*;
 
 /**
  * This class implements the game logic useful to place the dice in the SchemaCard or execute a specific ToolCard.
@@ -65,8 +59,6 @@ public class Board {
             players.add(new Player(users.get(i).getUsername(),i,this,privObjectiveCards[i]));
         }
     }
-
-    //GAME end {<player_id>,<final_score>,<position>}
 
     /**
      * Selects the random ToolCards to be used in the match
@@ -529,39 +521,60 @@ public class Board {
      * Calculates the players scores and returns the ranking inside the LightPlayer object
      * @return the list of players in the match with the updated ranks
      */
-    public List<RankingEntry> gameRunningEnd(){
+    public List<RankingEntry> gameRunningEnd(List<User> users){
         List<RankingEntry> playerScores=new ArrayList<>();
-        int maxScore=0;
-        int position=1;
 
         for(Player p:players){
-            if(!p.hasQuitted()){
+            if(!p.hasQuitted() && !users.get(p.getGameId()).getStatus().equals(UserStatus.DISCONNECTED)){
                 p.calculateScore();
+                playerScores.add(new RankingEntry(p.getGameId(),p.getScore(),0));
+            }else{
+                p.setFinalPosition(players.size());
             }
         }
 
-        for(int i=0; i<players.size();i++){
-            for(Player p2: players){
-                if(p2.getScore()>maxScore && p2.getFinalPosition()==0){
-                    maxScore=p2.getScore();
-                }
-            }
-            for (Player p1: players){
-                if(p1.getScore()==maxScore){
-                    p1.setFinalPosition(position);
-                }
-            }
-            maxScore=0;
-            position++;
+        sortScores(playerScores);
+
+        for(int i=0; i<playerScores.size();i++){
+            playerScores.get(i).setFinalPosition(i+1);
+            getPlayerById(playerScores.get(i).getPlayerId()).setFinalPosition(i+1);
+
+            System.out.println(playerScores.get(i).getPlayerId()+" "+playerScores.get(i).getPoints()+" "+playerScores.get(i).getFinalPosition());
         }
 
-        for(Player p:players) {
-            playerScores.add(new RankingEntry(p.getGameId(),p.getScore(),p.getFinalPosition()));
-        }
+        //adding disconnected or quitted users in the last position
+        /*for(Player p:players){
+            if(p.hasQuitted() || users.get(p.getGameId()).getStatus().equals(UserStatus.DISCONNECTED)){
+                int lastPos=playerScores.size();
+                playerScores.add(lastPos,new RankingEntry(p.getGameId(),0,lastPos+1));
+            }
+        }*/
 
         return playerScores;
     }
 
+    /**
+     * Sorts the score ranking list at the end of the match
+     * @param playerScores the score ranking list to sort
+     */
+    private void sortScores(List<RankingEntry> playerScores) {
+        playerScores.sort((r1, r2) -> {
+            Player p1=getPlayerById(r1.getPlayerId());
+            Player p2=getPlayerById(r2.getPlayerId());
+            if(r1.getPoints() == r2.getPoints()){
+                int privScore1=p1.getPrivObjective().getCardScore(p1.getSchema());
+                int privScore2=p2.getPrivObjective().getCardScore(p2.getSchema());
+                if(privScore1 == privScore2){
+                    if(p1.getFavorTokens() == p2.getFavorTokens()){
+                        return ((p1.getGameId()+1)%4)<((p2.getGameId()+1)%4) ? -1 : 1;
+                    }
+                    return p1.getFavorTokens()>p2.getFavorTokens() ? -1 : 1;
+                }
+                return privScore1>privScore2 ? -1 : 1;
+            }
+            return r1.getPoints()>r2.getPoints() ? -1 : 1;
+        });
+    }
 
     /**
      * Returns and indexed List of the dice contained in the player's SchemaCard

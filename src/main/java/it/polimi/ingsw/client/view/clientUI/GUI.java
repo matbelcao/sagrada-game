@@ -161,7 +161,7 @@ public class GUI extends Application implements ClientUI {
     }
 
     @Override
-    public void showLastScreen() {
+    public void showLatestScreen() {
 
     }
 

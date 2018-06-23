@@ -97,7 +97,7 @@ public class Client {
         this.updateQueue=new ArrayList<>();
     }
 
-    void reset() {
+    void resetForNewGame() {
 
         synchronized (lockStatus) {
             this.userStatus = UserStatus.CONNECTED;
@@ -105,6 +105,7 @@ public class Client {
         synchronized (lockReady) {
             this.ready = false;
         }
+
 
         clientConn.newMatch();
     }
@@ -415,7 +416,10 @@ public class Client {
     public void updateGameStart(int numPlayers, int playerId){
 
         this.board= new LightBoard(numPlayers);
-
+        synchronized (lockStatus){
+            userStatus=UserStatus.PLAYING;
+            lockStatus.notifyAll();
+        }
 
         List<LightPlayer> players = clientConn.getPlayers();
         for (int i = 0; i < board.getNumPlayers(); i++) {
@@ -424,10 +428,7 @@ public class Client {
 
         board.setMyPlayerId(playerId);
 
-        synchronized (lockStatus){
-            userStatus=UserStatus.PLAYING;
-            lockStatus.notifyAll();
-        }
+
 
         board.setPrivObj(clientConn.getPrivateObject());
 

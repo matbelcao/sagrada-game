@@ -14,13 +14,14 @@ public class ClientFSM {
     static final char END_TURN = 'e';
     static final char BACK = 'b';
     static final char DISCARD = 'd';
+    static final char NEW_GAME = 'n';
 
     private final Object lockState=new Object();
     private ClientFSMState state;
     private Client client;
 
     ClientFSM(Client client){
-        state= ClientFSMState.CHOOSE_SCHEMA;
+        state = ClientFSMState.CHOOSE_SCHEMA;
         this.client=client;
     }
 
@@ -44,14 +45,14 @@ public class ClientFSM {
                     if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(GAME_ENDED))) {
                         client.getClientConn().endTurn();
                     }else{
-                        client.getClientUI().showLastScreen();
+                        invalidInput();
                     }
                     break;
                 case BACK:
                     if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(GAME_ENDED)||state.equals(MAIN))){
                         client.getClientConn().back();
                     }else{
-                        client.getClientUI().showLastScreen();
+                        invalidInput();
                     }
                     break;
                 case DISCARD:
@@ -59,10 +60,19 @@ public class ClientFSM {
                         client.getClientConn().discard();
                         client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
                     }else{
-                        client.getClientUI().showLastScreen();
+                        invalidInput();
                     }
                     break;
-
+                case NEW_GAME:
+                    if (state.equals(GAME_ENDED)) {
+                        synchronized (lockState){
+                            state=GAME_ENDED.nextState(true);
+                        }
+                        client.resetForNewGame();
+                    }else{
+                       invalidInput();
+                    }
+                    break;
                 default:
                     invalidInput();
                     return;
@@ -72,13 +82,13 @@ public class ClientFSM {
             state=state.nextState(false, option==BACK, option==END_TURN, option==DISCARD);
             lockState.notifyAll();
         }
-        if(!(option==QUIT)) {
+        if(option != QUIT) {
             client.getBoard().notifyObservers();
         }
     }
 
     void invalidInput() {
-        client.getClientUI().showLastScreen();
+        client.getClientUI().showLatestScreen();
     }
 
     /**
@@ -119,20 +129,9 @@ public class ClientFSM {
 
             case TOOL_CAN_CONTINUE:
                 break;
-            case GAME_ENDED:
-                manageNewGameChoice(index);
-                break;
             default:
                 invalidInput();
                 break;
-        }
-    }
-
-    private void manageNewGameChoice(int index) {
-        if(index==0){
-            client.reset();
-        }else{
-            invalidInput();
         }
     }
 
@@ -149,7 +148,7 @@ public class ClientFSM {
             }
             client.getClientUI().showWaitingForGameStartScreen();
         } else {
-            client.getClientUI().showLastScreen();
+            invalidInput();
         }
     }
 
@@ -161,7 +160,7 @@ public class ClientFSM {
         switch (index) {
             case 1:
                 if(isPlacedDie()){
-                    client.getClientUI().showLastScreen();
+                   invalidInput();
                     return;
                 }
                 client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
@@ -180,7 +179,7 @@ public class ClientFSM {
 
                 break;
             default:
-                client.getClientUI().showLastScreen();
+                invalidInput();
         }
         client.getBoard().notifyObservers();
     }
@@ -245,7 +244,7 @@ public class ClientFSM {
             }
             client.getBoard().notifyObservers();
         } else {
-            client.getClientUI().showLastScreen();
+            invalidInput();
         }
     }
 
@@ -287,7 +286,7 @@ public class ClientFSM {
                 }
                 toolContinue();
             }
-        }else {client.getClientUI().showLastScreen();}
+        }else {invalidInput();}
     }
 
     /**
@@ -341,7 +340,7 @@ public class ClientFSM {
                 client.getUpdates();
             }
         }else{
-            client.getClientUI().showLastScreen();
+            invalidInput();
         }
     }
 

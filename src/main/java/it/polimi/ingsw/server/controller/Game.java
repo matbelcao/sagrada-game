@@ -166,7 +166,7 @@ public class Game extends Thread implements Iterable  {
     private void notifyGameEnd() {
         List<RankingEntry> ranking;
 
-        ranking=board.gameRunningEnd();
+        ranking=board.gameRunningEnd(users);
         fsm.endGame();
 
         for(User u:users){

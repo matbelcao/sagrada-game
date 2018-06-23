@@ -3,7 +3,7 @@ package it.polimi.ingsw.client.view.clientUI.uielements.enums;
 public enum CLIElems {
     EMPTY("EMPTI"),
     FILLED("FILLED"),
-    PLAYER_INFO("player-info"),
+    CLIENT_INFO("player-info"),
     USERNAME_ID("username-id"),
     TOKENS_INFO("tokens-info"),
     TOOL_INDEX("tool-index"),

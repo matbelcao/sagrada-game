@@ -119,7 +119,7 @@ public class CLI implements ClientUI {
      * this method is used to show the last screen that was printed to the console
      */
     @Override
-    public void showLastScreen() {
+    public void showLatestScreen() {
         printToScreen(view.printLatestScreen());
     }
 
