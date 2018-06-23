@@ -18,6 +18,5 @@ public class LightBoardEvents {
     public static final int SelectedDie=14;
     public static final int FavorTokens=15;
     public static final int DraftPool=16;
-
-
+    public static final int RoundNumber =17 ;
 }

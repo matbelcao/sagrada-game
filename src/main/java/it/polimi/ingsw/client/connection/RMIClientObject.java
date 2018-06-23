@@ -58,7 +58,7 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     }
 
     @Override
-    public LightGameStatus getGameStatus() throws RemoteException {
+    public LightGameStatus getGameStatus() {
         return user.getGame().getGameStatus();
     }
 
@@ -119,7 +119,7 @@ public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt
     public void quit() { user.quit(); }
 
     @Override
-    public void newMatch() throws RemoteException { user.newMatch(); }
+    public void newMatch() { user.newMatch(); }
 
     @Override
     public boolean pong() {

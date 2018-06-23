@@ -30,7 +30,7 @@ public class UICommandController extends Thread {
      */
     @Override
     public void run() {
-        String command = "";
+        String command;
 
         while (clientFSM.isAlive()) {
 
