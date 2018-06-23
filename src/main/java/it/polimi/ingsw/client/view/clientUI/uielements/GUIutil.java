@@ -6,6 +6,7 @@ import it.polimi.ingsw.client.view.clientUI.GUI;
 import it.polimi.ingsw.client.view.clientUI.MyEvent;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
+import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.common.serializables.*;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -26,8 +27,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -283,32 +282,26 @@ public class GUIutil {
             }
                 break;
             case SELECT_DIE:
-                if(!latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE)){
-                    //do  todo delete remove windowed approach
-                    Stage window = new Stage();
-                    window.initModality(Modality.APPLICATION_MODAL);
-                    Button decrease = new Button("decrease");
-                    Button increase = new Button("increase");
-                    decrease.setOnAction(e->{
-                        cmdWrite.write("0");
-                        window.close();
-                    });
-                    increase.setOnAction(e->{
-                        cmdWrite.write("1");
-                        window.close();
-                    });
-                    Scene s = new Scene(new HBox(decrease,increase),300,300);
-                    window.setScene(s);
-                    window.showAndWait();
-                }else if(!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)) {
-                    for (IndexedCellContent activeCell : latestDiceList) {
-                        Canvas c = poolDice.get(activeCell.getPosition());
-                        highlight(c, dieDim);
-                        c.setOnMouseClicked(e -> {
-                            System.out.println("selected die at position " + poolDice.indexOf(c) + " in draftpool");
-                            cmdWrite.write(poolDice.indexOf(c) + "");
-                        });
+                 if(!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)) {
+                    if(!latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) ||latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))){
+                         poolDice.clear();
+                         for (IndexedCellContent selectableDie : latestDiceList) {
+                             Canvas c = IndexedCellToCanvas(selectableDie.getContent(), dieDim);
+                             c.setOnMouseClicked(e -> cmdWrite.write(latestDiceList.indexOf(selectableDie) + ""));
+                             highlight(c,dieDim);
+                             poolDice.add(c);
+                         }
+                     }else{
+                        for (IndexedCellContent activeCell : latestDiceList) {
+                            Canvas c = poolDice.get(activeCell.getPosition());
+                            highlight(c, dieDim);
+                            c.setOnMouseClicked(e -> {
+                                System.out.println("selected die at position " + poolDice.indexOf(c) + " in draftpool");
+                                cmdWrite.write(poolDice.indexOf(c) + "");
+                            });
+                        }
                     }
+
                 }
 
         }
@@ -319,7 +312,7 @@ public class GUIutil {
 
         }
 
-        //todo update
+    //todo update
     public GridPane drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie,List<Actions> latestOptionsList, int favortokens) {
         GridPane g = schemaToGrid(schema,dieDim*NUM_COLS,dieDim*NUM_ROWS,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList);
         return g;
@@ -502,6 +495,16 @@ public class GUIutil {
         drawSchema(lightSchemaCard,gc);
         return canvas;
     }*/
+   private Canvas IndexedCellToCanvas(CellContent cellContent,double dieDim) {
+       Canvas canvas = new Canvas(dieDim,dieDim);
+       if(cellContent.isDie()){
+           drawDie(cellContent.getColor(),cellContent.getShade(),canvas.getGraphicsContext2D(),0,0,dieDim);
+       }else{
+           drawConstraint(cellContent,canvas.getGraphicsContext2D(),0,0,dieDim);
+       }
+       return canvas;
+   }
+
 
     public Canvas lightDieToCanvas(LightDie die, double dieDim){
         Canvas dieCanvas = new Canvas(dieDim,dieDim);
@@ -727,19 +730,41 @@ public class GUIutil {
         gc.strokeRect(x,y,cellDim,cellDim);
     }
 
+    private void drawConstraint(CellContent cell, GraphicsContext gc, double x, double y, double cellDim){
+        if(cell.isDie()){
+            return;
+        }else{
+            if(cell.hasColor()){
+                drawColorConstraint(cell.getColor(),gc,x,y, cellDim);
+            }else{
+                drawShadeConstraint(cell.getShade(),gc,x,y,cellDim);
+            }
+        }
+    }
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double cellDim) {
         drawConstraint(constraint,gc,0,0,cellDim);
     }
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double cellDim) {
         if (constraint.hasColor()) {
-            gc.setFill(it.polimi.ingsw.common.enums.Color.toFXConstraintColor(constraint.getColor()));
-            gc.fillRect(x, y, cellDim, cellDim);
+            drawColorConstraint(constraint.getColor(), gc, x, y, cellDim);
         }else{
-            gc.setFill(Color.LIGHTGRAY);
-            gc.fillRect(x, y, cellDim, cellDim);
-            drawConstraintSpots(gc,x,y,cellDim,constraint.getShade().toInt());
+            drawShadeConstraint(constraint.getShade(), gc, x, y, cellDim);
         }
+    }
+
+    private void drawShadeConstraint(Shade shade, GraphicsContext gc, double x, double y, double cellDim) {
+        gc.setFill(Color.LIGHTGRAY);
+        gc.fillRect(x, y, cellDim, cellDim);
+        drawConstraintSpots(gc,x,y,cellDim,shade.toInt());
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(cellDim*LINE_TO_CELL);
+        gc.strokeRect(x, y, cellDim, cellDim);
+    }
+
+    private void drawColorConstraint(it.polimi.ingsw.common.enums.Color color, GraphicsContext gc, double x, double y, double cellDim) {
+        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXConstraintColor(color));
+        gc.fillRect(x, y, cellDim, cellDim);
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(cellDim*LINE_TO_CELL);
         gc.strokeRect(x, y, cellDim, cellDim);
@@ -748,6 +773,7 @@ public class GUIutil {
     private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
         drawDie(lightDie,graphicsContext2D,0,0,dieDim);
     }
+
     private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double dieDim) {
         double lineWidth = LINE_TO_DIE*dieDim;
         gc.setFill(Color.BLACK);
@@ -755,6 +781,15 @@ public class GUIutil {
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
         gc.fillRoundRect(x+lineWidth,y+lineWidth,dieDim-2*lineWidth,dieDim-2*lineWidth, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM*dieDim);
         drawSpots(gc,x,y,dieDim,lightDie.getShade().toInt());
+    }
+
+    private void drawDie(it.polimi.ingsw.common.enums.Color color, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
+        double lineWidth = LINE_TO_DIE*dieDim;
+        gc.setFill(Color.BLACK);
+        gc.fillRoundRect(x,y,dieDim,dieDim, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM *dieDim);
+        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(color));
+        gc.fillRoundRect(x+lineWidth,y+lineWidth,dieDim-2*lineWidth,dieDim-2*lineWidth, DIE_ARC_TO_DIM*dieDim, DIE_ARC_TO_DIM*dieDim);
+        drawSpots(gc,x,y,dieDim,shade.toInt());
     }
 
     private void drawSpots(GraphicsContext gc, double dieDim, int count) {
