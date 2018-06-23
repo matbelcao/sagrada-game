@@ -1,6 +1,5 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.clientController.QueuedCmdReader;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.clientUI.CLI;
 import it.polimi.ingsw.client.view.clientUI.ClientUI;
@@ -100,7 +99,7 @@ public class Client {
     void resetForNewGame() {
 
         synchronized (lockStatus) {
-            this.userStatus = UserStatus.CONNECTED;
+            this.userStatus = UserStatus.LOBBY;
         }
         synchronized (lockReady) {
             this.ready = false;
@@ -420,7 +419,7 @@ public class Client {
             userStatus=UserStatus.PLAYING;
             lockStatus.notifyAll();
         }
-
+        fsm.resetState();
         List<LightPlayer> players = clientConn.getPlayers();
         for (int i = 0; i < board.getNumPlayers(); i++) {
             board.addPlayer(players.get(i));
@@ -473,7 +472,7 @@ public class Client {
 
             if (!gameStatus.isInit()) {
                 board.setIsFirstTurn(gameStatus.getIsFirstTurn());
-                board.setRoundTrack(clientConn.getRoundtrack(), gameStatus.getNumRound());
+                board.setRoundTrack(clientConn.getRoundtrack());
                 board.setNowPlaying(gameStatus.getNowPlaying());
 
                 for (int i = 0; i < board.getNumPlayers(); i++) {
@@ -495,7 +494,8 @@ public class Client {
 
     public void updateGameRoundStart(int numRound){
 
-        board.setRoundTrack(clientConn.getRoundtrack(),numRound);
+        board.setRoundTrack(clientConn.getRoundtrack());
+        board.setRoundNumber(numRound);
         board.setDraftPool(clientConn.getDraftPool());
         fsm.setNotMyTurn();
         board.stateChanged();
@@ -538,6 +538,7 @@ public class Client {
                 }
             }
         }
+        board.setNowPlaying(playerId);
         board.setDraftPool(clientConn.getDraftPool());
         board.setNowPlaying(playerId);
         board.setIsFirstTurn(isFirstTurn);
@@ -603,7 +604,7 @@ public class Client {
      */
     public void getUpdates(){
         board.setDraftPool(clientConn.getDraftPool());
-        board.setRoundTrack(clientConn.getRoundtrack(), board.getRoundNumber());
+        board.setRoundTrack(clientConn.getRoundtrack());
         board.updateSchema(board.getNowPlaying(),clientConn.getSchema(board.getNowPlaying()));
         board.setTools(clientConn.getTools());
         board.updateFavorTokens(board.getNowPlaying(),clientConn.getFavorTokens(board.getNowPlaying()));

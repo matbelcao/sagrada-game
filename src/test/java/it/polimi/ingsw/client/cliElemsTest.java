@@ -102,8 +102,9 @@ class cliElemsTest {
         cliview.updateSchema(player2);
         cliview.updateSchema(player3);
 
-        cliview.updateRoundTurn(5,true, 0);
-
+        cliview.updateRoundNumber(5);
+        cliview.updateIsFirstTurn(true);
+        cliview.updateNowPlaying(2);
         cliview.updateDraftPool(draftpool);
 
         list.add(0);

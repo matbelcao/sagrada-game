@@ -32,7 +32,7 @@ public class CLIView {
     static final String SEPARATOR ="|" ;
 
     private String clientInfo =EMPTY_STRING;
-    private String turnRoundinfo=EMPTY_STRING;
+    private String roundinfo =EMPTY_STRING;
     private final HashMap<Integer,List<String>> schemas= new HashMap<>();
     private List<String> objectives= new ArrayList<>();
     private final List<String> tools = new ArrayList<>();
@@ -46,6 +46,7 @@ public class CLIView {
     private int playerId;
     private String latestScreen =EMPTY_STRING;
     private List<String> gameRanking=new ArrayList<>();
+    private String isFirstTurn;
 
     /**
      * this sets the language for the cli and resets some objects
@@ -262,20 +263,25 @@ public class CLIView {
     /**
      * updates the information abuot the round, turn and who's playing this turn
      * @param roundNumber the number of the round
-     * @param isFirstTurn wheter it is or not the first turn in the round
-     * @param nowPlaying the user playing the turn
+     *
      */
-    public  void updateRoundTurn(int roundNumber, boolean isFirstTurn, int nowPlaying){
-        turnRoundinfo= String.format(cliElements.getElem(ROUND_TURN),
+    public  void updateRoundNumber(int roundNumber){
+        roundinfo = String.format(cliElements.getElem(ROUND_INFO),
                 uiMsg.getMessage(ROUND),
-                roundNumber,
-                isFirstTurn?
-                        uiMsg.getMessage(FIRST_TURN):
-                        uiMsg.getMessage(SECOND_TURN)
-        );
+                roundNumber+1);
+    }
+    public void updateIsFirstTurn(boolean isFirstTurn){
+        this.isFirstTurn=isFirstTurn?
+                uiMsg.getMessage(FIRST_TURN):
+                uiMsg.getMessage(SECOND_TURN);
+    }
+
+    private String buildTurnRoundInfo(){
+        return String.format(cliElements.getElem(ROUND_TURN),roundinfo,isFirstTurn);
+    }
+
+    public void updateNowPlaying(int nowPlaying) {
         List<String> updateSchema;
-
-
         updateSchema=schemas.get(nowPlaying);
         Random randomGen = new Random();
         updateSchema.set(0,addColorToLine(boldify(updateSchema.get(0)),Color.values()[randomGen.nextInt(5)]));
@@ -703,7 +709,7 @@ public class CLIView {
         if(result.size()>=CELL_HEIGHT) {
             result.set(CELL_HEIGHT - 1,
                     result.get(CELL_HEIGHT - 1) +
-                            boldify(String.format(cliElements.getElem(POINT_LEFT), uiMsg.getMessage(DRAFTPOOL)))+replicate(SPACE+EMPTY_STRING,9)+ boldify(turnRoundinfo));
+                            boldify(String.format(cliElements.getElem(POINT_LEFT), uiMsg.getMessage(DRAFTPOOL)))+replicate(SPACE+EMPTY_STRING,9)+ boldify(buildTurnRoundInfo()));
             result.set(CELL_HEIGHT - 1, result.get(CELL_HEIGHT - 1)  + alignRight(boldify(clientInfo), SCREEN_WIDTH - printableLength(result.get(CELL_HEIGHT - 1))));
             result = appendRows(buildSeparator(draftPool.size()), result);
         }

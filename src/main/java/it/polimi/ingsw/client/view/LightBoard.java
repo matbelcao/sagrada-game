@@ -10,14 +10,14 @@ import java.util.*;
  * the client and ui, the logic of the model is only present on the server
  */
 public class LightBoard extends Observable {
-    public static final int NUM_TOOLS=3;
-    public static final int NUM_PUB_OBJ=3;
-    public static final int MAX_PLAYERS=4;
+    public static final int NUM_TOOLS = 3;
+    public static final int NUM_PUB_OBJ = 3;
+    public static final int MAX_PLAYERS = 4;
     private List<LightTool> tools;
     private List<LightCard> pubObj;
     private int numPlayers;
     private LightPrivObj privObj;
-    private HashMap<Integer,LightPlayer> players;
+    private HashMap<Integer, LightPlayer> players;
     private List<LightDie> draftPool;
     private List<List<LightDie>> roundTrack;
     private int roundNumber;
@@ -34,6 +34,7 @@ public class LightBoard extends Observable {
 
     /**
      * this builds the lightboard and initializes the number of players of the match
+     *
      * @param numPlayers the number of users that are playing this
      */
     public LightBoard(int numPlayers) {
@@ -46,8 +47,8 @@ public class LightBoard extends Observable {
         latestOptionsList = new ArrayList<>();
         latestPlacementsList = new ArrayList<>();
         latestDiceList = new ArrayList<>();
-        changes=new ArrayList<>();
-        lockChanges=new Object();
+        changes = new ArrayList<>();
+        lockChanges = new Object();
         nowPlaying = -1;
         roundNumber = -1;
     }
@@ -60,12 +61,12 @@ public class LightBoard extends Observable {
 
     }
 
-    public boolean isInit(){
-        return roundNumber==-1;
+    public boolean isInit() {
+        return roundNumber == -1;
     }
 
-    private void addToChanges(int event){
-        synchronized (lockChanges){
+    private void addToChanges(int event) {
+        synchronized (lockChanges) {
             changes.add(event);
             lockChanges.notifyAll();
         }
@@ -73,6 +74,7 @@ public class LightBoard extends Observable {
 
     /**
      * this sets the drafted schemas for the initial choice
+     *
      * @param draftedSchemas the drafted schemas
      */
     public void setDraftedSchemas(List<LightSchemaCard> draftedSchemas) {
@@ -90,6 +92,7 @@ public class LightBoard extends Observable {
 
     /**
      * sets the id of the user
+     *
      * @param myPlayerId the id to be set
      */
     public void setMyPlayerId(int myPlayerId) {
@@ -107,6 +110,7 @@ public class LightBoard extends Observable {
 
     /**
      * sets the id of the user that is now playing his turn
+     *
      * @param nowPlaying the id
      */
     public void setNowPlaying(int nowPlaying) {
@@ -117,11 +121,12 @@ public class LightBoard extends Observable {
 
     /**
      * this adds a player to the board
+     *
      * @param player the player to be added
      */
-    public void addPlayer(LightPlayer player){
-        assert(players.size()<numPlayers);
-        players.put(player.getPlayerId(),player);
+    public void addPlayer(LightPlayer player) {
+        assert (players.size() < numPlayers);
+        players.put(player.getPlayerId(), player);
         setChanged();
     }
 
@@ -134,6 +139,7 @@ public class LightBoard extends Observable {
 
     /**
      * sets the private objective of the player
+     *
      * @param privObj the private objective
      */
     public void setPrivObj(LightPrivObj privObj) {
@@ -144,20 +150,22 @@ public class LightBoard extends Observable {
 
     /**
      * this sets the list of tools for the match
+     *
      * @param tools the list of tools
      */
-    public void setTools(List<LightTool> tools){
-        this.tools=tools;
+    public void setTools(List<LightTool> tools) {
+        this.tools = tools;
         addToChanges(LightBoardEvents.Tools);
         setChanged();
     }
 
     /**
      * this sets ne public objectives
+     *
      * @param pubObjs the public objectives
      */
-    public void setPubObjs(List<LightCard> pubObjs){
-        this.pubObj=pubObjs;
+    public void setPubObjs(List<LightCard> pubObjs) {
+        this.pubObj = pubObjs;
         addToChanges(LightBoardEvents.PubObjs);
         setChanged();
     }
@@ -193,10 +201,11 @@ public class LightBoard extends Observable {
 
     /**
      * this updates the draftpool by overwriting it
+     *
      * @param draftPool the new draftpool
      */
     public void setDraftPool(List<LightDie> draftPool) {
-        this.draftPool=draftPool;
+        this.draftPool = draftPool;
         addToChanges(LightBoardEvents.DraftPool);
         setChanged();
 
@@ -211,18 +220,21 @@ public class LightBoard extends Observable {
 
     /**
      * sets the roundtrack and number of round
-     * @param roundTrack the new roundtrack
-     * @param numRound the number of the turn
+     *  @param roundTrack the new roundtrack
+     *
      */
-    public void setRoundTrack(List<List<LightDie>> roundTrack, int numRound) {
+    public void setRoundTrack(List<List<LightDie>> roundTrack) {
         this.roundTrack = roundTrack;
-        this.roundNumber = numRound;
         addToChanges(LightBoardEvents.RoundTrack);
-        addToChanges(LightBoardEvents.NowPlaying);
         setChanged();
     }
 
+    public void setRoundNumber(int roundNumber) {
 
+        this.roundNumber = roundNumber;
+        addToChanges(LightBoardEvents.RoundNumber);
+        setChanged();
+    }
 
     /**
      * this updates the schema of a certain player

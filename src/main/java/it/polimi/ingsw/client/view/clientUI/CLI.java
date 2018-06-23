@@ -17,7 +17,6 @@ import it.polimi.ingsw.common.serializables.LightSchemaCard;
 
 import java.io.BufferedReader;
 import java.io.Console;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
@@ -198,6 +197,13 @@ public class CLI implements ClientUI {
         if(changes.contains(LightBoardEvents.RoundTrack))
             view.updateRoundTrack(board.getRoundTrack());
 
+        if(changes.contains(LightBoardEvents.RoundNumber))
+            view.updateRoundNumber(board.getRoundNumber());
+
+        if(changes.contains(LightBoardEvents.IsFirstTurn))
+            view.updateIsFirstTurn(board.getIsFirstTurn());
+
+
         if(changes.contains(LightBoardEvents.Status)
                 || changes.contains(LightBoardEvents.StateChanged)
                 || changes.contains(LightBoardEvents.FavorTokens)
@@ -211,7 +217,8 @@ public class CLI implements ClientUI {
         }
 
         if(changes.contains(LightBoardEvents.NowPlaying))
-            view.updateRoundTurn(board.getRoundNumber(), board.getIsFirstTurn(), board.getNowPlaying());
+            view.updateNowPlaying(board.getNowPlaying());
+
 
 
         switch (client.getTurnState()) {

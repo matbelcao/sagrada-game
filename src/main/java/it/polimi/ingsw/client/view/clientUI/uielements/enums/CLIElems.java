@@ -18,7 +18,7 @@ public enum CLIElems {
     LOGIN_LINE("login-line"),
     LOBBY("lobby"),
     DRAFTED_INFO("drafted-info"),
-    POINTS("points");
+    POINTS("points"), ROUND_INFO("round-info");
 
     private String clielem;
     CLIElems(String clielem){
