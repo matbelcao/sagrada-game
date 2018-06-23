@@ -36,6 +36,7 @@ import java.util.List;
 
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.MAIN;
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.NOT_MY_TURN;
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.SELECT_DIE;
 import static it.polimi.ingsw.client.view.clientUI.MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL;
 
 public class GUIutil {
@@ -121,11 +122,11 @@ public class GUIutil {
     }
 
     private double getCardWidth(){
-        double width = 258;
+        double width = 221;
         return width;
     }
     private double getCardHeight(){
-        double height = 350;
+        double height = 300;
         return height;
     }
 
@@ -138,29 +139,48 @@ public class GUIutil {
 
     public HBox buildRoundTrack(List<List<LightDie>> roundTrack, double width, double height, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favortokens) {
         double cellDim = getMainSceneCellDim(width,height);
-        HBox track = new HBox();
-        track.setSpacing(10); //todo dynamic spacing??
+        ArrayList<StackPane> roundTrackCells = new ArrayList<>();
 
             for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
-                StackPane cell = emptyRoundTrackCell(i,cellDim);
-                if(i<roundTrack.size()) {
+                StackPane cell = emptyRoundTrackCell(i, cellDim);
+                if (i < roundTrack.size()) {
                     Canvas c = new Canvas(cellDim, cellDim);
                     GraphicsContext gc = c.getGraphicsContext2D();
-                    if(roundTrack.get(i).size()>1){
+                    if (roundTrack.get(i).size() > 1) {
                         //draw to dice in a cell
                         drawDie(roundTrack.get(i).get(0), gc, cellDim);
-                        drawDie(roundTrack.get(i).get(1), gc,cellDim/2,0, cellDim);
+                        drawDie(roundTrack.get(i).get(1), gc, cellDim / 2, 0, cellDim);
                         Event myEvent = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
-                        cell.setOnMouseEntered(e->{
+                        cell.setOnMouseEntered(e -> {
                             cell.fireEvent(myEvent);
                         });
-                    }else {
+                    } else {
                         drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                    }
+                    //todo refactor
+                    if(turnState.equals(SELECT_DIE)&& !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)){
+                        highlight(c,cellDim);
                     }
                     cell.getChildren().add(c);
                 }
-                track.getChildren().add(cell);
+                roundTrackCells.add(cell);
             }
+
+        switch (turnState) {
+            case SELECT_DIE:
+                if (!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
+                    for (int i = 0; i < roundTrack.size(); i++) {
+                        if(roundTrack.get(i).size()<2){
+                            int finalI = i;
+                            roundTrackCells.get(i).setOnMouseClicked(e->cmdWrite.write(getMultipleDieTrackCellIndex(finalI,roundTrack)+ ""));
+                        }
+                    }
+                }
+                break;
+        }
+            HBox track = new HBox();
+            track.setSpacing(10); //todo add dynamic spacing
+            track.getChildren().addAll(roundTrackCells);
         return track;
     }
 
@@ -202,8 +222,21 @@ public class GUIutil {
             GraphicsContext gc = c.getGraphicsContext2D();
             drawDie(multipleDiceList.get(i), gc, cellDim);
             multipleDiceTrack.getChildren().add(c);
+            if(turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)){
+                highlight(c,cellDim);
+                int multipleDieIndex = getMultipleDieTrackCellIndex(selectedTrackCellIndex,roundTrack) + i;
+                c.setOnMouseClicked(e -> cmdWrite.write( multipleDieIndex+ ""));
+            }
         }
         return multipleDiceTrack;
+    }
+
+    private int getMultipleDieTrackCellIndex(int index, List<List<LightDie>> roundTrack){
+        int selectedCellindex = 0;
+        for(int j=0; j<index; j++){
+            selectedCellindex += roundTrack.get(j).size();
+        }
+        return selectedCellindex;
     }
 
     private StackPane emptyRoundTrackCell(int i, double cellDim) {
@@ -291,6 +324,10 @@ public class GUIutil {
                              highlight(c,dieDim);
                              poolDice.add(c);
                          }
+                        /*Event myEvent = new MyEvent(,); //todo choose wich one to use
+                        cell.setOnMouseEntered(e->{
+                            cell.fireEvent(myEvent);
+                        });*/
                      }else{
                         for (IndexedCellContent activeCell : latestDiceList) {
                             Canvas c = poolDice.get(activeCell.getPosition());

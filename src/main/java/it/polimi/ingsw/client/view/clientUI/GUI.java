@@ -252,7 +252,6 @@ public class GUI extends Application implements ClientUI {
             });
             scene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL , event -> {
                 scene.setRoot(bulidMainPaneBack(event.getCellIndex(),200,200,board));
-                System.out.println("clicked " + event.getCellIndex());
             });
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
@@ -286,7 +285,7 @@ public class GUI extends Application implements ClientUI {
         return p;
     }
 
-    BorderPane buildBackPane(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
+    private BorderPane buildBackPane(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
