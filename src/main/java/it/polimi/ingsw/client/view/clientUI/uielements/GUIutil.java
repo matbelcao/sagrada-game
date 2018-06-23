@@ -426,42 +426,6 @@ public class GUIutil {
         return grid;
     }
 
-    /* public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth, ClientFSMState turnState, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie){
-        GridPane grid = new GridPane();
-        Insets padding = new Insets(10,10,10,10);
-        grid.setPadding(padding);
-        double cellDIm = width/NUM_COLS;
-        for(int i = 0; i < NUM_ROWS; i++){
-            for(int j = 0; j < NUM_COLS; j++){
-                Canvas cell;
-                if(lightSchemaCard.hasConstraintAt(i,j)){
-                    cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i,j),cellDIm);
-                    grid.add(cell,j,i);
-                }else{
-                    cell = whiteCanvas(cellDIm);
-                    grid.add(cell,j,i);
-                }
-                if(lightSchemaCard.hasDieAt(i,j)){
-                    cell = lightDieToCanvas(lightSchemaCard.getDieAt(i,j),cellDIm);
-                    grid.add(cell,j,i);
-                }
-                int position = i*NUM_COLS+j;
-
-
-                if(turnState.equals(ClientFSMState.CHOOSE_PLACEMENT)&& latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)&& latestPlacementsList.contains(position)){
-                    highlight(cell,cellDIm);
-                    System.out.println("highlighting schema because i'm in choose placement and latest selected die is draftpool");
-                    cell.setOnMouseClicked(e->{
-                        cmdWrite.write(latestPlacementsList.indexOf(position) +"");
-                        System.out.println("selected position " + position);
-                    });
-                    continue;
-                }
-            }
-        }
-        return grid;
-    }*/
-
     public VBox drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState) {
         Button priv = new Button("Private Objective");
         Button pub = new Button("Public Objectives");
@@ -525,13 +489,6 @@ public class GUIutil {
         drawWhiteCell(gc,0,0,dim);
         return whiteCanvas;
     }
-
-   /* private Canvas schemaToCanvas(LightSchemaCard lightSchemaCard,double width, double height) {
-        Canvas canvas = new Canvas(width, height);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        drawSchema(lightSchemaCard,gc);
-        return canvas;
-    }*/
    private Canvas IndexedCellToCanvas(CellContent cellContent,double dieDim) {
        Canvas canvas = new Canvas(dieDim,dieDim);
        if(cellContent.isDie()){
@@ -564,27 +521,6 @@ public class GUIutil {
     public double getMainSceneCellDim(double newWidth, double newHeight) {
         return 100;
     }
-
-
-    /* private void drawSchema(LightSchemaCard lightSchemaCard, GraphicsContext gc) {
-         double dieDim = getDieDimension();
-         double y = 0;
-         double x = 0;
-         for(int i = 0; i < NUM_ROWS; i++){
-             for(int j = 0; j < NUM_COLS; j++){
-                 if(lightSchemaCard.hasDieAt(i,j)){
-                     drawDie(lightSchemaCard.getDieAt(i,j),gc,x,y,dieDim);
-                 }else if(lightSchemaCard.hasConstraintAt(i,j)){
-                     drawConstraint(lightSchemaCard.getConstraintAt(i,j),gc,x,y,dieDim);
-                 }else{
-                     drawWhiteCell(gc,x,y,dieDim);
-                 }
-                 x += dieDim;
-             }
-             x = 0;
-             y += dieDim;
-         }
-     }*/
    //todo delete class
     //just a class to avoid having repeated code
     private class DraftedSchemasWindowDim {
