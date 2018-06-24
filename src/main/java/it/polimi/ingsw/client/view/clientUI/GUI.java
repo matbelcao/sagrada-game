@@ -240,7 +240,7 @@ public class GUI extends Application implements ClientUI {
                     System.out.println("tool can continue------------------------------------------------------------------");
                     break;
             }
-            Scene scene = new Scene(buildFrontPane(200,200,board));
+            Scene scene = new Scene(bulidMainPane(200,200,board));
             //root.setStyle("-fx-background-color: black;"); //todo change
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(600);
@@ -251,7 +251,11 @@ public class GUI extends Application implements ClientUI {
                 scene.setRoot(buildFrontPane(200,200,board));
             });
             scene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL , event -> {
-                scene.setRoot(bulidMainPaneBack(event.getCellIndex(),200,200,board));
+                scene.setRoot(bulidBackPaneRoundTrack(event.getCellIndex(),200,200,board));
+            });
+            scene.addEventHandler(MyEvent.SHOW_SELECTABLE_DICE_LIST , event -> {
+                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                scene.setRoot(bulidOptionScreen(200,200,board));
             });
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
@@ -266,26 +270,33 @@ public class GUI extends Application implements ClientUI {
         });
     }
 
-    StackPane bulidMainPaneBack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
+    StackPane bulidMultipleDiceScreen(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
         BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
-        BorderPane backPane = buildBackPane(selectedTrackCellIndex,newWidth,newHeight,board);
+        BorderPane backPane = bulidBackPaneRoundTrack(selectedTrackCellIndex,newWidth,newHeight,board);
+        StackPane p = new StackPane(backPane,frontPane);
+        backPane.toFront();
+        return p;
+    }
+    StackPane bulidOptionScreen(double newWidth, double newHeight, LightBoard board){
+        BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
+        BorderPane backPane = sceneCreator.bulidBackPaneOptions(newWidth,newHeight,board);
         StackPane p = new StackPane(backPane,frontPane);
         backPane.toFront();
         return p;
     }
 
-    StackPane bulidMainPaneFront(double newWidth, double newHeight, LightBoard board){
+    StackPane bulidMainPane(double newWidth, double newHeight, LightBoard board){
         BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
-        BorderPane backPane = buildBackPane(0,newWidth,newHeight,board); // todo fix
-        StackPane p = new StackPane(backPane,frontPane);
-        /*frontPane.addEventHandler(MyEvent.CLICKED_FRONT , event -> {
-            backPane.toFront();
-        });*/
-        //return new StackPane(frontPane,backPane)
+        List <Actions> latestOptionsList = board.getLatestOptionsList();
+        StackPane p = new StackPane(frontPane);
+        if (client.getTurnState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
+            BorderPane backPane = sceneCreator.bulidBackPaneOptions(newWidth,newHeight,board);
+            p.getChildren().add(backPane);
+        }
         return p;
     }
 
-    private BorderPane buildBackPane(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
+    private BorderPane bulidBackPaneRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
