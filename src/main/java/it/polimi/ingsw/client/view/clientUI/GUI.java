@@ -22,6 +22,7 @@ import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Observable;
 
 import static it.polimi.ingsw.client.view.clientUI.MyEvent.MOUSE_EXITED_BACK_PANE;
+import static it.polimi.ingsw.client.view.clientUI.MyEvent.SELECTED_PLAYER;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;
 
@@ -251,7 +253,10 @@ public class GUI extends Application implements ClientUI {
                 scene.setRoot(buildFrontPane(200,200,board));
             });
             scene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL , event -> {
-                scene.setRoot(bulidMultipleDiceScreen(event.getCellIndex(),200,200,board));
+                scene.setRoot(showMultipleDiceScreen(event.getCellIndex(),200,200,board));
+            });
+            scene.addEventHandler(SELECTED_PLAYER , event -> {
+                scene.setRoot(showSelectedPlayer(event.getCellIndex(),200,200,board));
             });
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
@@ -266,7 +271,15 @@ public class GUI extends Application implements ClientUI {
         });
     }
 
-    StackPane bulidMultipleDiceScreen(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
+    private Parent showSelectedPlayer(int cellIndex, int width, int height, LightBoard board) {
+        BorderPane frontPane = buildFrontPane(width,height,board);
+        BorderPane backPane = new BorderPane();
+        StackPane p = new StackPane(backPane,frontPane);
+        backPane.toFront();
+        return p;
+    }
+
+    StackPane showMultipleDiceScreen(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
         BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
         BorderPane backPane = bulidBackPaneRoundTrack(selectedTrackCellIndex,newWidth,newHeight,board);
         StackPane p = new StackPane(backPane,frontPane);
@@ -331,8 +344,13 @@ public class GUI extends Application implements ClientUI {
 
         BorderPane frontPane = new BorderPane();
         HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackList,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        Region divider = new Region();
+        HBox.setHgrow(divider,Priority.ALWAYS);
+        HBox menuButtons = sceneCreator.getMenuButtons(turnState);
+        roundTrack.getChildren().addAll(divider,menuButtons);
         frontPane.setTop(roundTrack);
         roundTrack.setAlignment(TOP_LEFT);
+
 
         GridPane schema = sceneCreator.drawSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
         frontPane.setLeft(schema);
@@ -343,9 +361,10 @@ public class GUI extends Application implements ClientUI {
         cards.setAlignment(CENTER_LEFT);
 
         HBox draftpool = sceneCreator.buildDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
-        Region divider = new Region();
-        HBox bottomContainer = new HBox(draftpool);
+        HBox otherPlayers = sceneCreator.getPlayersSelector(board);
+        Region divider2 = new Region();
         HBox.setHgrow(divider,Priority.ALWAYS);
+        HBox bottomContainer = new HBox(otherPlayers,divider,draftpool);
         draftpool.setAlignment(BOTTOM_RIGHT);
         frontPane.setBottom(bottomContainer);
         return frontPane;

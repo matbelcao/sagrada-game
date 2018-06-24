@@ -175,11 +175,7 @@ public class GUIutil {
         }
         HBox track = new HBox();
         track.setSpacing(10); //todo add dynamic spacing
-        Region divider = new Region();
-        HBox.setHgrow(divider,Priority.ALWAYS);
-        HBox menuButtons = getMenuButtons(turnState);
         track.getChildren().addAll(roundTrackCells);
-        track.getChildren().addAll(divider,menuButtons);
         return track;
     }
 
@@ -504,6 +500,30 @@ public class GUIutil {
 
     public double getMainSceneCellDim(double newWidth, double newHeight) {
         return 100;
+    }
+
+    public HBox getPlayersSelector(LightBoard board) {
+        HBox playerSelector = new HBox();
+        for(int i = 0; i<board.getNumPlayers();i++){
+            if(i == board.getMyPlayerId()){
+                continue;
+            }else{
+                int playerIndex = i;
+                Label playerLabel = new Label(board.getPlayerById(i).getUsername());
+                /*Rectangle playerStatusIndicator = new Rectangle(30,10);
+                playerStatusIndicator.setFill(Color.PINK);
+                Canvas statusBar = new Canvas(25,5);
+                GraphicsContext gc = statusBar.getGraphicsContext2D();
+                gc.setFill(Color.GREEN);
+                gc.fillRect(0,0,25,5);
+                VBox nameStatusContainer = new VBox(playerLabel,statusBar);
+                nameStatusContainer.setStyle("-fx-background-color: rgb(125,125,125,0.3);");
+                StackPane p = new StackPane(playerStatusIndicator,nameStatusContainer);
+                playerLabel.setOnMouseEntered(e-> playerLabel.fireEvent(new MyEvent(SELECTED_PLAYER,playerIndex)));
+                playerSelector.getChildren().add(p);*/
+            }
+        }
+        return  playerSelector;
     }
 
     //todo delete class
