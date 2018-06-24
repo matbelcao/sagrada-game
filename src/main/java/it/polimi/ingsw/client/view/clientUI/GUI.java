@@ -342,12 +342,10 @@ public class GUI extends Application implements ClientUI {
         frontPane.setRight(cards);
         cards.setAlignment(CENTER_LEFT);
 
-        HBox menuButtons = sceneCreator.getMenuButtons(turnState,favorTokens);
         HBox draftpool = sceneCreator.buildDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
         Region divider = new Region();
-        HBox bottomContainer = new HBox(menuButtons,divider,draftpool);
+        HBox bottomContainer = new HBox(draftpool);
         HBox.setHgrow(divider,Priority.ALWAYS);
-        menuButtons.setAlignment(BOTTOM_LEFT);
         draftpool.setAlignment(BOTTOM_RIGHT);
         frontPane.setBottom(bottomContainer);
         return frontPane;

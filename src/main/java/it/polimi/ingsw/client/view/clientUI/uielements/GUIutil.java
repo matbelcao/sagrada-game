@@ -175,7 +175,11 @@ public class GUIutil {
         }
         HBox track = new HBox();
         track.setSpacing(10); //todo add dynamic spacing
+        Region divider = new Region();
+        HBox.setHgrow(divider,Priority.ALWAYS);
+        HBox menuButtons = getMenuButtons(turnState);
         track.getChildren().addAll(roundTrackCells);
+        track.getChildren().addAll(divider,menuButtons);
         return track;
     }
 
@@ -309,7 +313,6 @@ public class GUIutil {
             case SELECT_DIE:
                 if (!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)) {
                     if (!latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
-                        System.out.println("okok");
                     } else {
                         for (IndexedCellContent activeCell : latestDiceList) {
                             Canvas c = poolDice.get(activeCell.getPosition());
@@ -336,7 +339,7 @@ public class GUIutil {
         return g;
     }
 
-    public HBox getMenuButtons(ClientFSMState turnState, int favortokens) {
+    public HBox getMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button("end turn");
         endTurn.setOnAction(e -> cmdWrite.write("e"));
         Button back = new Button("back");
@@ -347,10 +350,9 @@ public class GUIutil {
         } else {
             turnStateIndicator.setFill(Color.GREEN);
         }
-        Label favorT = new Label("" + favortokens);
         Label turn = new Label(turnState.toString());
         HBox h = new HBox();
-        h.getChildren().addAll(back, endTurn, turnStateIndicator, turn, favorT);
+        h.getChildren().addAll(back, endTurn, turnStateIndicator, turn);
         return h;
     }
 
