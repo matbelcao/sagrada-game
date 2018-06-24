@@ -37,8 +37,9 @@ public class MasterServer{
     private String ipAddress;
     private int portRMI;
     private int portSocket;
+    private static final String CONFIGURATION_FILE_NAME="ServerConf.xml";
     private boolean additionalSchemas; //to be used for additional schemas FA
-    public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"server"+File.separator; //append class name + ".xml" to obtain complete path
+    public static final String XML_SOURCE = "xml"+File.separator+"server"+File.separator; //append class name + ".xml" to obtain complete path
     private int lobbyTime;
     private int turnTime;
     private final ArrayList <User> users;
@@ -67,8 +68,8 @@ public class MasterServer{
     }
 
     private static MasterServer parser(){
-
-        File xmlFile= new File(XML_SOURCE+"ServerConf.xml");
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        File xmlFile= new File(classLoader.getResource(XML_SOURCE+CONFIGURATION_FILE_NAME).getFile());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -416,7 +417,8 @@ public class MasterServer{
         try {
             MasterServer.startMasterServer();
         } catch (InstantiationException e) {
-            System.out.println("\u001B[31m"+"ERR: couldn't start the Master Server"+"\u001B[0m");
+            e.printStackTrace();
+            System.out.println("ERR: couldn't start the Master Server");
             return;
         }
         MasterServer server= MasterServer.getMasterServer();

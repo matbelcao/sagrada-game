@@ -3,8 +3,8 @@ package it.polimi.ingsw.client.view.clientUI;
 import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.LightBoardEvents;
-import it.polimi.ingsw.client.view.clientUI.uielements.CLIView;
-import it.polimi.ingsw.client.view.clientUI.uielements.CLIViewUtils;
+import it.polimi.ingsw.client.view.clientUI.uielements.CLIObjects;
+import it.polimi.ingsw.client.view.clientUI.uielements.CLIUtils;
 import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
@@ -29,7 +29,7 @@ import static it.polimi.ingsw.common.enums.ErrMsg.ERROR_RETRIEVING_CONSOLE;
  */
 public class CLI implements ClientUI {
     private static final String STRING_NEWLINE="%s%n";
-    private final CLIView view;
+    private final CLIObjects view;
     private Console console;
 
     private Client client;
@@ -52,7 +52,7 @@ public class CLI implements ClientUI {
 
         this.uimsg=new UIMessages(lang);
         this.client = client;
-        this.view=new CLIView(lang);
+        this.view=new CLIObjects(lang);
 
         resetScreen();
     }
@@ -68,7 +68,7 @@ public class CLI implements ClientUI {
      * this cleans the screen and resets the cursor at the top of the page
      */
     private void resetScreen(){
-        printToScreen(CLIViewUtils.resetScreenPosition());
+        printToScreen(CLIUtils.resetScreenPosition());
     }
 
     /**

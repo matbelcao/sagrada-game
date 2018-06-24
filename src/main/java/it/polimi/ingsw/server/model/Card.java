@@ -23,7 +23,8 @@ public abstract class Card {
      * @return  color string if type is PrivObjectiveCard, else null
      */
     protected String xmlReader(int id, String xmlSrc, String type){
-        File xmlFile= new File(xmlSrc);
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        File xmlFile= new File(classLoader.getResource(xmlSrc).getFile());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         NodeList nodeList;

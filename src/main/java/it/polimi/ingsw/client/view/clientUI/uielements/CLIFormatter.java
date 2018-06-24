@@ -1,7 +1,7 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIElems;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats;
 import it.polimi.ingsw.common.enums.Shade;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,13 +13,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 
-public class CLIElements {
+public class CLIFormatter {
     private Element elemFile;
-    private static final String ELEM_FILE= Client.XML_SOURCE+"CLI.xml";
-    private static final String CLI_COMP= "cli-components";
+    private static final String FORMATS_FILE_NAME="CLIFormats.xml";
+    private static final String CLI_COMP= "cli-formats";
 
 
-    public CLIElements() throws InstantiationException {
+    public CLIFormatter() throws InstantiationException {
         this.elemFile=parser();
         if(this.elemFile==null){
             throw new InstantiationException();
@@ -27,7 +27,8 @@ public class CLIElements {
     }
 
     private static Element parser(){
-        File xmlFile = new File(ELEM_FILE);
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        File xmlFile= new File(classLoader.getResource(Client.XML_SOURCE+FORMATS_FILE_NAME).getFile());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = null;
 
@@ -58,7 +59,7 @@ public class CLIElements {
      * @param elem the requested element
      * @return the string containing the element's representation
      */
-    public String getElem(CLIElems elem){
+    public String getElem(CLIFormats elem){
         return getString(elem.toString());
     }
 
