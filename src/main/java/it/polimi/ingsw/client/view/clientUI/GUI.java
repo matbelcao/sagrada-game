@@ -251,11 +251,7 @@ public class GUI extends Application implements ClientUI {
                 scene.setRoot(buildFrontPane(200,200,board));
             });
             scene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL , event -> {
-                scene.setRoot(bulidBackPaneRoundTrack(event.getCellIndex(),200,200,board));
-            });
-            scene.addEventHandler(MyEvent.SHOW_SELECTABLE_DICE_LIST , event -> {
-                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                scene.setRoot(bulidOptionScreen(200,200,board));
+                scene.setRoot(bulidMultipleDiceScreen(event.getCellIndex(),200,200,board));
             });
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
