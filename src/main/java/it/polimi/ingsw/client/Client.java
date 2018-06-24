@@ -34,6 +34,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static it.polimi.ingsw.common.enums.ErrMsg.*;
 
@@ -59,7 +60,7 @@ public class Client {
     private UILanguage lang;
     private LightBoard board;
     private ClientFSM fsm;
-    public static final String XML_SOURCE = "xml"+File.separator+"client" +File.separator;
+    public static final String XML_SOURCE = "xml/client/";
     private final Object lockCredentials=new Object();
 
     private boolean ready;
@@ -115,7 +116,7 @@ public class Client {
      */
     private static Client parser(){
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File xmlFile= new File(classLoader.getResource(XML_SOURCE+CONFIGURATION_FILE_NAME).getFile());
+        File xmlFile= new File(Objects.requireNonNull(classLoader.getResource(XML_SOURCE + CONFIGURATION_FILE_NAME)).getFile());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {

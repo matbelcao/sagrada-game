@@ -4,6 +4,8 @@ import javax.xml.parsers.*;
 import org.w3c.dom.*;
 
 import java.io.IOException;
+import java.util.Objects;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -24,7 +26,7 @@ public abstract class Card {
      */
     protected String xmlReader(int id, String xmlSrc, String type){
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File xmlFile= new File(classLoader.getResource(xmlSrc).getFile());
+        File xmlFile= new File(Objects.requireNonNull(classLoader.getResource(xmlSrc)).getFile());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         NodeList nodeList;

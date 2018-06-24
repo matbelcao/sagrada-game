@@ -23,10 +23,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 
 /**
@@ -39,7 +36,7 @@ public class MasterServer{
     private int portSocket;
     private static final String CONFIGURATION_FILE_NAME="ServerConf.xml";
     private boolean additionalSchemas; //to be used for additional schemas FA
-    public static final String XML_SOURCE = "xml"+File.separator+"server"+File.separator; //append class name + ".xml" to obtain complete path
+    public static final String XML_SOURCE = "xml/server/"; //append class name + ".xml" to obtain complete path
     private int lobbyTime;
     private int turnTime;
     private final ArrayList <User> users;
@@ -69,7 +66,7 @@ public class MasterServer{
 
     private static MasterServer parser(){
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File xmlFile= new File(classLoader.getResource(XML_SOURCE+CONFIGURATION_FILE_NAME).getFile());
+        File xmlFile= new File(Objects.requireNonNull(classLoader.getResource(XML_SOURCE + CONFIGURATION_FILE_NAME)).getFile());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {

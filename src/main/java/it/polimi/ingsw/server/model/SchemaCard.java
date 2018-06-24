@@ -75,10 +75,10 @@ public class SchemaCard implements Iterable<Cell>  {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 
         if(additionalSchema){
-            xmlFile= new File(classLoader.getResource(xmlAdditionalSchema).getFile());
+            xmlFile= new File(Objects.requireNonNull(classLoader.getResource(xmlAdditionalSchema)).getFile());
 
         }else{
-            xmlFile= new File(classLoader.getResource(xmlSchema).getFile());
+            xmlFile= new File(Objects.requireNonNull(classLoader.getResource(xmlSchema)).getFile());
 
         }
 
