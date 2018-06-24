@@ -11,8 +11,10 @@ import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.common.serializables.*;
 import javafx.event.Event;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -21,6 +23,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -35,6 +38,7 @@ import java.util.List;
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
 import static it.polimi.ingsw.client.view.clientUI.MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL;
 import static it.polimi.ingsw.client.view.clientUI.MyEvent.MOUSE_EXITED_BACK_PANE;
+import static it.polimi.ingsw.client.view.clientUI.MyEvent.SELECTED_PLAYER;
 
 public class GUIutil {
     private final CmdWriter cmdWrite;
@@ -146,9 +150,7 @@ public class GUIutil {
                     drawDie(roundTrack.get(i).get(0), gc, cellDim);
                     drawDie(roundTrack.get(i).get(1), gc, cellDim / 2, 0, cellDim);
                     Event myEvent = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
-                    cell.setOnMouseEntered(e -> {
-                        cell.fireEvent(myEvent);
-                    });
+                    cell.setOnMouseEntered(e -> cell.fireEvent(myEvent));
                 } else {
                     drawDie(roundTrack.get(i).get(0), gc, cellDim);
                 }
@@ -505,27 +507,42 @@ public class GUIutil {
     public HBox getPlayersSelector(LightBoard board) {
         HBox playerSelector = new HBox();
         for(int i = 0; i<board.getNumPlayers();i++){
+            Group playerStatusBar = playerStatusBar(board.getPlayerById(i).getUsername(),board.getPlayerById(i).getStatus());
+            playerSelector.getChildren().add(playerStatusBar);
             if(i == board.getMyPlayerId()){
                 continue;
             }else{
-                int playerIndex = i;
-                Label playerLabel = new Label(board.getPlayerById(i).getUsername());
-                /*Rectangle playerStatusIndicator = new Rectangle(30,10);
-                playerStatusIndicator.setFill(Color.PINK);
-                Canvas statusBar = new Canvas(25,5);
-                GraphicsContext gc = statusBar.getGraphicsContext2D();
-                gc.setFill(Color.GREEN);
-                gc.fillRect(0,0,25,5);
-                VBox nameStatusContainer = new VBox(playerLabel,statusBar);
-                nameStatusContainer.setStyle("-fx-background-color: rgb(125,125,125,0.3);");
-                StackPane p = new StackPane(playerStatusIndicator,nameStatusContainer);
-                playerLabel.setOnMouseEntered(e-> playerLabel.fireEvent(new MyEvent(SELECTED_PLAYER,playerIndex)));
-                playerSelector.getChildren().add(p);*/
+                Event mouseEnteredPlayerStatusBar = new MyEvent(SELECTED_PLAYER, i);
+                playerStatusBar.setOnMouseEntered(e -> {
+                    playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar);
+                    System.out.println("enterreredfsfsjfnsdlghsdkgnsknsd,gnsjklgns");
+                });
             }
         }
+        playerSelector.setAlignment(Pos.BOTTOM_LEFT);
         return  playerSelector;
     }
 
+    private Group playerStatusBar(String username, LightPlayerStatus status){
+        double width = 100;
+        double heigth = 20;
+        Text playerName = new Text(username);
+        playerName.setFont(Font.font("Serif", 25));
+        Circle statusCircle = new Circle(10);
+        if(status.equals(LightPlayerStatus.PLAYING)){
+            statusCircle.setFill(Color.GREEN);
+        }else if(status.equals(LightPlayerStatus.DISCONNECTED) || status.equals(LightPlayerStatus.QUITTED)){
+            statusCircle.setFill(Color.RED);
+        }else{
+            statusCircle.setFill(Color.GRAY);
+        }
+        HBox statusAndName= new HBox(statusCircle,playerName);
+        statusAndName.setAlignment(Pos.CENTER);
+        playerName.setTextAlignment(TextAlignment.CENTER);
+        statusAndName.setStyle("-fx-background-color: rgb(125,125,125,0.3);");
+        StackPane p = new StackPane(statusAndName);
+        return new Group(p);
+    }
     //todo delete class
     //just a class to avoid having repeated code
     private class DraftedSchemasWindowDim {

@@ -271,12 +271,16 @@ public class GUI extends Application implements ClientUI {
         });
     }
 
-    private Parent showSelectedPlayer(int cellIndex, int width, int height, LightBoard board) {
+    private Parent showSelectedPlayer(int playerId, int width, int height, LightBoard board) {
         BorderPane frontPane = buildFrontPane(width,height,board);
-        BorderPane backPane = new BorderPane();
+        BorderPane backPane = buildSelectdPlayerSchema(playerId,width, height, board);
         StackPane p = new StackPane(backPane,frontPane);
         backPane.toFront();
         return p;
+    }
+
+    BorderPane buildSelectdPlayerSchema(int playerId, int width, int height, LightBoard board){
+        return new BorderPane();
     }
 
     StackPane showMultipleDiceScreen(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
