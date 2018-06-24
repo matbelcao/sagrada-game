@@ -13,14 +13,14 @@ import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.util.*;
 
-import static it.polimi.ingsw.client.view.clientUI.uielements.CLIViewUtils.*;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIElems.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.CLIUtils.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 
 /**
  * this class contains the objects used by the cli to show the board components to the user
  */
-public class CLIView {
+public class CLIObjects {
 
     private static final int MAX_MENULIST_COLUMNS = 4;
 
@@ -52,7 +52,7 @@ public class CLIView {
      * this sets the language for the cli and resets some objects
      * @param lang the language
      */
-    public CLIView(UILanguage lang) {
+    public CLIObjects(UILanguage lang) {
         uiMsg=new UIMessages(lang);
         updateRoundTrack(new ArrayList<>());
         updateDraftPool(new HashMap<>());
@@ -64,7 +64,7 @@ public class CLIView {
     public String printLoginUsername() {
         StringBuilder result= new StringBuilder();
 
-        result.append(String.format(cliElements.getElem(LOGIN_LINE),uiMsg.getMessage(LOGIN_USERNAME)));
+        result.append(String.format(cliFormatter.getElem(LOGIN_LINE),uiMsg.getMessage(LOGIN_USERNAME)));
         return result.toString();
     }
 
@@ -72,7 +72,7 @@ public class CLIView {
      * @return  the line to be printed as a prompt for the password
      */
     public String printLoginPassword() {
-        return String.format(cliElements.getElem(LOGIN_LINE),uiMsg.getMessage(LOGIN_PASSWORD));
+        return String.format(cliFormatter.getElem(LOGIN_LINE),uiMsg.getMessage(LOGIN_PASSWORD));
     }
 
 
@@ -241,7 +241,7 @@ public class CLIView {
 
         result.addAll(buildCellRow(baseRow,0, Board.NUM_ROUNDS));
         List<String> padding=buildWall(result.size()-1, 1, SPACE);
-        padding.add(boldify(String.format(cliElements.getElem(POINT_LEFT),uiMsg.getMessage(ROUNDTRACK))));
+        padding.add(boldify(String.format(cliFormatter.getElem(POINT_LEFT),uiMsg.getMessage(ROUNDTRACK))));
         result= appendRows(result,padding);
         this.roundTrack=result;
     }
@@ -266,7 +266,7 @@ public class CLIView {
      *
      */
     public  void updateRoundNumber(int roundNumber){
-        roundinfo = String.format(cliElements.getElem(ROUND_INFO),
+        roundinfo = String.format(cliFormatter.getElem(ROUND_INFO),
                 uiMsg.getMessage(ROUND),
                 roundNumber+1);
     }
@@ -277,7 +277,7 @@ public class CLIView {
     }
 
     private String buildTurnRoundInfo(){
-        return String.format(cliElements.getElem(ROUND_TURN),roundinfo,isFirstTurn);
+        return String.format(cliFormatter.getElem(ROUND_TURN),roundinfo,isFirstTurn);
     }
 
     public void updateNowPlaying(int nowPlaying) {
@@ -310,8 +310,8 @@ public class CLIView {
         gameRanking.add(EMPTY_STRING);
         for(int position=1; position<=players.size(); position++){
             gameRanking.add(
-                    String.format(cliElements.getElem(LIST_ELEMENT),position,players.get(position-1).getUsername())+
-                            String.format(cliElements.getElem(POINTS),uiMsg.getMessage(PLAYER_SCORE),players.get(position-1).getPoints())
+                    String.format(cliFormatter.getElem(LIST_ELEMENT),position,players.get(position-1).getUsername())+
+                            String.format(cliFormatter.getElem(POINTS),uiMsg.getMessage(PLAYER_SCORE),players.get(position-1).getPoints())
             );
         }
     }
@@ -324,7 +324,7 @@ public class CLIView {
      * @return the info
      */
     private String buildDraftedSchemaInfo(LightSchemaCard schemaCard, int number) {
-        String indexname = boldify(String.format(cliElements.getElem(DRAFTED_INFO),number ,schemaCard.getName()));
+        String indexname = boldify(String.format(cliFormatter.getElem(DRAFTED_INFO),number ,schemaCard.getName()));
         return indexname + alignRight(printFavorTokens(schemaCard.getFavorTokens()),SCHEMA_WIDTH-printableLength(indexname));
     }
 
@@ -345,7 +345,7 @@ public class CLIView {
      * @return the prompt line
      */
     private String getPrompt(ClientFSMState state) {
-        return String.format(cliElements.getElem(PROMPT), buildPromptOptions(state));
+        return String.format(cliFormatter.getElem(PROMPT), buildPromptOptions(state));
     }
 
 
@@ -381,7 +381,7 @@ public class CLIView {
         clearMenu();
         menuList.add(uiMsg.getMessage(CHOOSE_TOOL));
         for(int i=0; i<LightBoard.NUM_TOOLS;i++) {
-            menuList.add(String.format(cliElements.getElem(LIST_ELEMENT),i, tools.get(i).getName()));
+            menuList.add(String.format(cliFormatter.getElem(LIST_ELEMENT),i, tools.get(i).getName()));
         }
         padMenu();
         fillMenu();
@@ -396,8 +396,8 @@ public class CLIView {
         menuList.add(EMPTY_STRING);
         menuList.add(uiMsg.getMessage(MAIN_CHOICE));
         menuList.add(EMPTY_STRING);
-        menuList.add(String.format(cliElements.getElem(LIST_ELEMENT),0,uiMsg.getMessage(USE_TOOL)));
-        if(!ClientFSMState.isPlacedDie())menuList.add(String.format(cliElements.getElem(LIST_ELEMENT),1,uiMsg.getMessage(PLACE_DIE)));
+        menuList.add(String.format(cliFormatter.getElem(LIST_ELEMENT),0,uiMsg.getMessage(USE_TOOL)));
+        if(!ClientFSMState.isPlacedDie())menuList.add(String.format(cliFormatter.getElem(LIST_ELEMENT),1,uiMsg.getMessage(PLACE_DIE)));
 
         padMenu();
         fillMenu();
@@ -590,7 +590,7 @@ public class CLIView {
     public  void setClientInfo(ConnectionMode mode, String username){
         if(mode==null||username==null){ throw new IllegalArgumentException();}
 
-        clientInfo = String.format(cliElements.getElem(CLIENT_INFO),
+        clientInfo = String.format(cliFormatter.getElem(CLIENT_INFO),
                 username,
                 uiMsg.getMessage(CONNECTED_VIA),
                 mode);
@@ -625,7 +625,7 @@ public class CLIView {
                 list.set(i,
                         list.get(i)
                                 + String.format(
-                                        cliElements.getElem(LIST_ELEMENT), numAddedDice, buildDiceListEntry(dice.get(numAddedDice))));
+                                        cliFormatter.getElem(LIST_ELEMENT), numAddedDice, buildDiceListEntry(dice.get(numAddedDice))));
             }
         }
 
@@ -640,15 +640,15 @@ public class CLIView {
      */
     private String buildDiceListEntry(IndexedCellContent die){
         StringBuilder entry= new StringBuilder();
-        entry.append(CLIViewUtils.buildSmallDie(die.getContent())).append(SPACE);
+        entry.append(CLIUtils.buildSmallDie(die.getContent())).append(SPACE);
         if(die.getPlace().equals(Place.SCHEMA)){
             entry.append(rowColmumn(die.getPosition()));
 
         } else if(die.getPlace().equals(Place.ROUNDTRACK)){
-            entry.append(String.format(cliElements.getElem(INDEX),uiMsg.getMessage(ROUND_NUMBER),die.getPosition()));
+            entry.append(String.format(cliFormatter.getElem(INDEX),uiMsg.getMessage(ROUND_NUMBER),die.getPosition()));
 
         }else{
-            entry.append(String.format(cliElements.getElem(INDEX),uiMsg.getMessage(POS),die.getPosition()));
+            entry.append(String.format(cliFormatter.getElem(INDEX),uiMsg.getMessage(POS),die.getPosition()));
         }
         return entry.toString();
     }
@@ -666,7 +666,7 @@ public class CLIView {
         int numAddedIndexes=0;
         for(int column=0;column<MAX_MENULIST_COLUMNS && numAddedIndexes<indexes.size();column++) {
             for (int i = 0; i <  Math.min(indexes.size(), (SCHEMA_HEIGHT )) && numAddedIndexes<indexes.size(); i++,numAddedIndexes++) {
-                list.set(i,list.get(i) + String.format(cliElements.getElem(LIST_ELEMENT), numAddedIndexes, rowColmumn(indexes.get(numAddedIndexes))));
+                list.set(i,list.get(i) + String.format(cliFormatter.getElem(LIST_ELEMENT), numAddedIndexes, rowColmumn(indexes.get(numAddedIndexes))));
             }
         }
 
@@ -681,7 +681,7 @@ public class CLIView {
     private static String rowColmumn(int index){
         int row= index/SchemaCard.NUM_COLS;
         int column= index%SchemaCard.NUM_COLS;
-        return String.format(cliElements.getElem(ROW_COL),uiMsg.getMessage(ROW),row,uiMsg.getMessage(COL),column);
+        return String.format(cliFormatter.getElem(ROW_COL),uiMsg.getMessage(ROW),row,uiMsg.getMessage(COL),column);
     }
 
 
@@ -709,7 +709,7 @@ public class CLIView {
         if(result.size()>=CELL_HEIGHT) {
             result.set(CELL_HEIGHT - 1,
                     result.get(CELL_HEIGHT - 1) +
-                            boldify(String.format(cliElements.getElem(POINT_LEFT), uiMsg.getMessage(DRAFTPOOL)))+replicate(SPACE+EMPTY_STRING,9)+ boldify(buildTurnRoundInfo()));
+                            boldify(String.format(cliFormatter.getElem(POINT_LEFT), uiMsg.getMessage(DRAFTPOOL)))+replicate(SPACE+EMPTY_STRING,9)+ boldify(buildTurnRoundInfo()));
             result.set(CELL_HEIGHT - 1, result.get(CELL_HEIGHT - 1)  + alignRight(boldify(clientInfo), SCREEN_WIDTH - printableLength(result.get(CELL_HEIGHT - 1))));
             result = appendRows(buildSeparator(draftPool.size()), result);
         }
@@ -756,11 +756,11 @@ public class CLIView {
     private String buildSchemaInfo(LightPlayer player,int width) {
         if(player==null){throw new IllegalArgumentException();}
 
-        String info=String.format(cliElements.getElem(USERNAME_ID),
+        String info=String.format(cliFormatter.getElem(USERNAME_ID),
                 player.getUsername(),alignRight(uiMsg.getMessage(PLAYER_NUMBER) +
                         player.getPlayerId(),width - printableLength(player.getUsername())));
         if(player.getStatus().equals(LightPlayerStatus.PLAYING)) {
-            info = info + (String.format(cliElements.getElem(TOKENS_INFO),
+            info = info + (String.format(cliFormatter.getElem(TOKENS_INFO),
                     uiMsg.getMessage(REMAINING_TOKENS),
                     alignRight(
                             replicate(FAVOR, player.getFavorTokens()),

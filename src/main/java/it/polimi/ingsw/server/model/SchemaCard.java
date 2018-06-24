@@ -72,11 +72,14 @@ public class SchemaCard implements Iterable<Cell>  {
      */
     public static SchemaCard parser(int id,boolean additionalSchema){
         File xmlFile=null;
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 
         if(additionalSchema){
-            xmlFile= new File(xmlAdditionalSchema);
+            xmlFile= new File(classLoader.getResource(xmlAdditionalSchema).getFile());
+
         }else{
-            xmlFile= new File(xmlSchema);
+            xmlFile= new File(classLoader.getResource(xmlSchema).getFile());
+
         }
 
         String name="";
@@ -129,7 +132,8 @@ public class SchemaCard implements Iterable<Cell>  {
      * @return the number of SchemaCards
      */
     public static int getAdditionalSchemaSize(){
-        File xmlFile= new File(xmlAdditionalSchema);
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        File xmlFile= new File(classLoader.getResource(xmlAdditionalSchema).getFile());
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -144,6 +148,7 @@ public class SchemaCard implements Iterable<Cell>  {
             return nodeList.getLength();
 
         }catch (SAXException | ParserConfigurationException | IOException e1) {
+            e1.printStackTrace();
             System.err.println("ERR: couldn't open the file correctly");
             return 0;
         }

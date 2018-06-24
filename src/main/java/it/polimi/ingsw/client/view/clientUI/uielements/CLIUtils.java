@@ -7,15 +7,15 @@ import it.polimi.ingsw.server.model.SchemaCard;
 import java.io.IOException;
 import java.util.*;
 
-import static it.polimi.ingsw.client.view.clientUI.uielements.CLIView.*;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIElems.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.CLIObjects.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats.*;
 import static it.polimi.ingsw.common.enums.ErrMsg.*;
 
 /**
  * This class contains all utility methods for the cliview class. All methods here are static
- * and can be used to execute different tasks for the CLIView.
+ * and can be used to execute different tasks for the CLIObjects.
  */
-public class CLIViewUtils {
+public class CLIUtils {
 
 
     private static final String NIL_CHAR = "\0";
@@ -34,17 +34,17 @@ public class CLIViewUtils {
 
     private static final String GREY = "\u001b[37m";
 
-    static CLIElements cliElements;
+    static CLIFormatter cliFormatter;
 
     static {
         try {
-            cliElements = new CLIElements();
+            cliFormatter = new CLIFormatter();
         } catch (InstantiationException e) {
             System.exit(2);
         }
     }
 
-    private CLIViewUtils(){}
+    private CLIUtils(){}
 
     static int printableLength(String line){
         String[] chars=line.split(ESCAPE);
@@ -212,7 +212,7 @@ public class CLIViewUtils {
     static  List<String> buildSchema(LightSchemaCard schema, boolean setIndexes) {
         List<String> result= new ArrayList<>();
 
-        if(setIndexes){result.add(cliElements.getElem(SCHEMA_COLUMNS));}
+        if(setIndexes){result.add(cliFormatter.getElem(SCHEMA_COLUMNS));}
 
         for(int row = 0; row< SchemaCard.NUM_ROWS; row++){
             if(setIndexes){
@@ -306,13 +306,13 @@ public class CLIViewUtils {
 
         if(cellContent==null){
             //empty
-            rows = splitElem(cliElements.getElem(EMPTY));
+            rows = splitElem(cliFormatter.getElem(EMPTY));
         }else {
             //not empty
 
             //die
             if (cellContent.isDie()) {
-                rows = splitElem(cliElements.getBigDie(cellContent.getShade()));
+                rows = splitElem(cliFormatter.getBigDie(cellContent.getShade()));
             }
 
             //constraint
@@ -320,11 +320,11 @@ public class CLIViewUtils {
                 if (cellContent.hasColor()) {
 
                     //color constraint
-                    rows = splitElem(cliElements.getElem(FILLED));
+                    rows = splitElem(cliFormatter.getElem(FILLED));
                 } else {
 
                     //shade constraint
-                    rows = splitElem(cliElements.getBigDie(cellContent.getShade()));
+                    rows = splitElem(cliFormatter.getBigDie(cellContent.getShade()));
                 }
             }
 
@@ -362,7 +362,7 @@ public class CLIViewUtils {
         if(tool.isUsed()) {
             result.set(0, result.get(0)+SPACE+ FAVOR);
         }
-        result.set(0,boldify(String.format(cliElements.getElem(LIST_ELEMENT),index,result.get(0))));
+        result.set(0,boldify(String.format(cliFormatter.getElem(LIST_ELEMENT),index,result.get(0))));
         return result;
     }
 

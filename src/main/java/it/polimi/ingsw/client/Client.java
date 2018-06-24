@@ -49,7 +49,7 @@ public class Client {
     private ConnectionMode connMode;
     private String username;
     private char [] password;
-
+    private static final String CONFIGURATION_FILE_NAME= "ClientConf.xml";
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
     private ClientConn clientConn;
@@ -59,7 +59,7 @@ public class Client {
     private UILanguage lang;
     private LightBoard board;
     private ClientFSM fsm;
-    public static final String XML_SOURCE = "src"+ File.separator+"xml"+File.separator+"client" +File.separator;
+    public static final String XML_SOURCE = "xml"+File.separator+"client" +File.separator;
     private final Object lockCredentials=new Object();
 
     private boolean ready;
@@ -114,7 +114,8 @@ public class Client {
      * @return the newly created client
      */
     private static Client parser(){
-        File xmlFile= new File(XML_SOURCE+"ClientConf.xml");
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        File xmlFile= new File(classLoader.getResource(XML_SOURCE+CONFIGURATION_FILE_NAME).getFile());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -159,13 +160,6 @@ public class Client {
      */
     void setUiMode(UIMode uiMode) {
         this.uiMode = uiMode;
-    }
-
-    /**
-     * @return the set language
-     */
-    public UILanguage getLang() {
-        return lang;
     }
 
     /**

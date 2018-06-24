@@ -56,7 +56,8 @@ public class ToolCard extends Card {
     }
 
     protected void toolReader(int id) {
-        File xmlFile = new File(XML_LOGIC);
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        File xmlFile= new File(classLoader.getResource(XML_LOGIC).getFile());
         String text;
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -314,7 +315,7 @@ public class ToolCard extends Card {
         try {
             schemaTemp.putDie(oldIndexList.get(0),selectedDice.get(0),IgnoredConstraint.FORCE);
         } catch (IllegalDieException e) {
-            System.out.println("Something gone wrong....");
+            System.out.println("Something went wrong....");
         }
         return placements;
     }
@@ -336,7 +337,7 @@ public class ToolCard extends Card {
             try {
                 schemaTemp.putDie(oldIndexList.get(0),selectedDice.get(0),IgnoredConstraint.FORCE);
             } catch (IllegalDieException e1) {
-                System.out.println("Something gone wrong....");
+                System.out.println("Something went wrong....");
             }
         }
         return true;
@@ -368,7 +369,7 @@ public class ToolCard extends Card {
      * @return if the execution flow is not finished yet, false elsewhere
      */
     public boolean toolCanContinue(Player player){
-        //System.out.println(selectedDice+"  "+oldIndexList);
+        //System.out.println(selectedDice+"  "+oldIndexList); //TODO delete
         if(actions.get(actionIndex)!=Actions.SWAP && actions.get(actionIndex)!=Actions.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
             selectedDice.remove(0);
         }

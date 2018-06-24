@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
-import it.polimi.ingsw.client.view.clientUI.ClientUI;
+import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import org.w3c.dom.Document;
@@ -18,10 +18,13 @@ public class UIMessages {
     private static final String MSG="messages";
     private final UILanguage lang;
     private static final Integer FIRST=0;
+    private static final String UIMESSAGES_FILE_NAME= "UIMessages.xml";
 
     public UIMessages(UILanguage lang) {
         this.lang = lang;
-        File xmlFile = new File(ClientUI.MESSAGES_FILE);
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        File xmlFile= new File(classLoader.getResource(Client.XML_SOURCE+UIMESSAGES_FILE_NAME).getFile());
+
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
 

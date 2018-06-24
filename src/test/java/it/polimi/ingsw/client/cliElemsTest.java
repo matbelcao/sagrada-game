@@ -1,9 +1,9 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
-import it.polimi.ingsw.client.view.clientUI.uielements.CLIElements;
-import it.polimi.ingsw.client.view.clientUI.uielements.CLIView;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIElems;
+import it.polimi.ingsw.client.view.clientUI.uielements.CLIFormatter;
+import it.polimi.ingsw.client.view.clientUI.uielements.CLIObjects;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.ConnectionMode;
@@ -20,11 +20,11 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIElems.FILLED;
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats.FILLED;
 import static it.polimi.ingsw.common.enums.Shade.*;
 
 class cliElemsTest {
-    private static CLIElements cliel;
+    private static CLIFormatter cliel;
     private static String OS = null;
     static String getOsName()
     {
@@ -39,13 +39,13 @@ class cliElemsTest {
 
     static {
         try {
-            cliel = new CLIElements();
+            cliel = new CLIFormatter();
         } catch (InstantiationException e) {
             e.printStackTrace();
         }
     }
 
-    private static CLIView cliview;
+    private static CLIObjects cliview;
     private static LightPlayer player0;
     private static LightPlayer player1;
     private static LightPlayer player2;
@@ -92,7 +92,7 @@ class cliElemsTest {
         player3.setStatus(LightPlayerStatus.DISCONNECTED);
 
 
-            cliview= new CLIView(UILanguage.ita);
+            cliview= new CLIObjects(UILanguage.ita);
 
 
         cliview.setMatchInfo(1,4);
@@ -170,7 +170,7 @@ class cliElemsTest {
         System.out.println("");
         System.out.printf(cliel.getElem(FILLED));
         System.out.println("");
-        System.out.printf(cliel.getElem(CLIElems.EMPTY));
+        System.out.printf(cliel.getElem(CLIFormats.EMPTY));
 
         System.out.println("");System.out.println("");System.out.println("");
 

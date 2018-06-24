@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI.uielements.enums;
 
-public enum CLIElems {
+public enum CLIFormats {
     EMPTY("EMPTI"),
     FILLED("FILLED"),
     CLIENT_INFO("player-info"),
@@ -21,7 +21,7 @@ public enum CLIElems {
     POINTS("points"), ROUND_INFO("round-info");
 
     private String clielem;
-    CLIElems(String clielem){
+    CLIFormats(String clielem){
         this.clielem = clielem;
 
     }

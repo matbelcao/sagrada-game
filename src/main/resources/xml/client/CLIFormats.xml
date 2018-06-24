@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<cli-components>
+<cli-formats>
     <ONE> _____ ::|     |::|  ●  |::|_____|</ONE>
     <TWO> _____ ::|    ●|::|     |::|●____|</TWO>
     <THREE> _____ ::|    ●|::|  ●  |::|●____|</THREE>
@@ -24,4 +24,4 @@
     <lobby>%n%n                 %s</lobby>
     <drafted-info>(%s) %s</drafted-info>
     <points> %s: %d</points>
-</cli-components>
+</cli-formats>

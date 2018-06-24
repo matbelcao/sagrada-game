@@ -4,12 +4,10 @@ import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.serializables.LightPrivObj;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
 
-import java.io.File;
 import java.util.List;
 import java.util.Observer;
 
 public interface ClientUI extends Observer {
-    String MESSAGES_FILE="src"+ File.separator+"xml"+File.separator+"client"+File.separator+"UIMessages.xml";
 
     /**
      * this method prints a message that notifies the user that the connectioin to the server was correctly established

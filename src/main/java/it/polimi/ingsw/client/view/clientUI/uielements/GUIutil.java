@@ -718,6 +718,7 @@ public class GUIutil {
     private Canvas drawCard(LightCard card, double imageWidth, double imageHeight) {
         Canvas cardCanvas = new Canvas(imageWidth, imageHeight);
         GraphicsContext gc = cardCanvas.getGraphicsContext2D();
+
         try (InputStream is = new FileInputStream(card.getImgSrc() + ".png")) {
             Image img = new Image(is);
             gc.drawImage(img, 0, 0, imageWidth, imageHeight);

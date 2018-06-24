@@ -37,7 +37,7 @@ public class ServerOptions {
 
 
     public static void printHelpMessage(){
-        String message="ERROR: couldn't load configuration files\n";
+        String message="ERR: couldn't load configuration files\n";
 
         File xmlFile= new File(MasterServer.XML_SOURCE+HELP_FILE);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
