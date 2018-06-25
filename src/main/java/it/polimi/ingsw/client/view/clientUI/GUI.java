@@ -246,9 +246,9 @@ public class GUI extends Application implements ClientUI {
             Scene scene = new Scene(bulidMainPane(200,200,board));
             //root.setStyle("-fx-background-color: black;"); //todo change
             primaryStage.setScene(scene);
-            primaryStage.setMinWidth(0);
-            primaryStage.setMinHeight(0);
-            primaryStage.sizeToScene();
+            primaryStage.setMinWidth(sceneCreator.getGameSceneMinWidth());
+            primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight());
+            System.out.println(primaryStage.getWidth()+"  "+primaryStage.getHeight());
 
             scene.addEventHandler(MOUSE_EXITED_BACK_PANE , event -> {
                 scene.setRoot(buildFrontPane(200,200,board));

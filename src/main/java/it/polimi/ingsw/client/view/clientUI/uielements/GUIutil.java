@@ -73,21 +73,17 @@ public class GUIutil {
     private static final int ROUNDTRACK_SIZE = 10;
     private static final double ROUNDTRACK_TEXT_SIZE_TO_CELL = 0.7;
     private static final double TEXT_DIM_TO_CELL_DIM = 0.5;
-    private static final double MAIN_SCENE_RATIO = 1.4286;
-    private static final double MAIN_SCENE_TO_SCREEN = 0.8;
+    private static final double MAIN_GAME_SCENE_RATIO = 1.72629;
+    private static final double MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH = 0.8265;
     private static final double DIE_ARC_TO_DIM = 0.35;
     private static final double LINE_TO_DIE = 0.045;
 
     //die s..
-    private static final int SCREEN_TO_DIE = 25;
-    private static final int DIE_TO_LINE = 10;
     private static final int SPOT_RATIO = 6;
-
-    private static final int LINE_WIDTH = 2;
-
 
     public GUIutil(Rectangle2D visualBounds, GUI gui, CmdWriter cmdWrite) {
         SCREEN_WIDTH = visualBounds.getWidth();
+        System.out.println("+++++++++-----------------+++++++++++++++++++------------------+++++"+SCREEN_WIDTH);
         SCREEN_HEIGHT = visualBounds.getHeight();
         this.gui = gui;
         this.cmdWrite = cmdWrite;
@@ -117,6 +113,14 @@ public class GUIutil {
         return drawingWidth / DRAFTED_CANVAS_SCENE_RATIO;
     }
 
+    public double getGameSceneMinWidth(){
+        return MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH*SCREEN_WIDTH;
+    }
+
+    public double getGameSceneMinHeight(){
+        return getGameSceneMinWidth()/MAIN_GAME_SCENE_RATIO;
+    }
+
     private double getCardWidth() {
         double width = 221;
         return width;
@@ -128,7 +132,7 @@ public class GUIutil {
     }
 
     public double getMainSceneCellDim(double newWidth, double newHeight) { //todo modify
-        return 80;
+        return 90;
     }
 
     public double getSelectedSchemaLineWidth(double sceneWidth, double sceneHeight) {
