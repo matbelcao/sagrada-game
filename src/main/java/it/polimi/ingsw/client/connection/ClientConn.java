@@ -68,7 +68,11 @@ public interface ClientConn {
      */
     List<LightPlayer> getPlayers();
 
-
+    /**
+     * The client invokest this function to retireve the necessary information to
+     * guarantee the correct reconnection during the game.
+     * @return the match status
+     */
     LightGameStatus getGameStatus();
 
     /**
@@ -143,7 +147,9 @@ public interface ClientConn {
      */
     void quit();
 
-
+    /**
+     * This function is invoked in case the client wants to start a new match when the previously is just ended
+     */
     void newMatch();
 
     /**

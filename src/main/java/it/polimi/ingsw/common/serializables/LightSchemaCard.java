@@ -1,4 +1,5 @@
 package it.polimi.ingsw.common.serializables;
+import it.polimi.ingsw.common.connection.SocketString;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Constraint;
 import it.polimi.ingsw.server.model.SchemaCard;
@@ -75,7 +76,7 @@ public class LightSchemaCard implements Serializable {
         for(int i=4;i<parsed.length;i++){
             String [] cellcontent=parsed[i].trim().split(",");
             int index= Integer.parseInt(cellcontent[1]);
-            if(cellcontent[0].equals("D")){
+            if(cellcontent[0].equals(SocketString.DIE)){
                 map.put(index,new LightDie(cellcontent[3],cellcontent[2]));
             }else{
                 map.put(index,new LightConstraint(cellcontent[2]));
