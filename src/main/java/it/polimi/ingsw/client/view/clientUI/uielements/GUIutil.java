@@ -507,8 +507,32 @@ public class GUIutil {
         return new Scene(p);
     }
 
-    public double getMainSceneCellDim(double newWidth, double newHeight) {
+    public double getMainSceneCellDim(double newWidth, double newHeight) { //todo modify
         return 100;
+    }
+
+    public BorderPane buildSelectdPlayerPane(int playerId, int width, int height, LightBoard board){
+        BorderPane selectedPlayerPane = new BorderPane();
+        HBox playersSelector = getPlayersSelector(board);
+        Region divider2 = new Region();
+        HBox.setHgrow(divider2,Priority.ALWAYS);
+        HBox bottomContainer = new HBox(playersSelector,divider2);
+        selectedPlayerPane.setBottom(bottomContainer);
+        double cellDim = getMainSceneCellDim(width,height);
+        selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT));
+        Canvas playerSchema = new Canvas(cellDim*NUM_COLS,cellDim*NUM_ROWS);
+        drawSchema(playerSchema.getGraphicsContext2D(),board.getPlayerById(playerId).getSchema(),0,0,cellDim);
+        StackPane p = new StackPane(playerSchema);
+        selectedPlayerPane.setLeft(p);
+        p.setAlignment(Pos.CENTER);
+        selectedPlayerPane.getLeft().setStyle("-fx-background-color: rgb(255,255,255);");
+        Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
+        selectedPlayerPane.getLeft().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
+
+
+        selectedPlayerPane.setLeft(p);
+
+        return selectedPlayerPane;
     }
 
     public HBox getPlayersSelector(LightBoard board) {
@@ -520,10 +544,7 @@ public class GUIutil {
                 continue;
             }else{
                 Event mouseEnteredPlayerStatusBar = new MyEvent(SELECTED_PLAYER, i);
-                playerStatusBar.setOnMouseEntered(e -> {
-                    playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar);
-                    System.out.println("enterreredfsfsjfnsdlghsdkgnsknsd,gnsjklgns");
-                });
+                playerStatusBar.setOnMouseEntered(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
             }
         }
         playerSelector.setAlignment(Pos.BOTTOM_LEFT);
@@ -707,33 +728,6 @@ public class GUIutil {
             y += cellDim;
         }
     }
-
-
-    /*private void drawCard(LightCard card, GraphicsContext gc, double x, double y, double imageWidth, double imageHeight) {
-        // Image image = new Image(getClass().getResourceAsStream("src"+ File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"1.png"));
-        // Image image = new Image(client.class.getResourceAsStream("src"+ File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"1.png"));
-        //TODO hookup with resources
-        //try (InputStream is = new FileInputStream("src" + File.separator + "img" + File.separator + "PrivObjectiveCard" + File.separator + "1.png")) {
-        try (InputStream is = new FileInputStream(card.getImgSrc() + ".png")) {
-            Image img = new Image(is);
-            gc.drawImage(img, x, y, imageWidth, imageHeight);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
-
-    /*private Canvas drawCard(LightCard card, double imageWidth, double imageHeight) {
-        Canvas cardCanvas = new Canvas(imageWidth, imageHeight);
-        GraphicsContext gc = cardCanvas.getGraphicsContext2D();
-
-        try (InputStream is = new FileInputStream(card.getImgSrc() + ".png")) {
-            Image img = new Image(is);
-            gc.drawImage(img, 0, 0, imageWidth, imageHeight);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return cardCanvas;
-    }*/
 
     private void drawWhiteCell(GraphicsContext gc, double x, double y, double cellDim) {
         gc.setFill(Color.WHITE);

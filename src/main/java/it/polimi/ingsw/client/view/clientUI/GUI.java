@@ -274,14 +274,10 @@ public class GUI extends Application implements ClientUI {
 
     private Parent showSelectedPlayer(int playerId, int width, int height, LightBoard board) {
         BorderPane frontPane = buildFrontPane(width,height,board);
-        BorderPane backPane = buildSelectdPlayerSchema(playerId,width, height, board);
+        BorderPane backPane = sceneCreator.buildSelectdPlayerPane(playerId,width, height, board);
         StackPane p = new StackPane(backPane,frontPane);
         backPane.toFront();
         return p;
-    }
-
-    BorderPane buildSelectdPlayerSchema(int playerId, int width, int height, LightBoard board){
-        return new BorderPane();
     }
 
     StackPane showMultipleDiceScreen(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
@@ -335,7 +331,7 @@ public class GUI extends Application implements ClientUI {
         return backPane;
     }
 
-    BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board){
+    private BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board){
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
@@ -366,10 +362,10 @@ public class GUI extends Application implements ClientUI {
         cards.setAlignment(CENTER_LEFT);
 
         HBox draftpool = sceneCreator.buildDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
-        HBox otherPlayers = sceneCreator.getPlayersSelector(board);
+        HBox playersSelector = sceneCreator.getPlayersSelector(board);
         Region divider2 = new Region();
-        HBox.setHgrow(divider,Priority.ALWAYS);
-        HBox bottomContainer = new HBox(otherPlayers,divider,draftpool);
+        HBox.setHgrow(divider2,Priority.ALWAYS);
+        HBox bottomContainer = new HBox(playersSelector,divider2,draftpool);
         draftpool.setAlignment(BOTTOM_RIGHT);
         frontPane.setBottom(bottomContainer);
         return frontPane;
