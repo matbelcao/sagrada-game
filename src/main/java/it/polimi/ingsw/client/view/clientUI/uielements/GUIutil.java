@@ -321,14 +321,16 @@ public class GUIutil {
         }
         GridPane pool = new GridPane();
         int i = 0;
-        int j = 0;
-        while (i < poolDice.size() && i < NUM_COLS){
-            pool.add(poolDice.get(i),i,0);
+        int coloumnIndex = NUM_COLS;
+        while (i < poolDice.size() && coloumnIndex>0){
+            pool.add(poolDice.get(i),coloumnIndex,1);
             i++;
+            coloumnIndex--;
         }
+        coloumnIndex = NUM_COLS;
        while (i < poolDice.size()){
-           pool.add(poolDice.get(i),j,1);
-           j++;
+           pool.add(poolDice.get(i),coloumnIndex,0);
+           coloumnIndex--;
            i++;
        }
         pool.setPadding(new Insets(10,10,10,10));
