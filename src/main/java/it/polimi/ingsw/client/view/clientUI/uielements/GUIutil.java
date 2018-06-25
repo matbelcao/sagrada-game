@@ -280,7 +280,7 @@ public class GUIutil {
         gc.fillText(index + "", cellDim / 2, cellDim / 2);
     }
 
-    public HBox buildDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList) {
+    public GridPane buildDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList) {
         ArrayList<Canvas> poolDice = new ArrayList<>();
         for (int i = 0; i < draftPool.size(); i++) {
             Canvas c = new Canvas(dieDim, dieDim);
@@ -319,9 +319,19 @@ public class GUIutil {
                 }
 
         }
-        HBox pool = new HBox();
-        pool.setSpacing(10);
-        pool.getChildren().addAll(poolDice);
+        GridPane pool = new GridPane();
+        int i = 0;
+        int j = 0;
+        while (i < poolDice.size() && i < NUM_COLS){
+            pool.add(poolDice.get(i),i,0);
+            i++;
+        }
+       while (i < poolDice.size()){
+           pool.add(poolDice.get(i),j,1);
+           j++;
+           i++;
+       }
+        pool.setPadding(new Insets(10,10,10,10));
         return pool;
 
     }
