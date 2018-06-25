@@ -509,7 +509,7 @@ public class Client {
                 ready=true;
                 lockReady.notifyAll();
             }
-
+            return;
         }
         board.notifyObservers();
 
