@@ -354,20 +354,27 @@ public class GUI extends Application implements ClientUI {
 
 
         GridPane schema = sceneCreator.drawSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
-        frontPane.setLeft(schema);
+        HBox playersSelector = sceneCreator.getPlayersSelector(board);
+        StackPane p = new StackPane(schema);
         schema.setAlignment(CENTER);
+        frontPane.setLeft(new VBox(p,playersSelector));
+        VBox.setVgrow(p,Priority.ALWAYS);
 
         VBox cards = sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState);
-        frontPane.setRight(cards);
-        cards.setAlignment(CENTER_LEFT);
-
         HBox draftpool = sceneCreator.buildDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
-        HBox playersSelector = sceneCreator.getPlayersSelector(board);
         Region divider2 = new Region();
-        HBox.setHgrow(divider2,Priority.ALWAYS);
-        HBox bottomContainer = new HBox(playersSelector,divider2,draftpool);
+        cards.getChildren().addAll(divider2,draftpool);
+        VBox.setVgrow(divider2,Priority.ALWAYS);
         draftpool.setAlignment(BOTTOM_RIGHT);
-        frontPane.setBottom(bottomContainer);
+
+        frontPane.setRight(cards);
+        cards.setAlignment(TOP_RIGHT);
+
+        //HBox playersSelector = sceneCreator.getPlayersSelector(board);
+
+        //HBox.setHgrow(divider2,Priority.ALWAYS);
+        //HBox bottomContainer = new HBox(playersSelector,divider2,draftpool);
+       // frontPane.setBottom(bottomContainer);
         return frontPane;
     }
 
