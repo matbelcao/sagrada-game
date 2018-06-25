@@ -344,30 +344,32 @@ public class GUI extends Application implements ClientUI {
         ClientFSMState              turnState = client.getTurnState();
 
         BorderPane frontPane = new BorderPane();
+
+        //Top side of the border pane
         HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackList,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
         Region divider = new Region();
         HBox.setHgrow(divider,Priority.ALWAYS);
         VBox menuButtons = sceneCreator.getMenuButtons(turnState);
         roundTrack.getChildren().addAll(divider,menuButtons);
-        frontPane.setTop(roundTrack);
         roundTrack.setAlignment(TOP_LEFT);
+        frontPane.setTop(roundTrack);
 
-
+        //Center side of the border pane
         GridPane schema = sceneCreator.drawSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
         HBox playersSelector = sceneCreator.getPlayersSelector(board);
         StackPane schemaContainer = new StackPane(schema);
         schema.setAlignment(CENTER);
-        frontPane.setLeft(new VBox(schemaContainer,playersSelector));
         VBox.setVgrow(schemaContainer,Priority.ALWAYS);
+        frontPane.setCenter(new VBox(schemaContainer,playersSelector));
 
+        //Right side of the border pane
         VBox cards = sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState);
+        StackPane cardsContainer = new StackPane(cards);
+        cards.setAlignment(CENTER);
         GridPane draftpool = sceneCreator.buildDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
-        Region divider2 = new Region();
-        cards.getChildren().addAll(divider2,draftpool);
-        VBox.setVgrow(divider2,Priority.ALWAYS);
+        VBox.setVgrow(cardsContainer,Priority.ALWAYS);
         draftpool.setAlignment(BOTTOM_RIGHT);
-        frontPane.setRight(cards);
-        cards.setAlignment(TOP_RIGHT);
+        frontPane.setRight(new VBox(cardsContainer,draftpool));
         return frontPane;
     }
 

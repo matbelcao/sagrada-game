@@ -525,24 +525,23 @@ public class GUIutil {
     public BorderPane buildSelectdPlayerPane(int playerId, int width, int height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
         HBox playersSelector = getPlayersSelector(board);
-        Region divider2 = new Region();
-        HBox.setHgrow(divider2,Priority.ALWAYS);
-        HBox bottomContainer = new HBox(playersSelector,divider2);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer,Priority.ALWAYS);
+        HBox bottomContainer = new HBox(playersSelector,spacer);
         selectedPlayerPane.setBottom(bottomContainer);
+
+        selectedPlayerPane.setRight(new Rectangle(0,0,getCardWidth()*3,1));
+
         double cellDim = getMainSceneCellDim(width,height);
         selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT));
         Canvas playerSchema = new Canvas(cellDim*NUM_COLS,cellDim*NUM_ROWS);
         drawSchema(playerSchema.getGraphicsContext2D(),board.getPlayerById(playerId).getSchema(),0,0,cellDim);
-        StackPane p = new StackPane(playerSchema);
-        selectedPlayerPane.setLeft(p);
-        p.setAlignment(Pos.CENTER);
-        selectedPlayerPane.getLeft().setStyle("-fx-background-color: rgb(255,255,255);");
+        StackPane schemaContainer = new StackPane(playerSchema);
+        selectedPlayerPane.setCenter(schemaContainer);
+        schemaContainer.setAlignment(Pos.CENTER);
+        //selectedPlayerPane.getCenter().setStyle("-fx-background-color: rgb(255,255,255,0.2);");
         Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
-        selectedPlayerPane.getLeft().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
-
-
-        selectedPlayerPane.setLeft(p);
-
+        selectedPlayerPane.getCenter().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
         return selectedPlayerPane;
     }
 
