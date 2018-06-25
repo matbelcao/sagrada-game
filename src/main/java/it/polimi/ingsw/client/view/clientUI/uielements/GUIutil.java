@@ -171,7 +171,7 @@ public class GUIutil {
                 break;
         }
         HBox track = new HBox();
-        track.setSpacing(10); //todo add dynamic spacing
+        track.setSpacing(5); //todo add dynamic spacing
         track.getChildren().addAll(roundTrackCells);
         return track;
     }
@@ -409,8 +409,6 @@ public class GUIutil {
                 grid.add(gridCells.get(row * NUM_COLS + col), col, row);
             }
         }
-        Insets padding = new Insets(10, 10, 10, 10);
-        grid.setPadding(padding);
         return grid;
     }
 
