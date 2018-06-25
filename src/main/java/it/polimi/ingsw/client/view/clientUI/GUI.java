@@ -347,7 +347,7 @@ public class GUI extends Application implements ClientUI {
         HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackList,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
         Region divider = new Region();
         HBox.setHgrow(divider,Priority.ALWAYS);
-        HBox menuButtons = sceneCreator.getMenuButtons(turnState);
+        VBox menuButtons = sceneCreator.getMenuButtons(turnState);
         roundTrack.getChildren().addAll(divider,menuButtons);
         frontPane.setTop(roundTrack);
         roundTrack.setAlignment(TOP_LEFT);

@@ -124,6 +124,10 @@ public class GUIutil {
         return height;
     }
 
+    public double getMainSceneCellDim(double newWidth, double newHeight) { //todo modify
+        return 80;
+    }
+
     public double getSelectedSchemaLineWidth(double sceneWidth, double sceneHeight) {
         DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth, sceneHeight);
         double drawingWidth = sizes.getDrawingWidth();
@@ -344,21 +348,22 @@ public class GUIutil {
         return g;
     }
 
-    public HBox getMenuButtons(ClientFSMState turnState) {
+    public VBox getMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button("end turn");
         endTurn.setOnAction(e -> cmdWrite.write("e"));
         Button back = new Button("back");
         back.setOnAction(e -> cmdWrite.write("b"));
-        Rectangle turnStateIndicator = new Rectangle(50, 50);
+       /* Rectangle turnStateIndicator = new Rectangle(50, 50);
         if (turnState.equals(NOT_MY_TURN)) {
             turnStateIndicator.setFill(Color.RED);
         } else {
             turnStateIndicator.setFill(Color.GREEN);
-        }
+        }*/
         Label turn = new Label(turnState.toString());
-        HBox h = new HBox();
-        h.getChildren().addAll(back, endTurn, turnStateIndicator, turn);
-        return h;
+        VBox buttonContainer = new VBox();
+        //buttonContainer.getChildren().addAll(back, endTurn, turnStateIndicator, turn);
+        buttonContainer.getChildren().addAll(back, endTurn);
+        return buttonContainer;
     }
 
     public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList) {
@@ -515,10 +520,6 @@ public class GUIutil {
         Text waitingText = new Text(message);
         StackPane p = new StackPane(waitingText);
         return new Scene(p);
-    }
-
-    public double getMainSceneCellDim(double newWidth, double newHeight) { //todo modify
-        return 100;
     }
 
     public BorderPane buildSelectdPlayerPane(int playerId, int width, int height, LightBoard board){
