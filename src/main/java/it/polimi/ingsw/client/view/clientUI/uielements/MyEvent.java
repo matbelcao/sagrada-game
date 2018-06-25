@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.view.clientUI;
+package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import javafx.event.Event;
 import javafx.event.EventType;
@@ -16,7 +16,7 @@ public class MyEvent extends Event {
     public MyEvent(EventType<? extends Event> eventType) {
         super(eventType);
     }
-    int getCellIndex(){
+    public int getCellIndex(){
         return cellIndex;
     }
 }

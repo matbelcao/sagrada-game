@@ -4,7 +4,6 @@ import it.polimi.ingsw.client.clientController.CmdWriter;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.GUI;
-import it.polimi.ingsw.client.view.clientUI.MyEvent;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Shade;
@@ -34,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
-import static it.polimi.ingsw.client.view.clientUI.MyEvent.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.*;
 
 public class GUIutil {
     private final CmdWriter cmdWrite;

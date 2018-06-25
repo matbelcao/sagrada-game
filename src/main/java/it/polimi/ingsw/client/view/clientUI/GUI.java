@@ -7,6 +7,7 @@ import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.textGen;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
+import it.polimi.ingsw.client.view.clientUI.uielements.MyEvent;
 import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.connection.Credentials;
@@ -42,8 +43,8 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.Observable;
 
-import static it.polimi.ingsw.client.view.clientUI.MyEvent.MOUSE_EXITED_BACK_PANE;
-import static it.polimi.ingsw.client.view.clientUI.MyEvent.SELECTED_PLAYER;
+import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.MOUSE_EXITED_BACK_PANE;
+import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.SELECTED_PLAYER;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;
 
