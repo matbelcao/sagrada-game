@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class LightCard implements Serializable {
     private String name;
     private String description;
-    private static final String imgSrc="src/img/PubObjectiveCard";
+    private static final String imgSrc="img/PubObjectiveCard/";
     private int id;
 
     public LightCard(String name, String description, int id){

@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.Serializable;
 
 public class LightTool extends LightCard implements Serializable {
-    private static  String imgSrc="src"+ File.separator+"img"+File.separator+"ToolCard"+File.separator;
+    private static  String imgSrc = "img/ToolCard/";
     private boolean used;
     public LightTool(String name, String description, int id, boolean used) {
         super(name, description, id);
