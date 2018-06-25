@@ -144,6 +144,11 @@ public class RMIClient implements ClientConn{
         return players;
     }
 
+    /**
+     * The client invokest this function to retireve the necessary information to
+     * guarantee the correct reconnection during the game.
+     * @return the match status
+     */
     @Override
     public LightGameStatus getGameStatus() {
         LightGameStatus status=null;
@@ -315,6 +320,9 @@ public class RMIClient implements ClientConn{
         }
     }
 
+    /**
+     * This function is invoked in case the client wants to start a new match when the previously is just ended
+     */
     @Override
     public void newMatch() {
         try {

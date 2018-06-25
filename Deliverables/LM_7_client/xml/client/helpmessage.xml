@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+
+        <!-- client help message -->
+
+<message>
+    <help-message>
+Welcome to Sagrada!
+    Usage:
+            -h/--help                               Get this help message
+            -g/--gui                                Set the preferred UI mode to GUI
+            -c/--cli                                Set the preferred UI mode to CLI
+            -a/--server-address ipv4_address        Set the ip address of the server
+            -r/--rmi                                Set the preferred connection mode to RMI
+            -s/--socket                             Set the preferred connection mode to Socket
+            -i/--italian                            Set UI language to italian
+            -e/--english                            Set UI language to english
+
+    By choosing no options default options will be set:
+            ip:                 127.0.0.1
+            ui:                 GUI
+            connection mode:    socket
+            language:           ita
+
+    </help-message>
+</message>

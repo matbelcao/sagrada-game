@@ -72,7 +72,7 @@ The server sends this message to all players in the lobby after a successful log
 +   __`SERVER`__ to __`PLAYER0`__  
 
 	`LOGIN ko`
-	
+
 +   __`PLAYER1`__ to __`SERVER`__  
 
 	`LOGIN PLAYER1 bubu7tete`
@@ -129,9 +129,11 @@ This message is sent at every beginning/end of a turn and can trigger (end) clie
 
 ##### `GAME end_turn`
 
-this message is sent to the server in case the client wants to end his turn before the timer goes off.
+This message is sent to the server in case the client wants to end his turn before the timer goes off.
 
+##### `GAME new_match`
 
+This message is sent to the server in case the client wants to start a new match when the previously is just ended.
 
 ### Example Session
 
@@ -164,7 +166,7 @@ The client sends this message to request the complete schema card (. The draft o
 
 This message is used to get the number of tokens remaining to the specified player.
 
-##### `GET priv|pub|tool|draftpool|roundtrack|players`
+##### `GET priv|pub|tool|draftpool|roundtrack|players|game_status`
 
 +   `priv`: the user requests the private objective card
 +   `pub`: the user requests the three public objective cards
@@ -172,6 +174,7 @@ This message is used to get the number of tokens remaining to the specified play
 +   `draftpool`: the user requests the dice in the draftpool
 +   `roundtrack`: the user requests the dice in the roundtrack
 +   `players`: the user requests the list of players of the match
++   `game_status`: the user requests the status of the the match when reconnected
 
 
 The client sends this message to request the card parameters, some dice in the board or info about other players.
@@ -181,7 +184,7 @@ The client sends this message to request the card parameters, some dice in the b
 ##### `SEND schema <name> <favor_tokens> [{D,<position>,<color>,<shade>|  {C,<index>,<color>|<shade>}] ...`
 
 +   `schema`: signals that the schema is being sent in its entirety
-+   `<favor_tokens>`: the number of favor tokens associated with the schema 
++   `<favor_tokens>`: the number of favor tokens associated with the schema
 +   `<name>`: the name of the schema
 +   `D`: the cell is occupied by a die
 +   `C`: there is a constraint in the cell
@@ -189,7 +192,7 @@ The client sends this message to request the card parameters, some dice in the b
 +   `<color>`: the color property
 +   `<shade>`: the shade property
 
-The server responds with this message to give information about the dice/constraints that are in the requested schema. 
+The server responds with this message to give information about the dice/constraints that are in the requested schema.
 
 ##### `SEND priv|pub|tool <id> <name> <description> [<color>|<used>]`
 
@@ -221,12 +224,23 @@ The server responds with this message to give information about the dice placed 
 +   `<num_tokens>`: the number of remaining tokens
 
 
-##### `SEND players {<player_id>,<username>} ...`
+##### `SEND players {<player_id>,<username>,<status>} ...`
 
 +   `<player_id>`: the player's identifier (0 to 3)
 +   `<username>`: the username that the player used to login
++   `<status>`: the player's connection status (PLAYING or DISCONNECTED or QUITTED)
 
-This message is used to send a list of the players of the match and their usernames.
+This message is used to send a list of the players of the match, their usernames and current status.
+
+##### `SEND game_status <isInit> <numPlayers> <numRound> <isFirstTurn> <nowPlaying>`
+
++   `<isInit>`: if the game has already started or someone has yet to choose a schema card
++   `<numPlayers>`: the number of players in the match
++   `<numRound>`: the number of the match round
++   `<isFirstTurn>`: if it is the player's first or second turn in the current round
++   `<numPlaying>`: the ID of who is playing
+
+This message is used to send the necessary information to the user to guarantee correct reconnection during the game.
 
 ### Example Session
 
@@ -243,7 +257,7 @@ This message is used to send a list of the players of the match and their userna
 +   __`PLAYER0`__ and __`PLAYER1`__ to __`SERVER`__
 
 	`GET schema draft`
-	
+
 +   __`SERVER`__ to __`PLAYER0`__
 
 	`SEND schema Kaleidoscopic_Dreams 4 C,0,0,THREE C,1,2,GREEN ...`
@@ -272,7 +286,7 @@ This message is used to gather a list of dice from the server. Said list will be
 +   `<shade>,<color>`: represent the characteristics of the die
 
 
-This message is used in order to send and ordered list of valid options the client can later select a die from with the `SELECT` command. 
+This message is used in order to send and ordered list of valid options the client can later select a die from with the `SELECT` command.
 
 
 ### Client-side
@@ -303,7 +317,7 @@ __NOTICE:__ whenever a single option is sent to the client the choice will be ma
 
 +   `<position>`: this is the actual position inside the schema where the die can be placed (0-19)
 
-This message is used only to list possible placements in a schema after the client has chosen __PLACE_DIE__ and has sent a `GET_LIST_PLACEMENTS` towards the server.
+This message is used only to list possible placements in a schema after the client has chosen __PLACE_DIE__ and has sent a `GET_PLACEMENTS_LIST` towards the server.
 
 
 ### Client-side
@@ -332,9 +346,9 @@ This is the reply of the server to a `CHOOSE` message previously received from t
 
 ### Client-side
 
-##### `EXIT`
+##### `BACK`
 
-This message signals that the player wants to go back to where he can choose to either use a toolcard or place a die. 
+This message signals that the player wants to go back to where he can choose to either use a toolcard or place a die.
 __NOTICE__: any progress in the usage of a tool card that is not a legal state to be "committed" to the board will be lost, and the favor tokens will be gone.
 
 
@@ -373,7 +387,7 @@ This message is sent during the execution of the procedures of a toolcard, after
 +   __`SERVER`__ to __`PLAYER0`__
 
 	`CHOICE ok`
-	
+
 +   `...`
 
 +   __`PLAYER1`__ to __`SERVER`__
@@ -415,7 +429,7 @@ This message is sent during the execution of the procedures of a toolcard, after
 +   __`PLAYER0`__ to __`SERVER`__
 
 	`SELECT 1 `
-	
+
 +   __`SERVER`__ to __`PLAYER0`__
 
 	`LIST_OPTIONS 0,PLACE_DIE`
@@ -423,7 +437,7 @@ This message is sent during the execution of the procedures of a toolcard, after
 +   __`PLAYER0`__ to __`SERVER`__
 
 	`CHOOSE 0`
-	
+
 +   __`SERVER`__ to __`PLAYER0`__
 
 	`CHOICE ok`
@@ -431,22 +445,22 @@ This message is sent during the execution of the procedures of a toolcard, after
 +   __`PLAYER0`__ to __`SERVER`__
 
 	`GET_PLACEMENTS_LIST`
-	
+
 +   __`SERVER`__ to __`PLAYER0`__
 
 	`LIST_PLACEMENTS 0 2 4 5 9 17 18 19`
-	
+
 +   __`PLAYER0`__ to __`SERVER`__
 
 	`CHOOSE 1`
-	
+
 +   __`SERVER`__ to __`PLAYER0`__
 
 	`CHOICE ok`
-	
+
 (this confirms that the placement of the die (`BLUE,THREE`) in the third cell of the schema of player0 has been made correctly)
-	
-	
+
+
 +   `...`
 
 ## The Loop
@@ -464,7 +478,7 @@ The execution of a turn and it's parts, as well as the usage of a tool, is based
 6. server: `CHOICE ok`
 7. user: `GET_PLACEMENTS_LIST`
 8. server: `LIST_PLACEMENTS [<position>]...`
-9. the client can now `DISCARD` and go back to #1 or `CHOOSE <index>` 
+9. the client can now `DISCARD` and go back to #1 or `CHOOSE <index>`
 10. server: `CHOICE ok`
 11. client gets the updates made to the board then returns to the initial choice
 
@@ -479,7 +493,7 @@ The execution of a turn and it's parts, as well as the usage of a tool, is based
 5. user:`CHOOSE 0`
 6. server: `CHOICE ok`if it is a `PLACE_DIE` repeat the steps (7-11) as in the __Placement of a die__ (the server knows the constraint and will apply them according to the selected tool) once finished come back to step #7
 7. user: `TOOL can_continue`
-8. server: `TOOL ok|ko` if ko then the changes to the board will be applied and the user will return to the decision of placing a die or using a tool if ok will go back to step #2 
+8. server: `TOOL ok|ko` if ko then the changes to the board will be applied and the user will return to the decision of placing a die or using a tool if ok will go back to step #2
 
 At the end of each iteration of the loop the temporary board is updated for the user to be able to continue in the game/execution of a tool effect. The changes are made to the actual board only if the state is valid according to the rules of the game.
 
@@ -509,7 +523,7 @@ Theese messages are sent to all connected users and also may serve the purpose o
 +   __`SERVER`__ to __`PLAYER0`__ and __`PLAYER1`__
 
 	`PING`
-	
+
 +   __`PLAYER1`__ to __`SERVER`__
 
 	`PONG`
@@ -539,6 +553,7 @@ Theese messages are sent to all connected users and also may serve the purpose o
 
 
 ## Connection Status Detection
+This messages are user by the clinet and server to detect if the connection is still available.
 ### Server-side
 
 ##### `PING`
@@ -551,61 +566,17 @@ Theese messages are sent to all connected users and also may serve the purpose o
 ### Example session
 +   `...`
 
-+   __`SERVER`__ to __`PLAYER1`__ 
++   __`SERVER`__ to __`PLAYER1`__
 
 	`PING`
-	
+
 +   __`PLAYER1`__ to __`SERVER`__
 
 	`PONG`
 
-+   __`SERVER`__ to __`PLAYER1`__ 
++   __`SERVER`__ to __`PLAYER1`__
 
 	`PING`
-	
-+   __`PLAYER1`__ to __`SERVER`__
-
-	`PONG`
-
-+   __`SERVER`__ to __`PLAYER1`__ 
-
-	`PING`
-	
-+   __`PLAYER1`__ to __`SERVER`__
-
-	`PONG`
-
-+   __`SERVER`__ to __`PLAYER1`__ 
-
-	`PING`
-	
-+   __`PLAYER1`__ to __`SERVER`__
-
-	`PONG`
-
-+   __`SERVER`__ to __`PLAYER1`__ 
-
-	`PING`
-	
-+   __`PLAYER1`__ to __`SERVER`__
-
-	`PONG`
-
-+   __`SERVER`__ to __`PLAYER1`__ 
-
-	`PING`
-	
-+   __`PLAYER1`__ to __`SERVER`__
-
-	`PONG`
-
-+   __`SERVER`__ to __`PLAYER1`__ 
-
-	`PING`
-	
-+   __`PLAYER1`__ to __`SERVER`__
-
-	`PONG`
 
 +   `...`
 

@@ -1,5 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
+import it.polimi.ingsw.common.connection.SocketString;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,31 +32,31 @@ public class ClientParser {
         parsedResult.addAll(Arrays.asList(command));
         switch (keyword) {
 
-            case "LOGIN":
+            case SocketString.LOGIN:
                 return checkLogin(parsedResult);
-            case "LOBBY":
+            case SocketString.LOBBY:
                 return checkLobby(parsedResult);
-            case "GAME":
+            case SocketString.GAME:
                 return checkGame(parsedResult);
-            case "SEND":
+            case SocketString.SEND:
                 return checkSend(parsedResult);
-            case "LIST_DICE":
+            case SocketString.LIST_DICE:
                 return checkDiceList(parsedResult);
-            case "LIST_OPTIONS":
+            case SocketString.LIST_OPTIONS:
                 return parsedResult.size()>=2;
-            case "LIST_PLACEMENTS":
+            case SocketString.LIST_PLACEMENTS:
                 return true;
-            case "CHOICE":
+            case SocketString.CHOICE:
                 return checkChoice(parsedResult);
-            case "TOOL":
+            case SocketString.TOOL:
                 return checkTool(parsedResult);
-            case "STATUS":
+            case SocketString.STATUS:
                 return checkStatus(parsedResult);
-            case "PING":
+            case SocketString.PING:
                 return parsedResult.size()==1;
-            case "INVALID":
+            case SocketString.INVALID:
                 return true;
-            case "ILLEGAL":
+            case SocketString.ILLEGAL:
                 return true;
             default:
                 parsedResult.clear();
@@ -66,76 +68,76 @@ public class ClientParser {
 
     public static boolean isLogin(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("LOGIN");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.LOGIN);
 
     }
 
     public static boolean isLobby(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("LOBBY");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.LOBBY);
 
     }
 
     public static boolean isGame(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("GAME");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.GAME);
 
     }
 
     public static boolean isSend(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("SEND");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.SEND);
 
     }
 
     public static boolean isDiceList(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("LIST_DICE");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.LIST_DICE);
 
     }
 
     public static boolean isOptionList(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("LIST_OPTIONS");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.LIST_OPTIONS);
 
     }
 
     public static boolean isPlacementList(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("LIST_PLACEMENTS");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.LIST_PLACEMENTS);
 
     }
 
     public static boolean isChoice(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("CHOICE");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.CHOICE);
 
     }
 
     public static boolean isTool(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("TOOL");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.TOOL);
     }
 
     public static boolean isStatus(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("STATUS");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.STATUS);
 
     }
 
     public static boolean isInvalid(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("INVALID");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.INVALID);
     }
 
     public static boolean isPing(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("PING");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.PING);
     }
 
     public static boolean isIllegalAction(String message){
         if (message == null) throw new IllegalArgumentException();
-        return message.trim().split("\\s+",2)[0].equals("ILLEGAL");
+        return message.trim().split("\\s+",2)[0].equals(SocketString.ILLEGAL);
     }
 
     /**
@@ -164,23 +166,23 @@ public class ClientParser {
     private static boolean checkGame(List<String> parsedResult){
         if(parsedResult.size()<2){return false;}
         switch(parsedResult.get(1)){
-            case "start":
+            case SocketString.START:
                 return parsedResult.size() == 4;
-            case "end":
+            case SocketString.END:
                 for(int i=2;i<parsedResult.size();i++)
                     if (parsedResult.get(i).split(",").length != 3) {
                         return false;
                     }
                 return true;
-            case "round_start":
+            case SocketString.ROUND_START:
                 return parsedResult.size() == 3;
-            case "round_end":
+            case SocketString.ROUND_END:
                 return parsedResult.size() == 3;
-            case "turn_start":
+            case SocketString.TURN_START:
                 return parsedResult.size() == 4;
-            case "turn_end":
+            case SocketString.TURN_END:
                 return parsedResult.size() == 4;
-            case"board_changed":
+            case SocketString.BOARD_CHANGED:
                 return true;
             default:
                 return false;
@@ -194,23 +196,23 @@ public class ClientParser {
      */
     private static boolean checkSend(List<String> parsedResult){
         if(parsedResult.size()<2){return false;}
-        if(parsedResult.get(1).equals("schema") && parsedResult.size()>4) {
+        if(parsedResult.get(1).equals(SocketString.SCHEMA) && parsedResult.size()>4) {
             return checkSendSchema(parsedResult);
         }
-        if(parsedResult.get(1).equals("game_status")) {
+        if(parsedResult.get(1).equals(SocketString.GAME_STATUS)) {
             return true;
         }
-        if(parsedResult.get(1).equals("favor_tokens") && parsedResult.size()==3){return true;}
-        if(parsedResult.get(1).equals("priv")||parsedResult.get(1).equals("tool")){
+        if(parsedResult.get(1).equals(SocketString.TOKENS) && parsedResult.size()==3){return true;}
+        if(parsedResult.get(1).equals(SocketString.PRIVATE)||parsedResult.get(1).equals(SocketString.TOOLCARD)){
             return parsedResult.size() == 6 ;
         }
-        if(parsedResult.get(1).equals("pub")){
+        if(parsedResult.get(1).equals(SocketString.PUBLIC)){
             return parsedResult.size() == 5 ;
         }
-        if(parsedResult.get(1).equals("draftpool")||parsedResult.get(1).equals("roundtrack")||parsedResult.get(1).equals("roundtrack_update")){
+        if(parsedResult.get(1).equals(SocketString.DRAFTPOOL)||parsedResult.get(1).equals(SocketString.ROUNDTRACK)){
             return checkCommaParametersLength(3,parsedResult);
         }
-        if(parsedResult.get(1).equals("players")){
+        if(parsedResult.get(1).equals(SocketString.PLAYERS)){
             return checkCommaParametersLength(3,parsedResult);
         }
         return false;
@@ -227,10 +229,10 @@ public class ClientParser {
                 i++;
             }
             String[] args = parsedResult.get(i).split(",");
-            if (args[0].equals("D") && args.length != 4) {
+            if (args[0].equals(SocketString.DIE) && args.length != 4) {
                 return false;
             }
-            if (args[0].equals("C") && args.length != 3) {
+            if (args[0].equals(SocketString.CONSTRAINT) && args.length != 3) {
                 return false;
             }
         }
@@ -256,7 +258,7 @@ public class ClientParser {
      * @return true iff the parameters are valid
      */
     private static boolean checkDiceList(List<String> parsedResult){
-        if(!parsedResult.get(0).equals("LIST_DICE")) {return false;}
+        if(!parsedResult.get(0).equals(SocketString.LIST_DICE)) {return false;}
         for (int i = 2; i < parsedResult.size(); i++) {
             if (parsedResult.get(i).split(",").length != 3) {
                 return false;
@@ -272,7 +274,7 @@ public class ClientParser {
      */
     private static boolean checkTool(List<String> parsedResult){
         if(parsedResult.size()!=2){return false;}
-        return parsedResult.get(1).equals("ok") || parsedResult.get(1).equals("ko");
+        return parsedResult.get(1).equals(SocketString.OK) || parsedResult.get(1).equals(SocketString.KO);
     }
 
     /**
@@ -282,7 +284,7 @@ public class ClientParser {
      */
     private static boolean checkChoice(List<String> parsedResult){
         if(parsedResult.size()!=2){return false;}
-        return parsedResult.get(1).equals("ok") || parsedResult.get(1).equals("ko");
+        return parsedResult.get(1).equals(SocketString.OK) || parsedResult.get(1).equals(SocketString.KO);
     }
 
     private static boolean checkStatus(List<String> parsedResult) {
