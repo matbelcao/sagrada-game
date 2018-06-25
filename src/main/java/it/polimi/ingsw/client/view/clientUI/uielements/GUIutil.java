@@ -23,22 +23,18 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
-import static it.polimi.ingsw.client.view.clientUI.MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL;
-import static it.polimi.ingsw.client.view.clientUI.MyEvent.MOUSE_EXITED_BACK_PANE;
-import static it.polimi.ingsw.client.view.clientUI.MyEvent.SELECTED_PLAYER;
+import static it.polimi.ingsw.client.view.clientUI.MyEvent.*;
 
 public class GUIutil {
     private final CmdWriter cmdWrite;
@@ -416,9 +412,14 @@ public class GUIutil {
         HBox cardContainer = new HBox();
         VBox primaryContainer = new VBox(buttonContainer, cardContainer);
 
-        priv.setOnAction(e -> cardContainer.getChildren().setAll(drawCard(privObj, getCardWidth(), getCardHeight())));
+        priv.setOnAction(e -> {
+            Rectangle privObjImg = drawCard(privObj, getCardWidth(), getCardHeight());
+            Rectangle emptyRect1 = new Rectangle(getCardWidth(), getCardHeight(),Color.TRANSPARENT);
+            Rectangle emptyRect2 = new Rectangle(getCardWidth(), getCardHeight(),Color.TRANSPARENT);
+            cardContainer.getChildren().setAll(privObjImg,emptyRect1,emptyRect2);
+        });
         pub.setOnAction(e -> {
-            ArrayList<Canvas> cards = new ArrayList();
+            ArrayList<Rectangle> cards = new ArrayList();
             for (LightCard pubObjCard : pubObjs) {
                 cards.add(drawCard(pubObjCard, getCardWidth(), getCardHeight()));
 
@@ -426,23 +427,36 @@ public class GUIutil {
             cardContainer.getChildren().setAll(cards);
         });
         tool.setOnAction(e1 -> {
-            ArrayList<Canvas> cards = new ArrayList();
+            ArrayList<Rectangle> cards = new ArrayList();
             for (LightCard toolCard : tools) {
-                Canvas c = drawCard(toolCard, getCardWidth(), getCardHeight());
-                c.setOnMouseClicked(e2 -> {
+               Rectangle toolRect = drawCard(toolCard, getCardWidth(), getCardHeight());
+                toolRect.setOnMouseClicked(e2 -> {
                     if (turnState.equals(MAIN)) {
                         cmdWrite.write("0");
-                        System.out.println(".................selected tool " + tools.indexOf(toolCard) + "..........");
                         cmdWrite.write(tools.indexOf(toolCard) + "");
                     }
                 });
-                cards.add(c);
+                cards.add(toolRect);
             }
             cardContainer.getChildren().setAll(cards);
         });
         tool.fire();
         return primaryContainer;
 
+    }
+
+    private Rectangle drawCard(LightCard card, double imageWidth, double imageHeight) {
+        /*age image = new Image("img/PrivObjectiveCard/1.png");
+        ImageView view = new ImageView();
+        view.setImage(image);
+        Rectangle2D viewportRect = new Rectangle2D(0, 35, imageWidth, imageHeight);
+        view.setViewport(viewportRect);
+        return view;*/
+        Image image = new Image(card.getImgSrc()+".png");
+        Rectangle imgRect = new Rectangle(imageWidth, imageHeight);
+        ImagePattern imagePattern = new ImagePattern(image);
+        imgRect.setFill(imagePattern);
+        return imgRect;
     }
 
     private void highlight(Canvas cell, double cellDim) {
@@ -629,7 +643,7 @@ public class GUIutil {
         //clean the canvas
         gc.clearRect(0, 0, sceneWidth, sceneHeight);
 
-        drawCard(privObj, gc, privObjX, privObjY, privObjWidth, privObjHeight);
+       //drawCard(privObj, gc, privObjX, privObjY, privObjWidth, privObjHeight); //todo reimplemet
         drawCompleteSchema(gc, lightSchemaCard.get(0), x + extPadding, y + extPadding, schemaWidth, schemaHeight);
         drawCompleteSchema(gc, lightSchemaCard.get(1), x + extPadding + schemaWidth + intPadding, y + extPadding, schemaWidth, schemaHeight);
         drawCompleteSchema(gc, lightSchemaCard.get(2), x + extPadding, y + extPadding + schemaHeight + intPadding, schemaWidth, schemaHeight);
@@ -702,7 +716,7 @@ public class GUIutil {
     }
 
 
-    private void drawCard(LightCard card, GraphicsContext gc, double x, double y, double imageWidth, double imageHeight) {
+    /*private void drawCard(LightCard card, GraphicsContext gc, double x, double y, double imageWidth, double imageHeight) {
         // Image image = new Image(getClass().getResourceAsStream("src"+ File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"1.png"));
         // Image image = new Image(client.class.getResourceAsStream("src"+ File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"1.png"));
         //TODO hookup with resources
@@ -713,9 +727,9 @@ public class GUIutil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
-    private Canvas drawCard(LightCard card, double imageWidth, double imageHeight) {
+    /*private Canvas drawCard(LightCard card, double imageWidth, double imageHeight) {
         Canvas cardCanvas = new Canvas(imageWidth, imageHeight);
         GraphicsContext gc = cardCanvas.getGraphicsContext2D();
 
@@ -726,7 +740,7 @@ public class GUIutil {
             e.printStackTrace();
         }
         return cardCanvas;
-    }
+    }*/
 
     private void drawWhiteCell(GraphicsContext gc, double x, double y, double cellDim) {
         gc.setFill(Color.WHITE);
