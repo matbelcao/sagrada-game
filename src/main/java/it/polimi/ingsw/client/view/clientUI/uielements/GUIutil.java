@@ -34,6 +34,9 @@ import java.util.List;
 
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.*;
+import static javafx.geometry.Pos.BOTTOM_RIGHT;
+import static javafx.geometry.Pos.CENTER;
+import static javafx.geometry.Pos.TOP_LEFT;
 
 public class GUIutil {
     private final CmdWriter cmdWrite;
@@ -177,6 +180,7 @@ public class GUIutil {
         HBox track = new HBox();
         track.setSpacing(5); //todo add dynamic spacing
         track.getChildren().addAll(roundTrackCells);
+        track.setAlignment(TOP_LEFT);
         return track;
     }
 
@@ -338,6 +342,7 @@ public class GUIutil {
            i++;
        }
         pool.setPadding(new Insets(10,10,10,10));
+        pool.setAlignment(BOTTOM_RIGHT);
         return pool;
 
     }
@@ -414,6 +419,7 @@ public class GUIutil {
                 grid.add(gridCells.get(row * NUM_COLS + col), col, row);
             }
         }
+        grid.setAlignment(CENTER);
         return grid;
     }
 
@@ -539,7 +545,6 @@ public class GUIutil {
         StackPane schemaContainer = new StackPane(playerSchema);
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
-        //selectedPlayerPane.getCenter().setStyle("-fx-background-color: rgb(255,255,255,0.2);");
         Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
         selectedPlayerPane.getCenter().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
         return selectedPlayerPane;

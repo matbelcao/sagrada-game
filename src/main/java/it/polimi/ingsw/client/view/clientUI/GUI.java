@@ -351,14 +351,12 @@ public class GUI extends Application implements ClientUI {
         HBox.setHgrow(divider,Priority.ALWAYS);
         VBox menuButtons = sceneCreator.getMenuButtons(turnState);
         roundTrack.getChildren().addAll(divider,menuButtons);
-        roundTrack.setAlignment(TOP_LEFT);
         frontPane.setTop(roundTrack);
 
         //Center side of the border pane
         GridPane schema = sceneCreator.drawSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
         HBox playersSelector = sceneCreator.getPlayersSelector(board);
         StackPane schemaContainer = new StackPane(schema);
-        schema.setAlignment(CENTER);
         VBox.setVgrow(schemaContainer,Priority.ALWAYS);
         frontPane.setCenter(new VBox(schemaContainer,playersSelector));
 
@@ -368,7 +366,6 @@ public class GUI extends Application implements ClientUI {
         cards.setAlignment(CENTER);
         GridPane draftpool = sceneCreator.buildDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
         VBox.setVgrow(cardsContainer,Priority.ALWAYS);
-        draftpool.setAlignment(BOTTOM_RIGHT);
         frontPane.setRight(new VBox(cardsContainer,draftpool));
         return frontPane;
     }
