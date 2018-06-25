@@ -2,7 +2,6 @@ package it.polimi.ingsw.common.serializables;
 
 import it.polimi.ingsw.server.model.Card;
 
-import java.io.File;
 import java.io.Serializable;
 
 public class LightCard implements Serializable {
