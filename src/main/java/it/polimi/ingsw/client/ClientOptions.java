@@ -1,16 +1,16 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
-import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMode;
+import it.polimi.ingsw.common.enums.ConnectionMode;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public class ClientOptions {
@@ -20,13 +20,13 @@ public class ClientOptions {
     private static final String LONG_OPTION="(\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+))";
     private static final String SHORT_OPTION="(\\-[hgcrsaie]+)";
     private static final String IP_ADDRESS="(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$)";
-
+    private static final String HELP_FILE= "helpmessage.xml";
 
 
     public static void printHelpMessage(){
         String message="ERROR: couldn't load configuration files\n";
-
-        File xmlFile= new File(Client.XML_SOURCE+"helpmessage.xml");
+        ClassLoader classLoader=ClassLoader.getSystemClassLoader();
+        InputStream xmlFile=classLoader.getResourceAsStream(Client.XML_SOURCE+HELP_FILE);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {

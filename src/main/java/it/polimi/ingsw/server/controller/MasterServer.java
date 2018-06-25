@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -66,7 +67,7 @@ public class MasterServer{
 
     private static MasterServer parser(){
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File xmlFile= new File(Objects.requireNonNull(classLoader.getResource(XML_SOURCE + CONFIGURATION_FILE_NAME)).getFile());
+        InputStream xmlFile=classLoader.getResourceAsStream(XML_SOURCE + CONFIGURATION_FILE_NAME);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {

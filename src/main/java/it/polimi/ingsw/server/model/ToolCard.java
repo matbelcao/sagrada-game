@@ -18,6 +18,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class ToolCard extends Card {
 
 
 
-    public ToolCard(int id) {
+    public ToolCard(int id) {// TODO: 25/06/2018 remove parser from constructor
         super();
         super.xmlReader(id, XML_DESCRIPTION, "ToolCard");
         this.used = false;
@@ -57,7 +58,7 @@ public class ToolCard extends Card {
 
     protected void toolReader(int id) {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File xmlFile= new File(classLoader.getResource(XML_LOGIC).getFile());
+        InputStream xmlFile= classLoader.getResourceAsStream(XML_LOGIC);
         String text;
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -329,7 +330,7 @@ public class ToolCard extends Card {
     public boolean internalDiePlacement(int index){
         List<Integer> placerments= internalListPlacements();
         try {
-            //System.out.println("Internal_placement: "+selectedDice.get(0).toString()+" "+ignoredConstraint+" "+oldIndexList.get(0));
+            //System.out.println("Internal_placement: "+selectedDice.get(0).toString()+" "+ignoredConstraint+" "+oldIndexList.get(0)); //TODO delete
             schemaTemp.removeDie(oldIndexList.get(0));
             schemaTemp.putDie(placerments.get(index),selectedDice.get(0),ignoredConstraint);
             numDiePlaced++;

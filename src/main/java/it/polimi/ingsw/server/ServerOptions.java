@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 
@@ -38,8 +39,8 @@ public class ServerOptions {
 
     public static void printHelpMessage(){
         String message="ERR: couldn't load configuration files\n";
-
-        File xmlFile= new File(MasterServer.XML_SOURCE+HELP_FILE);
+        ClassLoader classLoader=ClassLoader.getSystemClassLoader();
+        InputStream xmlFile=classLoader.getResourceAsStream(MasterServer.XML_SOURCE+HELP_FILE);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {

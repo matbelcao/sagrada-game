@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class CLIFormatter {
     private Element elemFile;
@@ -28,7 +29,7 @@ public class CLIFormatter {
 
     private static Element parser(){
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File xmlFile= new File(classLoader.getResource(Client.XML_SOURCE+FORMATS_FILE_NAME).getFile());
+        InputStream xmlFile= classLoader.getResourceAsStream(Client.XML_SOURCE+FORMATS_FILE_NAME);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = null;
 
