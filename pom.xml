@@ -31,14 +31,29 @@
                         </goals>
                         <configuration>
                             <finalName>LM_7_client</finalName>
+                            <filters>
+                                <filter>
+                                    <artifact>it.polimi.ingsw</artifact>
+                                    <excludes>
+                                        <exclude>it/polimi/ingsw/server/**</exclude> <!--to exclude a set of classes from the project structure-->
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>xml/server/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <Main-Class>it.polimi.ingsw.client.Client</Main-Class>
                                     </manifestEntries>
-                                </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
-                                    <resource>xml/server/**/*</resource>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -50,6 +65,25 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>it.polimi.ingsw</artifact>
+                                    <excludes>
+                                        <exclude>it/polimi/ingsw/client/**</exclude> <!--to exclude a set of classes from the project structure-->
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>img/**</exclude>
+                                        <exclude>xml/client/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                             <finalName>LM_7_server</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -57,13 +91,12 @@
                                         <Main-Class>it.polimi.ingsw.server.controller.MasterServer</Main-Class>
                                     </manifestEntries>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
-                                    <resources>
-                                        <resource>xml/client/**/*</resource>
-                                        <resource>img/**/*</resource>
-                                    </resources>
-                                </transformer>
                             </transformers>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.fusesource.jansi:jansi</exclude>
+                                </excludes>
+                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
