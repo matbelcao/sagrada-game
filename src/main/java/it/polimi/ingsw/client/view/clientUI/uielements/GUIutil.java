@@ -530,7 +530,7 @@ public class GUIutil {
 
     public BorderPane buildSelectdPlayerPane(int playerId, int width, int height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
-        HBox playersSelector = getPlayersSelector(board);
+        HBox playersSelector = getPlayersStatusBar(playerId,board);
         Region spacer = new Region();
         HBox.setHgrow(spacer,Priority.ALWAYS);
         HBox bottomContainer = new HBox(playersSelector,spacer);
@@ -550,10 +550,10 @@ public class GUIutil {
         return selectedPlayerPane;
     }
 
-    public HBox getPlayersSelector(LightBoard board) {
+    public HBox getPlayersStatusBar(int hilighlightedPlayerId,LightBoard board) {
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
-            Group playerStatusBar = playerStatusBar(playerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
+            Group playerStatusBar = getPlayerStatusBar(playerId,hilighlightedPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
             playerSelector.getChildren().add(playerStatusBar);
             if(playerId == board.getMyPlayerId()){
                 continue;
@@ -566,11 +566,14 @@ public class GUIutil {
         return  playerSelector;
     }
 
-    private Group playerStatusBar(int playerId, String username, LightPlayerStatus status, int nowPlaying){
+    private Group getPlayerStatusBar(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
         double width = 100; //todo update dynamically
         double heigth = 20;
         Text playerName = new Text(username);
         playerName.setFont(Font.font("Serif", 25));
+        if(playerId == hilighlightedPlayerId){
+            playerName.setFill(Color.DARKBLUE);
+        }
         Circle statusCircle = new Circle(10);
         if(playerId == nowPlaying ){
             statusCircle.setFill(Color.GREEN);

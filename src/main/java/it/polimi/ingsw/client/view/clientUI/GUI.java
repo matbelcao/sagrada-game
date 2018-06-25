@@ -246,8 +246,8 @@ public class GUI extends Application implements ClientUI {
             Scene scene = new Scene(bulidMainPane(200,200,board));
             //root.setStyle("-fx-background-color: black;"); //todo change
             primaryStage.setScene(scene);
-            primaryStage.setMinWidth(600);
-            primaryStage.setMinHeight(600);
+            primaryStage.setMinWidth(0);
+            primaryStage.setMinHeight(0);
             primaryStage.sizeToScene();
 
             scene.addEventHandler(MOUSE_EXITED_BACK_PANE , event -> {
@@ -355,7 +355,7 @@ public class GUI extends Application implements ClientUI {
 
         //Center side of the border pane
         GridPane schema = sceneCreator.drawSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
-        HBox playersSelector = sceneCreator.getPlayersSelector(board);
+        HBox playersSelector = sceneCreator.getPlayersStatusBar(board.getMyPlayerId(),board);
         StackPane schemaContainer = new StackPane(schema);
         VBox.setVgrow(schemaContainer,Priority.ALWAYS);
         frontPane.setCenter(new VBox(schemaContainer,playersSelector));
