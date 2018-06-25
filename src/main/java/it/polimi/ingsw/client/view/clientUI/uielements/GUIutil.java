@@ -446,12 +446,6 @@ public class GUIutil {
     }
 
     private Rectangle drawCard(LightCard card, double imageWidth, double imageHeight) {
-        /*age image = new Image("img/PrivObjectiveCard/1.png");
-        ImageView view = new ImageView();
-        view.setImage(image);
-        Rectangle2D viewportRect = new Rectangle2D(0, 35, imageWidth, imageHeight);
-        view.setViewport(viewportRect);
-        return view;*/
         Image image = new Image(card.getImgSrc()+".png");
         Rectangle imgRect = new Rectangle(imageWidth, imageHeight);
         ImagePattern imagePattern = new ImagePattern(image);
@@ -485,7 +479,7 @@ public class GUIutil {
         return whiteCanvas;
     }
 
-    public Canvas IndexedCellToCanvas(CellContent cellContent, double dieDim) {
+    private Canvas indexedCellToCanvas(CellContent cellContent, double dieDim) {
         Canvas canvas = new Canvas(dieDim, dieDim);
         if (cellContent.isDie()) {
             drawDie(cellContent.getColor(), cellContent.getShade(), canvas.getGraphicsContext2D(), 0, 0, dieDim);
@@ -496,7 +490,7 @@ public class GUIutil {
     }
 
 
-    public Canvas lightDieToCanvas(LightDie die, double dieDim) {
+    private Canvas lightDieToCanvas(LightDie die, double dieDim) {
         Canvas dieCanvas = new Canvas(dieDim, dieDim);
         drawDie(die, dieCanvas.getGraphicsContext2D(), dieDim);
         return dieCanvas;
@@ -914,7 +908,7 @@ public class GUIutil {
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         double cellDim = getMainSceneCellDim(width, height);
         for (IndexedCellContent selectableDie : latestDiceList) {
-            Canvas c = IndexedCellToCanvas(selectableDie.getContent(), cellDim);
+            Canvas c = indexedCellToCanvas(selectableDie.getContent(), cellDim);
             c.setOnMouseClicked(e -> {
                 cmdWrite.write(latestDiceList.indexOf(selectableDie) + "");
                 Event exitBackPane = new MyEvent(MOUSE_EXITED_BACK_PANE);
