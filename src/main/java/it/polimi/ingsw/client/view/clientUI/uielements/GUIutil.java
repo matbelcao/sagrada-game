@@ -537,13 +537,13 @@ public class GUIutil {
 
     public HBox getPlayersSelector(LightBoard board) {
         HBox playerSelector = new HBox();
-        for(int i = 0; i<board.getNumPlayers();i++){
-            Group playerStatusBar = playerStatusBar(board.getPlayerById(i).getUsername(),board.getPlayerById(i).getStatus());
+        for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
+            Group playerStatusBar = playerStatusBar(playerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
             playerSelector.getChildren().add(playerStatusBar);
-            if(i == board.getMyPlayerId()){
+            if(playerId == board.getMyPlayerId()){
                 continue;
             }else{
-                Event mouseEnteredPlayerStatusBar = new MyEvent(SELECTED_PLAYER, i);
+                Event mouseEnteredPlayerStatusBar = new MyEvent(SELECTED_PLAYER, playerId);
                 playerStatusBar.setOnMouseEntered(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
             }
         }
@@ -551,13 +551,13 @@ public class GUIutil {
         return  playerSelector;
     }
 
-    private Group playerStatusBar(String username, LightPlayerStatus status){
-        double width = 100;
+    private Group playerStatusBar(int playerId, String username, LightPlayerStatus status, int nowPlaying){
+        double width = 100; //todo update dynamically
         double heigth = 20;
         Text playerName = new Text(username);
         playerName.setFont(Font.font("Serif", 25));
         Circle statusCircle = new Circle(10);
-        if(status.equals(LightPlayerStatus.PLAYING)){
+        if(playerId == nowPlaying ){
             statusCircle.setFill(Color.GREEN);
         }else if(status.equals(LightPlayerStatus.DISCONNECTED) || status.equals(LightPlayerStatus.QUITTED)){
             statusCircle.setFill(Color.RED);
@@ -571,6 +571,7 @@ public class GUIutil {
         StackPane p = new StackPane(statusAndName);
         return new Group(p);
     }
+
     //todo delete class
     //just a class to avoid having repeated code
     private class DraftedSchemasWindowDim {
