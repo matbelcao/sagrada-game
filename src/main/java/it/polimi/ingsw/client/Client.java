@@ -25,8 +25,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -116,7 +115,7 @@ public class Client {
      */
     private static Client parser(){
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File xmlFile= new File(Objects.requireNonNull(classLoader.getResource(XML_SOURCE + CONFIGURATION_FILE_NAME)).getFile());
+        InputStream xmlFile=classLoader.getResourceAsStream(XML_SOURCE + CONFIGURATION_FILE_NAME);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -135,6 +134,7 @@ public class Client {
 
             return new Client(uiMode,connMode,serverIP,port,lang);
         } catch (ParserConfigurationException | IOException | SAXException e) {
+            e.printStackTrace();
             System.exit(1);
             return null;
         }

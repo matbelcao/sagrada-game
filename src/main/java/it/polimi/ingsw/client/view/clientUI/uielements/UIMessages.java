@@ -10,8 +10,8 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class UIMessages {
     private Element msgFile;
@@ -23,7 +23,7 @@ public class UIMessages {
     public UIMessages(UILanguage lang) {
         this.lang = lang;
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File xmlFile= new File(classLoader.getResource(Client.XML_SOURCE+UIMESSAGES_FILE_NAME).getFile());
+        InputStream xmlFile= classLoader.getResourceAsStream(Client.XML_SOURCE+UIMESSAGES_FILE_NAME);
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
