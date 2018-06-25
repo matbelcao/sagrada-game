@@ -3,7 +3,6 @@ package it.polimi.ingsw.server.controller;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.ServerOptions;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
-//import it.polimi.ingsw.server.connection.Heartbeat;
 import it.polimi.ingsw.server.connection.RMIAuthenticator;
 import it.polimi.ingsw.server.connection.SocketAuthenticator;
 import it.polimi.ingsw.server.model.User;
@@ -14,8 +13,8 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -23,7 +22,12 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
+
+//import it.polimi.ingsw.server.connection.Heartbeat;
 
 
 /**
@@ -66,7 +70,7 @@ public class MasterServer{
 
     private static MasterServer parser(){
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File xmlFile= new File(Objects.requireNonNull(classLoader.getResource(XML_SOURCE + CONFIGURATION_FILE_NAME)).getFile());
+        InputStream xmlFile=classLoader.getResourceAsStream(XML_SOURCE + CONFIGURATION_FILE_NAME);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {

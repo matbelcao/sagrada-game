@@ -4,7 +4,6 @@ import it.polimi.ingsw.client.clientController.CmdWriter;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.GUI;
-import it.polimi.ingsw.client.view.clientUI.MyEvent;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Shade;
@@ -23,22 +22,18 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
-import static it.polimi.ingsw.client.view.clientUI.MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL;
-import static it.polimi.ingsw.client.view.clientUI.MyEvent.MOUSE_EXITED_BACK_PANE;
-import static it.polimi.ingsw.client.view.clientUI.MyEvent.SELECTED_PLAYER;
+import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.*;
 
 public class GUIutil {
     private final CmdWriter cmdWrite;
@@ -416,9 +411,14 @@ public class GUIutil {
         HBox cardContainer = new HBox();
         VBox primaryContainer = new VBox(buttonContainer, cardContainer);
 
-        priv.setOnAction(e -> cardContainer.getChildren().setAll(drawCard(privObj, getCardWidth(), getCardHeight())));
+        priv.setOnAction(e -> {
+            Rectangle privObjImg = drawCard(privObj, getCardWidth(), getCardHeight());
+            Rectangle emptyRect1 = new Rectangle(getCardWidth(), getCardHeight(),Color.TRANSPARENT);
+            Rectangle emptyRect2 = new Rectangle(getCardWidth(), getCardHeight(),Color.TRANSPARENT);
+            cardContainer.getChildren().setAll(privObjImg,emptyRect1,emptyRect2);
+        });
         pub.setOnAction(e -> {
-            ArrayList<Canvas> cards = new ArrayList();
+            ArrayList<Rectangle> cards = new ArrayList();
             for (LightCard pubObjCard : pubObjs) {
                 cards.add(drawCard(pubObjCard, getCardWidth(), getCardHeight()));
 
@@ -426,23 +426,30 @@ public class GUIutil {
             cardContainer.getChildren().setAll(cards);
         });
         tool.setOnAction(e1 -> {
-            ArrayList<Canvas> cards = new ArrayList();
+            ArrayList<Rectangle> cards = new ArrayList();
             for (LightCard toolCard : tools) {
-                Canvas c = drawCard(toolCard, getCardWidth(), getCardHeight());
-                c.setOnMouseClicked(e2 -> {
+               Rectangle toolRect = drawCard(toolCard, getCardWidth(), getCardHeight());
+                toolRect.setOnMouseClicked(e2 -> {
                     if (turnState.equals(MAIN)) {
                         cmdWrite.write("0");
-                        System.out.println(".................selected tool " + tools.indexOf(toolCard) + "..........");
                         cmdWrite.write(tools.indexOf(toolCard) + "");
                     }
                 });
-                cards.add(c);
+                cards.add(toolRect);
             }
             cardContainer.getChildren().setAll(cards);
         });
         tool.fire();
         return primaryContainer;
 
+    }
+
+    private Rectangle drawCard(LightCard card, double imageWidth, double imageHeight) {
+        Image image = new Image(card.getImgSrc()+".png");
+        Rectangle imgRect = new Rectangle(imageWidth, imageHeight);
+        ImagePattern imagePattern = new ImagePattern(image);
+        imgRect.setFill(imagePattern);
+        return imgRect;
     }
 
     private void highlight(Canvas cell, double cellDim) {
@@ -471,7 +478,7 @@ public class GUIutil {
         return whiteCanvas;
     }
 
-    public Canvas IndexedCellToCanvas(CellContent cellContent, double dieDim) {
+    private Canvas indexedCellToCanvas(CellContent cellContent, double dieDim) {
         Canvas canvas = new Canvas(dieDim, dieDim);
         if (cellContent.isDie()) {
             drawDie(cellContent.getColor(), cellContent.getShade(), canvas.getGraphicsContext2D(), 0, 0, dieDim);
@@ -482,7 +489,7 @@ public class GUIutil {
     }
 
 
-    public Canvas lightDieToCanvas(LightDie die, double dieDim) {
+    private Canvas lightDieToCanvas(LightDie die, double dieDim) {
         Canvas dieCanvas = new Canvas(dieDim, dieDim);
         drawDie(die, dieCanvas.getGraphicsContext2D(), dieDim);
         return dieCanvas;
@@ -500,36 +507,57 @@ public class GUIutil {
         return new Scene(p);
     }
 
-    public double getMainSceneCellDim(double newWidth, double newHeight) {
+    public double getMainSceneCellDim(double newWidth, double newHeight) { //todo modify
         return 100;
+    }
+
+    public BorderPane buildSelectdPlayerPane(int playerId, int width, int height, LightBoard board){
+        BorderPane selectedPlayerPane = new BorderPane();
+        HBox playersSelector = getPlayersSelector(board);
+        Region divider2 = new Region();
+        HBox.setHgrow(divider2,Priority.ALWAYS);
+        HBox bottomContainer = new HBox(playersSelector,divider2);
+        selectedPlayerPane.setBottom(bottomContainer);
+        double cellDim = getMainSceneCellDim(width,height);
+        selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT));
+        Canvas playerSchema = new Canvas(cellDim*NUM_COLS,cellDim*NUM_ROWS);
+        drawSchema(playerSchema.getGraphicsContext2D(),board.getPlayerById(playerId).getSchema(),0,0,cellDim);
+        StackPane p = new StackPane(playerSchema);
+        selectedPlayerPane.setLeft(p);
+        p.setAlignment(Pos.CENTER);
+        selectedPlayerPane.getLeft().setStyle("-fx-background-color: rgb(255,255,255);");
+        Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
+        selectedPlayerPane.getLeft().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
+
+
+        selectedPlayerPane.setLeft(p);
+
+        return selectedPlayerPane;
     }
 
     public HBox getPlayersSelector(LightBoard board) {
         HBox playerSelector = new HBox();
-        for(int i = 0; i<board.getNumPlayers();i++){
-            Group playerStatusBar = playerStatusBar(board.getPlayerById(i).getUsername(),board.getPlayerById(i).getStatus());
+        for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
+            Group playerStatusBar = playerStatusBar(playerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
             playerSelector.getChildren().add(playerStatusBar);
-            if(i == board.getMyPlayerId()){
+            if(playerId == board.getMyPlayerId()){
                 continue;
             }else{
-                Event mouseEnteredPlayerStatusBar = new MyEvent(SELECTED_PLAYER, i);
-                playerStatusBar.setOnMouseEntered(e -> {
-                    playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar);
-                    System.out.println("enterreredfsfsjfnsdlghsdkgnsknsd,gnsjklgns");
-                });
+                Event mouseEnteredPlayerStatusBar = new MyEvent(SELECTED_PLAYER, playerId);
+                playerStatusBar.setOnMouseEntered(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
             }
         }
         playerSelector.setAlignment(Pos.BOTTOM_LEFT);
         return  playerSelector;
     }
 
-    private Group playerStatusBar(String username, LightPlayerStatus status){
-        double width = 100;
+    private Group playerStatusBar(int playerId, String username, LightPlayerStatus status, int nowPlaying){
+        double width = 100; //todo update dynamically
         double heigth = 20;
         Text playerName = new Text(username);
         playerName.setFont(Font.font("Serif", 25));
         Circle statusCircle = new Circle(10);
-        if(status.equals(LightPlayerStatus.PLAYING)){
+        if(playerId == nowPlaying ){
             statusCircle.setFill(Color.GREEN);
         }else if(status.equals(LightPlayerStatus.DISCONNECTED) || status.equals(LightPlayerStatus.QUITTED)){
             statusCircle.setFill(Color.RED);
@@ -543,6 +571,7 @@ public class GUIutil {
         StackPane p = new StackPane(statusAndName);
         return new Group(p);
     }
+
     //todo delete class
     //just a class to avoid having repeated code
     private class DraftedSchemasWindowDim {
@@ -629,7 +658,7 @@ public class GUIutil {
         //clean the canvas
         gc.clearRect(0, 0, sceneWidth, sceneHeight);
 
-        drawCard(privObj, gc, privObjX, privObjY, privObjWidth, privObjHeight);
+       //drawCard(privObj, gc, privObjX, privObjY, privObjWidth, privObjHeight); //todo reimplemet
         drawCompleteSchema(gc, lightSchemaCard.get(0), x + extPadding, y + extPadding, schemaWidth, schemaHeight);
         drawCompleteSchema(gc, lightSchemaCard.get(1), x + extPadding + schemaWidth + intPadding, y + extPadding, schemaWidth, schemaHeight);
         drawCompleteSchema(gc, lightSchemaCard.get(2), x + extPadding, y + extPadding + schemaHeight + intPadding, schemaWidth, schemaHeight);
@@ -699,33 +728,6 @@ public class GUIutil {
             x = initX;
             y += cellDim;
         }
-    }
-
-
-    private void drawCard(LightCard card, GraphicsContext gc, double x, double y, double imageWidth, double imageHeight) {
-        // Image image = new Image(getClass().getResourceAsStream("src"+ File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"1.png"));
-        // Image image = new Image(client.class.getResourceAsStream("src"+ File.separator+"img"+File.separator+"PrivObjectiveCard"+File.separator+"1.png"));
-        //TODO hookup with resources
-        //try (InputStream is = new FileInputStream("src" + File.separator + "img" + File.separator + "PrivObjectiveCard" + File.separator + "1.png")) {
-        try (InputStream is = new FileInputStream(card.getImgSrc() + ".png")) {
-            Image img = new Image(is);
-            gc.drawImage(img, x, y, imageWidth, imageHeight);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Canvas drawCard(LightCard card, double imageWidth, double imageHeight) {
-        Canvas cardCanvas = new Canvas(imageWidth, imageHeight);
-        GraphicsContext gc = cardCanvas.getGraphicsContext2D();
-
-        try (InputStream is = new FileInputStream(card.getImgSrc() + ".png")) {
-            Image img = new Image(is);
-            gc.drawImage(img, 0, 0, imageWidth, imageHeight);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return cardCanvas;
     }
 
     private void drawWhiteCell(GraphicsContext gc, double x, double y, double cellDim) {
@@ -900,7 +902,7 @@ public class GUIutil {
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         double cellDim = getMainSceneCellDim(width, height);
         for (IndexedCellContent selectableDie : latestDiceList) {
-            Canvas c = IndexedCellToCanvas(selectableDie.getContent(), cellDim);
+            Canvas c = indexedCellToCanvas(selectableDie.getContent(), cellDim);
             c.setOnMouseClicked(e -> {
                 cmdWrite.write(latestDiceList.indexOf(selectableDie) + "");
                 Event exitBackPane = new MyEvent(MOUSE_EXITED_BACK_PANE);

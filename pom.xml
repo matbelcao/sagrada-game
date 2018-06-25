@@ -18,36 +18,53 @@
             </plugin>
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <outputDirectory>Deliverables</outputDirectory>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>build-server</id>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>it.polimi.ingsw.server.controller.MasterServer</mainClass>
-                                </transformer>
-                            </transformers>
-                            <finalName>serverLM7</finalName>
-                        </configuration>
+                        <id>client</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <finalName>LM_7_client</finalName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>it.polimi.ingsw.client.Client</Main-Class>
+                                    </manifestEntries>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                                    <resource>xml/server/**/*</resource>
+                                </transformer>
+                            </transformers>
+                        </configuration>
                     </execution>
                     <execution>
-                        <id>build-client</id>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>it.polimi.ingsw.client.Client</mainClass>
-                                </transformer>
-                            </transformers>
-                            <finalName>clientLM7</finalName>
-                        </configuration>
+                        <id>server</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <finalName>LM_7_server</finalName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>it.polimi.ingsw.server.controller.MasterServer</Main-Class>
+                                    </manifestEntries>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                                    <resources>
+                                        <resource>xml/client/**/*</resource>
+                                        <resource>img/**/*</resource>
+                                    </resources>
+                                </transformer>
+                            </transformers>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

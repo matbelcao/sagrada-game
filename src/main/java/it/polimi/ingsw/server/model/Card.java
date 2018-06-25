@@ -1,12 +1,15 @@
 package it.polimi.ingsw.server.model;
-import java.io.File;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
-
-import java.io.IOException;
-import java.util.Objects;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This abstract class is useful to the subclasses [ToolCard , ObjectiveCard and SchemaCard] to initialize common parameters
@@ -26,7 +29,7 @@ public abstract class Card {
      */
     protected String xmlReader(int id, String xmlSrc, String type){
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File xmlFile= new File(Objects.requireNonNull(classLoader.getResource(xmlSrc)).getFile());
+        InputStream xmlFile= classLoader.getResourceAsStream(xmlSrc);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         NodeList nodeList;

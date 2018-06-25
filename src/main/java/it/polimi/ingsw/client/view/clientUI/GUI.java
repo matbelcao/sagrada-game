@@ -7,6 +7,7 @@ import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.textGen;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
+import it.polimi.ingsw.client.view.clientUI.uielements.MyEvent;
 import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.connection.Credentials;
@@ -42,8 +43,8 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.Observable;
 
-import static it.polimi.ingsw.client.view.clientUI.MyEvent.MOUSE_EXITED_BACK_PANE;
-import static it.polimi.ingsw.client.view.clientUI.MyEvent.SELECTED_PLAYER;
+import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.MOUSE_EXITED_BACK_PANE;
+import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.SELECTED_PLAYER;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;
 
@@ -273,14 +274,10 @@ public class GUI extends Application implements ClientUI {
 
     private Parent showSelectedPlayer(int playerId, int width, int height, LightBoard board) {
         BorderPane frontPane = buildFrontPane(width,height,board);
-        BorderPane backPane = buildSelectdPlayerSchema(playerId,width, height, board);
+        BorderPane backPane = sceneCreator.buildSelectdPlayerPane(playerId,width, height, board);
         StackPane p = new StackPane(backPane,frontPane);
         backPane.toFront();
         return p;
-    }
-
-    BorderPane buildSelectdPlayerSchema(int playerId, int width, int height, LightBoard board){
-        return new BorderPane();
     }
 
     StackPane showMultipleDiceScreen(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
@@ -334,7 +331,7 @@ public class GUI extends Application implements ClientUI {
         return backPane;
     }
 
-    BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board){
+    private BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board){
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
@@ -357,20 +354,27 @@ public class GUI extends Application implements ClientUI {
 
 
         GridPane schema = sceneCreator.drawSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
-        frontPane.setLeft(schema);
+        HBox playersSelector = sceneCreator.getPlayersSelector(board);
+        StackPane p = new StackPane(schema);
         schema.setAlignment(CENTER);
+        frontPane.setLeft(new VBox(p,playersSelector));
+        VBox.setVgrow(p,Priority.ALWAYS);
 
         VBox cards = sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState);
-        frontPane.setRight(cards);
-        cards.setAlignment(CENTER_LEFT);
-
         HBox draftpool = sceneCreator.buildDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
-        HBox otherPlayers = sceneCreator.getPlayersSelector(board);
         Region divider2 = new Region();
-        HBox.setHgrow(divider,Priority.ALWAYS);
-        HBox bottomContainer = new HBox(otherPlayers,divider,draftpool);
+        cards.getChildren().addAll(divider2,draftpool);
+        VBox.setVgrow(divider2,Priority.ALWAYS);
         draftpool.setAlignment(BOTTOM_RIGHT);
-        frontPane.setBottom(bottomContainer);
+
+        frontPane.setRight(cards);
+        cards.setAlignment(TOP_RIGHT);
+
+        //HBox playersSelector = sceneCreator.getPlayersSelector(board);
+
+        //HBox.setHgrow(divider2,Priority.ALWAYS);
+        //HBox bottomContainer = new HBox(playersSelector,divider2,draftpool);
+       // frontPane.setBottom(bottomContainer);
         return frontPane;
     }
 
