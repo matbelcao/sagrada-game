@@ -163,20 +163,19 @@ public class GUIutil {
 
     public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox track = new HBox();
-        track.setSpacing(10); ////todo dynamic spacing??
+        track.setSpacing(5); ////todo dynamic spacing??
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
-            Rectangle dummyCell = dummyRoundTrackCell(cellDim);
-            track.getChildren().add(dummyCell);
+            Cell cell = new Cell(cellDim,Place.ROUNDTRACK);
+            cell.setVisible(false);
+            track.getChildren().add(cell);
             if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
                 Event showMultipleDice = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
-                dummyCell.setOnMouseEntered(e -> {
-                    dummyCell.fireEvent(showMultipleDice);
-                });
+                cell.setOnMouseEntered(e -> cell.fireEvent(showMultipleDice));
             }
         }
         return track;
     }
-
+   
     public HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox multipleDiceTrack = new HBox();
         multipleDiceTrack.setSpacing(10); ////todo dynamic spacing??
@@ -226,12 +225,6 @@ public class GUIutil {
         Rectangle innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
         innerRect.setFill(Color.WHITE);
         return new StackPane(outerRect, innerRect, t);
-    }
-
-    private Rectangle dummyRoundTrackCell(double cellDim) {
-        Rectangle transparentRect = new Rectangle(0, 0, cellDim, cellDim);
-        transparentRect.setFill(Color.TRANSPARENT);
-        return transparentRect;
     }
 
     private StackPane fullRoundTrackCell(int i, double cellDim) {
@@ -403,14 +396,15 @@ public class GUIutil {
         selectedPlayerPane.setBottom(bottomContainer);
 
         double cellDim = getMainSceneCellDim(width,height);
-        selectedPlayerPane.setRight(new Rectangle(getCardWidth(cellDim)*NUM_OF_TOOLS,getCardHeight(cellDim),Color.TRANSPARENT));
-        selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT));
-        //Group playerSchema = schemaToGridPane(cellDim,board.getPlayerById(playerId).getSchema(),NOT_MY_TURN,null,null,null,null)
-        Canvas playerSchema = new Canvas(cellDim*NUM_COLS,cellDim*NUM_ROWS);
-        buildSchema(playerSchema.getGraphicsContext2D(),board.getPlayerById(playerId).getSchema(),0,0,cellDim);
+        selectedPlayerPane.setRight(new Rectangle(getCardWidth(cellDim)*NUM_OF_TOOLS,getCardHeight(cellDim),Color.TRANSPARENT)); //the space occupied by cards
+        selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT)); //the space occupied by roundtrack
+        ArrayList<Cell> selectedPlayerSchema = getSchemaCells(board.getPlayerById(playerId).getSchema(), cellDim);
+        Group playerSchema = buildSchema(selectedPlayerSchema,board.getPlayerById(playerId).getFavorTokens(),cellDim);
         StackPane schemaContainer = new StackPane(playerSchema);
+        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112);"); //todo hookup with css and make the same as the front pane background
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
+
         Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
         selectedPlayerPane.getCenter().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
         return selectedPlayerPane;

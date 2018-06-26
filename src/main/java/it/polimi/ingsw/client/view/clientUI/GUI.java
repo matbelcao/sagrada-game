@@ -63,7 +63,6 @@ public class GUI extends Application implements ClientUI {
     private Text messageToUser = new Text();
     private CmdWriter cmdWrite;
     private int playerId;
-    private static Scene mainScene;
 
     public GUI() {
         instance = this;
@@ -251,13 +250,14 @@ public class GUI extends Application implements ClientUI {
             primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight());
             double currentWidth = primaryStage.getWidth();
             double currentHeight = primaryStage.getHeight();
-            if(mainScene == null){
+            Scene mainScene = primaryStage.getScene();
+            mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
+            /*if(mainScene == null){ //todo remove if beppe says it works on mac
                 mainScene = new Scene(bulidMainPane(currentWidth,currentHeight,board));
                 primaryStage.setScene(mainScene);
             }else{
                 mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
-            }
-
+            }*/
 
 
             //root.setStyle("-fx-background-color: black;"); //todo change
@@ -280,7 +280,7 @@ public class GUI extends Application implements ClientUI {
 
     StackPane showMultipleDiceScreen(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
         BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
-        BorderPane backPane = bulidBackPaneRoundTrack(selectedTrackCellIndex,newWidth,newHeight,board);
+        BorderPane backPane = showMultipleDiceRoundTrack(selectedTrackCellIndex,newWidth,newHeight,board);
         StackPane p = new StackPane(backPane,frontPane);
         backPane.toFront();
         return p;
@@ -304,15 +304,12 @@ public class GUI extends Application implements ClientUI {
         return p;
     }
 
-    private BorderPane bulidBackPaneRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
+    private BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
-        List <LightDie> draftPool = board.getDraftPool();
         List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
         List <Integer>              latestPlacementsList = board.getLatestPlacementsList();
         IndexedCellContent          latestSelectedDie = board.getLatestSelectedDie();
-        List <Actions>              latestOptionsList = board.getLatestOptionsList();
-        LightSchemaCard             schemaCard = board.getPlayerById(playerId).getSchema();
         int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
         ClientFSMState              turnState = client.getTurnState();
 
@@ -334,9 +331,6 @@ public class GUI extends Application implements ClientUI {
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
         List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
-        List <Integer>              latestPlacementsList = board.getLatestPlacementsList();
-        IndexedCellContent          latestSelectedDie = board.getLatestSelectedDie();
-        List <Actions>              latestOptionsList = board.getLatestOptionsList();
         LightSchemaCard             schemaCard = board.getPlayerById(playerId).getSchema();
         int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
         ClientFSMState              turnState = client.getTurnState();
@@ -347,12 +341,11 @@ public class GUI extends Application implements ClientUI {
         ArrayList<Cell> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
         ArrayList<Cell> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
         sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
-        frontPane.setStyle("-fx-background-color: rgba(245,220,112,0.4);"); //todo hookup with css
+        frontPane.setStyle("-fx-background-color: rgba(245,220,112);"); //todo hookup with css
 
 
 
         //Top side of the border pane
-        //todo update
         HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackCells);
         Region separator = new Region();
         HBox.setHgrow(separator,Priority.ALWAYS);
@@ -361,7 +354,6 @@ public class GUI extends Application implements ClientUI {
         frontPane.setTop(roundTrack);
 
         //Center side of the border pane
-        //todo update
         Group schema = sceneCreator.buildSchema(schemaCells,favorTokens,cellDim);
         HBox playersSelector = sceneCreator.getPlayersStatusBar(board.getMyPlayerId(),board);
         StackPane schemaContainer = new StackPane(schema);
@@ -372,7 +364,6 @@ public class GUI extends Application implements ClientUI {
         VBox cards = sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState);
         StackPane cardsContainer = new StackPane(cards);
         cards.setAlignment(CENTER);
-        //todo update
         GridPane draftpool = sceneCreator.buildDraftPool(draftPoolCells);
         VBox.setVgrow(cardsContainer,Priority.ALWAYS);
         frontPane.setRight(new VBox(cardsContainer,draftpool));
