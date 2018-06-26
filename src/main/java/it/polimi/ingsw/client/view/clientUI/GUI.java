@@ -243,36 +243,37 @@ public class GUI extends Application implements ClientUI {
                     System.out.println("tool can continue------------------------------------------------------------------");
                     break;
             }
-            Scene scene = new Scene(bulidMainPane(200,200,board));
-            //root.setStyle("-fx-background-color: black;"); //todo change
-            primaryStage.setScene(scene);
             primaryStage.setMinWidth(sceneCreator.getGameSceneMinWidth());
             primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight());
-            System.out.println(primaryStage.getWidth()+"  "+primaryStage.getHeight());
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            Scene scene = new Scene(bulidMainPane(currentWidth,currentHeight,board));
 
+            //root.setStyle("-fx-background-color: black;"); //todo change
+            primaryStage.setScene(scene);
             scene.addEventHandler(MOUSE_EXITED_BACK_PANE , event -> {
-                scene.setRoot(buildFrontPane(200,200,board));
+                scene.setRoot(buildFrontPane(scene.getWidth(), scene.getHeight(),board));
             });
             scene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL , event -> {
-                scene.setRoot(showMultipleDiceScreen(event.getCellIndex(),200,200,board));
+                scene.setRoot(showMultipleDiceScreen(event.getCellIndex(),scene.getWidth(), scene.getHeight(),board));
             });
             scene.addEventHandler(SELECTED_PLAYER , event -> {
-                scene.setRoot(showSelectedPlayer(event.getCellIndex(),200,200,board));
+                scene.setRoot(showSelectedPlayer(event.getCellIndex(),scene.getWidth(), scene.getHeight(),board));
             });
             scene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
-                double newHeight = scene.getHeight();
-                scene.setRoot(buildFrontPane(newWidth,newHeight,board));
+                double newHeight =  scene.getHeight();
+                scene.setRoot(bulidMainPane(newWidth,newHeight,board));
             });
             scene.heightProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = scene.getWidth();
-                double newHeight = scene.getHeight();
-                scene.setRoot(buildFrontPane(newWidth,newHeight,board));
+                double newHeight =  scene.getHeight();
+                scene.setRoot(bulidMainPane(newWidth,newHeight,board));
             });
         });
     }
 
-    private Parent showSelectedPlayer(int playerId, int width, int height, LightBoard board) {
+    private Parent showSelectedPlayer(int playerId, double width, double height, LightBoard board) {
         BorderPane frontPane = buildFrontPane(width,height,board);
         BorderPane backPane = sceneCreator.buildSelectdPlayerPane(playerId,width, height, board);
         StackPane p = new StackPane(backPane,frontPane);
@@ -319,8 +320,8 @@ public class GUI extends Application implements ClientUI {
         ClientFSMState              turnState = client.getTurnState();
 
         BorderPane backPane = new BorderPane();
-        HBox d1 = sceneCreator.buildDummyTrack(roundTrack,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
-        HBox d2 = sceneCreator.buildMultipleDiceBar(selectedTrackCellIndex,roundTrack,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        HBox d1 = sceneCreator.buildDummyTrack(cellDim,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        HBox d2 = sceneCreator.buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
         VBox vbox =new VBox(d1,d2);
         vbox.setSpacing(10); //todo make dynamic?
         Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
@@ -346,11 +347,11 @@ public class GUI extends Application implements ClientUI {
         BorderPane frontPane = new BorderPane();
 
         //Top side of the border pane
-        HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackList,newWidth,newHeight,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
-        Region divider = new Region();
-        HBox.setHgrow(divider,Priority.ALWAYS);
+        HBox roundTrack = sceneCreator.buildRoundTrack(cellDim,roundTrackList,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        Region separator = new Region();
+        HBox.setHgrow(separator,Priority.ALWAYS);
         VBox menuButtons = sceneCreator.getMenuButtons(turnState);
-        roundTrack.getChildren().addAll(divider,menuButtons);
+        roundTrack.getChildren().addAll(separator,menuButtons);
         frontPane.setTop(roundTrack);
 
         //Center side of the border pane
@@ -390,7 +391,7 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-
+    //todo delete class
     class DraftedSchemasGroup extends Group{
         Canvas canvas;
         Pane mouseActionPane;

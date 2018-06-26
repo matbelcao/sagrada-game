@@ -44,6 +44,9 @@ public class GUIutil {
     //ratio is width/height
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
+    private static final double NUM_OF_TOOLS = 3;
+    private static final int ROUNDTRACK_SIZE = 10;
+
     private final double SCREEN_WIDTH;
     private final double SCREEN_HEIGHT;
     //-----login Stage
@@ -69,12 +72,15 @@ public class GUIutil {
     private static final double SCHEMA_W_TO_EXTERNAL_PADDING = 18;
     private static final double SCHEMA_W_TO_INTERNAL_PADDING = 18;
     private static final double SCHEMA_W_TO_PRIV_OBJ_PADDING = 9;
-    //Main scene
-    private static final int ROUNDTRACK_SIZE = 10;
+    //Main game scene
     private static final double ROUNDTRACK_TEXT_SIZE_TO_CELL = 0.7;
     private static final double TEXT_DIM_TO_CELL_DIM = 0.5;
     private static final double MAIN_GAME_SCENE_RATIO = 1.72629;
     private static final double MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH = 0.8265;
+    private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.137615;
+    private static final double MAIN_GAME_CELL_DIM_TO_WIDTH = 0.0797171;
+    private static final double CARD_WIDTH_TO_CELL_DIM = 2.455555555555;
+    private static final double CARD_HEIGHT_TO_CELL_DIM = 3.33333333333;
     private static final double DIE_ARC_TO_DIM = 0.35;
     private static final double LINE_TO_DIE = 0.045;
 
@@ -118,22 +124,34 @@ public class GUIutil {
     }
 
     public double getGameSceneMinHeight(){
-        return getGameSceneMinWidth()/MAIN_GAME_SCENE_RATIO;
+        return (getGameSceneMinWidth()/MAIN_GAME_SCENE_RATIO);
     }
 
-    private double getCardWidth() {
-        double width = 221;
+
+    private double getCardWidth(double cellDim) {
+        //double width = 221;
+        double width = cellDim*CARD_WIDTH_TO_CELL_DIM;
         return width;
     }
 
-    private double getCardHeight() {
-        double height = 300;
+    private double getCardHeight(double cellDim) {
+        //double height = 300;
+        double height = cellDim*CARD_HEIGHT_TO_CELL_DIM;
         return height;
     }
 
-    public double getMainSceneCellDim(double newWidth, double newHeight) { //todo modify
-        return 90;
+    public double getMainSceneCellDim(double newWidth, double newHeight) {
+        double cellDim;
+        double sceneRatio = newWidth / newHeight;
+        if (sceneRatio >= MAIN_GAME_SCENE_RATIO) {
+           cellDim = newHeight* MAIN_GAME_CELL_DIM_TO_HEIGHT;
+        } else {
+            cellDim = newWidth* MAIN_GAME_CELL_DIM_TO_WIDTH;
+        }
+        return cellDim;
     }
+
+
 
     public double getSelectedSchemaLineWidth(double sceneWidth, double sceneHeight) {
         DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth, sceneHeight);
@@ -142,8 +160,7 @@ public class GUIutil {
         return LINE_TO_CELL * CELL_TO_SCHEMA_W * schemaWidth;
     }
 
-    public HBox buildRoundTrack(List<List<LightDie>> roundTrack, double width, double height, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favortokens) {
-        double cellDim = getMainSceneCellDim(width, height);
+    public HBox buildRoundTrack(double cellDim,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favortokens) {
         ArrayList<StackPane> roundTrackCells = new ArrayList<>();
 
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
@@ -188,8 +205,7 @@ public class GUIutil {
         return track;
     }
 
-    public HBox buildDummyTrack(List<List<LightDie>> roundTrack, double newWidth, double newHeight, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
-        double cellDim = getMainSceneCellDim(newWidth, newHeight);
+    public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox track = new HBox();
         track.setSpacing(10); ////todo dynamic spacing??
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
@@ -205,8 +221,7 @@ public class GUIutil {
         return track;
     }
 
-    public HBox buildMultipleDiceBar(int selectedTrackCellIndex, List<List<LightDie>> roundTrack, double width, double height, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
-        double cellDim = getMainSceneCellDim(width, height);
+    public HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox multipleDiceTrack = new HBox();
         multipleDiceTrack.setSpacing(10); ////todo dynamic spacing??
 
@@ -353,7 +368,7 @@ public class GUIutil {
 
     //todo update
     public GridPane drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList, int favortokens) {
-        GridPane g = schemaToGrid(schema, dieDim * NUM_COLS, dieDim * NUM_ROWS, turnState, latestDiceList, latestPlacementsList, latestSelectedDie, latestOptionsList);
+        GridPane g = schemaToGrid(dieDim,schema, turnState, latestDiceList, latestPlacementsList, latestSelectedDie, latestOptionsList);
         return g;
     }
 
@@ -375,20 +390,19 @@ public class GUIutil {
         return buttonContainer;
     }
 
-    public GridPane schemaToGrid(LightSchemaCard lightSchemaCard, double width, double heigth, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList) {
-        double dieDim = width / NUM_COLS;
+    public GridPane schemaToGrid(double cellDim, LightSchemaCard lightSchemaCard, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList) {
         ArrayList<Canvas> gridCells = new ArrayList<>();
 
         for (int i = 0; i < NUM_COLS * NUM_ROWS; i++) {
             Canvas cell;
             if (lightSchemaCard.hasConstraintAt(i)) {
-                cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i), dieDim);
+                cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i), cellDim);
                 gridCells.add(cell);
             } else if (lightSchemaCard.hasDieAt(i)) {  //todo change it with active cell object
-                cell = lightDieToCanvas(lightSchemaCard.getDieAt(i), dieDim);
+                cell = lightDieToCanvas(lightSchemaCard.getDieAt(i), cellDim);
                 gridCells.add(cell);
             } else {
-                cell = whiteCanvas(dieDim);
+                cell = whiteCanvas(cellDim);
                 gridCells.add(cell);
             }
         }
@@ -398,7 +412,7 @@ public class GUIutil {
                 if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL) || !latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)) {
                     for (Canvas c : gridCells) {
                         if (latestPlacementsList.contains(gridCells.indexOf(c))) {
-                            highlight(c, dieDim);
+                            highlight(c, cellDim);
                             c.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(gridCells.indexOf(c)) + ""));
                         }
                     }
@@ -408,7 +422,7 @@ public class GUIutil {
                 if (!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.SCHEMA)) {
                     for (IndexedCellContent activeCell : latestDiceList) {
                         Canvas c = gridCells.get(activeCell.getPosition());
-                        highlight(c, dieDim);
+                        highlight(c, cellDim);
                         c.setOnMouseClicked(e -> {
                             System.out.println("selected die at position " + gridCells.indexOf(c) + " in schema");
                             cmdWrite.write(latestDiceList.indexOf(activeCell) + "");
@@ -437,15 +451,15 @@ public class GUIutil {
         VBox primaryContainer = new VBox(buttonContainer, cardContainer);
 
         priv.setOnAction(e -> {
-            Rectangle privObjImg = drawCard(privObj, getCardWidth(), getCardHeight());
-            Rectangle emptyRect1 = new Rectangle(getCardWidth(), getCardHeight(),Color.TRANSPARENT);
-            Rectangle emptyRect2 = new Rectangle(getCardWidth(), getCardHeight(),Color.TRANSPARENT);
+            Rectangle privObjImg = drawCard(privObj, getCardWidth(cellDim), getCardHeight(cellDim));
+            Rectangle emptyRect1 = new Rectangle(getCardWidth(cellDim), getCardHeight(cellDim),Color.TRANSPARENT);
+            Rectangle emptyRect2 = new Rectangle(getCardWidth(cellDim), getCardHeight(cellDim),Color.TRANSPARENT);
             cardContainer.getChildren().setAll(privObjImg,emptyRect1,emptyRect2);
         });
         pub.setOnAction(e -> {
             ArrayList<Rectangle> cards = new ArrayList();
             for (LightCard pubObjCard : pubObjs) {
-                cards.add(drawCard(pubObjCard, getCardWidth(), getCardHeight()));
+                cards.add(drawCard(pubObjCard, getCardWidth(cellDim), getCardHeight(cellDim)));
 
             }
             cardContainer.getChildren().setAll(cards);
@@ -453,7 +467,7 @@ public class GUIutil {
         tool.setOnAction(e1 -> {
             ArrayList<Rectangle> cards = new ArrayList();
             for (LightCard toolCard : tools) {
-               Rectangle toolRect = drawCard(toolCard, getCardWidth(), getCardHeight());
+               Rectangle toolRect = drawCard(toolCard, getCardWidth(cellDim), getCardHeight(cellDim));
                 toolRect.setOnMouseClicked(e2 -> {
                     if (turnState.equals(MAIN)) {
                         cmdWrite.write("0");
@@ -532,7 +546,7 @@ public class GUIutil {
         return new Scene(p);
     }
 
-    public BorderPane buildSelectdPlayerPane(int playerId, int width, int height, LightBoard board){
+    public BorderPane buildSelectdPlayerPane(int playerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
         HBox playersSelector = getPlayersStatusBar(playerId,board);
         Region spacer = new Region();
@@ -540,9 +554,8 @@ public class GUIutil {
         HBox bottomContainer = new HBox(playersSelector,spacer);
         selectedPlayerPane.setBottom(bottomContainer);
 
-        selectedPlayerPane.setRight(new Rectangle(0,0,getCardWidth()*3,1));
-
         double cellDim = getMainSceneCellDim(width,height);
+        selectedPlayerPane.setRight(new Rectangle(getCardWidth(cellDim)*NUM_OF_TOOLS,getCardHeight(cellDim),Color.TRANSPARENT));
         selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT));
         Canvas playerSchema = new Canvas(cellDim*NUM_COLS,cellDim*NUM_ROWS);
         drawSchema(playerSchema.getGraphicsContext2D(),board.getPlayerById(playerId).getSchema(),0,0,cellDim);
