@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -71,14 +72,14 @@ public class SchemaCard implements Iterable<Cell>  {
      * @return the bulit SchemaCard
      */
     public static SchemaCard parser(int id,boolean additionalSchema){
-        File xmlFile=null;
+        InputStream xmlFile=null;
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 
         if(additionalSchema){
-            xmlFile= new File(Objects.requireNonNull(classLoader.getResource(xmlAdditionalSchema)).getFile());
+            xmlFile= classLoader.getResourceAsStream(xmlAdditionalSchema);
 
         }else{
-            xmlFile= new File(Objects.requireNonNull(classLoader.getResource(xmlSchema)).getFile());
+            xmlFile=classLoader.getResourceAsStream(xmlSchema);
 
         }
 

@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<conf>
-    <address>127.0.0.1</address>
-    <connectionMode>SOCKET</connectionMode>
-    <UI>CLI</UI>
-    <portRMI>1099</portRMI>
-    <portSocket>3000</portSocket>
-    <language>ita</language>
-</conf>
