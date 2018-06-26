@@ -43,9 +43,23 @@ import static it.polimi.ingsw.common.enums.ErrMsg.*;
  */
 public class Client {
 
+    public static final String XML_SOURCE = "xml/client/";
+
     private static final String EMPTY_STRING="";
     private static final String CONFIGURATION_FILE_NAME= "ClientConf.xml";
-    public static final String XML_SOURCE = "xml/client/";
+    private static final String RMI_HOSTNAME_PROPERTY = "java.rmi.server.hostname";
+    private static final String OS_NAME_PROPERTY = "os.name" ;
+    private static final String WINDOWS_OS = "Windows" ;
+    private static final String CONFIGURATIONS = "conf";
+    private static final String UI ="UI" ;
+    private static final String IPV4_ADDRESS = "address";
+    private static final String CONNECTION_MODE = "connectionMode";
+    private static final String LANG = "language";
+    private static final String RMI_PORT ="portRMI";
+    private static final String SOCKET_PORT ="portSocket";
+    private static final String RMI_SLASHSLASH ="rmi://";
+    private static final String SLASH ="/";
+    private static final String AUTH = "auth" ;
 
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
@@ -57,7 +71,7 @@ public class Client {
 
     private UIMode uiMode;
     private ClientUI clientUI;
-    private UILanguage lang;
+    private UILanguage language;
 
     private LightBoard board;
     private ClientFSM fsm;
@@ -71,20 +85,21 @@ public class Client {
     private final List<Thread> updatesQueue;
 
 
+
     /**
      * constructs the client object and sets some parameters
      * @param uiMode the type of ui preferred
      * @param connMode the preferred connection mode
      * @param serverIP the server ip
      * @param port the port to connect to
-     * @param lang the desired language
+     * @param language the desired language
      */
-    public Client(UIMode uiMode,ConnectionMode connMode,String serverIP,Integer port,UILanguage lang) {
+    public Client(UIMode uiMode,ConnectionMode connMode,String serverIP,Integer port,UILanguage language) {
         this.uiMode = uiMode;
         this.connMode = connMode;
         this.serverIP = serverIP;
         this.port = port;
-        this.lang = lang;
+        this.language = language;
         this.userStatus = UserStatus.DISCONNECTED;
         this.readyWithBasicBoardElems = false;
         this.updatesQueue =new ArrayList<>();
@@ -103,15 +118,15 @@ public class Client {
             dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
-            Element eElement = (Element)doc.getElementsByTagName("conf").item(0);
-            UIMode uiMode=UIMode.valueOf(eElement.getElementsByTagName("UI").item(0).getTextContent());
-            String serverIP=eElement.getElementsByTagName("address").item(0).getTextContent();
-            ConnectionMode connMode=ConnectionMode.valueOf(eElement.getElementsByTagName("connectionMode").item(0).getTextContent());
-            UILanguage lang=UILanguage.valueOf(eElement.getElementsByTagName("language").item(0).getTextContent());
+            Element eElement = (Element)doc.getElementsByTagName(CONFIGURATIONS).item(0);
+            UIMode uiMode=UIMode.valueOf(eElement.getElementsByTagName(UI).item(0).getTextContent());
+            String serverIP=eElement.getElementsByTagName(IPV4_ADDRESS).item(0).getTextContent();
+            ConnectionMode connMode=ConnectionMode.valueOf(eElement.getElementsByTagName(CONNECTION_MODE).item(0).getTextContent());
+            UILanguage lang=UILanguage.valueOf(eElement.getElementsByTagName(LANG).item(0).getTextContent());
             int port;
             if(connMode.equals(ConnectionMode.RMI)){
-                port=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
-            }else{ port=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent()); }
+                port=Integer.parseInt(eElement.getElementsByTagName(RMI_PORT).item(0).getTextContent());
+            }else{ port=Integer.parseInt(eElement.getElementsByTagName(SOCKET_PORT).item(0).getTextContent()); }
 
             return new Client(uiMode,connMode,serverIP,port,lang);
         } catch (ParserConfigurationException | IOException | SAXException e) {
@@ -153,10 +168,10 @@ public class Client {
 
     /**
      * This method sets the wanted language
-     * @param lang the requested language
+     * @param language the requested language
      */
-    void setLang(UILanguage lang) {
-        this.lang = lang;
+    void setLanguage(UILanguage language) {
+        this.language = language;
     }
 
     /**
@@ -223,9 +238,9 @@ public class Client {
             if(isWindows()){
                 AnsiConsole.systemInstall();
             }
-            clientUI=new CLI(this,lang);
+            clientUI=new CLI(this, language);
         }else{
-            new Thread(() -> GUI.launch(this,lang)).start();
+            new Thread(() -> GUI.launch(this, language)).start();
             while(GUI.getGUI() == null){
                 try {
                     Thread.sleep(100);
@@ -245,7 +260,7 @@ public class Client {
      */
     public static boolean isWindows()
     {
-        return System.getProperty("os.name").startsWith("Windows");
+        return System.getProperty(OS_NAME_PROPERTY).startsWith(WINDOWS_OS);
     }
 
 
@@ -266,6 +281,7 @@ public class Client {
             if (connMode.equals(ConnectionMode.SOCKET)) {
                 clientConn = new SocketClient(this, serverIP, port);
             }
+
             do{
                 
                 synchronized (lockCredentials) {
@@ -290,7 +306,7 @@ public class Client {
 
             this.fsm=new ClientFSM(this);
             if(connMode.equals(ConnectionMode.RMI)){
-                AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
+                AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+AUTH);
                 authenticator.updateConnected(username);
             }
 
@@ -346,11 +362,11 @@ public class Client {
      * @return true iff the login had a positive result
      */
     private boolean loginRMI() throws RemoteException, MalformedURLException, NotBoundException {
-        System.setProperty("java.rmi.server.hostname",serverIP);
-        AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
+        System.setProperty(RMI_HOSTNAME_PROPERTY,serverIP);
+        AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+AUTH);
         if(authenticator.authenticate(username,password)){
             //get the stub of the remote object
-            RMIClientInt rmiConnStub = (RMIClientInt) Naming.lookup("rmi://"+serverIP+"/"+username);
+            RMIClientInt rmiConnStub = (RMIClientInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+username);
             clientConn = new RMIClient(rmiConnStub, this);
             RMIServerInt rmiServerObject = new RMIServerObject(this);
             //check if the method is necessary or just extend unicast remote obj in RMIServerObject
@@ -445,20 +461,12 @@ public class Client {
         }
 
         board.setMyPlayerId(playerId);
-
-
-
         board.setPrivObj(clientConn.getPrivateObject());
-
         board.setDraftedSchemas(clientConn.getSchemaDraft());
-
         board.addObserver(clientUI);
 
         clientUI.updateGameStart(numPlayers,playerId);
-
         clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
-
-
 
     }
 
@@ -541,9 +549,11 @@ public class Client {
         board.setDraftPool(clientConn.getDraftPool());
         board.setNowPlaying(playerId);
         board.setIsFirstTurn(isFirstTurn);
+
         fsm.setNotMyTurn();
         fsm.setMyTurn(playerId==board.getMyPlayerId());
         board.stateChanged();
+
         board.notifyObservers();
 
     }
