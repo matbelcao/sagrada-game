@@ -40,6 +40,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
@@ -333,8 +334,16 @@ public class GUI extends Application implements ClientUI {
 
         BorderPane frontPane = new BorderPane();
 
+        ArrayList<Canvas> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
+        ArrayList<Canvas> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
+        ArrayList<StackPane> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
+        sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
+
+
+
         //Top side of the border pane
-        HBox roundTrack = sceneCreator.buildRoundTrack(cellDim,roundTrackList,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        //todo update
+        HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackCells);
         Region separator = new Region();
         HBox.setHgrow(separator,Priority.ALWAYS);
         VBox menuButtons = sceneCreator.getMenuButtons(turnState);
@@ -342,7 +351,8 @@ public class GUI extends Application implements ClientUI {
         frontPane.setTop(roundTrack);
 
         //Center side of the border pane
-        Group schema = sceneCreator.buildSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
+        //todo update
+        Group schema = sceneCreator.buildSchema(schemaCells,favorTokens,cellDim);
         HBox playersSelector = sceneCreator.getPlayersStatusBar(board.getMyPlayerId(),board);
         StackPane schemaContainer = new StackPane(schema);
         VBox.setVgrow(schemaContainer,Priority.ALWAYS);
@@ -352,7 +362,8 @@ public class GUI extends Application implements ClientUI {
         VBox cards = sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState);
         StackPane cardsContainer = new StackPane(cards);
         cards.setAlignment(CENTER);
-        GridPane draftpool = sceneCreator.buildDraftPool(draftPool,cellDim,turnState,latestDiceList,latestPlacementsList, latestSelectedDie,latestOptionsList);
+        //todo update
+        GridPane draftpool = sceneCreator.buildDraftPool(draftPoolCells);
         VBox.setVgrow(cardsContainer,Priority.ALWAYS);
         frontPane.setRight(new VBox(cardsContainer,draftpool));
         return frontPane;

@@ -35,9 +35,7 @@ import java.util.List;
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.REMAINING_TOKENS;
-import static javafx.geometry.Pos.BOTTOM_RIGHT;
-import static javafx.geometry.Pos.CENTER;
-import static javafx.geometry.Pos.TOP_LEFT;
+import static javafx.geometry.Pos.*;
 
 public class GUIutil {
     private final CmdWriter cmdWrite;
@@ -155,8 +153,6 @@ public class GUIutil {
         return cellDim;
     }
 
-
-
     public double getSelectedSchemaLineWidth(double sceneWidth, double sceneHeight) {
         DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth, sceneHeight);
         double drawingWidth = sizes.getDrawingWidth();
@@ -164,50 +160,7 @@ public class GUIutil {
         return LINE_TO_CELL * CELL_TO_SCHEMA_W * schemaWidth;
     }
 
-    public HBox buildRoundTrack(double cellDim,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favortokens) {
-        ArrayList<StackPane> roundTrackCells = new ArrayList<>();
 
-        for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
-            StackPane cell = emptyRoundTrackCell(i, cellDim);
-            if (i < roundTrack.size()) {
-                Canvas c = new Canvas(cellDim, cellDim);
-                GraphicsContext gc = c.getGraphicsContext2D();
-                if (roundTrack.get(i).size() > 1) {
-                    //draw to dice in a cell
-                    drawDie(roundTrack.get(i).get(0), gc, cellDim);
-                    drawDie(roundTrack.get(i).get(1), gc, cellDim / 2, 0, cellDim);
-                    Event myEvent = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
-                    cell.setOnMouseEntered(e -> cell.fireEvent(myEvent));
-                } else {
-                    drawDie(roundTrack.get(i).get(0), gc, cellDim);
-                }
-                //todo refactor
-                if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
-                    highlight(c, cellDim);
-                }
-                cell.getChildren().add(c);
-            }
-            roundTrackCells.add(cell);
-        }
-
-        switch (turnState) {
-            case SELECT_DIE:
-                if (!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
-                    for (int i = 0; i < roundTrack.size(); i++) {
-                        if (roundTrack.get(i).size() < 2) {
-                            int finalI = i;
-                            roundTrackCells.get(i).setOnMouseClicked(e -> cmdWrite.write(getMultipleDieTrackCellIndex(finalI, roundTrack) + ""));
-                        }
-                    }
-                }
-                break;
-        }
-        HBox track = new HBox();
-        track.setSpacing(5); //todo add dynamic spacing
-        track.getChildren().addAll(roundTrackCells);
-        track.setAlignment(TOP_LEFT);
-        return track;
-    }
 
     public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox track = new HBox();
@@ -311,85 +264,11 @@ public class GUIutil {
         gc.fillText(index + "", cellDim / 2, cellDim / 2);
     }
 
-    public GridPane buildDraftPool(List<LightDie> draftPool, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList) {
-        ArrayList<Canvas> poolDice = new ArrayList<>();
-        for (int i = 0; i < draftPool.size(); i++) {
-            Canvas c = new Canvas(dieDim, dieDim);
-            drawDie(draftPool.get(i), c.getGraphicsContext2D(), dieDim);
-            poolDice.add(c);
-        }
-        switch (turnState) {
-            case MAIN:
-                for (Canvas c : poolDice) {
-                    c.setOnMouseClicked(e -> {
-                        cmdWrite.write("1");
-                    });
-                }
-                break;
-            case CHOOSE_PLACEMENT:
-                if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
-                    if(latestOptionsList.get(0).equals(Actions.SET_SHADE)){
-                        break;//todo properly higlight the selected die
-                    }
-                    highlightBlue(poolDice.get(latestSelectedDie.getPosition()), dieDim);
-                }
-                break;
-            case SELECT_DIE:
-                if (!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)) {
-                    if (!latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
-                    } else {
-                        for (IndexedCellContent activeCell : latestDiceList) {
-                            Canvas c = poolDice.get(activeCell.getPosition());
-                            highlight(c, dieDim);
-                            c.setOnMouseClicked(e -> {
-                                cmdWrite.write(poolDice.indexOf(c) + "");
-                            });
-                        }
-                    }
-
-                }
-
-        }
-        GridPane pool = new GridPane();
-        int i = 0;
-        int coloumnIndex = NUM_COLS;
-        while (i < poolDice.size() && coloumnIndex>0){
-            pool.add(poolDice.get(i),coloumnIndex,1);
-            i++;
-            coloumnIndex--;
-        }
-        coloumnIndex = NUM_COLS;
-       while (i < poolDice.size()){
-           pool.add(poolDice.get(i),coloumnIndex,0);
-           coloumnIndex--;
-           i++;
-       }
-        pool.setPadding(new Insets(10,10,10,10));
-        pool.setAlignment(BOTTOM_RIGHT);
-        return pool;
-
-    }
-
-
-    //todo update
-    public Group buildSchema(LightSchemaCard schema, double cellDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList, int favortokens) {
-        GridPane g = schemaToGrid(cellDim,schema, turnState, latestDiceList, latestPlacementsList, latestSelectedDie, latestOptionsList);
-        Text favorTokens = new Text(uimsg.getMessage(REMAINING_TOKENS)+" "+favortokens);
-        favorTokens.setFont(Font.font("Serif", FAVOR_TOKEN_TEXT_TO_CELL_DIM*cellDim));
-        return new Group (new VBox(favorTokens,g));
-    }
-
     public VBox getMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button("end turn");
         endTurn.setOnAction(e -> cmdWrite.write("e"));
         Button back = new Button("back");
         back.setOnAction(e -> cmdWrite.write("b"));
-       /* Rectangle turnStateIndicator = new Rectangle(50, 50);
-        if (turnState.equals(NOT_MY_TURN)) {
-            turnStateIndicator.setFill(Color.RED);
-        } else {
-            turnStateIndicator.setFill(Color.GREEN);
-        }*/
         Label turn = new Label(turnState.toString());
         VBox buttonContainer = new VBox();
         //buttonContainer.getChildren().addAll(back, endTurn, turnStateIndicator, turn);
@@ -397,55 +276,6 @@ public class GUIutil {
         return buttonContainer;
     }
 
-    public GridPane schemaToGrid(double cellDim, LightSchemaCard lightSchemaCard, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList) {
-        ArrayList<Canvas> gridCells = new ArrayList<>();
-
-        for (int i = 0; i < NUM_COLS * NUM_ROWS; i++) {
-            Canvas cell;
-            if (lightSchemaCard.hasConstraintAt(i)) {
-                cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i), cellDim);
-                gridCells.add(cell);
-            } else if (lightSchemaCard.hasDieAt(i)) {  //todo change it with active cell object
-                cell = lightDieToCanvas(lightSchemaCard.getDieAt(i), cellDim);
-                gridCells.add(cell);
-            } else {
-                cell = whiteCanvas(cellDim);
-                gridCells.add(cell);
-            }
-        }
-
-        switch (turnState) {
-            case CHOOSE_PLACEMENT:
-                if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL) || !latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)) {
-                    for (Canvas c : gridCells) {
-                        if (latestPlacementsList.contains(gridCells.indexOf(c))) {
-                            highlight(c, cellDim);
-                            c.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(gridCells.indexOf(c)) + ""));
-                        }
-                    }
-                }
-                break;
-            case SELECT_DIE:
-                if (!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.SCHEMA)) {
-                    for (IndexedCellContent activeCell : latestDiceList) {
-                        Canvas c = gridCells.get(activeCell.getPosition());
-                        highlight(c, cellDim);
-                        c.setOnMouseClicked(e -> {
-                            cmdWrite.write(latestDiceList.indexOf(activeCell) + "");
-                        });
-                    }
-                }
-                break;
-        }
-        GridPane grid = new GridPane();
-        for (int row = 0; row < NUM_ROWS; row++) {
-            for (int col = 0; col < NUM_COLS; col++) {
-                grid.add(gridCells.get(row * NUM_COLS + col), col, row);
-            }
-        }
-        grid.setAlignment(CENTER);
-        return grid;
-    }
 
     public VBox drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState) {
         Button priv = new Button("Private Objective");
@@ -581,7 +411,7 @@ public class GUIutil {
         double cellDim = getMainSceneCellDim(width,height);
         selectedPlayerPane.setRight(new Rectangle(getCardWidth(cellDim)*NUM_OF_TOOLS,getCardHeight(cellDim),Color.TRANSPARENT));
         selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT));
-        //Group playerSchema = schemaToGrid(cellDim,board.getPlayerById(playerId).getSchema(),NOT_MY_TURN,null,null,null,null)
+        //Group playerSchema = schemaToGridPane(cellDim,board.getPlayerById(playerId).getSchema(),NOT_MY_TURN,null,null,null,null)
         Canvas playerSchema = new Canvas(cellDim*NUM_COLS,cellDim*NUM_ROWS);
         buildSchema(playerSchema.getGraphicsContext2D(),board.getPlayerById(playerId).getSchema(),0,0,cellDim);
         StackPane schemaContainer = new StackPane(playerSchema);
@@ -957,4 +787,194 @@ public class GUIutil {
         backPane.setCenter(optionBox);
         return backPane;
     }
+
+    //todo refactor to remove latestdice list and turn state
+    public ArrayList<StackPane> getRoundTrackCells(List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList,double cellDim) {
+        ArrayList<StackPane> roundTrackCells = new ArrayList<>();
+
+        for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
+            StackPane cell = emptyRoundTrackCell(i, cellDim);
+            if (i < roundTrack.size()) {
+                Canvas c = new Canvas(cellDim, cellDim);
+                GraphicsContext gc = c.getGraphicsContext2D();
+                if (roundTrack.get(i).size() > 1) {
+                    //draw to dice in a cell
+                    drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                    drawDie(roundTrack.get(i).get(1), gc, cellDim / 2, 0, cellDim);
+                    Event myEvent = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+                    cell.setOnMouseEntered(e -> cell.fireEvent(myEvent));
+                } else {
+                    drawDie(roundTrack.get(i).get(0), gc, cellDim);
+                }
+
+                //todo refactor
+                if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
+                    highlight(c, cellDim);
+                }
+                cell.getChildren().add(c);
+            }
+            roundTrackCells.add(cell);
+        }
+        return roundTrackCells;
+    }
+
+    public ArrayList<Canvas> getSchemaCells(LightSchemaCard lightSchemaCard,double cellDim) {
+        ArrayList<Canvas> gridCells = new ArrayList<>();
+
+        for (int i = 0; i < NUM_COLS * NUM_ROWS; i++) {
+            Canvas cell;
+            if (lightSchemaCard.hasConstraintAt(i)) {
+                cell = lightConstraintToCanvas(lightSchemaCard.getConstraintAt(i), cellDim);
+                gridCells.add(cell);
+            } else if (lightSchemaCard.hasDieAt(i)) {  //todo change it with active cell object
+                cell = lightDieToCanvas(lightSchemaCard.getDieAt(i), cellDim);
+                gridCells.add(cell);
+            } else {
+                cell = whiteCanvas(cellDim);
+                gridCells.add(cell);
+            }
+        }
+        return gridCells;
+    }
+
+    public ArrayList<Canvas> getDraftPoolCells(List<LightDie> draftPool, double cellDim) {
+        ArrayList<Canvas> poolDice = new ArrayList<>();
+        for (int i = 0; i < draftPool.size(); i++) {
+            Canvas c = new Canvas(cellDim, cellDim);
+            drawDie(draftPool.get(i), c.getGraphicsContext2D(), cellDim);
+            poolDice.add(c);
+        }
+        return poolDice;
+    }
+    public HBox buildRoundTrack( ArrayList<StackPane> roundTrackCells) {
+        HBox track = new HBox();
+        track.setSpacing(5); //todo add dynamic spacing
+        track.getChildren().addAll(roundTrackCells);
+        track.setAlignment(TOP_LEFT);
+        return track;
+    }
+
+    public GridPane buildDraftPool(ArrayList<Canvas> poolDice) {
+        GridPane pool = new GridPane();
+        int i = 0;
+        int coloumnIndex = NUM_COLS;
+        while (i < poolDice.size() && coloumnIndex>0){
+            pool.add(poolDice.get(i),coloumnIndex,1);
+            i++;
+            coloumnIndex--;
+        }
+        coloumnIndex = NUM_COLS;
+        while (i < poolDice.size()){
+            pool.add(poolDice.get(i),coloumnIndex,0);
+            coloumnIndex--;
+            i++;
+        }
+        pool.setPadding(new Insets(10,10,10,10));
+        pool.setAlignment(BOTTOM_RIGHT);
+        return pool;
+
+    }
+
+
+    //todo update
+    public Group buildSchema( ArrayList<Canvas> gridCells,int favortokens,double cellDim) {
+        GridPane g = schemaToGridPane(gridCells);
+        Text favorTokens = new Text(uimsg.getMessage(REMAINING_TOKENS)+" "+favortokens);
+        favorTokens.setFont(Font.font("Serif", FAVOR_TOKEN_TEXT_TO_CELL_DIM*cellDim));
+        return new Group (new VBox(favorTokens,g));
+    }
+
+    public GridPane schemaToGridPane(ArrayList<Canvas> gridCells) {
+        GridPane grid = new GridPane();
+        for (int row = 0; row < NUM_ROWS; row++) {
+            for (int col = 0; col < NUM_COLS; col++) {
+                grid.add(gridCells.get(row * NUM_COLS + col), col, row);
+            }
+        }
+        grid.setAlignment(CENTER);
+        return grid;
+    }
+    public void addActionListeners(ArrayList<Canvas> draftPoolCells, ArrayList<Canvas> schemaCells, ArrayList<StackPane> roundTrackCells, ClientFSMState turnState, LightBoard board,double cellDim) {
+        switch (turnState){
+            case CHOOSE_SCHEMA:
+                break;
+            case NOT_MY_TURN:
+                break;
+            case MAIN:
+                addMainStateActionListeners(draftPoolCells,schemaCells,roundTrackCells,board);
+            break;
+            case SELECT_DIE:
+                addSelectDieStateActionListener(draftPoolCells,schemaCells,roundTrackCells,board,cellDim);
+                break;
+            case CHOOSE_OPTION:
+                break;
+            case CHOOSE_TOOL:
+                break;
+            case CHOOSE_PLACEMENT:
+                addChoosePlacementActionListener(draftPoolCells,schemaCells,roundTrackCells,board,cellDim);
+                break;
+            case TOOL_CAN_CONTINUE:
+                break;
+        }
+
+    }
+    private void addSelectDieStateActionListener(ArrayList<Canvas> draftPoolCells, ArrayList<Canvas> schemaCells, ArrayList<StackPane> roundTrackCells, LightBoard board,double cellDim) {
+        List<Actions> latestOptionsList = board.getLatestOptionsList();
+        List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
+        List<List<LightDie>> roundTrack = board.getRoundTrack();
+
+        if(latestDiceList.isEmpty()){
+            return;
+        }
+        //latest dice list has dice
+        if (latestDiceList.get(0).getPlace().equals(Place.SCHEMA)) {
+            for (IndexedCellContent activeCell : latestDiceList) {
+                Canvas c = schemaCells.get(activeCell.getPosition());
+                highlight(c, cellDim);
+                c.setOnMouseClicked(e -> cmdWrite.write(latestDiceList.indexOf(activeCell) + ""));
+            }
+        } else if (latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)) {
+            if (!latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
+            }else {
+                for (IndexedCellContent activeCell : latestDiceList) {
+                    Canvas c = draftPoolCells.get(activeCell.getPosition());
+                    highlight(c, cellDim);
+                    c.setOnMouseClicked(e -> cmdWrite.write(draftPoolCells.indexOf(c) + ""));
+                }
+            }
+        }else if (latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
+            for (int i = 0; i < roundTrack.size(); i++) {
+                if (roundTrack.get(i).size() < 2) {
+                    int finalI = i;
+                    roundTrackCells.get(i).setOnMouseClicked(e -> cmdWrite.write(getMultipleDieTrackCellIndex(finalI, roundTrack) + ""));
+                }
+            }
+        }
+    }
+
+    private void addChoosePlacementActionListener(ArrayList<Canvas> draftPoolCells, ArrayList<Canvas> schemaCells, ArrayList<StackPane> roundTrackCells, LightBoard board, double cellDim) {
+        IndexedCellContent latestSelectedDie = board.getLatestSelectedDie();
+        List<Actions> latestOptionsList = board.getLatestOptionsList();
+        List<Integer> latestPlacementsList = board.getLatestPlacementsList();
+        if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL) || !latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)) {
+            for (Canvas c : schemaCells) {
+                if (latestPlacementsList.contains(schemaCells.indexOf(c))) {
+                    highlight(c, cellDim);
+                    c.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(c)) + ""));
+                }
+            }
+        }else if(latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
+            if(latestOptionsList.get(0).equals(Actions.SET_SHADE)){
+                return;//todo properly higlight the selected die
+            }
+            highlightBlue(draftPoolCells.get(latestSelectedDie.getPosition()), cellDim);
+        }
+    }
+
+    private void addMainStateActionListeners(ArrayList<Canvas> draftPoolCells, ArrayList<Canvas> schemaCells, ArrayList<StackPane> roundTrackCells, LightBoard board) {
+        for (Canvas c : draftPoolCells) {
+            c.setOnMouseClicked(e -> cmdWrite.write("1"));
+        }
+    }
+
 }
