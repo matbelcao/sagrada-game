@@ -217,7 +217,7 @@ public class SocketClient implements ClientConn {
                 break;
             case SocketString.BOARD_CHANGED:
                 client.addUpdateTask(new Thread(()->
-                client.getUpdates()
+                client.getBoardUpdates()
                 ));
                 break;
             default:

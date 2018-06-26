@@ -68,7 +68,7 @@ public class ClientFSM {
                         synchronized (lockState){
                             state=GAME_ENDED.nextState(true);
                         }
-                        client.resetForNewGame();
+                        client.prepareForNewGame();
                     }else{
                        invalidInput();
                     }
@@ -310,7 +310,7 @@ public class ClientFSM {
             }
         }
 
-        client.getUpdates();
+        client.getBoardUpdates();
     }
 
 
@@ -337,7 +337,7 @@ public class ClientFSM {
             if(state.equals(TOOL_CAN_CONTINUE)){
                 toolContinue();
             }else {
-                client.getUpdates();
+                client.getBoardUpdates();
             }
         }else{
             invalidInput();

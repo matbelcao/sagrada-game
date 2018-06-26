@@ -263,7 +263,7 @@ public class LightBoard extends Observable {
      * @param playerId the id of said player
      * @param status the new status
      */
-    public void updatestatus(int playerId, LightPlayerStatus status){
+    public void updateStatus(int playerId, LightPlayerStatus status){
         players.get(playerId).setStatus(status);
         addToChanges(LightBoardEvents.Status);
         setChanged();

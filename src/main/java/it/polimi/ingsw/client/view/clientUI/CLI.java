@@ -221,7 +221,7 @@ public class CLI implements ClientUI {
 
 
 
-        switch (client.getTurnState()) {
+        switch (client.getFsmState()) {
             case CHOOSE_SCHEMA:
                 break;
 
