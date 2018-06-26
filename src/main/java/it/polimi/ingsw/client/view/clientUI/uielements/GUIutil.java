@@ -34,12 +34,14 @@ import java.util.List;
 
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.REMAINING_TOKENS;
 import static javafx.geometry.Pos.BOTTOM_RIGHT;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.geometry.Pos.TOP_LEFT;
 
 public class GUIutil {
     private final CmdWriter cmdWrite;
+    private final UIMessages uimsg;
     private GUI gui;
     //ratio is width/height
     public static final int NUM_COLS = 5;
@@ -81,18 +83,20 @@ public class GUIutil {
     private static final double MAIN_GAME_CELL_DIM_TO_WIDTH = 0.0797171;
     private static final double CARD_WIDTH_TO_CELL_DIM = 2.455555555555;
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.33333333333;
+    private static final double FAVOR_TOKEN_TEXT_TO_CELL_DIM = 0.27777777;
     private static final double DIE_ARC_TO_DIM = 0.35;
     private static final double LINE_TO_DIE = 0.045;
 
     //die s..
     private static final int SPOT_RATIO = 6;
 
-    public GUIutil(Rectangle2D visualBounds, GUI gui, CmdWriter cmdWrite) {
+    public GUIutil(Rectangle2D visualBounds, GUI gui, CmdWriter cmdWrite, UIMessages uimsg) {
         SCREEN_WIDTH = visualBounds.getWidth();
         System.out.println("+++++++++-----------------+++++++++++++++++++------------------+++++"+SCREEN_WIDTH);
         SCREEN_HEIGHT = visualBounds.getHeight();
         this.gui = gui;
         this.cmdWrite = cmdWrite;
+        this.uimsg = uimsg;
     }
 
     public double getLoginWidth() {
@@ -366,10 +370,13 @@ public class GUIutil {
 
     }
 
+
     //todo update
-    public GridPane drawSchema(LightSchemaCard schema, double dieDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList, int favortokens) {
-        GridPane g = schemaToGrid(dieDim,schema, turnState, latestDiceList, latestPlacementsList, latestSelectedDie, latestOptionsList);
-        return g;
+    public Group buildSchema(LightSchemaCard schema, double cellDim, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, List<Actions> latestOptionsList, int favortokens) {
+        GridPane g = schemaToGrid(cellDim,schema, turnState, latestDiceList, latestPlacementsList, latestSelectedDie, latestOptionsList);
+        Text favorTokens = new Text(uimsg.getMessage(REMAINING_TOKENS)+" "+favortokens);
+        favorTokens.setFont(Font.font("Serif", FAVOR_TOKEN_TEXT_TO_CELL_DIM*cellDim));
+        return new Group (new VBox(favorTokens,g));
     }
 
     public VBox getMenuButtons(ClientFSMState turnState) {
@@ -424,7 +431,6 @@ public class GUIutil {
                         Canvas c = gridCells.get(activeCell.getPosition());
                         highlight(c, cellDim);
                         c.setOnMouseClicked(e -> {
-                            System.out.println("selected die at position " + gridCells.indexOf(c) + " in schema");
                             cmdWrite.write(latestDiceList.indexOf(activeCell) + "");
                         });
                     }
@@ -546,6 +552,24 @@ public class GUIutil {
         return new Scene(p);
     }
 
+    public HBox getPlayersStatusBar(int hilighlightedPlayerId,LightBoard board) {
+        HBox playerSelector = new HBox();
+        for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
+            Group playerStatusBar = getPlayerStatusBar(playerId,hilighlightedPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
+            playerSelector.getChildren().add(playerStatusBar);
+            if(playerId == board.getMyPlayerId()){
+                continue;
+            }else{
+                Event mouseEnteredPlayerStatusBar = new MyEvent(SELECTED_PLAYER, playerId);
+                playerStatusBar.setOnMouseEntered(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
+                playerStatusBar.setOnMouseClicked(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
+            }
+        }
+        playerSelector.setAlignment(Pos.BOTTOM_LEFT);
+        return  playerSelector;
+    }
+
+    //todo update
     public BorderPane buildSelectdPlayerPane(int playerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
         HBox playersSelector = getPlayersStatusBar(playerId,board);
@@ -557,8 +581,9 @@ public class GUIutil {
         double cellDim = getMainSceneCellDim(width,height);
         selectedPlayerPane.setRight(new Rectangle(getCardWidth(cellDim)*NUM_OF_TOOLS,getCardHeight(cellDim),Color.TRANSPARENT));
         selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT));
+        //Group playerSchema = schemaToGrid(cellDim,board.getPlayerById(playerId).getSchema(),NOT_MY_TURN,null,null,null,null)
         Canvas playerSchema = new Canvas(cellDim*NUM_COLS,cellDim*NUM_ROWS);
-        drawSchema(playerSchema.getGraphicsContext2D(),board.getPlayerById(playerId).getSchema(),0,0,cellDim);
+        buildSchema(playerSchema.getGraphicsContext2D(),board.getPlayerById(playerId).getSchema(),0,0,cellDim);
         StackPane schemaContainer = new StackPane(playerSchema);
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
@@ -567,25 +592,7 @@ public class GUIutil {
         return selectedPlayerPane;
     }
 
-    public HBox getPlayersStatusBar(int hilighlightedPlayerId,LightBoard board) {
-        HBox playerSelector = new HBox();
-        for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
-            Group playerStatusBar = getPlayerStatusBar(playerId,hilighlightedPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
-            playerSelector.getChildren().add(playerStatusBar);
-            if(playerId == board.getMyPlayerId()){
-                continue;
-            }else{
-                Event mouseEnteredPlayerStatusBar = new MyEvent(SELECTED_PLAYER, playerId);
-                playerStatusBar.setOnMouseEntered(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
-            }
-        }
-        playerSelector.setAlignment(Pos.BOTTOM_LEFT);
-        return  playerSelector;
-    }
-
     private Group getPlayerStatusBar(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
-        double width = 100; //todo update dynamically
-        double heigth = 20;
         Text playerName = new Text(username);
         playerName.setFont(Font.font("Serif", 25));
         if(playerId == hilighlightedPlayerId){
@@ -716,7 +723,7 @@ public class GUIutil {
         x = x + SCHEMA_LINE_TO_WIDTH * schemaWidth;
         y = y + SCHEMA_LINE_TO_WIDTH * schemaWidth;
         double cellDim = CELL_TO_SCHEMA_W * schemaWidth;
-        drawSchema(gc, lightSchemaCard, x, y, cellDim);
+        buildSchema(gc, lightSchemaCard, x, y, cellDim);
         int textLen = lightSchemaCard.getName().length();
         x = initialX + schemaWidth / 2;
         y = initialY + TEXT_HEIGHT_TO_SCHEMA_H * schemaHeight;
@@ -747,13 +754,13 @@ public class GUIutil {
     }
 
 
-    private void drawSchema(GraphicsContext gc, LightSchemaCard lightSchemaCard, double x, double y, double cellDim) {
+    private void buildSchema(GraphicsContext gc, LightSchemaCard lightSchemaCard, double x, double y, double cellDim) {
         double initX = x;
         for (int i = 0; i < NUM_ROWS; i++) {
             for (int j = 0; j < NUM_COLS; j++) {
                 if (lightSchemaCard.hasDieAt(i, j)) {
                     drawDie(lightSchemaCard.getDieAt(i, j), gc, x, y, cellDim);
-                } else if (lightSchemaCard.hasConstraintAt(i, j)) {
+                } else if (lightSchemaCard.hasConstraintAt(i,j)) {
                     drawConstraint(lightSchemaCard.getConstraintAt(i, j), gc, x, y, cellDim);
                 } else {
                     drawWhiteCell(gc, x, y, cellDim);

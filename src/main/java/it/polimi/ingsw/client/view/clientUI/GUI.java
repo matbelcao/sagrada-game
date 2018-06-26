@@ -80,7 +80,7 @@ public class GUI extends Application implements ClientUI {
     public void start(Stage primaryStage) {
         //get the dimensions of the screen
         synchronized (lock) {
-            sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(), this, getCmdWrite());
+            sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(), this, getCmdWrite() ,uimsg);
             lock.notifyAll();
         }
         this.primaryStage = primaryStage;
@@ -248,28 +248,15 @@ public class GUI extends Application implements ClientUI {
             double currentWidth = primaryStage.getWidth();
             double currentHeight = primaryStage.getHeight();
             Scene scene = new Scene(bulidMainPane(currentWidth,currentHeight,board));
+            primaryStage.setScene(scene);
 
             //root.setStyle("-fx-background-color: black;"); //todo change
-            primaryStage.setScene(scene);
-            scene.addEventHandler(MOUSE_EXITED_BACK_PANE , event -> {
-                scene.setRoot(buildFrontPane(scene.getWidth(), scene.getHeight(),board));
-            });
-            scene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL , event -> {
-                scene.setRoot(showMultipleDiceScreen(event.getCellIndex(),scene.getWidth(), scene.getHeight(),board));
-            });
-            scene.addEventHandler(SELECTED_PLAYER , event -> {
-                scene.setRoot(showSelectedPlayer(event.getCellIndex(),scene.getWidth(), scene.getHeight(),board));
-            });
-            scene.widthProperty().addListener((observable, oldValue, newValue) -> {
-                double newWidth = scene.getWidth();
-                double newHeight =  scene.getHeight();
-                scene.setRoot(bulidMainPane(newWidth,newHeight,board));
-            });
-            scene.heightProperty().addListener((observable, oldValue, newValue) -> {
-                double newWidth = scene.getWidth();
-                double newHeight =  scene.getHeight();
-                scene.setRoot(bulidMainPane(newWidth,newHeight,board));
-            });
+            scene.addEventHandler(MOUSE_EXITED_BACK_PANE, e->scene.setRoot(buildFrontPane(scene.getWidth(), scene.getHeight(),board)));
+            scene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->scene.setRoot(showMultipleDiceScreen(e.getCellIndex(),scene.getWidth(), scene.getHeight(),board)));
+            scene.addEventHandler(SELECTED_PLAYER, e -> scene.setRoot(showSelectedPlayer(e.getCellIndex(),scene.getWidth(), scene.getHeight(),board)));
+
+            scene.widthProperty().addListener((observable, oldValue, newValue) -> scene.setRoot(bulidMainPane(scene.getWidth(),scene.getHeight(),board)));
+            scene.heightProperty().addListener((observable, oldValue, newValue) -> scene.setRoot(bulidMainPane(scene.getWidth(),scene.getHeight(),board)));
         });
     }
 
@@ -355,7 +342,7 @@ public class GUI extends Application implements ClientUI {
         frontPane.setTop(roundTrack);
 
         //Center side of the border pane
-        GridPane schema = sceneCreator.drawSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
+        Group schema = sceneCreator.buildSchema(schemaCard,cellDim,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,latestOptionsList,favorTokens);
         HBox playersSelector = sceneCreator.getPlayersStatusBar(board.getMyPlayerId(),board);
         StackPane schemaContainer = new StackPane(schema);
         VBox.setVgrow(schemaContainer,Priority.ALWAYS);
