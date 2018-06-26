@@ -63,6 +63,7 @@ public class GUI extends Application implements ClientUI {
     private Text messageToUser = new Text();
     private CmdWriter cmdWrite;
     private int playerId;
+    private static Scene mainScene;
 
     public GUI() {
         instance = this;
@@ -250,16 +251,22 @@ public class GUI extends Application implements ClientUI {
             primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight());
             double currentWidth = primaryStage.getWidth();
             double currentHeight = primaryStage.getHeight();
-            Scene scene = new Scene(bulidMainPane(currentWidth,currentHeight,board));
-            primaryStage.setScene(scene);
+            if(mainScene == null){
+                mainScene = new Scene(bulidMainPane(currentWidth,currentHeight,board));
+                primaryStage.setScene(mainScene);
+            }else{
+                mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
+            }
+
+
 
             //root.setStyle("-fx-background-color: black;"); //todo change
-            scene.addEventHandler(MOUSE_EXITED_BACK_PANE, e->scene.setRoot(buildFrontPane(scene.getWidth(), scene.getHeight(),board)));
-            scene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->scene.setRoot(showMultipleDiceScreen(e.getCellIndex(),scene.getWidth(), scene.getHeight(),board)));
-            scene.addEventHandler(SELECTED_PLAYER, e -> scene.setRoot(showSelectedPlayer(e.getCellIndex(),scene.getWidth(), scene.getHeight(),board)));
+            mainScene.addEventHandler(MOUSE_EXITED_BACK_PANE, e->mainScene.setRoot(buildFrontPane(mainScene.getWidth(), mainScene.getHeight(),board)));
+            mainScene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->mainScene.setRoot(showMultipleDiceScreen(e.getCellIndex(),mainScene.getWidth(), mainScene.getHeight(),board)));
+            mainScene.addEventHandler(SELECTED_PLAYER, e -> mainScene.setRoot(showSelectedPlayer(e.getCellIndex(),mainScene.getWidth(), mainScene.getHeight(),board)));
 
-            scene.widthProperty().addListener((observable, oldValue, newValue) -> scene.setRoot(bulidMainPane(scene.getWidth(),scene.getHeight(),board)));
-            scene.heightProperty().addListener((observable, oldValue, newValue) -> scene.setRoot(bulidMainPane(scene.getWidth(),scene.getHeight(),board)));
+            mainScene.widthProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
+            mainScene.heightProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
         });
     }
 
