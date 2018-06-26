@@ -28,23 +28,28 @@ public class Cell extends StackPane{
     private Rectangle innerRect;
     private Canvas content;
 
-
-
     public Cell(int index, double cellDim){
             this.cellDim = cellDim;
+            this.dieDim = cellDim*DIE_DIM_TO_CELL_DIM;
+            this.content = new Canvas(dieDim,dieDim);
+            this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
+            double lineWidth = cellDim * LINE_TO_CELL;
+            double innerCellDim = cellDim - lineWidth;
+            this.innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
+            outerRect.setFill(Color.BLACK);
+            innerRect.setFill(Color.WHITE);
             int displayedIndex = index + 1;
             double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL * cellDim;
             Text t = new Text(displayedIndex + "");
             t.setFont(Font.font("Verdana", textSize));
             t.setFill(Color.BLACK);
-            double lineWidth = cellDim * LINE_TO_CELL;
-            double innerCellDim = cellDim - lineWidth;
-            this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
-            this.innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
-            outerRect.setFill(Color.BLACK);
-            innerRect.setFill(Color.WHITE);
-            this.getChildren().addAll(outerRect,innerRect,t);
-        }
+        //GraphicsContext gc = content.getGraphicsContext2D();
+        //gc.setFill(Color.BLUE);
+        //gc.fillRect(0,0,30,30);
+            this.getChildren().addAll(outerRect,innerRect,t,content);
+
+
+    }
 
     public Cell(double cellDim, Place place) {
         this.cellDim = cellDim;
@@ -65,23 +70,42 @@ public class Cell extends StackPane{
 
         this.getChildren().addAll(outerRect,innerRect,content);
     }
+    public void putDoubleDice(LightDie die1, LightDie die2) {
+        GraphicsContext gc = content.getGraphicsContext2D();
+        drawDie(die1, gc,0,0, dieDim);
+        drawDie(die2, gc, dieDim / 2, 0, dieDim);
+    }
 
     public void putDie(LightDie lightDie) {
-        double lineWidth = LINE_TO_DIE * dieDim;
-        GraphicsContext gc = content.getGraphicsContext2D();
-        //to allow to see the constraint underneath
-        gc.setFill(Color.TRANSPARENT);
-        gc.fillRect(0,0,dieDim,dieDim);
-        gc.setFill(Color.BLACK);
-        gc.fillRoundRect(0, 0, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
-        gc.fillRoundRect(lineWidth, lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        drawSpots(gc, 0, 0, dieDim, lightDie.getShade().toInt());
+        drawDie(lightDie,content.getGraphicsContext2D(),0,0,dieDim);
     }
 
     public void putConstraint(LightConstraint constraintAt) {
        drawConstraint(constraintAt,content.getGraphicsContext2D(),0,0,dieDim);
     }
+
+    private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
+        drawDie(lightDie, graphicsContext2D, 0, 0, dieDim);
+    }
+
+    private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double dieDim) {
+        double lineWidth = LINE_TO_DIE * dieDim;
+        gc.setFill(Color.BLACK);
+        gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
+        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
+        gc.fillRoundRect(x+lineWidth, y+lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
+        drawSpots(gc, x, y, dieDim, lightDie.getShade().toInt());
+    }
+
+    private void drawDie(it.polimi.ingsw.common.enums.Color color, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
+        double lineWidth = LINE_TO_DIE * dieDim;
+        gc.setFill(Color.BLACK);
+        gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
+        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(color));
+        gc.fillRoundRect(x + lineWidth, y + lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
+        drawSpots(gc, x, y, dieDim, shade.toInt());
+    }
+
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double cellDim) {
         if (constraint.hasColor()) {
@@ -206,9 +230,8 @@ public class Cell extends StackPane{
         gc.strokeRect(x, y, cellDim, cellDim);
     }
 
-    public void highlight() {
+    public void highlightGreen() {
         outerRect.setFill(Color.GREEN);
-        innerRect.setFill(Color.TRANSPARENT);
     }
 
     public void highlightBlue() {
@@ -220,7 +243,4 @@ public class Cell extends StackPane{
         innerRect.setFill(Color.TRANSPARENT);
     }
 
-    public void putWhiteCanvas() {
-        //drawWhiteCell(base.getGraphicsContext2D(),0,0,cellDim);
-    }
 }

@@ -338,8 +338,9 @@ public class GUI extends Application implements ClientUI {
 
         ArrayList<Cell> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
         ArrayList<Cell> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
-        ArrayList<StackPane> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
+        ArrayList<Cell> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
         sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
+        frontPane.setStyle("-fx-background-color: rgba(245,220,112,0.4);"); //todo hookup with css
 
 
 
