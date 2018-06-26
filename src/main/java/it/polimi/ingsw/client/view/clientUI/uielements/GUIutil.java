@@ -175,7 +175,7 @@ public class GUIutil {
         }
         return track;
     }
-   
+
     public HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox multipleDiceTrack = new HBox();
         multipleDiceTrack.setSpacing(10); ////todo dynamic spacing??
@@ -865,13 +865,6 @@ public class GUIutil {
 
     //todo update
     public Group buildSchema(ArrayList<Cell> gridCells, int favortokens, double cellDim) {
-        Group g = schemaToGridPane(gridCells);
-        Text favorTokens = new Text(uimsg.getMessage(REMAINING_TOKENS)+" "+favortokens);
-        favorTokens.setFont(Font.font("Serif", FAVOR_TOKEN_TEXT_TO_CELL_DIM*cellDim));
-        return new Group (new VBox(favorTokens,g));
-    }
-
-    public Group schemaToGridPane(ArrayList<Cell> gridCells) {
         GridPane grid = new GridPane();
         for (int row = 0; row < NUM_ROWS; row++) {
             for (int col = 0; col < NUM_COLS; col++) {
@@ -880,8 +873,11 @@ public class GUIutil {
         }
         grid.setStyle("-fx-background-color: rgb(0,0,0);"); //todo hookup with css or consider the pane added underneath
         grid.setAlignment(CENTER);
-        return new Group(grid);
+        Text favorTokens = new Text(uimsg.getMessage(REMAINING_TOKENS)+" "+favortokens);
+        favorTokens.setFont(Font.font("Serif", FAVOR_TOKEN_TEXT_TO_CELL_DIM*cellDim));
+        return new Group (new VBox(favorTokens,new Group(grid)));
     }
+
     public void addActionListeners(ArrayList<Cell> draftPoolCells, ArrayList<Cell> schemaCells, ArrayList<Cell> roundTrackCells, ClientFSMState turnState, LightBoard board, double cellDim) {
         switch (turnState){
             case CHOOSE_SCHEMA:

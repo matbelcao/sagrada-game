@@ -15,10 +15,10 @@ import javafx.scene.text.Text;
 
 public class Cell extends StackPane{
     private static final double ROUNDTRACK_TEXT_SIZE_TO_CELL = 0.7;
-    private static final double LINE_TO_CELL = 0.12;
+    private static final double BORDER_LINE_TO_CELL = 0.12;
     private static final double DIE_DIM_TO_CELL_DIM = 0.9;
     private static final double DIE_ARC_TO_DIM = 0.35;
-    private static final double LINE_TO_DIE = 0.02; //0.045
+    private static final double BORDER_LINE_TO_DIE = 0.02; //0.045
     private static final int SPOT_RATIO = 6;
 
 
@@ -33,7 +33,7 @@ public class Cell extends StackPane{
             this.dieDim = cellDim*DIE_DIM_TO_CELL_DIM;
             this.content = new Canvas(dieDim,dieDim);
             this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
-            double lineWidth = cellDim * LINE_TO_CELL;
+            double lineWidth = cellDim * BORDER_LINE_TO_CELL;
             double innerCellDim = cellDim - lineWidth;
             this.innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
             outerRect.setFill(Color.BLACK);
@@ -56,7 +56,7 @@ public class Cell extends StackPane{
         this.dieDim = cellDim*DIE_DIM_TO_CELL_DIM;
         this.content = new Canvas(dieDim,dieDim);
         this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
-        double lineWidth = cellDim * LINE_TO_CELL;
+        double lineWidth = cellDim * BORDER_LINE_TO_CELL;
         double innerCellDim = cellDim - lineWidth;
         this.innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
         switch (place){
@@ -89,7 +89,7 @@ public class Cell extends StackPane{
     }
 
     private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double dieDim) {
-        double lineWidth = LINE_TO_DIE * dieDim;
+        double lineWidth = BORDER_LINE_TO_DIE * dieDim;
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
@@ -98,7 +98,7 @@ public class Cell extends StackPane{
     }
 
     private void drawDie(it.polimi.ingsw.common.enums.Color color, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
-        double lineWidth = LINE_TO_DIE * dieDim;
+        double lineWidth = BORDER_LINE_TO_DIE * dieDim;
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(color));
@@ -225,7 +225,7 @@ public class Cell extends StackPane{
     private void drawWhiteCell(GraphicsContext gc, double x, double y, double cellDim) {
         gc.setFill(Color.WHITE);
         gc.setStroke(Color.BLACK);
-        gc.setLineWidth(cellDim * LINE_TO_CELL);
+        gc.setLineWidth(cellDim * BORDER_LINE_TO_CELL);
         gc.fillRect(x, y, cellDim, cellDim);
         gc.strokeRect(x, y, cellDim, cellDim);
     }

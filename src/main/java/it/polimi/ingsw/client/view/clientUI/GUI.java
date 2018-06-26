@@ -213,6 +213,32 @@ public class GUI extends Application implements ClientUI {
         });
     }
 
+    /*@Override
+    public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
+        Platform.runLater(() -> {
+            StackPane stackPane = new StackPane();
+            Scene scene = new Scene(stackPane);
+            DraftedSchemasGroup draftedSchemasGroup = new DraftedSchemasGroup(draftedSchemas,privObj);
+            stackPane.getChildren().add(draftedSchemasGroup);
+            scene.widthProperty().addListener((observable, oldValue, newValue) -> {
+                double newWidth = scene.getWidth();
+                double newHeight = scene.getHeight();
+                draftedSchemasGroup.updateScene(newWidth,newHeight);
+            });
+            scene.heightProperty().addListener((observable, oldValue, newValue) -> {
+                double newWidth = scene.getWidth();
+                double newHeight = scene.getHeight();
+                draftedSchemasGroup.updateScene(newWidth,newHeight);
+            });
+            primaryStage.setTitle("Sagrada");
+            primaryStage.setResizable(true);
+            primaryStage.setScene(scene);
+            primaryStage.setMinHeight(sceneCreator.getDraftedSchemasMinHeight());
+            primaryStage.setMinWidth(sceneCreator.getDraftedSchemasMinWidth());
+
+        });
+    }*/
+
     public void updateBoard(LightBoard board) {
         Platform.runLater(() -> {
             if (board == null) {
