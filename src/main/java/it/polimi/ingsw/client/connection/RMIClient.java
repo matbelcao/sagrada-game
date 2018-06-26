@@ -73,7 +73,7 @@ public class RMIClient implements ClientConn{
      * @return a list of three public objective cards immutable objects
      */
     @Override
-    public List<LightCard> getPublicObjects() {
+    public List<LightCard> getPublicObjectives() {
         List<LightCard> result = null;
         try {
             result = remoteObj.getPublicObjects();

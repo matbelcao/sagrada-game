@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.List;
 
 public class ClientOptions {
-
+    public static final String HELP="h";
     private ClientOptions(){}
 
     private static final String LONG_OPTION="(\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+))";

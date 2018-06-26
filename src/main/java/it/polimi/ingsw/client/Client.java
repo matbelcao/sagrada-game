@@ -500,14 +500,7 @@ public class Client {
         if(numRound==0) {
             synchronized (lockReady) {
 
-                for (int i = 0; i < board.getNumPlayers(); i++) {
-
-                    board.updateSchema(i, clientConn.getSchema(i));
-                    board.updateFavorTokens(i,clientConn.getFavorTokens(i));
-                }
-
-                board.setTools(clientConn.getTools());
-                board.setPubObjs(clientConn.getPublicObjects());
+                getCardsSchemasFavors();
 
                 readyWithBasicBoardElems =true;
                 lockReady.notifyAll();
@@ -516,6 +509,20 @@ public class Client {
         }
         board.notifyObservers();
 
+    }
+
+    /**
+     * this method retrieves the players' schemas and favor tokens and the tools and public objectives
+     */
+    private void getCardsSchemasFavors() {
+        for (int i = 0; i < board.getNumPlayers(); i++) {
+
+            board.updateSchema(i, clientConn.getSchema(i));
+            board.updateFavorTokens(i,clientConn.getFavorTokens(i));
+        }
+
+        board.setTools(clientConn.getTools());
+        board.setPubObjs(clientConn.getPublicObjectives());
     }
 
     /**
@@ -667,13 +674,8 @@ public class Client {
                 board.setRoundTrack(clientConn.getRoundtrack());
                 board.setNowPlaying(gameStatus.getNowPlaying());
 
-                for (int i = 0; i < board.getNumPlayers(); i++) {
-                    board.updateSchema(i, clientConn.getSchema(i));
-                    board.updateFavorTokens(i, clientConn.getFavorTokens(i));
-                }
+                getCardsSchemasFavors();
 
-                board.setTools(clientConn.getTools());
-                board.setPubObjs(clientConn.getPublicObjects());
                 board.setDraftPool(clientConn.getDraftPool());
             } else {
                 board.setDraftedSchemas(clientConn.getSchemaDraft());
@@ -719,7 +721,7 @@ public class Client {
         Client client;
         client = Client.getNewClient();
         if (args.length>0) {
-            if(!ClientOptions.getOptions(args,options) || options.contains("h")){
+            if(!ClientOptions.getOptions(args,options) || options.contains(ClientOptions.HELP)){
                 ClientOptions.printHelpMessage();
                 return;
             }else {

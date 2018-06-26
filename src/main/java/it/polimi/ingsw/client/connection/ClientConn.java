@@ -42,7 +42,7 @@ public interface ClientConn {
      * This function can be invoked to request the three public objective cards parameters
      * @return a list of three public objective cards immutable objects
      */
-    List<LightCard> getPublicObjects();
+    List<LightCard> getPublicObjectives();
 
     /**
      * This function can be invoked to request the three toolcards parameters
