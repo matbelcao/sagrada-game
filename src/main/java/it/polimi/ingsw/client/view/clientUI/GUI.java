@@ -6,6 +6,7 @@ import it.polimi.ingsw.client.clientController.QueuedCmdReader;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.textGen;
 import it.polimi.ingsw.client.view.LightBoard;
+import it.polimi.ingsw.client.view.clientUI.uielements.Cell;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
 import it.polimi.ingsw.client.view.clientUI.uielements.MyEvent;
 import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
@@ -47,7 +48,8 @@ import java.util.Observable;
 import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.MOUSE_EXITED_BACK_PANE;
 import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.SELECTED_PLAYER;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
-import static javafx.geometry.Pos.*;
+import static javafx.geometry.Pos.CENTER;
+import static javafx.geometry.Pos.TOP_LEFT;
 
 public class GUI extends Application implements ClientUI {
     private GUIutil sceneCreator;
@@ -334,8 +336,8 @@ public class GUI extends Application implements ClientUI {
 
         BorderPane frontPane = new BorderPane();
 
-        ArrayList<Canvas> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
-        ArrayList<Canvas> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
+        ArrayList<Cell> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
+        ArrayList<Cell> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
         ArrayList<StackPane> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
         sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
 
