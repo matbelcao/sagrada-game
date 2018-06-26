@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.List;
 
 public class ClientOptions {
-
+    public static final String HELP="h";
     private ClientOptions(){}
 
     private static final String LONG_OPTION="(\\-\\-(([a-z]+\\-[a-z]+)|[a-z]+))";
@@ -187,8 +187,8 @@ public class ClientOptions {
         if(options.contains("s")){ client.setConnMode(ConnectionMode.SOCKET);}
         if(options.contains("g")){ client.setUiMode(UIMode.GUI);}
         if(options.contains("c")){ client.setUiMode(UIMode.CLI);}
-        if(options.contains("e")){ client.setLang(UILanguage.eng);}
-        if(options.contains("i")){ client.setLang(UILanguage.ita);}
+        if(options.contains("e")){ client.setLanguage(UILanguage.eng);}
+        if(options.contains("i")){ client.setLanguage(UILanguage.ita);}
         if(options.contains("a")){ client.setServerIP(options.get(options.indexOf("a")+1));}
     }
 }

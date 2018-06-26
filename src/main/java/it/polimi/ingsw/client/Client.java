@@ -1,17 +1,17 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
-import it.polimi.ingsw.client.view.clientUI.CLI;
-import it.polimi.ingsw.client.view.clientUI.ClientUI;
 import it.polimi.ingsw.client.connection.ClientConn;
 import it.polimi.ingsw.client.connection.RMIClient;
 import it.polimi.ingsw.client.connection.RMIClientInt;
 import it.polimi.ingsw.client.connection.SocketClient;
+import it.polimi.ingsw.client.view.LightBoard;
+import it.polimi.ingsw.client.view.clientUI.CLI;
+import it.polimi.ingsw.client.view.clientUI.ClientUI;
 import it.polimi.ingsw.client.view.clientUI.GUI;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
-import it.polimi.ingsw.client.view.LightBoard;
-import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMode;
+import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.connection.AuthenticationInt;
@@ -25,7 +25,8 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -33,7 +34,6 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static it.polimi.ingsw.common.enums.ErrMsg.*;
 
@@ -43,38 +43,47 @@ import static it.polimi.ingsw.common.enums.ErrMsg.*;
  */
 public class Client {
 
-    private static final String EMPTY_STRING="";
+    public static final String XML_SOURCE = "xml/client/";
 
-    private UIMode uiMode;
-    private ConnectionMode connMode;
-    private String username;
-    private char [] password;
+    private static final String EMPTY_STRING="";
     private static final String CONFIGURATION_FILE_NAME= "ClientConf.xml";
+    private static final String RMI_HOSTNAME_PROPERTY = "java.rmi.server.hostname";
+    private static final String OS_NAME_PROPERTY = "os.name" ;
+    private static final String WINDOWS_OS = "Windows" ;
+    private static final String CONFIGURATIONS = "conf";
+    private static final String UI ="UI" ;
+    private static final String IPV4_ADDRESS = "address";
+    private static final String CONNECTION_MODE = "connectionMode";
+    private static final String LANG = "language";
+    private static final String RMI_PORT ="portRMI";
+    private static final String SOCKET_PORT ="portSocket";
+    private static final String RMI_SLASHSLASH ="rmi://";
+    private static final String SLASH ="/";
+    private static final String AUTH = "auth" ;
+
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
+
+    private ConnectionMode connMode;
     private ClientConn clientConn;
     private String serverIP;
     private Integer port;
+
+    private UIMode uiMode;
     private ClientUI clientUI;
-    private UILanguage lang;
+    private UILanguage language;
+
     private LightBoard board;
     private ClientFSM fsm;
-    public static final String XML_SOURCE = "xml/client/";
+
+    private String username;
+    private char [] password;
     private final Object lockCredentials=new Object();
 
-    private boolean ready;
+    private boolean readyWithBasicBoardElems;
     private final Object lockReady = new Object();
-    private final List<Thread> updateQueue;
+    private final List<Thread> updatesQueue;
 
-
-
-    /**
-     * @return true iff the client is using windows
-     */
-    public static boolean isWindows()
-    {
-        return System.getProperty("os.name").startsWith("Windows");
-    }
 
 
     /**
@@ -83,30 +92,17 @@ public class Client {
      * @param connMode the preferred connection mode
      * @param serverIP the server ip
      * @param port the port to connect to
-     * @param lang the desired language
+     * @param language the desired language
      */
-    public Client(UIMode uiMode,ConnectionMode connMode,String serverIP,Integer port,UILanguage lang) {
+    public Client(UIMode uiMode,ConnectionMode connMode,String serverIP,Integer port,UILanguage language) {
         this.uiMode = uiMode;
         this.connMode = connMode;
         this.serverIP = serverIP;
         this.port = port;
-        this.lang = lang;
+        this.language = language;
         this.userStatus = UserStatus.DISCONNECTED;
-        this.ready = false;
-        this.updateQueue=new ArrayList<>();
-    }
-
-    void resetForNewGame() {
-
-        synchronized (lockStatus) {
-            this.userStatus = UserStatus.LOBBY;
-        }
-        synchronized (lockReady) {
-            this.ready = false;
-        }
-
-
-        clientConn.newMatch();
+        this.readyWithBasicBoardElems = false;
+        this.updatesQueue =new ArrayList<>();
     }
 
     /**
@@ -122,15 +118,15 @@ public class Client {
             dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
-            Element eElement = (Element)doc.getElementsByTagName("conf").item(0);
-            UIMode uiMode=UIMode.valueOf(eElement.getElementsByTagName("UI").item(0).getTextContent());
-            String serverIP=eElement.getElementsByTagName("address").item(0).getTextContent();
-            ConnectionMode connMode=ConnectionMode.valueOf(eElement.getElementsByTagName("connectionMode").item(0).getTextContent());
-            UILanguage lang=UILanguage.valueOf(eElement.getElementsByTagName("language").item(0).getTextContent());
+            Element eElement = (Element)doc.getElementsByTagName(CONFIGURATIONS).item(0);
+            UIMode uiMode=UIMode.valueOf(eElement.getElementsByTagName(UI).item(0).getTextContent());
+            String serverIP=eElement.getElementsByTagName(IPV4_ADDRESS).item(0).getTextContent();
+            ConnectionMode connMode=ConnectionMode.valueOf(eElement.getElementsByTagName(CONNECTION_MODE).item(0).getTextContent());
+            UILanguage lang=UILanguage.valueOf(eElement.getElementsByTagName(LANG).item(0).getTextContent());
             int port;
             if(connMode.equals(ConnectionMode.RMI)){
-                port=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
-            }else{ port=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent()); }
+                port=Integer.parseInt(eElement.getElementsByTagName(RMI_PORT).item(0).getTextContent());
+            }else{ port=Integer.parseInt(eElement.getElementsByTagName(SOCKET_PORT).item(0).getTextContent()); }
 
             return new Client(uiMode,connMode,serverIP,port,lang);
         } catch (ParserConfigurationException | IOException | SAXException e) {
@@ -139,6 +135,13 @@ public class Client {
             return null;
         }
 
+    }
+
+    /**
+     * @return the state of the client's fsm
+     */
+    public ClientFSMState getFsmState(){
+        return fsm.getState();
     }
 
     /**
@@ -165,10 +168,10 @@ public class Client {
 
     /**
      * This method sets the wanted language
-     * @param lang the requested language
+     * @param language the requested language
      */
-    void setLang(UILanguage lang) {
-        this.lang = lang;
+    void setLanguage(UILanguage language) {
+        this.language = language;
     }
 
     /**
@@ -235,9 +238,9 @@ public class Client {
             if(isWindows()){
                 AnsiConsole.systemInstall();
             }
-            clientUI=new CLI(this,lang);
+            clientUI=new CLI(this, language);
         }else{
-            new Thread(() -> GUI.launch(this,lang)).start();
+            new Thread(() -> GUI.launch(this, language)).start();
             while(GUI.getGUI() == null){
                 try {
                     Thread.sleep(100);
@@ -249,6 +252,15 @@ public class Client {
         }
         clientUI.showLoginScreen();
 
+    }
+
+
+    /**
+     * @return true iff the client is using windows
+     */
+    public static boolean isWindows()
+    {
+        return System.getProperty(OS_NAME_PROPERTY).startsWith(WINDOWS_OS);
     }
 
 
@@ -269,6 +281,7 @@ public class Client {
             if (connMode.equals(ConnectionMode.SOCKET)) {
                 clientConn = new SocketClient(this, serverIP, port);
             }
+
             do{
                 
                 synchronized (lockCredentials) {
@@ -293,7 +306,7 @@ public class Client {
 
             this.fsm=new ClientFSM(this);
             if(connMode.equals(ConnectionMode.RMI)){
-                AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
+                AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+AUTH);
                 authenticator.updateConnected(username);
             }
 
@@ -303,8 +316,8 @@ public class Client {
                 lockStatus.notifyAll();
             }
             //start collecting commands from ui
-            commandManager();
-            turnRoundMessagesManager();
+            startUICommandController();
+            updateMessagesManager();
 
             //ENABLE PONG
             clientConn.pong();
@@ -318,6 +331,13 @@ public class Client {
         }
     }
 
+    /**
+     * this logs tries to log the user in
+     * @return true iff it succeeded
+     * @throws RemoteException
+     * @throws MalformedURLException
+     * @throws NotBoundException
+     */
     private boolean login() throws RemoteException, MalformedURLException, NotBoundException {
         if(this.username.equals(EMPTY_STRING)){return false;}
         boolean logged;
@@ -329,10 +349,11 @@ public class Client {
         return logged;
     }
 
-    private void commandManager(){
-
+    /**
+     * this starts a thread that is going to manage the commands received by the end user through the interaction with the ui
+     */
+    private void startUICommandController(){
         new UICommandController(fsm,clientUI.getCommandQueue()).start();
-
     }
 
 
@@ -341,11 +362,11 @@ public class Client {
      * @return true iff the login had a positive result
      */
     private boolean loginRMI() throws RemoteException, MalformedURLException, NotBoundException {
-        System.setProperty("java.rmi.server.hostname",serverIP);
-        AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup("rmi://"+serverIP+"/auth");
+        System.setProperty(RMI_HOSTNAME_PROPERTY,serverIP);
+        AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+AUTH);
         if(authenticator.authenticate(username,password)){
             //get the stub of the remote object
-            RMIClientInt rmiConnStub = (RMIClientInt) Naming.lookup("rmi://"+serverIP+"/"+username);
+            RMIClientInt rmiConnStub = (RMIClientInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+username);
             clientConn = new RMIClient(rmiConnStub, this);
             RMIServerInt rmiServerObject = new RMIServerObject(this);
             //check if the method is necessary or just extend unicast remote obj in RMIServerObject
@@ -366,28 +387,43 @@ public class Client {
         return userStatus.equals(UserStatus.LOBBY)||userStatus.equals(UserStatus.PLAYING);
     }
 
-    private void turnRoundMessagesManager(){
+    void prepareForNewGame() {
+
+        synchronized (lockStatus) {
+            this.userStatus = UserStatus.LOBBY;
+        }
+        synchronized (lockReady) {
+            this.readyWithBasicBoardElems = false;
+        }
+        clientConn.newMatch();
+    }
+
+
+    /**
+     * this manages the queue of updates with a fifo logic
+     */
+    private void updateMessagesManager(){
         new Thread(()-> {
             while(isLogged()) {
-                synchronized (updateQueue) {
-                    while (updateQueue.isEmpty()) {
+                synchronized (updatesQueue) {
+                    while (updatesQueue.isEmpty()) {
                         try {
-                            updateQueue.wait();
+                            updatesQueue.wait();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                             System.exit(2);
                         }
                     }
-                    updateQueue.notifyAll();
+                    updatesQueue.notifyAll();
                 }
-                    updateQueue.get(0).start();
+                    updatesQueue.get(0).start();
                     try {
-                        updateQueue.get(0).join();
+                        updatesQueue.get(0).join();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         System.exit(2);
                     }
-                    updateQueue.remove(0);
+                    updatesQueue.remove(0);
 
 
             }
@@ -395,10 +431,14 @@ public class Client {
         ).start();
     }
 
+    /**
+     * this adds a task to the queue of updates to make to the client's view
+     * @param newUpdate the new update to be made
+     */
     public void addUpdateTask(Thread newUpdate){
-        synchronized (updateQueue){
-            updateQueue.add(newUpdate);
-            updateQueue.notifyAll();
+        synchronized (updatesQueue){
+            updatesQueue.add(newUpdate);
+            updatesQueue.notifyAll();
         }
     }
 
@@ -421,24 +461,19 @@ public class Client {
         }
 
         board.setMyPlayerId(playerId);
-
-
-
         board.setPrivObj(clientConn.getPrivateObject());
-
         board.setDraftedSchemas(clientConn.getSchemaDraft());
-
         board.addObserver(clientUI);
 
         clientUI.updateGameStart(numPlayers,playerId);
-
         clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
-
-
 
     }
 
-
+    /**
+     * this notifies the end of a game be it for disconnection of too many players or for natural causes
+     * @param ranking the ranking of the players
+     */
     public void updateGameEnd(List<RankingEntry> ranking){
         for(RankingEntry entry : ranking){
             LightPlayer player=board.getPlayerById(entry.getPlayerId());
@@ -450,7 +485,176 @@ public class Client {
         board.notifyObservers();
     }
 
-    private void retrieveBoardOnReconnection(int myPlayerId){
+
+    /**
+     * this notifies the start of a new round
+     * @param numRound the number of the new round
+     */
+    public void updateGameRoundStart(int numRound){
+
+        board.setRoundTrack(clientConn.getRoundtrack());
+        board.setRoundNumber(numRound);
+        board.setDraftPool(clientConn.getDraftPool());
+        fsm.setNotMyTurn();
+        board.stateChanged();
+        if(numRound==0) {
+            synchronized (lockReady) {
+
+                getCardsSchemasFavors();
+
+                readyWithBasicBoardElems =true;
+                lockReady.notifyAll();
+            }
+            return;
+        }
+        board.notifyObservers();
+
+    }
+
+    /**
+     * this method retrieves the players' schemas and favor tokens and the tools and public objectives
+     */
+    private void getCardsSchemasFavors() {
+        for (int i = 0; i < board.getNumPlayers(); i++) {
+
+            board.updateSchema(i, clientConn.getSchema(i));
+            board.updateFavorTokens(i,clientConn.getFavorTokens(i));
+        }
+
+        board.setTools(clientConn.getTools());
+        board.setPubObjs(clientConn.getPublicObjectives());
+    }
+
+    /**
+     * notifies the end of a round of the game
+     * @param numRound the number of the round that just ended
+     */
+    public void updateGameRoundEnd(int numRound){
+
+
+    }
+
+    /**
+     * this notifies the user of the start of a new turn
+     * @param playerId the player who's about to play
+     * @param isFirstTurn true iff this is his/her first turn in the current round
+     */
+    public void updateGameTurnStart(int playerId, boolean isFirstTurn){
+
+        synchronized (lockReady) {
+            while (!readyWithBasicBoardElems) {
+                try {
+                    lockReady.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    System.err.println(ERR.toString()+INTERRUPTED_READY_WAIT);
+                    System.exit(2);
+                }
+            }
+        }
+        board.setNowPlaying(playerId);
+        board.setDraftPool(clientConn.getDraftPool());
+        board.setNowPlaying(playerId);
+        board.setIsFirstTurn(isFirstTurn);
+
+        fsm.setNotMyTurn();
+        fsm.setMyTurn(playerId==board.getMyPlayerId());
+        board.stateChanged();
+
+        board.notifyObservers();
+
+    }
+
+    /**
+     * this notifies the end of the turn of a player
+     * @param playerId the id of the player
+     */
+    public void updateGameTurnEnd(int playerId){
+        board.updateSchema(playerId,clientConn.getSchema(playerId));
+        board.notifyObservers();
+
+    }
+
+    /**
+     * this method updates the board with the changes regarding the user that is currently playing
+     */
+    public void getBoardUpdates(){
+        board.setDraftPool(clientConn.getDraftPool());
+        board.setRoundTrack(clientConn.getRoundtrack());
+        board.updateSchema(board.getNowPlaying(),clientConn.getSchema(board.getNowPlaying()));
+        board.setTools(clientConn.getTools());
+        board.updateFavorTokens(board.getNowPlaying(),clientConn.getFavorTokens(board.getNowPlaying()));
+
+        board.notifyObservers();
+    }
+
+
+    /**
+     * this method notifies the update of some player's status in the current game, this also serves the purpose
+     * of reconnecting a player to the game he was playing before he lost the connection
+     * @param playerId the id of the subject of the change in status
+     * @param gameEvent the event in some manner caused by the player
+     * @param username the username of the player
+     */
+    public void updatePlayerStatus(int playerId, GameEvent gameEvent, String username){
+
+        LightPlayerStatus status;
+
+        switch (gameEvent) {
+            case QUIT:
+                status = LightPlayerStatus.QUITTED;
+                break;
+            case RECONNECT:
+                status = LightPlayerStatus.PLAYING;
+
+                if(username.equals(this.username)){
+                    reconnectUserToGame(playerId);
+                }
+                break;
+            case DISCONNECT:
+                status = LightPlayerStatus.DISCONNECTED;
+                break;
+            default:
+                status = LightPlayerStatus.PLAYING;
+        }
+        board.updateStatus(playerId, status);
+
+        if(isPlayingTurns()) {
+            board.notifyObservers();
+        }else if(fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)){
+            clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
+        }
+    }
+
+    /**
+     * @return true iff the game has started and has not ended yet and the user has chosen his schema
+     */
+    public boolean isPlayingTurns() {
+        return !(fsm.getState().equals(ClientFSMState.SCHEMA_CHOSEN)
+                ||fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)
+                ||fsm.getState().equals(ClientFSMState.GAME_ENDED));
+    }
+
+    /**
+     * this method implements the rest of the procedure to reconnect a player to the game he lost connection to while
+     * he was playing
+     * @param playerId his playerID for the game being
+     */
+    private void reconnectUserToGame(int playerId) {
+        synchronized (lockStatus){
+            this.userStatus=UserStatus.PLAYING;
+            lockStatus.notifyAll();
+        }
+        retrieveBoardElemsOnReconnection(playerId);
+        fsm.resetState();
+        board.stateChanged();
+    }
+
+    /**
+     * this retrieves the needed board elements for the user that is reconnecting to a game
+     * @param myPlayerId his/her playerId
+     */
+    private void retrieveBoardElemsOnReconnection(int myPlayerId){
         synchronized (lockReady) {
             LightGameStatus gameStatus = clientConn.getGameStatus();
 
@@ -470,150 +674,18 @@ public class Client {
                 board.setRoundTrack(clientConn.getRoundtrack());
                 board.setNowPlaying(gameStatus.getNowPlaying());
 
-                for (int i = 0; i < board.getNumPlayers(); i++) {
-                    board.updateSchema(i, clientConn.getSchema(i));
-                    board.updateFavorTokens(i, clientConn.getFavorTokens(i));
-                }
+                getCardsSchemasFavors();
 
-                board.setTools(clientConn.getTools());
-                board.setPubObjs(clientConn.getPublicObjects());
                 board.setDraftPool(clientConn.getDraftPool());
             } else {
                 board.setDraftedSchemas(clientConn.getSchemaDraft());
             }
             board.addObserver(clientUI);
-            ready=true;
+            readyWithBasicBoardElems =true;
             lockReady.notifyAll();
         }
     }
 
-    public void updateGameRoundStart(int numRound){
-
-        board.setRoundTrack(clientConn.getRoundtrack());
-        board.setRoundNumber(numRound);
-        board.setDraftPool(clientConn.getDraftPool());
-        fsm.setNotMyTurn();
-        board.stateChanged();
-        if(numRound==0) {
-            synchronized (lockReady) {
-
-                for (int i = 0; i < board.getNumPlayers(); i++) {
-
-                    board.updateSchema(i, clientConn.getSchema(i));
-                    board.updateFavorTokens(i,clientConn.getFavorTokens(i));
-                }
-
-                board.setTools(clientConn.getTools());
-                board.setPubObjs(clientConn.getPublicObjects());
-
-                ready=true;
-                lockReady.notifyAll();
-            }
-            return;
-        }
-        board.notifyObservers();
-
-    }
-
-    public void updateGameRoundEnd(int numRound){
-
-
-    }
-
-    public void updateGameTurnStart(int playerId, boolean isFirstTurn){
-
-        synchronized (lockReady) {
-            while (!ready) {
-                try {
-                    lockReady.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    System.err.println(ERR.toString()+INTERRUPTED_READY_WAIT);
-                    System.exit(2);
-                }
-            }
-        }
-        board.setNowPlaying(playerId);
-        board.setDraftPool(clientConn.getDraftPool());
-        board.setNowPlaying(playerId);
-        board.setIsFirstTurn(isFirstTurn);
-        fsm.setNotMyTurn();
-        fsm.setMyTurn(playerId==board.getMyPlayerId());
-        board.stateChanged();
-        board.notifyObservers();
-
-    }
-
-    public void updateGameTurnEnd(int playerTurnId){
-        board.updateSchema(playerTurnId,clientConn.getSchema(playerTurnId));
-        board.notifyObservers();
-
-    }
-
-
-    public void updatePlayerStatus(int playerId, GameEvent gameEvent, String username){
-
-        LightPlayerStatus status;
-
-
-        switch (gameEvent) {
-            case QUIT:
-                status = LightPlayerStatus.QUITTED;
-                break;
-            case RECONNECT:
-                status = LightPlayerStatus.PLAYING;
-                if(username.equals(this.username)){
-                    synchronized (lockStatus){
-                        this.userStatus=UserStatus.PLAYING;
-                        lockStatus.notifyAll();
-                    }
-                    retrieveBoardOnReconnection(playerId);
-                    fsm.resetState();
-                    board.stateChanged();
-                }
-                break;
-            case DISCONNECT:
-                status = LightPlayerStatus.DISCONNECTED;
-                break;
-            default:
-                status = LightPlayerStatus.PLAYING;
-        }
-        board.updatestatus(playerId, status);
-
-        System.out.println(fsm.getState());
-        if(isPlayingTurns()) {
-            board.notifyObservers();
-        }else if(fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)){
-            clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
-        }
-    }
-
-    public boolean isPlayingTurns() {
-        return !(fsm.getState().equals(ClientFSMState.SCHEMA_CHOSEN)
-                ||fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)
-                ||fsm.getState().equals(ClientFSMState.GAME_ENDED));
-    }
-
-    /**
-     * this method updates the board with the changes regarding the user that is currently playing
-     */
-    public void getUpdates(){
-        board.setDraftPool(clientConn.getDraftPool());
-        board.setRoundTrack(clientConn.getRoundtrack());
-        board.updateSchema(board.getNowPlaying(),clientConn.getSchema(board.getNowPlaying()));
-        board.setTools(clientConn.getTools());
-        board.updateFavorTokens(board.getNowPlaying(),clientConn.getFavorTokens(board.getNowPlaying()));
-
-        board.notifyObservers();
-    }
-
-
-    /**
-     * @return the state of the client's fsm
-     */
-    public ClientFSMState getTurnState(){
-        return fsm.getState();
-    }
 
     /**
      * this method quits the player from the game, he/she will not be able to resume the game
@@ -649,7 +721,7 @@ public class Client {
         Client client;
         client = Client.getNewClient();
         if (args.length>0) {
-            if(!ClientOptions.getOptions(args,options) || options.contains("h")){
+            if(!ClientOptions.getOptions(args,options) || options.contains(ClientOptions.HELP)){
                 ClientOptions.printHelpMessage();
                 return;
             }else {

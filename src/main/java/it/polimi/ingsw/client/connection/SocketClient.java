@@ -217,7 +217,7 @@ public class SocketClient implements ClientConn {
                 break;
             case SocketString.BOARD_CHANGED:
                 client.addUpdateTask(new Thread(()->
-                client.getUpdates()
+                client.getBoardUpdates()
                 ));
                 break;
             default:
@@ -344,7 +344,7 @@ public class SocketClient implements ClientConn {
      * @return a list of three public objective cards immutable objects
      */
     @Override
-    public List<LightCard> getPublicObjects() {
+    public List<LightCard> getPublicObjectives() {
             ArrayList<String> result= new ArrayList<>();
             List<LightCard> pubObjCards=new ArrayList<>();
             LightCard lightObjCard;

@@ -69,7 +69,7 @@ public class RMIServerObject  implements RMIServerInt {
     @Override
     public void notifyBoardChanged(){
         client.addUpdateTask(new Thread(()->
-        client.getUpdates()
+        client.getBoardUpdates()
         ));
     }
 

@@ -218,7 +218,7 @@ public class GUI extends Application implements ClientUI {
             if (board == null) {
                 throw new IllegalArgumentException();
             }
-            switch (client.getTurnState()){
+            switch (client.getFsmState()){
                 case CHOOSE_SCHEMA:
                     System.out.println("choose----------------------------------------------------------------");
                     break;
@@ -297,7 +297,7 @@ public class GUI extends Application implements ClientUI {
         BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
         List <Actions> latestOptionsList = board.getLatestOptionsList();
         StackPane p = new StackPane(frontPane);
-        if (client.getTurnState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
+        if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
             BorderPane backPane = sceneCreator.bulidBackPaneOptions(newWidth,newHeight,board);
             p.getChildren().add(backPane);
         }
@@ -311,7 +311,7 @@ public class GUI extends Application implements ClientUI {
         List <Integer>              latestPlacementsList = board.getLatestPlacementsList();
         IndexedCellContent          latestSelectedDie = board.getLatestSelectedDie();
         int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
-        ClientFSMState              turnState = client.getTurnState();
+        ClientFSMState              turnState = client.getFsmState();
 
         BorderPane backPane = new BorderPane();
         HBox d1 = sceneCreator.buildDummyTrack(cellDim,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
@@ -333,7 +333,7 @@ public class GUI extends Application implements ClientUI {
         List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
         LightSchemaCard             schemaCard = board.getPlayerById(playerId).getSchema();
         int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
-        ClientFSMState              turnState = client.getTurnState();
+        ClientFSMState              turnState = client.getFsmState();
 
         BorderPane frontPane = new BorderPane();
 
