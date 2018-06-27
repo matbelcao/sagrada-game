@@ -32,7 +32,8 @@ import javafx.scene.text.TextAlignment;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.MAIN;
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.SELECT_DIE;
 import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.REMAINING_TOKENS;
 import static javafx.geometry.Pos.*;
@@ -53,6 +54,11 @@ public class GUIutil {
     private static final double LOGIN_TO_SCREEN_RATIO = 0.18;
     private static final double LOGIN_RATIO = 0.95;
     //-----Drafted Schema Stage
+    private static final double SCHEMA_LABEL_TO_SCHEMA_WIDTH = 0.0666666;
+
+
+
+
     private static final double DRAFTED_SCHEMAS_TO_SCREEN_RATIO = 0.6;
     private static final double DRAFTED_CANVAS_SCENE_RATIO = 1.5314;
     private static final double NUM_OF_DRAFTED_SCHEMAS = 4;
@@ -87,6 +93,7 @@ public class GUIutil {
 
     //die s..
     private static final int SPOT_RATIO = 6; //delete
+    private static final Color OPAQUE_FILL = Color.rgb(0,0,0,0.3);
 
     public GUIutil(Rectangle2D visualBounds, GUI gui, CmdWriter cmdWrite, UIMessages uimsg) {
         SCREEN_WIDTH = visualBounds.getWidth();
@@ -105,11 +112,13 @@ public class GUIutil {
     }
 
     public double getDraftedSchemasMinHeight() {
-        return getDraftedSchemasMinWidth() / DRAFTED_CANVAS_SCENE_RATIO;
+        //return getDraftedSchemasMinWidth() / DRAFTED_CANVAS_SCENE_RATIO;
+        return 0; //todo update
     }
 
     public double getDraftedSchemasMinWidth() {
-        return DRAFTED_SCHEMAS_TO_SCREEN_RATIO * SCREEN_WIDTH;
+        //return DRAFTED_SCHEMAS_TO_SCREEN_RATIO * SCREEN_WIDTH;
+        return 0; //todo update
     }
 
     private double getDraftedSchemasWidth(double drawingHeight) {
@@ -519,10 +528,10 @@ public class GUIutil {
         gc.clearRect(0, 0, sceneWidth, sceneHeight);
 
        //drawCard(privObj, gc, privObjX, privObjY, privObjWidth, privObjHeight); //todo reimplemet
-        drawCompleteSchema(gc, lightSchemaCard.get(0), x + extPadding, y + extPadding, schemaWidth, schemaHeight);
-        drawCompleteSchema(gc, lightSchemaCard.get(1), x + extPadding + schemaWidth + intPadding, y + extPadding, schemaWidth, schemaHeight);
-        drawCompleteSchema(gc, lightSchemaCard.get(2), x + extPadding, y + extPadding + schemaHeight + intPadding, schemaWidth, schemaHeight);
-        drawCompleteSchema(gc, lightSchemaCard.get(3), x + extPadding + schemaWidth + intPadding, y + extPadding + intPadding + schemaHeight, schemaWidth, schemaHeight);
+        //drawCompleteSchema(gc, lightSchemaCard.get(0), x + extPadding, y + extPadding, schemaWidth, schemaHeight);
+        //drawCompleteSchema(gc, lightSchemaCard.get(1), x + extPadding + schemaWidth + intPadding, y + extPadding, schemaWidth, schemaHeight);
+        //drawCompleteSchema(gc, lightSchemaCard.get(2), x + extPadding, y + extPadding + schemaHeight + intPadding, schemaWidth, schemaHeight);
+        //drawCompleteSchema(gc, lightSchemaCard.get(3), x + extPadding + schemaWidth + intPadding, y + extPadding + intPadding + schemaHeight, schemaWidth, schemaHeight);
 
         //todo delete
         gc.setLineWidth(1);
@@ -532,45 +541,6 @@ public class GUIutil {
         gc.strokeLine(0, sceneHeight, sceneWidth, 0);
 
     }
-
-    private void drawCompleteSchema(GraphicsContext gc, LightSchemaCard lightSchemaCard, double x, double y, double schemaWidth, double schemaHeight) {
-        double initialX = x;
-        double initialY = y;
-        gc.setFill(Color.BLACK);
-        gc.fillRoundRect(x, y, schemaWidth, schemaHeight, SCHEMA_ARC_TO_WIDTH * schemaWidth, SCHEMA_ARC_TO_WIDTH * schemaWidth);
-        x = x + SCHEMA_LINE_TO_WIDTH * schemaWidth;
-        y = y + SCHEMA_LINE_TO_WIDTH * schemaWidth;
-        double cellDim = CELL_TO_SCHEMA_W * schemaWidth;
-        buildSchema(gc, lightSchemaCard, x, y, cellDim);
-        int textLen = lightSchemaCard.getName().length();
-        x = initialX + schemaWidth / 2;
-        y = initialY + TEXT_HEIGHT_TO_SCHEMA_H * schemaHeight;
-        drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
-        drawFavorTokens(gc, initialX, y, schemaWidth, lightSchemaCard);
-
-    }
-
-    private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
-        int favorTokens = lightSchemaCard.getFavorTokens();
-        double favTokDiameter = schemaWidth * FAVOR_DIAM_TO_SCHEMA_W;
-        x = x + FAVOR_POS_TO_SCHEMA_W * schemaWidth;
-        for (int i = 0; i < favorTokens; i++) {
-            gc.setFill(Color.WHITE);
-            gc.fillOval(x, y + favTokDiameter / 3, favTokDiameter, favTokDiameter);
-            x = x - favTokDiameter - favTokDiameter / 10;
-        }
-
-    }
-
-    public void drawSchemaText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
-        double textSize = TEXT_DIM_TO_SCHEMA_W * schemaWidth;
-        gc.setFont(Font.font("Serif", textSize));
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.setTextBaseline(VPos.TOP);
-        gc.setFill(Color.AZURE);
-        gc.fillText(lightSchemaCard.getName(), x, y);
-    }
-
 
     private void buildSchema(GraphicsContext gc, LightSchemaCard lightSchemaCard, double x, double y, double cellDim) {
         double initX = x;
@@ -818,6 +788,7 @@ public class GUIutil {
             if (lightSchemaCard.hasDieAt(i)) {  //todo change it with active cell object
                 cell.putDie(lightSchemaCard.getDieAt(i));
             }
+
             gridCells.add(cell);
 
         }
@@ -865,6 +836,13 @@ public class GUIutil {
 
     //todo update
     public Group buildSchema(ArrayList<Cell> gridCells, int favortokens, double cellDim) {
+        Group grid = schemaToGrid(gridCells);
+        Text favorTokens = new Text(uimsg.getMessage(REMAINING_TOKENS)+" "+favortokens);
+        favorTokens.setFont(Font.font("Serif", FAVOR_TOKEN_TEXT_TO_CELL_DIM*cellDim));
+        return new Group (new VBox(favorTokens,new Group(grid)));
+    }
+
+    private Group schemaToGrid(ArrayList<Cell> gridCells) {
         GridPane grid = new GridPane();
         for (int row = 0; row < NUM_ROWS; row++) {
             for (int col = 0; col < NUM_COLS; col++) {
@@ -873,9 +851,7 @@ public class GUIutil {
         }
         grid.setStyle("-fx-background-color: rgb(0,0,0);"); //todo hookup with css or consider the pane added underneath
         grid.setAlignment(CENTER);
-        Text favorTokens = new Text(uimsg.getMessage(REMAINING_TOKENS)+" "+favortokens);
-        favorTokens.setFont(Font.font("Serif", FAVOR_TOKEN_TEXT_TO_CELL_DIM*cellDim));
-        return new Group (new VBox(favorTokens,new Group(grid)));
+        return new Group(grid);
     }
 
     public void addActionListeners(ArrayList<Cell> draftPoolCells, ArrayList<Cell> schemaCells, ArrayList<Cell> roundTrackCells, ClientFSMState turnState, LightBoard board, double cellDim) {
@@ -960,5 +936,113 @@ public class GUIutil {
             cell.setOnMouseClicked(e -> cmdWrite.write("1"));
         }
     }
+
+    public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj, double newWidth, double newHeight){
+        BorderPane draftedSchemasPane = new BorderPane();
+        GridPane grid = new GridPane();
+        double schemaWidth = 450*0.7;
+        double schemaHeight = 400*0.7;
+
+        for(int i = 0; i < 2; i++){
+            for(int j = 0; j < 2; j++){
+                int schemaIndex =i*2+j;
+                Group completeSchema = buildCompleteSchema(draftedSchemas.get(schemaIndex),schemaWidth,schemaHeight);
+                grid.add(completeSchema,j,i);
+                completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
+            }
+        }
+        grid.setVgap(20);
+        grid.setHgap(20);
+        grid.setAlignment(Pos.CENTER);
+
+        draftedSchemasPane.setCenter(grid);
+
+
+        return draftedSchemasPane ;
+    }
+
+    private Group buildCompleteSchema(LightSchemaCard lightSchemaCard, double schemaWidth, double schemaHeight) {
+        double space = SCHEMA_LABEL_TO_SCHEMA_WIDTH*schemaWidth;
+        double cellDim = CELL_TO_SCHEMA_W * schemaWidth;
+        double arcWidth = SCHEMA_ARC_TO_WIDTH * schemaWidth;
+        Canvas c = new Canvas(schemaWidth,schemaHeight);
+        GraphicsContext gc = c.getGraphicsContext2D();
+        gc.setFill(Color.BLACK);
+        gc.fillRoundRect(0, 0, schemaWidth, schemaHeight, arcWidth, arcWidth);
+        double x = schemaWidth / 2;
+        double y = TEXT_HEIGHT_TO_SCHEMA_H * schemaHeight;
+        drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
+        drawFavorTokens(gc, 0, y, schemaWidth, lightSchemaCard);
+        //acttion on mouse pass
+        Rectangle highlightRect = new Rectangle(0,0,schemaWidth,schemaHeight);
+        highlightRect.setArcWidth(arcWidth);
+        highlightRect.setArcHeight(arcWidth);
+        highlightRect.setFill(Color.TRANSPARENT);
+        highlightRect.setOnMouseEntered(e-> highlightRect.setFill(OPAQUE_FILL));
+        highlightRect.setOnMouseExited(e-> highlightRect.setFill(Color.TRANSPARENT));
+
+        Group g = schemaToGrid(getSchemaCells(lightSchemaCard,cellDim));
+        Rectangle spacer = new Rectangle(space,space);
+        spacer.setVisible(false);
+        Group cells = new Group(new VBox(g, spacer));
+        Group completSchema = new Group(new StackPane(c,cells,highlightRect));
+
+        return completSchema;
+
+    }
+
+
+    /*public StackPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj, double newWidth, double newHeight){
+        double width = 450;
+        double height = 400;
+        double space = 30;
+        double cellDim = CELL_TO_SCHEMA_W * width;
+        Canvas c = new Canvas(width,height);
+        GraphicsContext gc = c.getGraphicsContext2D();
+        drawCompleteSchema(gc, draftedSchemas.get(0),0,0,width,height);
+        Group g = schemaToGrid(getSchemaCells(draftedSchemas.get(0),cellDim));
+        Rectangle spacer = new Rectangle(space,space);
+        spacer.setVisible(false);
+        Group cells = new Group(new VBox(g, spacer));
+        Group completSchema = new Group(new StackPane(c,cells));
+
+
+        return new StackPane(completSchema) ;
+    }
+
+    private void drawCompleteSchema(GraphicsContext gc, LightSchemaCard lightSchemaCard, double x, double y, double schemaWidth, double schemaHeight) {
+        double initialX = x;
+        double initialY = y;
+
+        gc.setFill(Color.BLACK);
+        gc.fillRoundRect(x, y, schemaWidth, schemaHeight, SCHEMA_ARC_TO_WIDTH * schemaWidth, SCHEMA_ARC_TO_WIDTH * schemaWidth);
+        x = initialX + schemaWidth / 2;
+        y = initialY + TEXT_HEIGHT_TO_SCHEMA_H * schemaHeight;
+        drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
+        drawFavorTokens(gc, initialX, y, schemaWidth, lightSchemaCard);
+
+    }*/
+
+    private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
+        int favorTokens = lightSchemaCard.getFavorTokens();
+        double favTokDiameter = schemaWidth * FAVOR_DIAM_TO_SCHEMA_W;
+        x = x + FAVOR_POS_TO_SCHEMA_W * schemaWidth;
+        for (int i = 0; i < favorTokens; i++) {
+            gc.setFill(Color.WHITE);
+            gc.fillOval(x, y + favTokDiameter / 3, favTokDiameter, favTokDiameter);
+            x = x - favTokDiameter - favTokDiameter / 10;
+        }
+
+    }
+
+    private void drawSchemaText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
+        double textSize = TEXT_DIM_TO_SCHEMA_W * schemaWidth;
+        gc.setFont(Font.font("Serif", textSize));
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.TOP);
+        gc.setFill(Color.AZURE);
+        gc.fillText(lightSchemaCard.getName(), x, y);
+    }
+
 
 }

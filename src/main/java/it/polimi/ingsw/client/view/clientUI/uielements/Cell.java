@@ -242,5 +242,4 @@ public class Cell extends StackPane{
         outerRect.setFill(Color.TRANSPARENT);
         innerRect.setFill(Color.TRANSPARENT);
     }
-
 }
