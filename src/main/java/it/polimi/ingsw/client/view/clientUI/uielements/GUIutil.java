@@ -201,7 +201,7 @@ public class GUIutil {
         return multipleDiceTrack;
     }*/
 
-    public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
+   /* public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox track = new HBox();
         track.setSpacing(5); ////todo dynamic spacing??
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
@@ -214,6 +214,27 @@ public class GUIutil {
             }
         }
         return track;
+    }*/
+
+    public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
+        HBox track = new HBox();
+        track.setSpacing(5); ////todo dynamic spacing??
+        for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
+            Rectangle dummyCell = dummyRoundTrackCell(cellDim);
+            track.getChildren().add(dummyCell);
+            if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
+                Event showMultipleDice = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+                dummyCell.setOnMouseEntered(e -> {
+                    dummyCell.fireEvent(showMultipleDice);
+                });
+            }
+        }
+        return track;
+    }
+    private Rectangle dummyRoundTrackCell(double cellDim) {
+        Rectangle transparentRect = new Rectangle(0, 0, cellDim, cellDim);
+        transparentRect.setFill(Color.TRANSPARENT);
+        return transparentRect;
     }
 
     public HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
