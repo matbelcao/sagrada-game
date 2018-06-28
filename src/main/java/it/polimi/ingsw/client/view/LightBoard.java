@@ -397,10 +397,11 @@ public class LightBoard extends Observable {
             players.add(this.players.get(i));
         }
 
-        players.sort(Comparator.comparing(LightPlayer::getFinalPosition));
+        players.sort(Comparator.comparing(LightPlayer::getFinalPosition).reversed());
 
         return players;
     }
+
 
 
 }

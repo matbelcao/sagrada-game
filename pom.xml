@@ -35,7 +35,7 @@
                                 <filter>
                                     <artifact>it.polimi.ingsw</artifact>
                                     <excludes>
-                                        <exclude>it/polimi/ingsw/server/**</exclude> <!--to exclude a set of classes from the project structure-->
+                                        <exclude>it/polimi/ingsw/server/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
@@ -69,7 +69,7 @@
                                 <filter>
                                     <artifact>it.polimi.ingsw</artifact>
                                     <excludes>
-                                        <exclude>it/polimi/ingsw/client/**</exclude> <!--to exclude a set of classes from the project structure-->
+                                        <exclude>it/polimi/ingsw/client/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
