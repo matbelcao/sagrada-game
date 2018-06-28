@@ -181,7 +181,7 @@ The client sends this message to request the card parameters, some dice in the b
 
 ### Server-side
 ###### Notice: the following messages of this section all require an `ACK send` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
-##### `SEND schema <name> <favor_tokens> [{D,<position>,<color>,<shade>|  {C,<index>,<color>|<shade>}] ...`
+##### `SEND schema <name> <favor_tokens> [{D,<position>,<dieColor>,<shade>|  {C,<index>,<dieColor>|<shade>}] ...`
 
 +   `schema`: signals that the schema is being sent in its entirety
 +   `<favor_tokens>`: the number of favor tokens associated with the schema
@@ -189,12 +189,12 @@ The client sends this message to request the card parameters, some dice in the b
 +   `D`: the cell is occupied by a die
 +   `C`: there is a constraint in the cell
 +   `<index>`: the cell's index in the schema (0 to 19)
-+   `<color>`: the color property
++   `<dieColor>`: the dieColor property
 +   `<shade>`: the shade property
 
 The server responds with this message to give information about the dice/constraints that are in the requested schema.
 
-##### `SEND priv|pub|tool <id> <name> <description> [<color>|<used>]`
+##### `SEND priv|pub|tool <id> <name> <description> [<dieColor>|<used>]`
 
 +   `priv`: the requested element is a private objective card
 +   `pub`: the requested element is a public objective card
@@ -203,18 +203,18 @@ The server responds with this message to give information about the dice/constra
 +   `<name>`: the card's name
 +   `<description>`: the card's description
 +   `<used>`: boolean value that tells if the tool has already been used
-+   `<color>`: the private objective color
++   `<dieColor>`: the private objective dieColor
 
 The server responds with this message to give information about the requested card(s).
 
-##### `SEND draftpool|roundtrack [(<index>|<round>),<color>,<shade>] ... `
+##### `SEND draftpool|roundtrack [(<index>|<round>),<dieColor>,<shade>] ... `
 
 +   `draftpool`: the requested elements concern the draftpool
 +   `roundtrack`: the requested elements concern the roundtrack
 +   `pub`: the requested element is a public objective card
 +   `<index>`: the die position in the draftpool
 +   `<round>`: the number of the round the die was left over
-+   `<color>`: the die color property
++   `<dieColor>`: the die dieColor property
 +   `<shade>`: the die shade property
 
 The server responds with this message to give information about the dice placed in the board's area that is shared by all players.
@@ -275,7 +275,7 @@ This message is used to gather a list of dice from the server. Said list will be
 
 ### Server-side
 
-##### `LIST_DICE <from> [<position>,<shade>,<color>] ...`
+##### `LIST_DICE <from> [<position>,<shade>,<dieColor>] ...`
 
 +   `<from>`: this field tells where the dice that are being listed come from (draft-pool, schema, roundtrack ...)
 +   `<position>`: an integer value that carries the information about the "phisical" position of the die in the element of the board . Based on the field `<from>`it can be:
@@ -283,7 +283,7 @@ This message is used to gather a list of dice from the server. Said list will be
 	+   __0-8__ for the draftpool
 	+   __0-9__ (with multiple occurrencies if needed) for the roundtrack
 	+   __0__ for others (toolcards #1,11)
-+   `<shade>,<color>`: represent the characteristics of the die
++   `<shade>,<dieColor>`: represent the characteristics of the die
 
 
 This message is used in order to send and ordered list of valid options the client can later select a die from with the `SELECT` command.
@@ -308,7 +308,7 @@ This message is a request to the server to specify the possible actions the user
 	+   __REROLL__: this allows the user to reroll the selected die;
 	+   __FLIP__: this allows the user to flip the die;
 	+   __SET_SHADE__: this is specific to tool #11 and signals that the user will need to choose a new shade for a die;
-	+   __SET_COLOR__: the player will need to choose a color;
+	+   __SET_COLOR__: the player will need to choose a dieColor;
 	+   __NONE__: no further choices will be required from the player in the logical flow of the current tool.
 
 __NOTICE:__ whenever a single option is sent to the client the choice will be made automatically and will be transparent to the user.
@@ -582,7 +582,7 @@ This messages are user by the clinet and server to detect if the connection is s
 
 ## Dice and Constraints Syntax
 ###### In this section is reported the dice coding used in the client-server communication.
-|   color   |    shade    |
+|   dieColor   |    shade    |
 |:-----------:|:-----------:|
 |   RED     |     ONE     |
 |   GREEN   |     TWO     |    

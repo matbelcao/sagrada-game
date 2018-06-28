@@ -181,7 +181,7 @@ The client sends this message to request the card parameters, some dice in the b
 
 ### Server-side
 ###### Notice: the following messages of this section all require an `ACK send` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
-##### `SEND schema <name> [<favor_tokens>] [{D,<index>,<color>,<shade>|  {C,<index>,<color>|<shade>}] ...`
+##### `SEND schema <name> [<favor_tokens>] [{D,<index>,<dieColor>,<shade>|  {C,<index>,<dieColor>|<shade>}] ...`
 
 +   `schema`: signals that the schema is being sent in its entirety
 +   `<favor_tokens>`: the number of favor tokens associated with the schema (this is used only when sending the drafted schemas at the beginning of a game)
@@ -189,12 +189,12 @@ The client sends this message to request the card parameters, some dice in the b
 +   `D`: the cell is occupied by a die
 +   `C`: there is a constraint in the cell
 +   `<index>`: the cell's index in the schema (0 to 19)
-+   `<color>`: the color property
++   `<dieColor>`: the dieColor property
 +   `<shade>`: the shade property
 
 The server responds with this message to give the information about the dice/constraints that are in the requested schema. The server can choose to just send an update (`schema_update`), instead of the whole schema, to the client when changes are made to the content of a schema after each turn.
 
-##### `SEND priv|pub|tool <id> <name> <description> [<color>|<used>]`
+##### `SEND priv|pub|tool <id> <name> <description> [<dieColor>|<used>]`
 
 +   `priv`: the requested element is a private objective card
 +   `pub`: the requested element is a public objective card
@@ -203,18 +203,18 @@ The server responds with this message to give the information about the dice/con
 +   `<name>`: the card's name
 +   `<description>`: the card's description
 +   `<used>`: boolean value that tells if the tool has already been used
-+   `<color>`: the private objective color
++   `<dieColor>`: the private objective dieColor
 
 The server responds with this message to give information about the requested card(s).
 
-##### `SEND draftpool|roundtrack [(<index>|<round>),<color>,<shade>] ... `
+##### `SEND draftpool|roundtrack [(<index>|<round>),<dieColor>,<shade>] ... `
 
 +   `draftpool`: the requested elements concern the draftpool
 +   `roundtrack`: the requested elements concern the roundtrack
 +   `pub`: the requested element is a public objective card
 +   `<index>`: the die position in the draftpool
 +   `<round>`: the number of the round the die was left over
-+   `<color>`: the die color property
++   `<dieColor>`: the die dieColor property
 +   `<shade>`: the die shade property
 
 The server responds with this message to give information about the dice placed in the board's area that is shared by all players.
@@ -282,14 +282,14 @@ This asks the server a list of possible placements for the die that has been rer
 
 ### Server-side
 ###### Notice: the following messages of this section starting with `LIST` require an `ACK list` each. if a client doesn't reply with an ack within a reasonable time is to be considered offline.
-##### `LIST schema|roundtrack|draftpool [<index>,<position>,<color>,<shade>] ...`
+##### `LIST schema|roundtrack|draftpool [<index>,<position>,<dieColor>,<shade>] ...`
 
 +   `schema`: provides an ordered list of the positions of the player's schema that have a die in place. The client can then `SELECT` a die from this list using the command above to obtain a list of possible placements (for example while using tool cards)
 +   `roundtrack`: provides an ordered list of the dice that are in the roundtrack
 +   `draftpool`: provides an ordered list of the dice of the draftpool
 +   `<index>`: this is the index (starting from 0) in the list of placements, this will be used to `CHOOSE` or `SELECT` the placement later on
 +   `<position>`: an integer value that carries the information about the position of the die in the element of the board
-+   `<color>,<shade>`: represent the characteristics of the die
++   `<dieColor>,<shade>`: represent the characteristics of the die
 
 
 This message is used in order to create a list of valid options the client can later select a die from with the `SELECT` command. The die will be definitively chosen and actually placed only after a valid sequence of `GET_DICE_LIST ...`, `SELECT die <index>`, `CHOOSE die_placement <index>` [see the example below].
@@ -474,7 +474,7 @@ The receiver reports to the sender that he has received the information correctl
 
 ## Dice and Constraints Syntax
 ###### In this section is reported the dice coding used in the client-server communication.
-|   color   |    shade    |
+|   dieColor   |    shade    |
 |:-----------:|:-----------:|
 |   RED     |     ONE     |
 |   GREEN   |     TWO     |    
