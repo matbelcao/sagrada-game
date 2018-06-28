@@ -200,13 +200,11 @@ public class GUI extends Application implements ClientUI {
             draftedSchemaScene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = draftedSchemaScene.getWidth();
                 double newHeight = draftedSchemaScene.getHeight();
-                System.out.println(newWidth+"  "+ newHeight);
                 draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth,newHeight));
             });
             draftedSchemaScene.heightProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = draftedSchemaScene.getWidth();
                 double newHeight = draftedSchemaScene.getHeight();
-                System.out.println(newWidth+"  "+ newHeight);
                 draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth,newHeight));
             });
 

@@ -85,10 +85,6 @@ public class GUIutil {
     private static final double TEXT_DIM_TO_SCHEMA_W = 0.0505;
     private static final double FAVOR_DIAM_TO_SCHEMA_W = 0.038;
     private static final double FAVOR_POS_TO_SCHEMA_W = 0.92;
-    //Those are the ratios between the schemas and their padding respectively to the window, other schemas and priv obj
-    private static final double SCHEMA_W_TO_EXTERNAL_PADDING = 18;
-    private static final double SCHEMA_W_TO_INTERNAL_PADDING = 18;
-    private static final double SCHEMA_W_TO_PRIV_OBJ_PADDING = 9;
     //Main game scene
     private static final double ROUNDTRACK_TEXT_SIZE_TO_CELL = 0.7; //TODO DELETE and check if the others have been eliminated
     private static final double TEXT_DIM_TO_CELL_DIM = 0.5;
@@ -159,13 +155,13 @@ public class GUIutil {
         }
         return cellDim;
     }
-
-    public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
+    //too slow
+   /* public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox track = new HBox();
         track.setSpacing(5); ////todo dynamic spacing??
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             Cell cell = new Cell(cellDim,Place.ROUNDTRACK);
-            cell.setVisible(false);
+            cell.setVisible(true);
             track.getChildren().add(cell);
             if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
                 Event showMultipleDice = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
@@ -177,7 +173,7 @@ public class GUIutil {
 
     public HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox multipleDiceTrack = new HBox();
-        multipleDiceTrack.setSpacing(10); ////todo dynamic spacing??
+        multipleDiceTrack.setSpacing(5); ////todo dynamic spacing??
 
         List<LightDie> multipleDiceList = roundTrack.get(selectedTrackCellIndex);
         int multipleDiceListSize = multipleDiceList.size();
@@ -200,6 +196,50 @@ public class GUIutil {
                 cell.highlightGreen();
                 int multipleDieIndex = getMultipleDieTrackCellIndex(selectedTrackCellIndex, roundTrack) + i;
                 cell.setOnMouseClicked(e -> cmdWrite.write(multipleDieIndex + ""));
+            }
+        }
+        return multipleDiceTrack;
+    }*/
+
+    public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
+        HBox track = new HBox();
+        track.setSpacing(5); ////todo dynamic spacing??
+        for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
+            Cell cell = new Cell(cellDim,Place.ROUNDTRACK);
+            cell.setVisible(false);
+            track.getChildren().add(cell);
+            if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
+                Event showMultipleDice = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+                cell.setOnMouseEntered(e -> cell.fireEvent(showMultipleDice));
+            }
+        }
+        return track;
+    }
+
+    public HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
+        HBox multipleDiceTrack = new HBox();
+        multipleDiceTrack.setSpacing(5); ////todo dynamic spacing??
+
+        List<LightDie> multipleDiceList = roundTrack.get(selectedTrackCellIndex);
+        int multipleDiceListSize = multipleDiceList.size();
+        int startingIndex = selectedTrackCellIndex - (int) Math.round((multipleDiceListSize / 2));
+        if (startingIndex + multipleDiceListSize > ROUNDTRACK_SIZE) {
+            startingIndex = ROUNDTRACK_SIZE - multipleDiceListSize;
+        }
+
+        for (int i = 0; i < startingIndex; i++) {
+            Canvas c = new Canvas(cellDim, cellDim);
+            multipleDiceTrack.getChildren().add(c);
+        }
+        for (int i = 0; i < multipleDiceListSize; i++) {
+            Canvas c = new Canvas(cellDim, cellDim);
+            GraphicsContext gc = c.getGraphicsContext2D();
+            drawDie(multipleDiceList.get(i), gc, cellDim);
+            multipleDiceTrack.getChildren().add(c);
+            if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
+                highlight(c, cellDim);
+                int multipleDieIndex = getMultipleDieTrackCellIndex(selectedTrackCellIndex, roundTrack) + i;
+                c.setOnMouseClicked(e -> cmdWrite.write(multipleDieIndex + ""));
             }
         }
         return multipleDiceTrack;
@@ -397,7 +437,7 @@ public class GUIutil {
         gc.strokeRect(x, y, cellDim, cellDim);
     }
 
-    /*private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
+    private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
         drawDie(lightDie, graphicsContext2D, 0, 0, dieDim);
     }
 
@@ -408,16 +448,16 @@ public class GUIutil {
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
         gc.fillRoundRect(x + lineWidth, y + lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         drawSpots(gc, x, y, dieDim, lightDie.getShade().toInt());
-    }*/
+    }
 
-    /*private void drawDie(it.polimi.ingsw.common.enums.Color color, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
+    private void drawDie(it.polimi.ingsw.common.enums.Color color, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
         double lineWidth = LINE_TO_DIE * dieDim;
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(color));
         gc.fillRoundRect(x + lineWidth, y + lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         drawSpots(gc, x, y, dieDim, shade.toInt());
-    }*/
+    }
 
 
     private void drawSpots(GraphicsContext gc, double xAxisDiePosition, double Y_axis_die_position, double dieDim, int count) {
