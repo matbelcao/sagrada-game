@@ -188,11 +188,13 @@ public class GUIutil {
 
         for (int i = 0; i < startingIndex; i++) {
             Cell cell = new Cell(cellDim);
-            cell.setVisible(false);
+            cell.hideCellBorders();
             multipleDiceTrack.getChildren().add(cell);
         }
         for (int i = 0; i < multipleDiceListSize; i++) {
             Cell cell = new Cell(cellDim);
+            cell.hideCellBorders();
+            cell.putDie(multipleDiceList.get(i));
             multipleDiceTrack.getChildren().add(cell);
             if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
                 cell.highlightGreen();
