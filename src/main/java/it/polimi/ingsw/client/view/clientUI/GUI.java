@@ -287,7 +287,7 @@ public class GUI extends Application implements ClientUI {
     }
     StackPane bulidOptionScreen(double newWidth, double newHeight, LightBoard board){
         BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
-        BorderPane backPane = sceneCreator.bulidBackPaneOptions(newWidth,newHeight,board);
+        BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,board);
         StackPane p = new StackPane(backPane,frontPane);
         backPane.toFront();
         return p;
@@ -298,7 +298,7 @@ public class GUI extends Application implements ClientUI {
         List <Actions> latestOptionsList = board.getLatestOptionsList();
         StackPane p = new StackPane(frontPane);
         if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
-            BorderPane backPane = sceneCreator.bulidBackPaneOptions(newWidth,newHeight,board);
+            BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,board);
             p.getChildren().add(backPane);
         }
         return p;

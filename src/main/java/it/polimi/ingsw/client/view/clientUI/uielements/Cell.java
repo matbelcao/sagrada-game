@@ -2,6 +2,7 @@ package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Shade;
+import it.polimi.ingsw.common.serializables.CellContent;
 import it.polimi.ingsw.common.serializables.LightConstraint;
 import it.polimi.ingsw.common.serializables.LightDie;
 import javafx.scene.canvas.Canvas;
@@ -28,48 +29,47 @@ public class Cell extends StackPane{
     private Rectangle innerRect;
     private Canvas content;
 
+    public Cell(double cellDim){
+        this.cellDim = cellDim;
+        this.dieDim = cellDim*DIE_DIM_TO_CELL_DIM;
+        this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
+        double lineWidth = cellDim * BORDER_LINE_TO_CELL;
+        double innerCellDim = cellDim - lineWidth;
+        this.innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
+        outerRect.setFill(Color.BLACK);
+        innerRect.setFill(Color.WHITE);
+        this.getChildren().addAll(outerRect,innerRect);
+    }
     public Cell(int index, double cellDim){
-            this.cellDim = cellDim;
-            this.dieDim = cellDim*DIE_DIM_TO_CELL_DIM;
-            this.content = new Canvas(dieDim,dieDim);
-            this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
-            double lineWidth = cellDim * BORDER_LINE_TO_CELL;
-            double innerCellDim = cellDim - lineWidth;
-            this.innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
-            outerRect.setFill(Color.BLACK);
-            innerRect.setFill(Color.WHITE);
-            int displayedIndex = index + 1;
+        this(cellDim);
+        this.content = new Canvas(dieDim,dieDim);
+        int displayedIndex = index + 1;
             double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL * cellDim;
             Text t = new Text(displayedIndex + "");
             t.setFont(Font.font("Verdana", textSize));
             t.setFill(Color.BLACK);
-        //GraphicsContext gc = content.getGraphicsContext2D();
-        //gc.setFill(Color.BLUE);
-        //gc.fillRect(0,0,30,30);
-            this.getChildren().addAll(outerRect,innerRect,t,content);
+            this.getChildren().addAll(t,content);
 
 
     }
 
     public Cell(double cellDim, Place place) {
-        this.cellDim = cellDim;
-        this.dieDim = cellDim*DIE_DIM_TO_CELL_DIM;
+        this(cellDim);
         this.content = new Canvas(dieDim,dieDim);
-        this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
-        double lineWidth = cellDim * BORDER_LINE_TO_CELL;
-        double innerCellDim = cellDim - lineWidth;
-        this.innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
         switch (place){
             case DRAFTPOOL:
                 this.hideCellBorders();
                 break;
-            default:
-                outerRect.setFill(Color.BLACK);
-                innerRect.setFill(Color.WHITE);
         }
-
-        this.getChildren().addAll(outerRect,innerRect,content);
+        this.getChildren().add(content);
     }
+
+    public Cell(CellContent cellContent, double cellDim) {
+        this(cellDim);
+        this.content = indexedCellToCanvas(cellContent,dieDim);
+        this.getChildren().add(content);
+    }
+
     public void putDoubleDice(LightDie die1, LightDie die2) {
         GraphicsContext gc = content.getGraphicsContext2D();
         drawDie(die1, gc,0,0, dieDim);
@@ -82,6 +82,28 @@ public class Cell extends StackPane{
 
     public void putConstraint(LightConstraint constraintAt) {
        drawConstraint(constraintAt,content.getGraphicsContext2D(),0,0,dieDim);
+    }
+
+    private Canvas indexedCellToCanvas(CellContent cellContent, double dieDim) {
+        Canvas canvas = new Canvas(dieDim, dieDim);
+        if (cellContent.isDie()) {
+            drawDie(cellContent.getColor(), cellContent.getShade(), canvas.getGraphicsContext2D(), 0, 0, dieDim);
+        } else {
+            drawConstraint(cellContent, canvas.getGraphicsContext2D(), 0, 0, dieDim);
+        }
+        return canvas;
+    }
+
+    private void drawConstraint(CellContent cell, GraphicsContext gc, double x, double y, double cellDim) {
+        if (cell.isDie()) {
+            return;
+        } else {
+            if (cell.hasColor()) {
+                drawColorConstraint(cell.getColor(), gc, x, y, cellDim);
+            } else {
+                drawShadeConstraint(cell.getShade(), gc, x, y, cellDim);
+            }
+        }
     }
 
     private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {

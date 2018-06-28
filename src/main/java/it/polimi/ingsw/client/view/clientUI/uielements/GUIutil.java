@@ -289,15 +289,7 @@ public class GUIutil {
         gc.strokeRect(0, 0, cellDim, cellDim);
     }
 
-    private Canvas indexedCellToCanvas(CellContent cellContent, double dieDim) {
-        Canvas canvas = new Canvas(dieDim, dieDim);
-        if (cellContent.isDie()) {
-            drawDie(cellContent.getColor(), cellContent.getShade(), canvas.getGraphicsContext2D(), 0, 0, dieDim);
-        } else {
-            drawConstraint(cellContent, canvas.getGraphicsContext2D(), 0, 0, dieDim);
-        }
-        return canvas;
-    }
+
 
     public Scene waitingForGameStartScene(String message) {
         Text waitingText = new Text(message);
@@ -376,17 +368,7 @@ public class GUIutil {
         gc.strokeRect(x, y, cellDim, cellDim);
     }
 
-    private void drawConstraint(CellContent cell, GraphicsContext gc, double x, double y, double cellDim) {
-        if (cell.isDie()) {
-            return;
-        } else {
-            if (cell.hasColor()) {
-                drawColorConstraint(cell.getColor(), gc, x, y, cellDim);
-            } else {
-                drawShadeConstraint(cell.getShade(), gc, x, y, cellDim);
-            }
-        }
-    }
+
 
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double cellDim) {
@@ -436,9 +418,6 @@ public class GUIutil {
         drawSpots(gc, x, y, dieDim, shade.toInt());
     }
 
-    private void drawSpots(GraphicsContext gc, double dieDim, int count) {
-        drawSpots(gc, 0, 0, dieDim, count);
-    }
 
     private void drawSpots(GraphicsContext gc, double xAxisDiePosition, double Y_axis_die_position, double dieDim, int count) {
         switch (count) {
@@ -517,25 +496,26 @@ public class GUIutil {
         gc.setFill(Color.BLACK);
         gc.fillOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
     }
-
-    public BorderPane bulidBackPaneOptions(double width, double height, LightBoard board) {
-        BorderPane backPane = new BorderPane();
+    //todo add Tect
+    public BorderPane bulidSelectDiePane(double width, double height, LightBoard board) {
+        BorderPane selectDiePane = new BorderPane();
         HBox optionBox = new HBox();
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         double cellDim = getMainSceneCellDim(width, height);
         for (IndexedCellContent selectableDie : latestDiceList) {
-            Canvas c = indexedCellToCanvas(selectableDie.getContent(), cellDim);
+            Cell c = new Cell(selectableDie.getContent(), cellDim);
             c.setOnMouseClicked(e -> {
                 cmdWrite.write(latestDiceList.indexOf(selectableDie) + "");
                 Event exitBackPane = new MyEvent(MOUSE_EXITED_BACK_PANE);
                 c.fireEvent(exitBackPane);
             });
-            highlight(c, cellDim);
+            c.highlightGreen();
             optionBox.getChildren().add(c);
         }
-        backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
-        backPane.setCenter(optionBox);
-        return backPane;
+        optionBox.setAlignment(CENTER);
+        selectDiePane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
+        selectDiePane.setCenter(new StackPane(optionBox));
+        return selectDiePane;
     }
 
     //todo refactor to remove latestdice list and turn state
@@ -618,7 +598,6 @@ public class GUIutil {
         return pool;
 
     }
-
 
     //todo update
     public Group buildSchema(ArrayList<Cell> gridCells, int favortokens, double cellDim) {
@@ -723,7 +702,7 @@ public class GUIutil {
         }
     }
 
-    public double getDraftedSchemasCellDim(double newWidth, double newHeight) {
+    private double getDraftedSchemasCellDim(double newWidth, double newHeight) {
         double cellDim;
         double sceneRatio = newWidth / newHeight;
         if (sceneRatio >= DRAFTED_SCHEMAS_SCENE_RATIO) {
@@ -733,7 +712,6 @@ public class GUIutil {
         }
         return cellDim;
     }
-
 
     public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj lightPrivObj, double newWidth, double newHeight){
         double cellDim = getDraftedSchemasCellDim(newWidth,newHeight);
@@ -755,13 +733,11 @@ public class GUIutil {
         privObj.setPadding(new Insets(0,0,0,spacing));
         StackPane cardsContainer = new StackPane(new Group(new HBox(grid, privObj)));
         cardsContainer.setAlignment(CENTER);
-
         draftedSchemasPane.setCenter(cardsContainer);
 
         Text selectSchemaText = new Text(uimsg.getMessage(CHOOSE_SCHEMA_2));
         selectSchemaText.setFont(Font.font("Serif", DRAFTED_SCHEMAS_TEXT_TO_CELL*cellDim));
         draftedSchemasPane.setTop(new StackPane(selectSchemaText));
-
 
         return draftedSchemasPane ;
     }
