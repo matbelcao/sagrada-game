@@ -27,41 +27,38 @@ public class Cell extends StackPane{
     private double dieDim;
     private Rectangle outerRect;
     private Rectangle innerRect;
+    private Text indexText;
     private Canvas content;
 
     public Cell(double cellDim){
         this.cellDim = cellDim;
         this.dieDim = cellDim*DIE_DIM_TO_CELL_DIM;
         this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
+        this.indexText = new Text();
+        this.content = new Canvas(dieDim,dieDim);
         double lineWidth = cellDim * BORDER_LINE_TO_CELL;
         double innerCellDim = cellDim - lineWidth;
         this.innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
         outerRect.setFill(Color.BLACK);
         innerRect.setFill(Color.WHITE);
-        this.getChildren().addAll(outerRect,innerRect);
+        this.getChildren().addAll(outerRect,innerRect,indexText,content);
     }
     public Cell(int index, double cellDim){
         this(cellDim);
-        this.content = new Canvas(dieDim,dieDim);
         int displayedIndex = index + 1;
             double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL * cellDim;
-            Text t = new Text(displayedIndex + "");
-            t.setFont(Font.font("Verdana", textSize));
-            t.setFill(Color.BLACK);
-            this.getChildren().addAll(t,content);
-
-
+            indexText.setText(displayedIndex + "");
+            indexText.setFont(Font.font("Verdana", textSize));
+            indexText.setFill(Color.BLACK);
     }
 
     public Cell(double cellDim, Place place) {
         this(cellDim);
-        this.content = new Canvas(dieDim,dieDim);
         switch (place){
             case DRAFTPOOL:
                 this.hideCellBorders();
                 break;
         }
-        this.getChildren().add(content);
     }
 
     public Cell(CellContent cellContent, double cellDim) {

@@ -181,24 +181,23 @@ public class GUIutil {
 
         List<LightDie> multipleDiceList = roundTrack.get(selectedTrackCellIndex);
         int multipleDiceListSize = multipleDiceList.size();
-        int startingIndex = selectedTrackCellIndex - (int) Math.round((multipleDiceListSize / 2));
+        int startingIndex = selectedTrackCellIndex - Math.round((multipleDiceListSize / 2));
         if (startingIndex + multipleDiceListSize > ROUNDTRACK_SIZE) {
             startingIndex = ROUNDTRACK_SIZE - multipleDiceListSize;
         }
 
         for (int i = 0; i < startingIndex; i++) {
-            Canvas c = new Canvas(cellDim, cellDim);
-            multipleDiceTrack.getChildren().add(c);
+            Cell cell = new Cell(cellDim);
+            cell.setVisible(false);
+            multipleDiceTrack.getChildren().add(cell);
         }
         for (int i = 0; i < multipleDiceListSize; i++) {
-            Canvas c = new Canvas(cellDim, cellDim);
-            GraphicsContext gc = c.getGraphicsContext2D();
-            drawDie(multipleDiceList.get(i), gc, cellDim);
-            multipleDiceTrack.getChildren().add(c);
+            Cell cell = new Cell(cellDim);
+            multipleDiceTrack.getChildren().add(cell);
             if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
-                highlight(c, cellDim);
+                cell.highlightGreen();
                 int multipleDieIndex = getMultipleDieTrackCellIndex(selectedTrackCellIndex, roundTrack) + i;
-                c.setOnMouseClicked(e -> cmdWrite.write(multipleDieIndex + ""));
+                cell.setOnMouseClicked(e -> cmdWrite.write(multipleDieIndex + ""));
             }
         }
         return multipleDiceTrack;
@@ -396,7 +395,7 @@ public class GUIutil {
         gc.strokeRect(x, y, cellDim, cellDim);
     }
 
-    private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
+    /*private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
         drawDie(lightDie, graphicsContext2D, 0, 0, dieDim);
     }
 
@@ -407,16 +406,16 @@ public class GUIutil {
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
         gc.fillRoundRect(x + lineWidth, y + lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         drawSpots(gc, x, y, dieDim, lightDie.getShade().toInt());
-    }
+    }*/
 
-    private void drawDie(it.polimi.ingsw.common.enums.Color color, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
+    /*private void drawDie(it.polimi.ingsw.common.enums.Color color, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
         double lineWidth = LINE_TO_DIE * dieDim;
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(color));
         gc.fillRoundRect(x + lineWidth, y + lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         drawSpots(gc, x, y, dieDim, shade.toInt());
-    }
+    }*/
 
 
     private void drawSpots(GraphicsContext gc, double xAxisDiePosition, double Y_axis_die_position, double dieDim, int count) {
