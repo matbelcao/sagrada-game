@@ -26,7 +26,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -34,7 +33,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -390,36 +388,6 @@ public class GUI extends Application implements ClientUI {
             primaryStage.setScene(sceneCreator.waitingForGameStartScene(message));
         });
 
-    }
-
-    //todo delete class
-    class DraftedSchemasGroup extends Group{
-        Canvas canvas;
-        Pane mouseActionPane;
-        List<LightSchemaCard> draftedSchemas;
-        LightPrivObj privObj;
-
-        public DraftedSchemasGroup(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
-            this.canvas = new Canvas();
-            this.mouseActionPane = new Pane();
-            this.draftedSchemas = draftedSchemas;
-            this.privObj = privObj;
-            this.getChildren().addAll(canvas,mouseActionPane);
-        }
-
-        private void setDraftedSchemasAction(List<Rectangle> actionRects, double borderLineWidth){
-            for (Rectangle r : actionRects) {
-                r.setFill(Color.TRANSPARENT);
-                r.setOnMouseEntered(e->r.setFill(Color.rgb(0,0,0,0.4)));
-                r.setOnMouseExited(e->r.setFill(Color.TRANSPARENT));
-                r.setOnMouseClicked(e->{
-                    cmdWrite.write(actionRects.indexOf(r)+"");
-                    r.setStroke(Color.BLUE);
-                    r.setStrokeWidth(borderLineWidth);
-                    showWaitingForGameStartScreen();
-                });
-            }
-        }
     }
 
     @Override

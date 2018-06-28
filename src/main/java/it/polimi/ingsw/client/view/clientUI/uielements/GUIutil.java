@@ -55,6 +55,17 @@ public class GUIutil {
     private static final double LOGIN_TO_SCREEN_RATIO = 0.18;
     private static final double LOGIN_RATIO = 0.95;
     //-----Drafted Schema Stage
+    private static final double SCHEMA_W_TO_CELL = 5.19481;
+    private static final double DRAFTED_SCHEMAS_TEXT_TO_CELL = 0.7;
+    private static final double SCHEMA_LABEL_TO_CELL_DIM = 0.34632;
+    private static final double PRIVOBJ_W_TO_CELL_DIM = 3.7518;
+    private static final double PRIVATE_OBJ_RATIO = 0.7386;
+    private static final double SCHEMA_H_TO_CELL = 4.6176;
+    private static final double DRAFTED_SCHEMAS_SCENE_RATIO = 1.47489;
+    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.061436;
+    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0906;
+    private static final double DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO = 0.6;
+    private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
 
 
 
@@ -119,14 +130,6 @@ public class GUIutil {
         return DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO * SCREEN_WIDTH;
     }
 
-    private double getDraftedSchemasWidth(double drawingHeight) {
-        return drawingHeight * DRAFTED_CANVAS_SCENE_RATIO;
-    }
-
-    private double getDraftedSchemasHeight(double drawingWidth) {
-        return drawingWidth / DRAFTED_CANVAS_SCENE_RATIO;
-    }
-
     public double getGameSceneMinWidth(){
         return MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH*SCREEN_WIDTH;
     }
@@ -156,9 +159,6 @@ public class GUIutil {
         }
         return cellDim;
     }
-
-
-
 
     public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox track = new HBox();
@@ -210,42 +210,6 @@ public class GUIutil {
             selectedCellindex += roundTrack.get(j).size();
         }
         return selectedCellindex;
-    }
-
-    private StackPane emptyRoundTrackCell(int i, double cellDim) {
-        int displayedIndex = i + 1;
-        double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL * cellDim;
-        Text t = new Text(displayedIndex + "");
-        t.setFont(Font.font("Verdana", textSize));
-        t.setFill(Color.BLACK);
-        double lineWidth = cellDim * LINE_TO_CELL;
-        double innerCellDim = cellDim - lineWidth;
-        Rectangle outerRect = new Rectangle(0, 0, cellDim, cellDim);
-        Rectangle innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
-        innerRect.setFill(Color.WHITE);
-        return new StackPane(outerRect, innerRect, t);
-    }
-
-    private StackPane fullRoundTrackCell(int i, double cellDim) {
-        int displayedIndex = i + 1;
-        double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL * cellDim;
-        Text t = new Text(displayedIndex + "");
-        t.setFont(Font.font("Verdana", textSize));
-        t.setFill(Color.GREEN);
-        double lineWidth = cellDim * LINE_TO_CELL;
-        double innerCellDim = cellDim - lineWidth;
-        Rectangle outerRect = new Rectangle(0, 0, cellDim, cellDim);
-        Rectangle innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
-        innerRect.setFill(Color.PINK);
-        return new StackPane(outerRect, innerRect, t);
-    }
-
-    private void drawEmptyRoundTrackCell(GraphicsContext gc, int index, double cellDim) {
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(cellDim * LINE_TO_CELL);
-        gc.strokeRect(0, 0, cellDim, cellDim);
-        drawRoundTrackNumber(gc, index, cellDim);
-
     }
 
     private void drawRoundTrackNumber(GraphicsContext gc, int index, double cellDim) {
@@ -325,25 +289,6 @@ public class GUIutil {
         gc.strokeRect(0, 0, cellDim, cellDim);
     }
 
-    private void highlightBlue(Canvas cell, double cellDim) {
-        GraphicsContext gc = cell.getGraphicsContext2D();
-        gc.setStroke(Color.BLUE);
-        gc.setLineWidth(cellDim * LINE_TO_CELL);
-        gc.strokeRect(0, 0, cellDim, cellDim);
-    }
-
-
-    private void highlight(StackPane p) {
-        highlight((Canvas) p.getChildren().get(1), 100);
-    }
-
-    private Canvas whiteCanvas(double dim) {
-        Canvas whiteCanvas = new Canvas(dim, dim);
-        GraphicsContext gc = whiteCanvas.getGraphicsContext2D();
-        drawWhiteCell(gc, 0, 0, dim);
-        return whiteCanvas;
-    }
-
     private Canvas indexedCellToCanvas(CellContent cellContent, double dieDim) {
         Canvas canvas = new Canvas(dieDim, dieDim);
         if (cellContent.isDie()) {
@@ -353,14 +298,6 @@ public class GUIutil {
         }
         return canvas;
     }
-
-
-    private Canvas lightDieToCanvas(LightDie die, double dieDim) {
-        Canvas dieCanvas = new Canvas(dieDim, dieDim);
-        drawDie(die, dieCanvas.getGraphicsContext2D(), dieDim);
-        return dieCanvas;
-    }
-
 
     public Scene waitingForGameStartScene(String message) {
         Text waitingText = new Text(message);
@@ -431,125 +368,6 @@ public class GUIutil {
         return new Group(p);
     }
 
-    //todo delete class
-    //just a class to avoid having repeated code
-    private class DraftedSchemasWindowDim {
-        double sceneWidth;
-        double sceneHeight;
-        double drawingHeight;
-        double drawingWidth;
-        double x;
-        double y;
-
-        private DraftedSchemasWindowDim(double sceneWidth, double sceneHeight) {
-            double sceneRatio = sceneWidth / sceneHeight;
-            if (sceneRatio >= DRAFTED_CANVAS_SCENE_RATIO) {
-                drawingHeight = sceneHeight;
-                drawingWidth = getDraftedSchemasWidth(drawingHeight);
-                x = (sceneWidth - drawingWidth) / 2;
-            } else {
-                drawingWidth = sceneWidth;
-                drawingHeight = getDraftedSchemasHeight(drawingWidth);
-                y = (sceneHeight - drawingHeight) / 2;
-            }
-        }
-
-        double getX() {
-            return x;
-        }
-
-        double getY() {
-            return y;
-        }
-
-        double getDrawingWidth() {
-            return drawingWidth;
-        }
-
-        double getDrawingHeight() {
-            return drawingHeight;
-        }
-
-    }
-
-    public List<Rectangle> draftedMouseActionAreas(double sceneWidth, double sceneHeight) {
-        DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth, sceneHeight);
-        double x = sizes.getX();
-        double y = sizes.getY();
-        double drawingWidth = sizes.getDrawingWidth();
-        double drawingHeight;
-        double schemaWidth = drawingWidth * SCHEMA_W_TO_DRAFTED_W;
-        double schemaHeight = schemaWidth / COMPLETE_SCHEMA_RATIO;
-        double extPadding = schemaWidth / SCHEMA_W_TO_EXTERNAL_PADDING;
-        double intPadding = schemaWidth / SCHEMA_W_TO_INTERNAL_PADDING;
-
-        Rectangle r0 = new Rectangle(x + extPadding, y + extPadding, schemaWidth, schemaHeight);
-        Rectangle r1 = new Rectangle(x + extPadding + schemaWidth + intPadding, y + extPadding, schemaWidth, schemaHeight);
-        Rectangle r2 = new Rectangle(x + extPadding, y + extPadding + schemaHeight + intPadding, schemaWidth, schemaHeight);
-        Rectangle r3 = new Rectangle(x + extPadding + schemaWidth + intPadding, y + extPadding + intPadding + schemaHeight, schemaWidth, schemaHeight);
-
-        ArrayList<Rectangle> rects = new ArrayList<>();
-        rects.add(r0);
-        rects.add(r1);
-        rects.add(r2);
-        rects.add(r3);
-        return rects;
-    }
-
-
-    public void drawDraftedSchemas(List<LightSchemaCard> lightSchemaCard, LightPrivObj privObj, Canvas canvas, double sceneWidth, double sceneHeight) {
-        DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth, sceneHeight);
-        double x = sizes.getX();
-        double y = sizes.getY();
-        double drawingWidth = sizes.getDrawingWidth();
-        double drawingHeight = sizes.getDrawingHeight();
-        double schemaWidth = drawingWidth * SCHEMA_W_TO_DRAFTED_W;
-        double schemaHeight = schemaWidth / COMPLETE_SCHEMA_RATIO;
-        double extPadding = schemaWidth / SCHEMA_W_TO_EXTERNAL_PADDING;
-        double intPadding = schemaWidth / SCHEMA_W_TO_INTERNAL_PADDING;
-
-        double privObjX = x + extPadding + schemaWidth + intPadding + schemaWidth + extPadding;
-        double privObjY = y + extPadding;
-        double privObjWidth = schemaWidth / SCHEMA_W_TO_PRIVOBJ_W;
-        double privObjHeight = privObjWidth / PRIVATE_OBJ_RATIO;
-
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        //clean the canvas
-        gc.clearRect(0, 0, sceneWidth, sceneHeight);
-
-       //drawCard(privObj, gc, privObjX, privObjY, privObjWidth, privObjHeight); //todo reimplemet
-        //drawCompleteSchema(gc, lightSchemaCard.get(0), x + extPadding, y + extPadding, schemaWidth, schemaHeight);
-        //drawCompleteSchema(gc, lightSchemaCard.get(1), x + extPadding + schemaWidth + intPadding, y + extPadding, schemaWidth, schemaHeight);
-        //drawCompleteSchema(gc, lightSchemaCard.get(2), x + extPadding, y + extPadding + schemaHeight + intPadding, schemaWidth, schemaHeight);
-        //drawCompleteSchema(gc, lightSchemaCard.get(3), x + extPadding + schemaWidth + intPadding, y + extPadding + intPadding + schemaHeight, schemaWidth, schemaHeight);
-
-        //todo delete
-        gc.setLineWidth(1);
-        gc.setStroke(Color.RED);
-        gc.strokeRect(x, y, drawingWidth, drawingHeight);
-        gc.strokeLine(0, 0, sceneWidth, sceneHeight);
-        gc.strokeLine(0, sceneHeight, sceneWidth, 0);
-
-    }
-
-    private void buildSchema(GraphicsContext gc, LightSchemaCard lightSchemaCard, double x, double y, double cellDim) {
-        double initX = x;
-        for (int i = 0; i < NUM_ROWS; i++) {
-            for (int j = 0; j < NUM_COLS; j++) {
-                if (lightSchemaCard.hasDieAt(i, j)) {
-                    drawDie(lightSchemaCard.getDieAt(i, j), gc, x, y, cellDim);
-                } else if (lightSchemaCard.hasConstraintAt(i,j)) {
-                    drawConstraint(lightSchemaCard.getConstraintAt(i, j), gc, x, y, cellDim);
-                } else {
-                    drawWhiteCell(gc, x, y, cellDim);
-                }
-                x += cellDim;
-            }
-            x = initX;
-            y += cellDim;
-        }
-    }
-
     private void drawWhiteCell(GraphicsContext gc, double x, double y, double cellDim) {
         gc.setFill(Color.WHITE);
         gc.setStroke(Color.BLACK);
@@ -570,15 +388,6 @@ public class GUIutil {
         }
     }
 
-    private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double cellDim) {
-        drawConstraint(constraint, gc, 0, 0, cellDim);
-    }
-
-    private Canvas lightConstraintToCanvas(LightConstraint constraint, double dieDim) {
-        Canvas dieCanvas = new Canvas(dieDim, dieDim);
-        drawConstraint(constraint, dieCanvas.getGraphicsContext2D(), 0, 0, dieDim);
-        return dieCanvas;
-    }
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double cellDim) {
         if (constraint.hasColor()) {
@@ -663,10 +472,6 @@ public class GUIutil {
         }
     }
 
-    private void drawConstraintSpots(GraphicsContext gc, double dieDim, int count) {
-        drawConstraintSpots(gc, 0, 0, dieDim, count);
-    }
-
     private void drawConstraintSpots(GraphicsContext gc, double xAxisDiePosition, double Y_axis_die_position, double dieDim, int count) {
         switch (count) {
             case 1:
@@ -698,11 +503,6 @@ public class GUIutil {
                 break;
         }
     }
-
-    private void drawConstraintSpot(GraphicsContext gc, double x, double y, double dieDim) {
-        drawConstraintSpot(gc, x, y, dieDim, 0, 0);
-    }
-
     private void drawConstraintSpot(GraphicsContext gc, double x, double y, double dieDim, double xAxisDiePosition, double yAxisDiePosition) {
         double spotDiameter = dieDim / SPOT_RATIO;
         gc.setFill(Color.WHITE);
@@ -710,10 +510,6 @@ public class GUIutil {
         gc.setLineWidth(spotDiameter / 5);
         gc.fillOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
         gc.strokeOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
-    }
-
-    private void drawSpot(GraphicsContext gc, double x, double y, double dieDim) {
-        drawSpot(gc, x, y, dieDim, 0, 0);
     }
 
     private void drawSpot(GraphicsContext gc, double x, double y, double dieDim, double xAxisDiePosition, double yAxisDiePosition) {
@@ -937,17 +733,6 @@ public class GUIutil {
         }
         return cellDim;
     }
-    private static final double SCHEMA_W_TO_CELL = 5.19481;
-    private static final double DRAFTED_SCHEMAS_TEXT_TO_CELL = 0.7;
-    private static final double SCHEMA_LABEL_TO_CELL_DIM = 0.34632;
-    private static final double PRIVOBJ_W_TO_CELL_DIM = 3.7518;
-    private static final double PRIVATE_OBJ_RATIO = 0.7386;
-    private static final double SCHEMA_H_TO_CELL = 4.6176;
-    private static final double DRAFTED_SCHEMAS_SCENE_RATIO = 1.47489;
-    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.061436;
-    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0906;
-    private static final double DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO = 0.6;
-    private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
 
 
     public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj lightPrivObj, double newWidth, double newHeight){
