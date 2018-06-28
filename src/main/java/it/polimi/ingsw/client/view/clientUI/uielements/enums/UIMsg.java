@@ -37,6 +37,7 @@ public enum UIMsg {
     PLACE_DIE("place-die"),
     USE_TOOL("use-tool"),
     CHOOSE_SCHEMA("choose-schema"),
+    CHOOSE_SCHEMA_2("choose-schema-2"),
     CHOOSE_TOOL("choose-tool"),
     MAIN_CHOICE("main-choice"),
     NOT_MY_TURN("not-my-turn"),
