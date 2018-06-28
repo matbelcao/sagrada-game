@@ -407,17 +407,6 @@ public class GUI extends Application implements ClientUI {
             this.getChildren().addAll(canvas,mouseActionPane);
         }
 
-        private void updateScene(double width, double height){
-            //update the width and height properties
-            canvas.setWidth(width);
-            canvas.setHeight(height);
-            double borderLineWidth = sceneCreator.getSelectedSchemaLineWidth(width,height);
-            sceneCreator.drawDraftedSchemas(draftedSchemas,privObj,canvas,width,height);
-            List<Rectangle> actionRects = sceneCreator.draftedMouseActionAreas(width,height);
-            setDraftedSchemasAction(actionRects,borderLineWidth);
-            mouseActionPane.getChildren().setAll(actionRects);
-        }
-
         private void setDraftedSchemasAction(List<Rectangle> actionRects, double borderLineWidth){
             for (Rectangle r : actionRects) {
                 r.setFill(Color.TRANSPARENT);

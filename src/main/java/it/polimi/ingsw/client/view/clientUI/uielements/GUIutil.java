@@ -55,23 +55,13 @@ public class GUIutil {
     private static final double LOGIN_TO_SCREEN_RATIO = 0.18;
     private static final double LOGIN_RATIO = 0.95;
     //-----Drafted Schema Stage
-    private static final double DRAFTED_SCHEMAS_TEXT_TO_CELL = 0.7;
-    private static final double SCHEMA_LABEL_TO_SCHEMA_WIDTH = 0.0666666;
+
+
+
+
+
+
     private static final double SCHEMA_W_TO_PRIVOBJ_W = 1.3846;
-    private static final double PRIVOBJ_W_TO_SCHEMA_WIDTH = 0.72222;
-    private static final double PRIVATE_OBJ_RATIO = 0.7386;
-    private static final double CELL_TO_SCHEMA_W = 0.1925;
-    private static final double CELL_TO_SCHEMA_H = 0.2165625;
-    private static final double DRAFTED_SCHEMAS_SCENE_RATIO = 1.47489;
-    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.061436;
-    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0906;
-    private static final double DRAFTED_SCHEMAS_TO_SCREEN_RATIO = 0.6;
-
-
-
-
-
-
     private static final double DRAFTED_CANVAS_SCENE_RATIO = 1.5314;
     private static final double NUM_OF_DRAFTED_SCHEMAS = 4;
 
@@ -126,7 +116,7 @@ public class GUIutil {
     }
 
     public double getDraftedSchemasMinWidth() {
-        return DRAFTED_SCHEMAS_TO_SCREEN_RATIO * SCREEN_WIDTH;
+        return DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO * SCREEN_WIDTH;
     }
 
     private double getDraftedSchemasWidth(double drawingHeight) {
@@ -147,13 +137,11 @@ public class GUIutil {
 
 
     private double getCardWidth(double cellDim) {
-        //double width = 221;
         double width = cellDim*CARD_WIDTH_TO_CELL_DIM;
         return width;
     }
 
     private double getCardHeight(double cellDim) {
-        //double height = 300;
         double height = cellDim*CARD_HEIGHT_TO_CELL_DIM;
         return height;
     }
@@ -169,12 +157,6 @@ public class GUIutil {
         return cellDim;
     }
 
-    public double getSelectedSchemaLineWidth(double sceneWidth, double sceneHeight) {
-        DraftedSchemasWindowDim sizes = new DraftedSchemasWindowDim(sceneWidth, sceneHeight);
-        double drawingWidth = sizes.getDrawingWidth();
-        double schemaWidth = drawingWidth * SCHEMA_W_TO_DRAFTED_W;
-        return LINE_TO_CELL * CELL_TO_SCHEMA_W * schemaWidth;
-    }
 
 
 
@@ -955,26 +937,36 @@ public class GUIutil {
         }
         return cellDim;
     }
+    private static final double SCHEMA_W_TO_CELL = 5.19481;
+    private static final double DRAFTED_SCHEMAS_TEXT_TO_CELL = 0.7;
+    private static final double SCHEMA_LABEL_TO_CELL_DIM = 0.34632;
+    private static final double PRIVOBJ_W_TO_CELL_DIM = 3.7518;
+    private static final double PRIVATE_OBJ_RATIO = 0.7386;
+    private static final double SCHEMA_H_TO_CELL = 4.6176;
+    private static final double DRAFTED_SCHEMAS_SCENE_RATIO = 1.47489;
+    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.061436;
+    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0906;
+    private static final double DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO = 0.6;
+    private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
+
 
     public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj lightPrivObj, double newWidth, double newHeight){
         double cellDim = getDraftedSchemasCellDim(newWidth,newHeight);
-        double spacing = 15;
-        double schemaWidth = cellDim/CELL_TO_SCHEMA_W;
-        double schemaHeight = cellDim/CELL_TO_SCHEMA_H;
+        double spacing = DRAFTED_SCHEMAS_SPACING_TO_CELL*cellDim;
 
         BorderPane draftedSchemasPane = new BorderPane();
         GridPane grid = new GridPane();
         for(int i = 0; i < 2; i++){
             for(int j = 0; j < 2; j++){
                 int schemaIndex =i*2+j;
-                Group completeSchema = buildCompleteSchema(draftedSchemas.get(schemaIndex),schemaWidth,schemaHeight);
+                Group completeSchema = buildCompleteSchema(draftedSchemas.get(schemaIndex),cellDim);
                 grid.add(completeSchema,j,i);
                 completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
             }
         }
         grid.setVgap(spacing);
         grid.setHgap(spacing);
-        StackPane privObj = new StackPane(drawCard(lightPrivObj, PRIVOBJ_W_TO_SCHEMA_WIDTH*schemaWidth, PRIVOBJ_W_TO_SCHEMA_WIDTH*schemaWidth/PRIVATE_OBJ_RATIO));
+        StackPane privObj = new StackPane(drawCard(lightPrivObj, PRIVOBJ_W_TO_CELL_DIM*cellDim, PRIVOBJ_W_TO_CELL_DIM*cellDim/PRIVATE_OBJ_RATIO));
         privObj.setPadding(new Insets(0,0,0,spacing));
         StackPane cardsContainer = new StackPane(new Group(new HBox(grid, privObj)));
         cardsContainer.setAlignment(CENTER);
@@ -989,10 +981,12 @@ public class GUIutil {
         return draftedSchemasPane ;
     }
 
-    private Group buildCompleteSchema(LightSchemaCard lightSchemaCard, double schemaWidth, double schemaHeight) {
-        double space = SCHEMA_LABEL_TO_SCHEMA_WIDTH*schemaWidth;
-        double cellDim = CELL_TO_SCHEMA_W * schemaWidth;
+    private Group buildCompleteSchema(LightSchemaCard lightSchemaCard, double cellDim) {
+        double schemaWidth = cellDim*SCHEMA_W_TO_CELL;
+        double schemaHeight = cellDim*SCHEMA_H_TO_CELL;
+        double nameLabelHeight = SCHEMA_LABEL_TO_CELL_DIM*cellDim;
         double arcWidth = SCHEMA_ARC_TO_WIDTH * schemaWidth;
+
         Canvas c = new Canvas(schemaWidth,schemaHeight);
         GraphicsContext gc = c.getGraphicsContext2D();
         gc.setFill(Color.BLACK);
@@ -1001,6 +995,7 @@ public class GUIutil {
         double y = TEXT_HEIGHT_TO_SCHEMA_H * schemaHeight;
         drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
         drawFavorTokens(gc, 0, y, schemaWidth, lightSchemaCard);
+
         //acttion on mouse pass
         Rectangle highlightRect = new Rectangle(0,0,schemaWidth,schemaHeight);
         highlightRect.setArcWidth(arcWidth);
@@ -1010,13 +1005,11 @@ public class GUIutil {
         highlightRect.setOnMouseExited(e-> highlightRect.setFill(Color.TRANSPARENT));
 
         Group g = schemaToGrid(getSchemaCells(lightSchemaCard,cellDim));
-        Rectangle spacer = new Rectangle(space,space);
+        Rectangle spacer = new Rectangle(nameLabelHeight,nameLabelHeight);
         spacer.setVisible(false);
         Group cells = new Group(new VBox(g, spacer));
 
         return new Group(new StackPane(c,cells,highlightRect));
-
-
     }
 
     private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
