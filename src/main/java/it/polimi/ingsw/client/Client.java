@@ -454,7 +454,7 @@ public class Client {
             userStatus=UserStatus.PLAYING;
             lockStatus.notifyAll();
         }
-        fsm.resetState();
+        fsm.resetState(true);
         List<LightPlayer> players = clientConn.getPlayers();
         for (int i = 0; i < board.getNumPlayers(); i++) {
             board.addPlayer(players.get(i));
@@ -646,8 +646,7 @@ public class Client {
             lockStatus.notifyAll();
         }
         retrieveBoardElemsOnReconnection(playerId);
-        fsm.resetState();
-        board.stateChanged();
+
     }
 
     /**
@@ -677,11 +676,16 @@ public class Client {
                 getCardsSchemasFavors();
 
                 board.setDraftPool(clientConn.getDraftPool());
+
+
             } else {
                 board.setDraftedSchemas(clientConn.getSchemaDraft());
             }
             board.addObserver(clientUI);
             readyWithBasicBoardElems =true;
+
+            fsm.resetState(gameStatus.isInit());
+            board.stateChanged();
             lockReady.notifyAll();
         }
     }

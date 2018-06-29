@@ -33,7 +33,7 @@ public class ServerFSM {
      * Allows to cancel the selection of a die, and then to select another one without exiting the ToolCard usage
      * @return the new turn's state
      */
-    public synchronized ServerState fsmDiscard(){
+    public  ServerState fsmDiscard(){
         if (curState.equals(ServerState.CHOOSE_PLACEMENT)){
             curState=ServerState.GET_DICE_LIST;
         }
@@ -44,7 +44,7 @@ public class ServerFSM {
      * Allows to exit the ToolCard execution procedure, interrupting the regular execution flow
      * @return the new turn's state
      */
-    public synchronized ServerState fsmExit(){
+    public  ServerState fsmExit(){
         if(!curState.equals(ServerState.INIT)){
             curState=ServerState.MAIN;
             toolActive=false;
@@ -59,7 +59,7 @@ public class ServerFSM {
      * @param isFirstTurn true if is the 1/2 player's turn
      * @return the new turn's state
      */
-    public synchronized ServerState newTurn(int userPlayingId, boolean isFirstTurn){
+    public ServerState newTurn(int userPlayingId, boolean isFirstTurn){
         curState=ServerState.MAIN;
         toolActive=false;
         numDiePlaced=0;
@@ -75,7 +75,7 @@ public class ServerFSM {
      * @param toolCard the toolcard selected by the player
      * @return the new turn's state
      */
-    public synchronized ServerState newToolUsage(ToolCard toolCard){
+    public ServerState newToolUsage(ToolCard toolCard){
         curState=ServerState.GET_DICE_LIST;
         toolActive=true;
         placeFrom=toolCard.getPlaceFrom();
@@ -87,14 +87,14 @@ public class ServerFSM {
      * Sets the variables for the ending of a new ToolCard usage, if it was previously activated
      * @return the new turn's state
      */
-    public synchronized ServerState endTool(){
+    public  ServerState endTool(){
         while(!curState.equals(ServerState.TOOL_CAN_CONTINUE)){
             curState=nextState(Actions.NONE);
         }
         return curState;
     }
 
-    public synchronized ServerState endGame(){
+    public  ServerState endGame(){
         curState=ServerState.GAME_ENDED;
         return curState;
     }
@@ -104,7 +104,7 @@ public class ServerFSM {
      * @param command the action that the player wants to perform
      * @return the new turn's state
      */
-    public synchronized ServerState nextState(Actions command){
+    public ServerState nextState(Actions command){
         switch (curState){
             case INIT:
                 curState=ServerState.MAIN;
@@ -218,7 +218,7 @@ public class ServerFSM {
         placeFrom=place;
     }
 
-    public synchronized ServerState getCurState(){
+    public ServerState getCurState(){
         return curState;
     }
 

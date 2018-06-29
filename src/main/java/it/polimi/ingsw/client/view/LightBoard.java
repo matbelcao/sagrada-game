@@ -61,9 +61,6 @@ public class LightBoard extends Observable {
 
     }
 
-    public boolean isInit() {
-        return roundNumber == -1;
-    }
 
     private void addToChanges(int event) {
         synchronized (lockChanges) {

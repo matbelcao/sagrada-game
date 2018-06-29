@@ -11,13 +11,16 @@ public class LightGameStatus implements Serializable {
 
 
     public LightGameStatus(boolean isInit,int numPlayers, int numRound, boolean isFirstTurn, int nowPlaying) {
-        this.isInit=isInit;
+        this.isInit = isInit;
         this.numPlayers = numPlayers;
         this.numRound = numRound;
         this.isFirstTurn = isFirstTurn;
         this.nowPlaying = nowPlaying;
     }
 
+    /**
+     * @return true iff the game
+     */
     public boolean isInit() {
         return isInit;
     }
