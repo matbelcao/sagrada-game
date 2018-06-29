@@ -62,14 +62,14 @@ public class RMIServerObject  implements RMIServerInt {
     @Override
     public void notifyStatusUpdate (GameEvent gameEvent, int id, String userName){
         client.addUpdateTask(new Thread(()->
-        client.updatePlayerStatus(id, gameEvent,userName)
+            client.updatePlayerStatus(id, gameEvent,userName)
         ));
     }
 
     @Override
     public void notifyBoardChanged(){
         client.addUpdateTask(new Thread(()->
-        client.getBoardUpdates()
+            client.getBoardUpdates()
         ));
     }
 

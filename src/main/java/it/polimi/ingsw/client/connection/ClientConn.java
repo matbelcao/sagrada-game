@@ -3,7 +3,6 @@ package it.polimi.ingsw.client.connection;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;
 
-import java.rmi.RemoteException;
 import java.util.List;
 
 public interface ClientConn {
