@@ -30,7 +30,7 @@ public class SocketClient implements ClientConn {
     private Client client;
     private final Object lockin=new Object();
     private Timer pingTimer;
-    private final Object pingLock=new Object();
+    private final Object lockPing =new Object();
     private boolean connectionOk;
     private boolean timerActive;
     private final Object lockOutSocket;
@@ -118,11 +118,11 @@ public class SocketClient implements ClientConn {
                         }
                         System.out.println("QUITTED(1)");
                     }
-                    synchronized (pingLock){
+                    synchronized (lockPing){
                         if(timerActive && pingTimer!=null){
                             pingTimer.cancel();
                             timerActive=false;
-                            pingLock.notifyAll();
+                            lockPing.notifyAll();
                         }
                     }
                     client.disconnect();
@@ -818,11 +818,11 @@ public class SocketClient implements ClientConn {
 
             }
         }
-        synchronized (pingLock){
+        synchronized (lockPing){
             if(timerActive){
                 pingTimer.cancel();
                 timerActive=false;
-                pingTimer.notifyAll();
+                lockPing.notifyAll();
             }
         }
     }
@@ -845,7 +845,7 @@ public class SocketClient implements ClientConn {
             syncedSocketWrite(SocketString.PONG);
             outSocket.flush();
             //System.out.println("PONG");
-            synchronized (pingLock) {
+            synchronized (lockPing) {
                 if(connectionOk) {
                     if(pingTimer!=null){
                         pingTimer.cancel();
@@ -853,7 +853,7 @@ public class SocketClient implements ClientConn {
                     pingTimer = new Timer();
                     pingTimer.schedule(new connectionTimeout(), PONG_TIME);
                     timerActive = true;
-                    pingLock.notifyAll();
+                    lockPing.notifyAll();
                 }
             }
         } catch (Exception e) {
@@ -868,13 +868,13 @@ public class SocketClient implements ClientConn {
     private class connectionTimeout extends TimerTask {
         @Override
         public void run(){
-            synchronized (pingLock) {
+            synchronized (lockPing) {
                 if(connectionOk) {
                     System.out.println("CONNECTION TIMEOUT!");
                     connectionOk = false;
                     timerActive = false;
                     client.disconnect();
-                    pingLock.notifyAll();
+                    lockPing.notifyAll();
                 }
             }
         }

@@ -28,7 +28,7 @@ public class SocketServer extends Thread implements ServerConn  {
     private PrintWriter outSocket;
     private User user;
     private Timer pingTimer;
-    private final Object pingLock;
+    private final Object lockPing;
     private boolean connectionOk;
     private final Object lockOutSocket;
     private static final int PING_TIME=5000;
@@ -43,7 +43,7 @@ public class SocketServer extends Thread implements ServerConn  {
         this.lockOutSocket=new Object();
         this.user = user;
         this.socket = socket;
-        this.pingLock = new Object();
+        this.lockPing = new Object();
         this.connectionOk=true;
         start();
     }
@@ -523,10 +523,10 @@ public class SocketServer extends Thread implements ServerConn  {
     private class connectionTimeout extends TimerTask {
         @Override
         public void run(){
-            synchronized (pingLock) {
+            synchronized (lockPing) {
                 if(user.getStatus()!=UserStatus.DISCONNECTED){
                     connectionOk = false;
-                    pingLock.notifyAll();
+                    lockPing.notifyAll();
                     MasterServer.getMasterServer().printMessage("CONNECTION TIMEOUT!");
                     user.disconnect();
                 }
@@ -535,12 +535,12 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     private void pong(){
-        synchronized (pingLock) {
+        synchronized (lockPing) {
             if(pingTimer!=null){
                 pingTimer.cancel();
             }
             pingTimer=null;
-            pingLock.notifyAll();
+            lockPing.notifyAll();
         }
     }
 
@@ -551,14 +551,14 @@ public class SocketServer extends Thread implements ServerConn  {
     public void ping() {
         new Thread(() -> {
             while(connectionOk) {
-                synchronized (pingLock) {
+                synchronized (lockPing) {
                     if (pingTimer==null && connectionOk) {
                         syncedSocketWrite(SocketString.PING);
 
                         pingTimer = new Timer();
                         pingTimer.schedule(new connectionTimeout(), PING_TIME);
                     }
-                    pingLock.notifyAll();
+                    lockPing.notifyAll();
                 }
                 try {
                     Thread.sleep(5000);
