@@ -75,7 +75,7 @@ class ToolCardTest {
         Player player = new Player("Player1",0,board,priv);
         SchemaCard schema= new SchemaCard(1,false);
         Die die1=new Die("FOUR","RED");
-        Die die2=new Die("ONE","YELLOW");
+        Die die2=new Die("ONE","BLUE");
         player.setSchema(schema);
 
         ToolCard tool= new ToolCard(2);
@@ -100,19 +100,22 @@ class ToolCardTest {
         assertEquals(die1.getShade().toString(),internalSchemaDiceList.get(0).getContent().getShade().toString());
         assertEquals(die2.getColor().toString(),internalSchemaDiceList.get(1).getContent().getDieColor().toString());
 
-        tool.internalSelectDie(0);
+        tool.internalSelectDie(1);
         assertEquals(Actions.PLACE_DIE,tool.getActions().get(0));
 
         List<Integer> placements=tool.internalListPlacements();
 
         int newIndex=placements.get(0);
         assertTrue(tool.internalDiePlacement(0));
-        assertEquals(die1.toString(),tool.getNewSchema().getCell(newIndex).getDie().toString());
-        assertFalse(tool.getNewSchema().getCell(2).hasDie());
+        assertEquals(die2.toString(),tool.getNewSchema().getCell(newIndex).getDie().toString());
+        assertTrue(tool.getNewSchema().getCell(1).hasDie());
+        assertFalse(tool.getNewSchema().getCell(6).hasDie());
         assertEquals(1,tool.getOldIndexes().size());
 
         assertFalse(tool.toolCanContinue(player));
-        assertEquals(schema.getSchemaDiceList(DieColor.NONE).toString(),tool.getNewSchema().getSchemaDiceList(DieColor.NONE).toString());
+        assertEquals(player.getSchema().getSchemaDiceList(DieColor.NONE).toString(),tool.getNewSchema().getSchemaDiceList(DieColor.NONE).toString());
+        assertTrue(player.getSchema().getCell(1).hasDie());
+        assertFalse(player.getSchema().getCell(6).hasDie());
         assertTrue(tool.isAlreadyUsed());
     }
 
