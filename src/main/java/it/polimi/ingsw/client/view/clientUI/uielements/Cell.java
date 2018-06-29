@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.common.serializables.CellContent;
@@ -84,7 +85,7 @@ public class Cell extends StackPane{
     private Canvas indexedCellToCanvas(CellContent cellContent, double dieDim) {
         Canvas canvas = new Canvas(dieDim, dieDim);
         if (cellContent.isDie()) {
-            drawDie(cellContent.getColor(), cellContent.getShade(), canvas.getGraphicsContext2D(), 0, 0, dieDim);
+            drawDie(cellContent.getDieColor(), cellContent.getShade(), canvas.getGraphicsContext2D(), 0, 0, dieDim);
         } else {
             drawConstraint(cellContent, canvas.getGraphicsContext2D(), 0, 0, dieDim);
         }
@@ -96,7 +97,7 @@ public class Cell extends StackPane{
             return;
         } else {
             if (cell.hasColor()) {
-                drawColorConstraint(cell.getColor(), gc, x, y, cellDim);
+                drawColorConstraint(cell.getDieColor(), gc, x, y, cellDim);
             } else {
                 drawShadeConstraint(cell.getShade(), gc, x, y, cellDim);
             }
@@ -111,16 +112,16 @@ public class Cell extends StackPane{
         double lineWidth = BORDER_LINE_TO_DIE * dieDim;
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
+        gc.setFill(DieColor.toFXColor(lightDie.getDieColor()));
         gc.fillRoundRect(x+lineWidth, y+lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         drawSpots(gc, x, y, dieDim, lightDie.getShade().toInt());
     }
 
-    private void drawDie(it.polimi.ingsw.common.enums.Color color, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
+    private void drawDie(DieColor dieColor, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
         double lineWidth = BORDER_LINE_TO_DIE * dieDim;
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(color));
+        gc.setFill(DieColor.toFXColor(dieColor));
         gc.fillRoundRect(x + lineWidth, y + lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         drawSpots(gc, x, y, dieDim, shade.toInt());
     }
@@ -128,7 +129,7 @@ public class Cell extends StackPane{
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double cellDim) {
         if (constraint.hasColor()) {
-            drawColorConstraint(constraint.getColor(), gc, x, y, cellDim);
+            drawColorConstraint(constraint.getDieColor(), gc, x, y, cellDim);
         } else {
             drawShadeConstraint(constraint.getShade(), gc, x, y, cellDim);
         }
@@ -141,8 +142,8 @@ public class Cell extends StackPane{
         gc.setStroke(Color.BLACK);
     }
 
-    private void drawColorConstraint(it.polimi.ingsw.common.enums.Color color, GraphicsContext gc, double x, double y, double cellDim) {
-        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXConstraintColor(color));
+    private void drawColorConstraint(DieColor dieColor, GraphicsContext gc, double x, double y, double cellDim) {
+        gc.setFill(DieColor.toFXConstraintColor(dieColor));
         gc.fillRect(x, y, cellDim, cellDim);
         gc.setStroke(Color.BLACK);
     }

@@ -4,7 +4,7 @@ import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.serializables.*;
@@ -284,7 +284,7 @@ public class CLIObjects {
         List<String> updateSchema;
         updateSchema=schemas.get(nowPlaying);
         Random randomGen = new Random();
-        updateSchema.set(0,addColorToLine(boldify(updateSchema.get(0)),Color.values()[randomGen.nextInt(5)]));
+        updateSchema.set(0,addColorToLine(boldify(updateSchema.get(0)), DieColor.values()[randomGen.nextInt(5)]));
     }
 
     /**

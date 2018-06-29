@@ -37,7 +37,7 @@ public class ToolCard extends Card {
     private List<DieQuantity> quantity;
     private Turn turn;
 
-    private Color constraint; //only for 12
+    private DieColor constraint; //only for 12
     private int numDiePlaced;
     private int actionIndex;
     private SchemaCard schemaTemp;
@@ -136,7 +136,7 @@ public class ToolCard extends Card {
 
             selectedDice=new ArrayList<>();
             oldIndexList=new ArrayList<>();
-            constraint=Color.NONE;
+            constraint= DieColor.NONE;
             actionIndex=0;
             schemaTemp=schema.cloneSchema();
             numDiePlaced=0;
@@ -269,7 +269,7 @@ public class ToolCard extends Card {
 
         while(diceIterator.hasNext()) {
             die = diceIterator.next().getDie();
-            if(!constraint.equals(Color.NONE)){
+            if(!constraint.equals(DieColor.NONE)){
                 if(die.getColor().equals(constraint)){
                     indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
                     indexedList.add(indexedCell);
@@ -474,9 +474,9 @@ public class ToolCard extends Card {
 
     /**
      * Returns the color constraint selected by the player during the ToolCard execution, if expected
-     * @return the Color constraint selected
+     * @return the DieColor constraint selected
      */
-    public Color getColorConstraint(){
+    public DieColor getColorConstraint(){
         return constraint;
     }
 

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
@@ -8,7 +8,7 @@ import it.polimi.ingsw.server.model.iterators.FullCellIterator;
  * This class implements the Cards named "Private Objective" and their score calculating algorithms
  */
 public class PrivObjectiveCard extends Card{
-    private Color color;
+    private DieColor dieColor;
     static final int NUM_PRIV_OBJ=5;
     private static String xmlSource=MasterServer.XML_SOURCE+"PrivObjectiveCard.xml";
 
@@ -18,19 +18,19 @@ public class PrivObjectiveCard extends Card{
      */
     public PrivObjectiveCard(int id){
         super();
-        this.color=Color.valueOf(super.xmlReader(id,xmlSource,"PrivObjectiveCard"));
+        this.dieColor = DieColor.valueOf(super.xmlReader(id,xmlSource,"PrivObjectiveCard"));
     }
 
     /**
-     * Returns the Color object of the card
-     * @return the Color of the card
+     * Returns the DieColor object of the card
+     * @return the DieColor of the card
      */
-    public Color getColor(){
-        return this.color;
+    public DieColor getDieColor(){
+        return this.dieColor;
     }
 
     /**
-     * This method computes the score given by the private objective card (based on its color)
+     * This method computes the score given by the private objective card (based on its dieColor)
      * @param schema the schema card the score needs to be calculated on
      * @return the actual score given by the card
      */
@@ -42,7 +42,7 @@ public class PrivObjectiveCard extends Card{
         while(diceIterator.hasNext()){
             diceIterator.next();
             tempDie=schema.getCell(diceIterator.getRow(),diceIterator.getColumn()).getDie();
-            if(color.toString().equals(tempDie.getColor().toString())){
+            if(dieColor.toString().equals(tempDie.getColor().toString())){
                 points+=tempDie.getShade().toInt();
             }
         }

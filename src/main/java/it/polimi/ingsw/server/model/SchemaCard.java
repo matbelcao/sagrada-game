@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
@@ -238,8 +238,8 @@ public class SchemaCard implements Iterable<Cell>  {
         return list;
     }
 
-    public List<Integer> listPossiblePlacementsSwap(Die die, Color fixedColor){
-        if(!fixedColor.equals(Color.NONE) && !die.getColor().equals(fixedColor)){
+    public List<Integer> listPossiblePlacementsSwap(Die die, DieColor fixedDieColor){
+        if(!fixedDieColor.equals(DieColor.NONE) && !die.getColor().equals(fixedDieColor)){
             throw new IllegalArgumentException();
         }
         List <Integer> list= new ArrayList<>();
@@ -255,7 +255,7 @@ public class SchemaCard implements Iterable<Cell>  {
         while(diceIterator.hasNext()){
             Cell celll=diceIterator.next();
 
-            if(celll.getDie().getColor().equals(fixedColor) || fixedColor.equals(Color.NONE)){
+            if(celll.getDie().getColor().equals(fixedDieColor) || fixedDieColor.equals(DieColor.NONE)){
                 SchemaCard tempschema=cloneSchema();
                 tempschema.removeDie(diceIterator.getIndex());
 
@@ -461,13 +461,13 @@ public class SchemaCard implements Iterable<Cell>  {
      * @param constraint the color restriction
      * @return a list of die
      */
-    public List<Die> getSchemaDiceList(Color constraint){
+    public List<Die> getSchemaDiceList(DieColor constraint){
         List<Die> dieList=new ArrayList<>();
         Die die;
         FullCellIterator diceIterator=(FullCellIterator)this.iterator();
         while(diceIterator.hasNext()) {
             die=diceIterator.next().getDie();
-            if(!constraint.equals(Color.NONE)){
+            if(!constraint.equals(DieColor.NONE)){
                 if(die.getColor().equals(constraint)){
                     dieList.add(die);
                 }
@@ -480,7 +480,7 @@ public class SchemaCard implements Iterable<Cell>  {
     }
 
     public int getDiePosition(Die die){
-        assert getSchemaDiceList(Color.NONE).contains(die);
+        assert getSchemaDiceList(DieColor.NONE).contains(die);
         FullCellIterator diceIterator=(FullCellIterator)this.iterator();
         while(diceIterator.hasNext()) {
             Die dieTemp=diceIterator.next().getDie();

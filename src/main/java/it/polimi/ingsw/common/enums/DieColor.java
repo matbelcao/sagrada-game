@@ -5,7 +5,7 @@ package it.polimi.ingsw.common.enums;
  * This enum offers the set of colors (RED, GREEN, YELLOW, BLUE, PURPLE) needed to build the dice,
  * it also contains the ansi code to apply color to text in the CLI
  */
-public enum Color { //need to add png address combined with Shade's ones
+public enum DieColor { //need to add png address combined with Shade's ones
     RED("\u001B[91m" ),
     GREEN("\u001B[92m"),
     YELLOW("\u001B[93m"),
@@ -17,15 +17,15 @@ public enum Color { //need to add png address combined with Shade's ones
 
     /**
      * Constructs the elements of the enum setting the corresponding ansi color code
-     * @param utf the Color utf code for CLI
+     * @param utf the DieColor utf code for CLI
      */
-    Color(String utf){
+    DieColor(String utf){
         this.utf=utf;
     }
 
     /**
      * Gets the ansi color code
-     * @return the Color ansi code for CLI
+     * @return the DieColor ansi code for CLI
      */
     public String getUtf(){
         return utf;
@@ -34,12 +34,12 @@ public enum Color { //need to add png address combined with Shade's ones
 
 
     /**
-     * Checks whether a string is a valid Color name
+     * Checks whether a string is a valid DieColor name
      * @param value the string to be checked
      * @return true iff the string equals the name of one of the listed colors
      */
     public static boolean contains(String value) {
-        for (Color c : Color.values()) {
+        for (DieColor c : DieColor.values()) {
             if (c.toString().equals(value)) {
                 return true;
             }
@@ -47,30 +47,30 @@ public enum Color { //need to add png address combined with Shade's ones
         return false;
     }
 
-    public static javafx.scene.paint.Color toFXConstraintColor(Color color){
-        if(color.equals(RED)){
+    public static javafx.scene.paint.Color toFXConstraintColor(DieColor dieColor){
+        if(dieColor.equals(RED)){
             return javafx.scene.paint.Color.web("#bb331a");
-        }else if(color.equals(GREEN)){
+        }else if(dieColor.equals(GREEN)){
             return javafx.scene.paint.Color.web("#579b55");
-        }else if(color.equals(YELLOW)){
+        }else if(dieColor.equals(YELLOW)){
             return javafx.scene.paint.Color.web("#e3d107");
-        }else if(color.equals(BLUE)){
+        }else if(dieColor.equals(BLUE)){
             return javafx.scene.paint.Color.web("#5faab9");
-        }else if(color.equals(PURPLE)){
+        }else if(dieColor.equals(PURPLE)){
             return javafx.scene.paint.Color.web("#a5468c");
         }else{
             return javafx.scene.paint.Color.web("#9e9e9e");
         }
     }
 
-    public static javafx.scene.paint.Color toFXColor(Color color){
-        if(color.equals(RED)){
+    public static javafx.scene.paint.Color toFXColor(DieColor dieColor){
+        if(dieColor.equals(RED)){
             return javafx.scene.paint.Color.RED;
-        }else if(color.equals(GREEN)){
+        }else if(dieColor.equals(GREEN)){
             return javafx.scene.paint.Color.GREEN;
-        }else if(color.equals(YELLOW)){
+        }else if(dieColor.equals(YELLOW)){
             return javafx.scene.paint.Color.YELLOW;
-        }else if(color.equals(BLUE)){
+        }else if(dieColor.equals(BLUE)){
             return javafx.scene.paint.Color.BLUE;
         }else
             return javafx.scene.paint.Color.PURPLE;

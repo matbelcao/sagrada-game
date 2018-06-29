@@ -1,11 +1,11 @@
 package it.polimi.ingsw.server.model.scorecalculator;
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.server.model.Die;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 import it.polimi.ingsw.server.model.SchemaCard;
 
 /**
- * This class implements the "Color Variety" Public Objective Card
+ * This class implements the "DieColor Variety" Public Objective Card
  */
 public class ScoreCalculator10 implements ScoreCalculator{
     /**
@@ -16,7 +16,7 @@ public class ScoreCalculator10 implements ScoreCalculator{
     @Override
     public int calculateScore(SchemaCard schema) {
         int points;
-        int[] count = new int[Color.values().length -1];
+        int[] count = new int[DieColor.values().length -1];
         FullCellIterator diceIterator = (FullCellIterator) schema.iterator();
         Die die;
 

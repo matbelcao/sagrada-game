@@ -5,6 +5,7 @@ import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.GUI;
 import it.polimi.ingsw.common.enums.Actions;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.common.serializables.*;
@@ -435,7 +436,7 @@ public class GUIutil {
 
     private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double cellDim) {
         if (constraint.hasColor()) {
-            drawColorConstraint(constraint.getColor(), gc, x, y, cellDim);
+            drawColorConstraint(constraint.getDieColor(), gc, x, y, cellDim);
         } else {
             drawShadeConstraint(constraint.getShade(), gc, x, y, cellDim);
         }
@@ -450,8 +451,8 @@ public class GUIutil {
         gc.strokeRect(x, y, cellDim, cellDim);
     }
 
-    private void drawColorConstraint(it.polimi.ingsw.common.enums.Color color, GraphicsContext gc, double x, double y, double cellDim) {
-        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXConstraintColor(color));
+    private void drawColorConstraint(DieColor dieColor, GraphicsContext gc, double x, double y, double cellDim) {
+        gc.setFill(DieColor.toFXConstraintColor(dieColor));
         gc.fillRect(x, y, cellDim, cellDim);
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(cellDim * LINE_TO_CELL);
@@ -466,16 +467,16 @@ public class GUIutil {
         double lineWidth = LINE_TO_DIE * dieDim;
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(lightDie.getColor()));
+        gc.setFill(DieColor.toFXColor(lightDie.getDieColor()));
         gc.fillRoundRect(x + lineWidth, y + lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         drawSpots(gc, x, y, dieDim, lightDie.getShade().toInt());
     }
 
-    private void drawDie(it.polimi.ingsw.common.enums.Color color, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
+    private void drawDie(DieColor dieColor, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
         double lineWidth = LINE_TO_DIE * dieDim;
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        gc.setFill(it.polimi.ingsw.common.enums.Color.toFXColor(color));
+        gc.setFill(DieColor.toFXColor(dieColor));
         gc.fillRoundRect(x + lineWidth, y + lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         drawSpots(gc, x, y, dieDim, shade.toInt());
     }

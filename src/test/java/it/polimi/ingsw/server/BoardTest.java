@@ -103,7 +103,7 @@ public class BoardTest {
 
         List<IndexedCellContent> schemaList1=board.getDiceList();
         assertEquals(die1.getShade(),schemaList1.get(0).getContent().getShade());
-        assertEquals(die2.getColor(),schemaList1.get(1).getContent().getColor());
+        assertEquals(die2.getColor(),schemaList1.get(1).getContent().getDieColor());
 
         assertEquals(Actions.PLACE_DIE,board.selectDie(0).get(0));
 

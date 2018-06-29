@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.server.model.Die;
 import it.polimi.ingsw.server.model.SchemaCard;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
@@ -129,7 +129,7 @@ class SchemaCardTest {
         List<Integer> listTemp = schema1.listPossiblePlacements(new Die("TWO","RED"));
         list.addAll(listTemp);
 
-        assertEquals(list,schema1.listPossiblePlacementsSwap(new Die("TWO","RED"), Color.RED));
+        assertEquals(list,schema1.listPossiblePlacementsSwap(new Die("TWO","RED"), DieColor.RED));
 
         try {
             schema1.putDie(7,new Die("FIVE","RED"),IgnoredConstraint.FORCE);
@@ -226,7 +226,7 @@ class SchemaCardTest {
             e.printStackTrace();
         }
 
-        List<Die> schemaContent1=schema1.getSchemaDiceList(Color.NONE);
+        List<Die> schemaContent1=schema1.getSchemaDiceList(DieColor.NONE);
         assertEquals(4,schemaContent1.size());
 
         assertEquals(die1.toString(),schemaContent1.get(0).toString());
@@ -235,7 +235,7 @@ class SchemaCardTest {
         assertEquals(die3.toString(),schemaContent1.get(3).toString());
 
 
-        List<Die> schemaContent2=schema1.getSchemaDiceList(Color.RED);
+        List<Die> schemaContent2=schema1.getSchemaDiceList(DieColor.RED);
         assertEquals(2,schemaContent2.size());
 
         assertEquals(die1,schemaContent2.get(1));
@@ -246,12 +246,12 @@ class SchemaCardTest {
 
 
         schema1.removeDie(9);
-        List<Die> schemaContent3=schema1.getSchemaDiceList(Color.RED);
+        List<Die> schemaContent3=schema1.getSchemaDiceList(DieColor.RED);
         assertEquals(1,schemaContent3.size());
         assertEquals(die3.toString(),schemaContent3.get(0).toString());
 
         schema1.removeDie(3);
-        assertEquals(2,schema1.getSchemaDiceList(Color.NONE).size());
+        assertEquals(2,schema1.getSchemaDiceList(DieColor.NONE).size());
 
     }
 }
