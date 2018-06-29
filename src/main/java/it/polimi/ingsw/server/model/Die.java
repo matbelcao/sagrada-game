@@ -14,6 +14,10 @@ import java.util.Random;
 public class Die {
     private LightDie lightDie;
 
+    private static final int MAX_SHADE=6;
+    private static final int MIN_SHADE=1;
+
+
     /**
      * Constructs the object setting its shade and dieColor
      * @param shade the Shade of the die
@@ -61,7 +65,7 @@ public class Die {
      * Increases by one the shade of the die
      */
     public void increaseShade () throws IllegalShadeException{
-        if(this.lightDie.getShade().toInt()==6){
+        if(this.lightDie.getShade().toInt()==MAX_SHADE){
             throw new IllegalShadeException();
         }
         this.setShade(this.lightDie.getShade().toInt() + 1);
@@ -72,7 +76,7 @@ public class Die {
      * @throws IllegalShadeException if the shade is equal to ONE
      */
     public void decreaseShade () throws IllegalShadeException{
-        if(this.lightDie.getShade().toInt()==1){
+        if(this.lightDie.getShade().toInt()==MIN_SHADE){
             throw new IllegalShadeException();
         }
         this.setShade(this.getShade().toInt() - 1);
@@ -90,7 +94,7 @@ public class Die {
      */
     public void reroll(){
         Random randomGen = new Random();
-        this.setShade(randomGen.nextInt(6)+1);
+        this.setShade(randomGen.nextInt(MAX_SHADE)+1);
     }
 
     public void swap(Die die){

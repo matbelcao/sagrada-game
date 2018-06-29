@@ -48,7 +48,7 @@ public abstract class Card {
                     this.imgSrc= eElement.getElementsByTagName("imgSrc").item(0).getTextContent().replace("::",File.separator);
                     this.description=eElement.getElementsByTagName("description").item(0).getTextContent();
 
-                    return type.equals("PrivObjectiveCard")? eElement.getElementsByTagName("color").item(0).getTextContent() : null;
+                    return type.equals("PrivObjectiveCard")? eElement.getElementsByTagName("dieColor").item(0).getTextContent() : null;
                 }
             }
         }catch (SAXException | ParserConfigurationException | IOException e1) {
