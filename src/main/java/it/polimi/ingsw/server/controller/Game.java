@@ -45,6 +45,7 @@ public class Game extends Thread implements Iterable  {
             u.setStatus(UserStatus.PLAYING);
             u.setGame(this);
         }
+        MasterServer.getMasterServer().printMessage("New match started with "+users.size()+" players");
     }
 
 
@@ -173,7 +174,7 @@ public class Game extends Thread implements Iterable  {
             board.getPlayer(u).quitMatch();
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
                 u.getServerConn().notifyGameEnd(ranking);
-                System.out.println("End match: "+u.getUsername());
+                MasterServer.getMasterServer().printMessage("End match: "+u.getUsername());
             }
         }
     }

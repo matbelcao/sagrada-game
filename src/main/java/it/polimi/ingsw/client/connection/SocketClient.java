@@ -22,6 +22,7 @@ public class SocketClient implements ClientConn {
     private static final int COMMA_PARAMS_START=2;
     private static final int LIST_START=1;
     private static final int NUM_CARDS=3;
+    private static final int PONG_TIME=10000;
 
     private Socket socket;
     private QueuedBufferedReader inSocket;
@@ -97,7 +98,7 @@ public class SocketClient implements ClientConn {
 
                             } else if (ClientParser.isPing(inSocket.readln())) {
                                 inSocket.pop();
-                                socketPong();
+                                pong();
                             } else if (ClientParser.isInvalid(inSocket.readln())) {
                                 inSocket.pop();
                                 System.out.println("INVALID message");
@@ -118,16 +119,15 @@ public class SocketClient implements ClientConn {
                         System.out.println("QUITTED(1)");
                     }
                     synchronized (pingLock){
-                        if(timerActive){
+                        if(timerActive && pingTimer!=null){
                             pingTimer.cancel();
                             timerActive=false;
-                            pingTimer.notifyAll();
+                            pingLock.notifyAll();
                         }
                     }
                     client.disconnect();
                 }
             }
-            System.out.println("EXIT LISTENING THREAD");
         }).start();
     }
 
@@ -837,34 +837,33 @@ public class SocketClient implements ClientConn {
     }
 
     /**
-     * Disabled for socket
+     * This method provides the ping functionality for checking if the connection is still active
      */
     @Override
     public void pong() {
-        return;
-    }
-
-    private void socketPong(){
         try{
             syncedSocketWrite(SocketString.PONG);
             outSocket.flush();
             //System.out.println("PONG");
             synchronized (pingLock) {
                 if(connectionOk) {
-                    pingTimer.cancel();
+                    if(pingTimer!=null){
+                        pingTimer.cancel();
+                    }
                     pingTimer = new Timer();
-                    pingTimer.schedule(new connectionTimeout(), 5000);
+                    pingTimer.schedule(new connectionTimeout(), PONG_TIME);
                     timerActive = true;
                     pingLock.notifyAll();
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return;
         }
     }
 
     /**
-     * Timeot connection
+     * If triggered, it means that the connection has broken
      */
     private class connectionTimeout extends TimerTask {
         @Override

@@ -37,8 +37,8 @@ public class QueuedBufferedReader implements QueuedReader {
                 }
 
                 //debug
-                if(!temp.equals("PING"))
-                    System.out.println("\t\t\t\t\t"+temp);
+                /*if(!temp.equals("PING"))
+                    System.out.println("\t\t\t\t\t"+temp);*/
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

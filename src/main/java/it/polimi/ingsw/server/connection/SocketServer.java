@@ -6,6 +6,7 @@ import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.controller.Game;
+import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.controller.Validator;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
@@ -30,6 +31,7 @@ public class SocketServer extends Thread implements ServerConn  {
     private final Object pingLock;
     private boolean connectionOk;
     private final Object lockOutSocket;
+    private static final int PING_TIME=5000;
 
     /**
      * This is the constructor of the class, it starts a thread linked to an open socket
@@ -104,7 +106,6 @@ public class SocketServer extends Thread implements ServerConn  {
                     break;
                 case SocketString.GET:
                     getCommands(parsedResult);
-                    System.out.println("qui");
                     break;
                 case SocketString.GET_DICE_LIST:
                     if (!user.isMyTurn()) { throw new IllegalActionException(); }
@@ -517,7 +518,7 @@ public class SocketServer extends Thread implements ServerConn  {
 
 
     /**
-     * Timeot connection
+     * If triggered, it means that the connection has broken
      */
     private class connectionTimeout extends TimerTask {
         @Override
@@ -526,8 +527,8 @@ public class SocketServer extends Thread implements ServerConn  {
                 if(user.getStatus()!=UserStatus.DISCONNECTED){
                     connectionOk = false;
                     pingLock.notifyAll();
+                    MasterServer.getMasterServer().printMessage("CONNECTION TIMEOUT!");
                     user.disconnect();
-                    System.out.println("CONNECTION TIMEOUT!");
                 }
             }
         }
@@ -535,7 +536,9 @@ public class SocketServer extends Thread implements ServerConn  {
 
     private void pong(){
         synchronized (pingLock) {
-            pingTimer.cancel();
+            if(pingTimer!=null){
+                pingTimer.cancel();
+            }
             pingTimer=null;
             pingLock.notifyAll();
         }
@@ -552,10 +555,8 @@ public class SocketServer extends Thread implements ServerConn  {
                     if (pingTimer==null && connectionOk) {
                         syncedSocketWrite(SocketString.PING);
 
-                        System.out.println("PING SOCKET");
-
                         pingTimer = new Timer();
-                        pingTimer.schedule(new connectionTimeout(), 5000);
+                        pingTimer.schedule(new connectionTimeout(), PING_TIME);
                     }
                     pingLock.notifyAll();
                 }

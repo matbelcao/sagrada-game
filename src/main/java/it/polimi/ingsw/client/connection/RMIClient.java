@@ -13,6 +13,7 @@ import java.util.List;
 public class RMIClient implements ClientConn{
     private RMIClientInt remoteObj; //user
     private Client client;
+    private static final int PONG_TIME=5000;
 
     public RMIClient(RMIClientInt remoteObj, Client client) {
         this.remoteObj = remoteObj;
@@ -333,8 +334,7 @@ public class RMIClient implements ClientConn{
     }
 
     /**
-     * Tests if the client is still connected
-     * @return true if the client is connected
+     * This method provides the ping functionality for checking if the connection is still active
      */
     @Override
     public void pong(){
@@ -344,11 +344,10 @@ public class RMIClient implements ClientConn{
                 try {
                     ping = remoteObj.pong();
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(PONG_TIME);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    //System.out.println("PONG RMI");
                 } catch (RemoteException e) {
                     if(client.isLogged()) {
                         client.disconnect();

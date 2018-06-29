@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public interface ClientConn {
+
     /**
      * The client invokes this method and then waits for a response from the server. This is typically the first communication
      * exchanged between client and server. The server will reply accordingly the authentication procedure
@@ -153,8 +154,7 @@ public interface ClientConn {
     void newMatch();
 
     /**
-     * This method provides the ping functionality for the client-side hearthBreath thread
-     * @return false iff the connection has broken
+     * This method provides the ping functionality for checking if the connection is still active
      */
     void pong();
 

@@ -3,6 +3,7 @@ package it.polimi.ingsw.server.connection;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.GameEvent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
+import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.User;
 
 import java.rmi.RemoteException;
@@ -12,6 +13,7 @@ public class RMIServer implements ServerConn {
         private RMIServerInt remoteObj; //client
         private User user;
         private boolean connectionOk;
+        private static final int PING_TIME=5000;
 
 
     RMIServer(RMIServerInt remoteObj, User user){
@@ -148,15 +150,14 @@ public class RMIServer implements ServerConn {
                 try {
                     ping = remoteObj.ping();
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(PING_TIME);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    System.out.println("PING RMI");
                 } catch (RemoteException e) {
                     if(user.getStatus()!=UserStatus.DISCONNECTED){
+                        MasterServer.getMasterServer().printMessage("CONNECTION TIMEOUT!");
                         user.disconnect();
-                        System.out.println("CONNECTION TIMEOUT!");
                     }
                     ping=false;
                 }

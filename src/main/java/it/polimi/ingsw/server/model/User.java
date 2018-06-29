@@ -147,7 +147,7 @@ public class User{
         if(game.isGameEnded()){
             status=UserStatus.CONNECTED;
             MasterServer.getMasterServer().updateConnected(this);
-            System.out.println("New match for: "+username);
+            MasterServer.getMasterServer().printMessage("New match for: "+username);
         }
     }
     
