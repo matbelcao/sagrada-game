@@ -1,7 +1,5 @@
 <?xml version="1.0" ?>
-
 <!-- server configuration file -->
-
 <conf>
 	<address>127.0.0.1</address>
 	<portRMI>1099</portRMI>

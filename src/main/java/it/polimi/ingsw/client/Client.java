@@ -671,6 +671,8 @@ public class Client {
             if (!gameStatus.isInit()) {
                 board.setIsFirstTurn(gameStatus.getIsFirstTurn());
                 board.setRoundTrack(clientConn.getRoundtrack());
+                board.setRoundNumber(gameStatus.getNumRound());
+
                 board.setNowPlaying(gameStatus.getNowPlaying());
 
                 getCardsSchemasFavors();

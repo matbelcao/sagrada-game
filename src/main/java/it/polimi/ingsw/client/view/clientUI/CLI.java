@@ -191,19 +191,6 @@ public class CLI implements ClientUI {
         if(changes.contains(LightBoardEvents.PubObjs))
             view.updateObjectives(board.getPubObjs(), board.getPrivObj());
 
-        if(changes.contains(LightBoardEvents.DraftPool))
-            view.updateDraftPool(board.getDraftPool());
-
-        if(changes.contains(LightBoardEvents.RoundTrack))
-            view.updateRoundTrack(board.getRoundTrack());
-
-        if(changes.contains(LightBoardEvents.RoundNumber))
-            view.updateRoundNumber(board.getRoundNumber());
-
-        if(changes.contains(LightBoardEvents.IsFirstTurn))
-            view.updateIsFirstTurn(board.getIsFirstTurn());
-
-
         if(changes.contains(LightBoardEvents.Status)
                 || changes.contains(LightBoardEvents.StateChanged)
                 || changes.contains(LightBoardEvents.FavorTokens)
@@ -216,10 +203,20 @@ public class CLI implements ClientUI {
             }
         }
 
+        if(changes.contains(LightBoardEvents.DraftPool))
+            view.updateDraftPool(board.getDraftPool());
+
+        if(changes.contains(LightBoardEvents.RoundNumber))
+            view.updateRoundNumber(board.getRoundNumber());
+
+        if(changes.contains(LightBoardEvents.IsFirstTurn))
+            view.updateIsFirstTurn(board.getIsFirstTurn());
+
+        if(changes.contains(LightBoardEvents.RoundTrack))
+            view.updateRoundTrack(board.getRoundTrack());
+
         if(changes.contains(LightBoardEvents.NowPlaying))
             view.updateNowPlaying(board.getNowPlaying());
-
-
 
         switch (client.getFsmState()) {
             case CHOOSE_SCHEMA:
