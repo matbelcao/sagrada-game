@@ -1,13 +1,13 @@
 package it.polimi.ingsw.common.serializables;
 
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.Constraint;
 
 import java.io.Serializable;
 
 public class LightConstraint implements CellContent,Serializable {
-    private Color color;
+    private DieColor dieColor;
     private Shade shade;
     private boolean isColorConstraint;
 
@@ -16,7 +16,7 @@ public class LightConstraint implements CellContent,Serializable {
             shade = Shade.valueOf(constraint);
             isColorConstraint= false;
         }else{
-            color = Color.valueOf(constraint);
+            dieColor = DieColor.valueOf(constraint);
             isColorConstraint= true;
         }
     }
@@ -31,10 +31,10 @@ public class LightConstraint implements CellContent,Serializable {
 
     /**
      * Creates the object setting the correct type of constraint
-     * @param color a Color constraint
+     * @param dieColor a DieColor constraint
      */
-    public LightConstraint(Color color) {
-        this.color = color;
+    public LightConstraint(DieColor dieColor) {
+        this.dieColor = dieColor;
         isColorConstraint = true;
     }
 
@@ -51,7 +51,7 @@ public class LightConstraint implements CellContent,Serializable {
      * @return the name of the value of the constraint
      */
     @Override
-    public String toString(){ return  this.isColorConstraint ? this.getColor().toString() : this.getShade().toString(); }
+    public String toString(){ return  this.isColorConstraint ? this.getDieColor().toString() : this.getShade().toString(); }
 
     @Override
     public boolean isDie() {
@@ -69,7 +69,7 @@ public class LightConstraint implements CellContent,Serializable {
     }
 
     @Override
-    public Color getColor() {
-        return this.color;
+    public DieColor getDieColor() {
+        return this.dieColor;
     }
 }

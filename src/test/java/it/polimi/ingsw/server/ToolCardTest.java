@@ -98,7 +98,7 @@ class ToolCardTest {
         List<IndexedCellContent> internalSchemaDiceList=tool.internalIndexedSchemaDiceList();
         assertEquals(2,internalSchemaDiceList.size());
         assertEquals(die1.getShade().toString(),internalSchemaDiceList.get(0).getContent().getShade().toString());
-        assertEquals(die2.getColor().toString(),internalSchemaDiceList.get(1).getContent().getColor().toString());
+        assertEquals(die2.getColor().toString(),internalSchemaDiceList.get(1).getContent().getDieColor().toString());
 
         tool.internalSelectDie(0);
         assertEquals(Actions.PLACE_DIE,tool.getActions().get(0));
@@ -112,7 +112,7 @@ class ToolCardTest {
         assertEquals(1,tool.getOldIndexes().size());
 
         assertFalse(tool.toolCanContinue(player));
-        assertEquals(schema.getSchemaDiceList(Color.NONE).toString(),tool.getNewSchema().getSchemaDiceList(Color.NONE).toString());
+        assertEquals(schema.getSchemaDiceList(DieColor.NONE).toString(),tool.getNewSchema().getSchemaDiceList(DieColor.NONE).toString());
         assertTrue(tool.isAlreadyUsed());
     }
 
@@ -180,19 +180,19 @@ class ToolCardTest {
         diceList=tool.shadeIncreaseDecrease(die1);
         assertEquals(1,diceList.size());
         assertEquals("TWO",diceList.get(0).getContent().getShade().toString());
-        assertEquals("GREEN",diceList.get(0).getContent().getColor().toString());
+        assertEquals("GREEN",diceList.get(0).getContent().getDieColor().toString());
 
         diceList=tool.shadeIncreaseDecrease(die2);
         assertEquals(2,diceList.size());
         assertEquals("FOUR",diceList.get(0).getContent().getShade().toString());
-        assertEquals("GREEN",diceList.get(0).getContent().getColor().toString());
+        assertEquals("GREEN",diceList.get(0).getContent().getDieColor().toString());
         assertEquals("TWO",diceList.get(1).getContent().getShade().toString());
-        assertEquals("GREEN",diceList.get(1).getContent().getColor().toString());
+        assertEquals("GREEN",diceList.get(1).getContent().getDieColor().toString());
 
         diceList=tool.shadeIncreaseDecrease(die3);
         assertEquals(1,diceList.size());
         assertEquals("FIVE",diceList.get(0).getContent().getShade().toString());
-        assertEquals("GREEN",diceList.get(0).getContent().getColor().toString());
+        assertEquals("GREEN",diceList.get(0).getContent().getDieColor().toString());
     }
 
     /**
@@ -331,7 +331,7 @@ class ToolCardTest {
         List<IndexedCellContent> diceList=tool.chooseShade();
         assertEquals(6,diceList.size());
         for(int i=0;i<diceList.size();i++){
-            assertEquals("PURPLE",diceList.get(i).getContent().getColor().toString());
+            assertEquals("PURPLE",diceList.get(i).getContent().getDieColor().toString());
             assertEquals(i+1,diceList.get(i).getContent().getShade().toInt());
         }
         assertTrue(tool.toolCanContinue(player));
@@ -367,9 +367,9 @@ class ToolCardTest {
 
 
         assertEquals(Actions.SET_COLOR,tool.getActions().get(0));
-        assertEquals(Color.NONE,tool.getColorConstraint());
+        assertEquals(DieColor.NONE,tool.getColorConstraint());
         tool.selectDie(new Die("ONE","BLUE"));
         tool.setColor();
-        assertEquals(Color.BLUE,tool.getColorConstraint());
+        assertEquals(DieColor.BLUE,tool.getColorConstraint());
     }
 }

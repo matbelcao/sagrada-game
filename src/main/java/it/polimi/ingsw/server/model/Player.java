@@ -1,11 +1,9 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
-import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class  Player {
     private final String username;
@@ -133,7 +131,7 @@ public class  Player {
      */
     public void calculateScore(){
         if(schema!=null) {
-            List<Die> schemaDie = schema.getSchemaDiceList(Color.NONE);
+            List<Die> schemaDie = schema.getSchemaDiceList(DieColor.NONE);
 
             if (this.score != 0) {
                 this.score = 0;

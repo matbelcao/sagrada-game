@@ -214,7 +214,7 @@ public class Board {
      * @return the indexed List of dice contained in a specific board position
      */
     public List<IndexedCellContent> getDiceList(){
-        Color constraint = Color.NONE;
+        DieColor constraint = DieColor.NONE;
 
         if(fsm.isToolActive()){
             constraint=selectedTool.getColorConstraint();
@@ -260,7 +260,7 @@ public class Board {
      */
     public List<Actions> selectDie(int dieIndex){
 
-        Color constraint = Color.NONE;
+        DieColor constraint = DieColor.NONE;
 
         if(fsm.isToolActive()) {
             //toolcard enabled
@@ -268,7 +268,7 @@ public class Board {
             if(selectedTool.isInternalSchemaPlacement() && enableToolList){
                 selectedDie=selectedTool.internalSelectDie(dieIndex);
             }else if (selectedCommand.equals(Actions.INCREASE_DECREASE) || selectedCommand.equals(Actions.SET_SHADE)){
-                selectedDie.setColor(diceList.get(dieIndex).getContent().getColor().toString());
+                selectedDie.setColor(diceList.get(dieIndex).getContent().getDieColor().toString());
                 selectedDie.setShade(diceList.get(dieIndex).getContent().getShade().toInt());
             } else{
                 selectedDie = getDieSelected(dieIndex, constraint);
@@ -581,7 +581,7 @@ public class Board {
      * @param constraint the constraint to select dice of only one color
      * @return the indexed List of the dice contained in the SchemaCard
      */
-    private  List<IndexedCellContent> indexedSchemaDiceList(Color constraint){
+    private  List<IndexedCellContent> indexedSchemaDiceList(DieColor constraint){
         List<IndexedCellContent> indexedList=new ArrayList<>();
         IndexedCellContent indexedCell;
         SchemaCard schema= getPlayerById(fsm.getUserPlayingId()).getSchema();
@@ -591,7 +591,7 @@ public class Board {
 
         while(diceIterator.hasNext()) {
             die = diceIterator.next().getDie();
-            if(!constraint.equals(Color.NONE)){
+            if(!constraint.equals(DieColor.NONE)){
                 if(die.getColor().equals(constraint)){
                     indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
                     indexedList.add(indexedCell);
@@ -645,7 +645,7 @@ public class Board {
      * Selects the die from the DraftPool/user's SchemaCard/RoundTrack and returns it.
      * @return the die selected
      */
-    private Die getDieSelected(int dieIndex,Color constraint) {
+    private Die getDieSelected(int dieIndex,DieColor constraint) {
         switch (fsm.getPlaceFrom()){
             case SCHEMA:
                 return getPlayerById(fsm.getUserPlayingId()).getSchema().getSchemaDiceList(constraint).get(dieIndex);

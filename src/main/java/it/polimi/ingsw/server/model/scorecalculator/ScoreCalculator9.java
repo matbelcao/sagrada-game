@@ -4,7 +4,7 @@ import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 import it.polimi.ingsw.server.model.SchemaCard;
 
 /**
- * This class implements the "Color Diagonals" Public Objective Card
+ * This class implements the "DieColor Diagonals" Public Objective Card
  */
 public class ScoreCalculator9 implements ScoreCalculator{
     /**

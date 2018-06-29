@@ -1,6 +1,6 @@
 package it.polimi.ingsw.common.serializables;
 
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.server.model.Die;
@@ -13,8 +13,8 @@ public class IndexedCellContent implements Serializable {
     private CellContent content;
 
 
-    public IndexedCellContent(int position, Place place, Shade shade, Color color){
-        this.content=new LightDie(shade,color);
+    public IndexedCellContent(int position, Place place, Shade shade, DieColor dieColor){
+        this.content=new LightDie(shade, dieColor);
         this.place=place;
         this.position=position;
     }
@@ -41,8 +41,8 @@ public class IndexedCellContent implements Serializable {
         this.place=place;
         this.position=position;
     }
-    public IndexedCellContent(int position,Place place, Color color){
-        this.content=new LightConstraint(color);
+    public IndexedCellContent(int position,Place place, DieColor dieColor){
+        this.content=new LightConstraint(dieColor);
         this.place=place;
         this.position=position;
     }

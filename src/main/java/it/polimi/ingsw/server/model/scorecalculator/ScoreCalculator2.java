@@ -3,7 +3,7 @@ import it.polimi.ingsw.server.model.SchemaCard;
 import java.util.ArrayList;
 
 /**
- * This class implements the "Column Color Variety" card Public Objective Card
+ * This class implements the "Column DieColor Variety" card Public Objective Card
  */
 public class ScoreCalculator2 implements ScoreCalculator{
 

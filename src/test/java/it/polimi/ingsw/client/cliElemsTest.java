@@ -5,7 +5,7 @@ import it.polimi.ingsw.client.view.clientUI.uielements.CLIFormatter;
 import it.polimi.ingsw.client.view.clientUI.uielements.CLIObjects;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.controller.MasterServer;
@@ -164,7 +164,7 @@ class cliElemsTest {
         System.out.println("");
         System.out.printf(cliel.getBigDie(FOUR));
         System.out.println("");
-        System.out.printf(Color.BLUE.getUtf()+cliel.getBigDie(FIVE)+ Color.NONE.getUtf());
+        System.out.printf(DieColor.BLUE.getUtf()+cliel.getBigDie(FIVE)+ DieColor.NONE.getUtf());
         System.out.println("");
         System.out.printf(cliel.getBigDie(SIX));
         System.out.println("");

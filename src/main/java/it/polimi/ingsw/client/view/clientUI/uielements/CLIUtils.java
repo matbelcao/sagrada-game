@@ -1,7 +1,7 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.SchemaCard;
 import java.io.IOException;
@@ -85,9 +85,9 @@ public class CLIUtils {
         }
 
         if(Client.isWindows()){
-            return boldify(addColorToLine(die.getShade().toInt()+"",die.getColor()));
+            return boldify(addColorToLine(die.getShade().toInt()+"",die.getDieColor()));
         }
-            return addColorToLine(die.getShade().getUtf(),die.getColor());
+            return addColorToLine(die.getShade().getUtf(),die.getDieColor());
     }
 
     /**
@@ -261,7 +261,7 @@ public class CLIUtils {
      * @return the bold string
      */
     public static String boldify(String line){
-        return BOLD +line+Color.NONE.getUtf();
+        return BOLD +line+DieColor.NONE.getUtf();
 
     }
 
@@ -278,7 +278,7 @@ public class CLIUtils {
         description.add(0,padUntil(EMPTY_STRING,width-CELL_WIDTH,SPACE));
         result.addAll(
                 appendRows(
-                        buildCell(new LightConstraint(privObj.getColor())),
+                        buildCell(new LightConstraint(privObj.getDieColor())),
                         description));
         return result;
     }
@@ -292,7 +292,7 @@ public class CLIUtils {
     static List<String> colorWall(List<String> wall){
         Random randomGen = new Random();
         for(int row=0 ; row <wall.size();row++){
-            wall.set(row,addColorToLine(wall.get(row),Color.values()[randomGen.nextInt(Color.values().length )]));
+            wall.set(row,addColorToLine(wall.get(row),DieColor.values()[randomGen.nextInt(DieColor.values().length )]));
         }
         return wall;
     }
@@ -330,7 +330,7 @@ public class CLIUtils {
 
             //add color to colored things
             if (cellContent.hasColor()) {
-                rows = addColor(rows, cellContent.getColor());
+                rows = addColor(rows, cellContent.getDieColor());
             }
         }
         return new ArrayList<>(Arrays.asList(rows));
@@ -369,7 +369,7 @@ public class CLIUtils {
 
 
     static String greyLine(String line){
-        return GREY+removeColor(line)+Color.NONE.getUtf();
+        return GREY+removeColor(line)+DieColor.NONE.getUtf();
     }
 
     private static String removeColor(String line) {
@@ -454,28 +454,28 @@ public class CLIUtils {
     }
 
     /**
-     * Adds the color to the cell being added to the "bigRow"
+     * Adds the dieColor to the cell being added to the "bigRow"
      * @param rows the rows to be added to the "bigRow"
-     * @param color the color to be added
+     * @param dieColor the dieColor to be added
      * @return the new array of string modified as said
      */
-    static String [] addColor(String[] rows, Color color) {
+    static String [] addColor(String[] rows, DieColor dieColor) {
         String [] result= new String[rows.length];
         if(rows.length==0){throw new IllegalArgumentException();}
         for(int i=0;i<rows.length;i++){
-            result[i] = addColorToLine(rows[i],color);
+            result[i] = addColorToLine(rows[i], dieColor);
         }
         return result;
     }
 
     /**
      * returns a copy of the string with added colors
-     * @param line the string to apply color to
-     * @param color the color to apply
+     * @param line the string to apply dieColor to
+     * @param dieColor the dieColor to apply
      * @return the colored string
      */
-    public static String addColorToLine(String line, Color color){
-        return color.getUtf()+line+Color.NONE.getUtf();
+    public static String addColorToLine(String line, DieColor dieColor){
+        return dieColor.getUtf()+line+DieColor.NONE.getUtf();
     }
 
     /**

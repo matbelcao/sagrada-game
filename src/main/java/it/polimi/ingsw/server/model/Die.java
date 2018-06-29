@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.exceptions.IllegalShadeException;
 import it.polimi.ingsw.common.serializables.LightDie;
@@ -15,18 +15,18 @@ public class Die {
     private LightDie lightDie;
 
     /**
-     * Constructs the object setting its shade and color
+     * Constructs the object setting its shade and dieColor
      * @param shade the Shade of the die
-     * @param color the Color of the die
+     * @param dieColor the DieColor of the die
      */
-    public Die(Shade shade, Color color){
-        this.lightDie =new LightDie(shade,color);
+    public Die(Shade shade, DieColor dieColor){
+        this.lightDie =new LightDie(shade, dieColor);
     }
 
     /**
      * Constructs the object setting its shade and color
      * @param shade the Shade of the die
-     * @param color the Color of the die
+     * @param color the DieColor of the die
      */
     public Die(String shade, String color){
         this.lightDie =new LightDie(shade,color);
@@ -35,18 +35,18 @@ public class Die {
     /**
      * Constructs the object setting its shade and color
      * @param shade the Shade of the die
-     * @param color the Color of the die
+     * @param color the DieColor of the die
      */
     public Die(int shade, String color ){
-        this.lightDie =new LightDie(Shade.valueOf(shade),Color.valueOf(color));
+        this.lightDie =new LightDie(Shade.valueOf(shade),DieColor.valueOf(color));
     }
 
     /**
-     * Gets the Color of the die
-     * @return  the Color of the die
+     * Gets the DieColor of the die
+     * @return  the DieColor of the die
      */
-    public Color getColor(){
-        return this.lightDie.getColor();
+    public DieColor getColor(){
+        return this.lightDie.getDieColor();
     }
 
     /**
@@ -106,10 +106,10 @@ public class Die {
      * @param shade the new shade to be set
      */
     public void setShade(int shade){
-        this.lightDie = new LightDie(Shade.valueOf(shade),this.lightDie.getColor());
+        this.lightDie = new LightDie(Shade.valueOf(shade),this.lightDie.getDieColor());
     }
 
-    public void setColor(String color){this.lightDie=new LightDie(this.lightDie.getShade(),Color.valueOf(color));}
+    public void setColor(String color){this.lightDie=new LightDie(this.lightDie.getShade(),DieColor.valueOf(color));}
 
     /**
      * Returns a string representation of the die
@@ -122,6 +122,6 @@ public class Die {
      * @return said string
      */
     public String toUtf(){
-        return this.getColor().getUtf()+this.getShade().getUtf()+Color.NONE.getUtf();
+        return this.getColor().getUtf()+this.getShade().getUtf()+DieColor.NONE.getUtf();
     }
 }

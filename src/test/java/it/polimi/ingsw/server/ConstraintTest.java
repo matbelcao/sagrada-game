@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.common.enums.Color;
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.server.model.Constraint;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class ConstraintTest {
         Constraint shadeConstraint=new Constraint(Shade.valueOf("SIX"));
         assertEquals("SIX",shadeConstraint.getShade().toString());
 
-        Constraint colorConstraint=new Constraint(Color.valueOf("RED"));
+        Constraint colorConstraint=new Constraint(DieColor.valueOf("RED"));
         assertEquals("RED",colorConstraint.getColor().toString());
     }
 

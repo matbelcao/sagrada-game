@@ -1,7 +1,7 @@
 package it.polimi.ingsw.server.model;
 
+import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.serializables.LightConstraint;
-import it.polimi.ingsw.common.enums.Color;
 import it.polimi.ingsw.common.enums.Shade;
 
 /**
@@ -30,10 +30,10 @@ public class Constraint {
 
     /**
      * Creates the object setting the correct type of constraint
-     * @param color a Color constraint
+     * @param dieColor a DieColor constraint
      */
-    public Constraint(Color color) {
-        this.constraint= new LightConstraint(color);
+    public Constraint(DieColor dieColor) {
+        this.constraint= new LightConstraint(dieColor);
     }
 
     /**
@@ -45,10 +45,10 @@ public class Constraint {
     }
 
     /**
-     * Get the Color of the constraint if it is a color constraint
-     * @return  the Color of the constraint
+     * Get the DieColor of the constraint if it is a color constraint
+     * @return  the DieColor of the constraint
      */
-    public Color getColor(){ return this.constraint.getColor(); }
+    public DieColor getColor(){ return this.constraint.getDieColor(); }
 
     /**
      * Checks which type of constraint is set
@@ -73,9 +73,9 @@ public class Constraint {
      */
     public String toUtf(){
         if(isColorConstraint()){
-            return this.constraint.getColor().getUtf()+Shade.EMPTY+Color.NONE.getUtf();
+            return this.constraint.getDieColor().getUtf()+Shade.EMPTY+DieColor.NONE.getUtf();
         }else{
-            return Color.NONE.getUtf() +this.constraint.getShade().getUtf();
+            return DieColor.NONE.getUtf() +this.constraint.getShade().getUtf();
         }
 
     }

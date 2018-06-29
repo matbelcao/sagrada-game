@@ -297,7 +297,7 @@ public class SocketServer extends Thread implements ServerConn  {
                     builder.append(" "+SocketString.CONSTRAINT+","+index+"," + s.getConstraintAt(index).toString());
                 }
                 if (s.hasDieAt(index)) {
-                    builder.append(" "+SocketString.DIE+","+index+"," + s.getDieAt(index).getColor().toString() + "," + s.getDieAt(index).getShade().toString());
+                    builder.append(" "+SocketString.DIE+","+index+"," + s.getDieAt(index).getDieColor().toString() + "," + s.getDieAt(index).getShade().toString());
                 }
             }
             syncedSocketWrite(builder.toString());
@@ -314,7 +314,7 @@ public class SocketServer extends Thread implements ServerConn  {
         builder.append(SocketString.SEND_SCHEMA+lightSchema.getName().replaceAll(" ","_")+" "+lightSchema.getFavorTokens());
         for (int index=0; index < SchemaCard.NUM_ROWS*SchemaCard.NUM_COLS ; index++) {
             if (lightSchema.hasDieAt(index)) {
-                builder.append(" "+SocketString.DIE+"," + index + "," + lightSchema.getDieAt(index).getColor().toString() + "," + lightSchema.getDieAt(index).getShade().toString());
+                builder.append(" "+SocketString.DIE+"," + index + "," + lightSchema.getDieAt(index).getDieColor().toString() + "," + lightSchema.getDieAt(index).getShade().toString());
             }else if (lightSchema.hasConstraintAt(index)) {
                 builder.append(" "+SocketString.CONSTRAINT+"," + index + "," + lightSchema.getConstraintAt(index).toString());
             }
@@ -338,7 +338,7 @@ public class SocketServer extends Thread implements ServerConn  {
         LightPrivObj privObjectiveCard=user.getGame().getPrivCard(user);
 
         syncedSocketWrite(SocketString.SEND_PRIVATE+privObjectiveCard.getId()+" "+privObjectiveCard.getName().replaceAll(" ", "_")
-                +" "+privObjectiveCard.getDescription().replaceAll(" ", "_")+" "+privObjectiveCard.getColor().toString());
+                +" "+privObjectiveCard.getDescription().replaceAll(" ", "_")+" "+privObjectiveCard.getDieColor().toString());
 
     }
 
@@ -375,7 +375,7 @@ public class SocketServer extends Thread implements ServerConn  {
 
         StringBuilder builder=new StringBuilder(SocketString.SEND_DRAFTPOOL);
         for (int i=0;i<draftPool.size();i++){
-            builder.append(" "+i+","+draftPool.get(i).getColor().toString()+","+draftPool.get(i).getShade().toString());
+            builder.append(" "+i+","+draftPool.get(i).getDieColor().toString()+","+draftPool.get(i).getShade().toString());
         }
         syncedSocketWrite(builder.toString());
 
@@ -392,7 +392,7 @@ public class SocketServer extends Thread implements ServerConn  {
         for(int i=0;i<trackList.size();i++){
             dieList= trackList.get(i);
             for(LightDie d:dieList){
-                builder.append(" "+i+","+d.getColor().toString()+","+d.getShade().toString());
+                builder.append(" "+i+","+d.getDieColor().toString()+","+d.getShade().toString());
             }
         }
         syncedSocketWrite(builder.toString());
@@ -435,7 +435,7 @@ public class SocketServer extends Thread implements ServerConn  {
             builder.append(" "+dice.get(0).getPlace().toString().toLowerCase());
             for(int index=0;index<dice.size();index++){
                 builder.append(" "+dice.get(index).getPosition()+","+dice.get(index).getContent().getShade().toString()
-                        +"," +dice.get(index).getContent().getColor().toString());
+                        +"," +dice.get(index).getContent().getDieColor().toString());
             }
         }
         syncedSocketWrite(builder.toString());
