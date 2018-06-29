@@ -6,21 +6,27 @@ import javafx.scene.paint.Color;
  * it also contains the ansi code to apply color to text in the CLI
  */
 public enum DieColor { //need to add png address combined with Shade's ones
-    RED("\u001B[91m" ),
-    GREEN("\u001B[92m"),
-    YELLOW("\u001B[93m"),
-    BLUE("\u001B[94m"),
-    PURPLE("\u001B[95m"),
-    NONE ("\u001B[0m"); //to be used (also) in shade restrictions
+    RED("\u001B[91m",   Color.web("#bb331a"), Color.RED   ),
+    GREEN("\u001B[92m", Color.web("#579b55"), Color.GREEN   ),
+    YELLOW("\u001B[93m",Color.web("#e3d107"), Color.YELLOW   ),
+    BLUE("\u001B[94m",  Color.web("#5faab9"), Color.BLUE   ),
+    PURPLE("\u001B[95m",Color.web("#a5468c"), Color.PURPLE   ),
+    NONE ("\u001B[0m",  Color.web("#9e9e9e"), Color.BLACK   ); //to be used (also) in shade restrictions
 
     private final String utf;
+    private final Color constraintColor;
+    private final Color dieColor;
 
     /**
      * Constructs the elements of the enum setting the corresponding ansi color code
      * @param utf the DieColor utf code for CLI
+     * @param constraintColor the java fx color for a constraint
+     * @param dieColor the javafx color for a die
      */
-    DieColor(String utf){
+    DieColor(String utf, Color constraintColor, Color dieColor){
         this.utf=utf;
+        this.constraintColor = constraintColor;
+        this.dieColor = dieColor;
     }
 
     /**
@@ -47,32 +53,11 @@ public enum DieColor { //need to add png address combined with Shade's ones
         return false;
     }
 
-    public static Color toFXConstraintColor(DieColor dieColor){
-        if(dieColor.equals(RED)){
-            return Color.web("#bb331a");
-        }else if(dieColor.equals(GREEN)){
-            return Color.web("#579b55");
-        }else if(dieColor.equals(YELLOW)){
-            return Color.web("#e3d107");
-        }else if(dieColor.equals(BLUE)){
-            return Color.web("#5faab9");
-        }else if(dieColor.equals(PURPLE)){
-            return Color.web("#a5468c");
-        }else{
-            return Color.web("#9e9e9e");
-        }
+    public Color getFXConstraintColor(){
+        return constraintColor;
     }
 
-    public static Color toFXColor(DieColor dieColor){
-        if(dieColor.equals(RED)){
-            return Color.RED;
-        }else if(dieColor.equals(GREEN)){
-            return Color.GREEN;
-        }else if(dieColor.equals(YELLOW)){
-            return Color.YELLOW;
-        }else if(dieColor.equals(BLUE)){
-            return Color.BLUE;
-        }else
-            return Color.PURPLE;
+    public Color getFXColor(){
+        return dieColor;
     }
 }
