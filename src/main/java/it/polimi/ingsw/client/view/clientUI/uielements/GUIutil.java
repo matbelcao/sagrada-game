@@ -68,11 +68,6 @@ public class GUIutil {
     private static final double DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO = 0.6;
     private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
 
-
-
-
-
-
     private static final double SCHEMA_W_TO_PRIVOBJ_W = 1.3846;
     private static final double DRAFTED_CANVAS_SCENE_RATIO = 1.5314;
     private static final double NUM_OF_DRAFTED_SCHEMAS = 4;
@@ -217,13 +212,17 @@ public class GUIutil {
         return track;
     }*/
 
-    public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
+    public HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox track = new HBox();
         track.setSpacing(5); ////todo dynamic spacing??
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             Rectangle dummyCell = dummyRoundTrackCell(cellDim);
             track.getChildren().add(dummyCell);
             if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
+                if(i == selectedTrackCellIndex){
+                    //to avoid having the same event being fired continuously while the mouse is above a roundtrack cell
+                    continue;
+                }
                 Event showMultipleDice = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
                 dummyCell.setOnMouseEntered(e -> {
                     dummyCell.fireEvent(showMultipleDice);

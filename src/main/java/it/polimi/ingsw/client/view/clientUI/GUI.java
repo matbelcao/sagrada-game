@@ -220,6 +220,8 @@ public class GUI extends Application implements ClientUI {
                 case CHOOSE_SCHEMA:
                     System.out.println("choose----------------------------------------------------------------");
                     break;
+                case SCHEMA_CHOSEN:
+                    break;
                 case NOT_MY_TURN:
                     System.out.println("not my-----------------------------------------------------------------");
                     break;
@@ -243,6 +245,8 @@ public class GUI extends Application implements ClientUI {
                 case TOOL_CAN_CONTINUE:
                     System.out.println("tool can continue------------------------------------------------------------------");
                     break;
+                case GAME_ENDED:
+                    break;
             }
             primaryStage.setMinWidth(sceneCreator.getGameSceneMinWidth());
             primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight());
@@ -250,7 +254,7 @@ public class GUI extends Application implements ClientUI {
             double currentHeight = primaryStage.getHeight();
             Scene mainScene = primaryStage.getScene();
             mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
-            /*if(mainScene == null){ //todo remove if beppe says it works on mac
+            /*if(mainScene == null){
                 mainScene = new Scene(bulidMainPane(currentWidth,currentHeight,board));
                 primaryStage.setScene(mainScene);
             }else{
@@ -258,10 +262,17 @@ public class GUI extends Application implements ClientUI {
             }*/
 
 
-            //root.setStyle("-fx-background-color: black;"); //todo change
             mainScene.addEventHandler(MOUSE_EXITED_BACK_PANE, e->mainScene.setRoot(buildFrontPane(mainScene.getWidth(), mainScene.getHeight(),board)));
-            mainScene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->mainScene.setRoot(showMultipleDiceScreen(e.getCellIndex(),mainScene.getWidth(), mainScene.getHeight(),board)));
-            mainScene.addEventHandler(SELECTED_PLAYER, e -> mainScene.setRoot(showSelectedPlayer(e.getCellIndex(),mainScene.getWidth(), mainScene.getHeight(),board)));
+            mainScene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->{
+                mainScene.setRoot(showMultipleDiceScreen(e.getCellIndex(),mainScene.getWidth(), mainScene.getHeight(),board));
+                e.consume();
+                System.out.println("mouse entered dummy");
+            });
+            mainScene.addEventHandler(SELECTED_PLAYER, e -> {
+                mainScene.setRoot(showSelectedPlayer(e.getCellIndex(),mainScene.getWidth(), mainScene.getHeight(),board));
+                System.out.println("selected player");
+
+            });
 
             mainScene.widthProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
             mainScene.heightProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
@@ -279,7 +290,7 @@ public class GUI extends Application implements ClientUI {
     StackPane showMultipleDiceScreen(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
         BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
         BorderPane backPane = showMultipleDiceRoundTrack(selectedTrackCellIndex,newWidth,newHeight,board);
-        StackPane p = new StackPane(backPane,frontPane);
+        StackPane p = new StackPane(frontPane,backPane);
         backPane.toFront();
         return p;
     }
@@ -312,7 +323,7 @@ public class GUI extends Application implements ClientUI {
         ClientFSMState              turnState = client.getFsmState();
 
         BorderPane backPane = new BorderPane();
-        HBox d1 = sceneCreator.buildDummyTrack(cellDim,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        HBox d1 = sceneCreator.buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
         HBox d2 = sceneCreator.buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
         VBox vbox =new VBox(d1,d2);
         vbox.setSpacing(10); //todo make dynamic?
