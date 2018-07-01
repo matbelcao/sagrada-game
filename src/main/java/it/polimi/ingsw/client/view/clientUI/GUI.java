@@ -43,8 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.MOUSE_EXITED_BACK_PANE;
-import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.SELECTED_PLAYER;
+import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.geometry.Pos.TOP_LEFT;
@@ -262,12 +261,12 @@ public class GUI extends Application implements ClientUI {
             }*/
 
 
-            mainScene.addEventHandler(MOUSE_EXITED_BACK_PANE, e->mainScene.setRoot(buildFrontPane(mainScene.getWidth(), mainScene.getHeight(),board)));
-            mainScene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->{
+            //mainScene.addEventHandler(MOUSE_EXITED_BACK_PANE, e->mainScene.setRoot(buildFrontPane(mainScene.getWidth(), mainScene.getHeight(),board)));
+           /* mainScene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->{
                 mainScene.setRoot(showMultipleDiceScreen(e.getCellIndex(),mainScene.getWidth(), mainScene.getHeight(),board));
                 e.consume();
                 System.out.println("mouse entered dummy");
-            });
+            });*/
             mainScene.addEventHandler(SELECTED_PLAYER, e -> {
                 mainScene.setRoot(showSelectedPlayer(e.getCellIndex(),mainScene.getWidth(), mainScene.getHeight(),board));
                 System.out.println("selected player");
@@ -306,11 +305,46 @@ public class GUI extends Application implements ClientUI {
         BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
         List <Actions> latestOptionsList = board.getLatestOptionsList();
         StackPane p = new StackPane(frontPane);
+        p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->{
+            p.getChildren().setAll(frontPane, showMultipleDiceRoundTrack(e.getCellIndex(),newWidth,newHeight,board));
+        });
+        p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
+
         if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
             BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,board);
             p.getChildren().add(backPane);
         }
         return p;
+    }
+    private BorderPane buildMultipleDicePane (double newWidth, double newHeight, LightBoard board){
+        double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
+        List <List<LightDie>>       roundTrack = board.getRoundTrack();
+        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
+        List <Integer>              latestPlacementsList = board.getLatestPlacementsList();
+        IndexedCellContent          latestSelectedDie = board.getLatestSelectedDie();
+        int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
+        ClientFSMState              turnState = client.getFsmState();
+
+        BorderPane multipleDicePane = new BorderPane();
+        Button b = new Button("prova");
+        multipleDicePane.setCenter(b);
+        Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
+        b.setOnAction(e->b.fireEvent(mouseExited));
+
+        multipleDicePane.addEventHandler(MOUSE_ENTERED_MULTIPLE_DICE_CELL,e->System.out.println("fidv sdjvsvsjdvsndjkvnsjvvvvvvvvvvkjsndd ddddddddddddddddd"));
+       // HBox d1 = sceneCreator.buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+       // HBox d2 = sceneCreator.buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        //VBox vbox =new VBox(d1,d2);
+        //vbox.setSpacing(10); //todo make dynamic?
+        //Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
+        //vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
+        //backPane.setTop(vbox);
+        //vbox.setAlignment(TOP_LEFT);
+        //backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
+
+
+
+        return multipleDicePane;
     }
 
     private BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
@@ -336,6 +370,7 @@ public class GUI extends Application implements ClientUI {
     }
 
     private BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board){
+        System.out.println("BULIDING FRONT PANEEEEEEEE");
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();

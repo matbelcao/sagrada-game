@@ -223,9 +223,10 @@ public class GUIutil {
                     //to avoid having the same event being fired continuously while the mouse is above a roundtrack cell
                     continue;
                 }
-                Event showMultipleDice = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+               Event showMultipleDice = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
                 dummyCell.setOnMouseEntered(e -> {
                     dummyCell.fireEvent(showMultipleDice);
+                    System.out.println("entered dummy");
                 });
             }
         }
@@ -558,7 +559,7 @@ public class GUIutil {
         gc.setFill(Color.BLACK);
         gc.fillOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
     }
-    //todo add Tect
+    //todo add Text
     public BorderPane bulidSelectDiePane(double width, double height, LightBoard board) {
         BorderPane selectDiePane = new BorderPane();
         HBox optionBox = new HBox();
@@ -590,7 +591,10 @@ public class GUIutil {
                     //draw to dice in a cell
                     cell.putDoubleDice(roundTrack.get(i).get(0),roundTrack.get(i).get(1));
                     Event myEvent = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
-                    cell.setOnMouseEntered(e -> cell.fireEvent(myEvent));
+                    cell.setOnMouseEntered(e -> {
+                        cell.fireEvent(myEvent);
+                        System.out.println("over roundtrack");
+                    });
                 } else {
                    cell.putDie(roundTrack.get(i).get(0));
                 }
