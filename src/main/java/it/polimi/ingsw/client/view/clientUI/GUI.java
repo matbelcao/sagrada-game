@@ -260,19 +260,11 @@ public class GUI extends Application implements ClientUI {
                 mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
             }*/
 
-
-            //mainScene.addEventHandler(MOUSE_EXITED_BACK_PANE, e->mainScene.setRoot(buildFrontPane(mainScene.getWidth(), mainScene.getHeight(),board)));
-           /* mainScene.addEventHandler(MyEvent.MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->{
-                mainScene.setRoot(showMultipleDiceScreen(e.getCellIndex(),mainScene.getWidth(), mainScene.getHeight(),board));
-                e.consume();
-                System.out.println("mouse entered dummy");
-            });*/
             mainScene.addEventHandler(SELECTED_PLAYER, e -> {
-                mainScene.setRoot(showSelectedPlayer(e.getCellIndex(),mainScene.getWidth(), mainScene.getHeight(),board));
+                mainScene.setRoot(showSelectedPlayer(e.getObjectIndex(),mainScene.getWidth(), mainScene.getHeight(),board));
                 System.out.println("selected player");
 
             });
-
             mainScene.widthProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
             mainScene.heightProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
         });
@@ -306,7 +298,7 @@ public class GUI extends Application implements ClientUI {
         List <Actions> latestOptionsList = board.getLatestOptionsList();
         StackPane p = new StackPane(frontPane);
         p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->{
-            p.getChildren().setAll(frontPane, showMultipleDiceRoundTrack(e.getCellIndex(),newWidth,newHeight,board));
+            p.getChildren().setAll(frontPane, showMultipleDiceRoundTrack(e.getObjectIndex(),newWidth,newHeight,board));
         });
         p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
 
