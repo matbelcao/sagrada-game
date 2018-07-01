@@ -365,7 +365,7 @@ public class GUIutil {
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
             Group playerStatusBar = getPlayerStatusBar(playerId,hilighlightedPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
             playerSelector.getChildren().add(playerStatusBar);
-            if(playerId == board.getMyPlayerId()){
+            if(playerId == board.getMyPlayerId() || playerId == hilighlightedPlayerId){
                 continue;
             }else{
                 Event mouseEnteredPlayerStatusBar = new MyEvent(SELECTED_PLAYER, playerId);

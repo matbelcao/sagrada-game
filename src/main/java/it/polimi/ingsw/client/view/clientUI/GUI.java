@@ -24,7 +24,6 @@ import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -259,23 +258,14 @@ public class GUI extends Application implements ClientUI {
             }else{
                 mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
             }*/
-
-            mainScene.addEventHandler(SELECTED_PLAYER, e -> {
-                mainScene.setRoot(showSelectedPlayer(e.getObjectIndex(),mainScene.getWidth(), mainScene.getHeight(),board));
-                System.out.println("selected player");
-
-            });
             mainScene.widthProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
             mainScene.heightProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
         });
     }
 
-    private Parent showSelectedPlayer(int playerId, double width, double height, LightBoard board) {
-        BorderPane frontPane = buildFrontPane(width,height,board);
-        BorderPane backPane = sceneCreator.buildSelectdPlayerPane(playerId,width, height, board);
-        StackPane p = new StackPane(backPane,frontPane);
-        backPane.toFront();
-        return p;
+    private BorderPane showSelectedPlayer(int playerId, double width, double height, LightBoard board) {
+        BorderPane selectdPlayerSchema = sceneCreator.buildSelectdPlayerPane(playerId,width, height, board);
+        return selectdPlayerSchema;
     }
 
     StackPane showMultipleDiceScreen(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
@@ -298,9 +288,14 @@ public class GUI extends Application implements ClientUI {
         List <Actions> latestOptionsList = board.getLatestOptionsList();
         StackPane p = new StackPane(frontPane);
         p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->{
-            p.getChildren().setAll(frontPane, showMultipleDiceRoundTrack(e.getObjectIndex(),newWidth,newHeight,board));
+            p.getChildren().setAll(frontPane, showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight,board));
+        });
+        p.addEventHandler(SELECTED_PLAYER, e -> {
+            p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight,board)); //todo create everything at once? note that two events are executed
+            System.out.println("selected player");
         });
         p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
+
 
         if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
             BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,board);
@@ -391,10 +386,10 @@ public class GUI extends Application implements ClientUI {
 
         //Center side of the border pane
         Group schema = sceneCreator.buildSchema(schemaCells,favorTokens,cellDim);
-        HBox playersSelector = sceneCreator.getPlayersStatusBar(board.getMyPlayerId(),board);
+        HBox playersStatusBar = sceneCreator.getPlayersStatusBar(board.getMyPlayerId(),board);
         StackPane schemaContainer = new StackPane(schema);
         VBox.setVgrow(schemaContainer,Priority.ALWAYS);
-        frontPane.setCenter(new VBox(schemaContainer,playersSelector));
+        frontPane.setCenter(new VBox(schemaContainer,playersStatusBar));
 
         //Right side of the border pane
         VBox cards = sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState);
