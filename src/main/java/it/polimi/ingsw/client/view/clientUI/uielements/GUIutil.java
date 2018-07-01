@@ -780,24 +780,25 @@ public class GUIutil {
     }
 
     public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj lightPrivObj, double newWidth, double newHeight){
+        System.out.println("BUILDING DRAFTED SCHEMAS");
         double cellDim = getDraftedSchemasCellDim(newWidth,newHeight);
         double spacing = DRAFTED_SCHEMAS_SPACING_TO_CELL*cellDim;
 
         BorderPane draftedSchemasPane = new BorderPane();
-        GridPane grid = new GridPane();
+        GridPane schemasGrid = new GridPane();
         for(int i = 0; i < 2; i++){
             for(int j = 0; j < 2; j++){
                 int schemaIndex =i*2+j;
                 Group completeSchema = buildCompleteSchema(draftedSchemas.get(schemaIndex),cellDim);
-                grid.add(completeSchema,j,i);
+                schemasGrid.add(completeSchema,j,i);
                 completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
             }
         }
-        grid.setVgap(spacing);
-        grid.setHgap(spacing);
+        schemasGrid.setVgap(spacing);
+        schemasGrid.setHgap(spacing);
         StackPane privObj = new StackPane(drawCard(lightPrivObj, PRIVOBJ_W_TO_CELL_DIM*cellDim, PRIVOBJ_W_TO_CELL_DIM*cellDim/PRIVATE_OBJ_RATIO));
         privObj.setPadding(new Insets(0,0,0,spacing));
-        StackPane cardsContainer = new StackPane(new Group(new HBox(grid, privObj)));
+        StackPane cardsContainer = new StackPane(new Group(new HBox(schemasGrid, privObj)));
         cardsContainer.setAlignment(CENTER);
         draftedSchemasPane.setCenter(cardsContainer);
 

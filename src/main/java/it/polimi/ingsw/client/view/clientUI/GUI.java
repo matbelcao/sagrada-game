@@ -195,7 +195,9 @@ public class GUI extends Application implements ClientUI {
             primaryStage.setMinHeight(minHeight);
             primaryStage.setMinWidth(minWidt);
 
-            draftedSchemaScene.widthProperty().addListener((observable, oldValue, newValue) -> {
+
+            //OLD VERSION
+            /*draftedSchemaScene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 double newWidth = draftedSchemaScene.getWidth();
                 double newHeight = draftedSchemaScene.getHeight();
                 draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth,newHeight));
@@ -204,7 +206,7 @@ public class GUI extends Application implements ClientUI {
                 double newWidth = draftedSchemaScene.getWidth();
                 double newHeight = draftedSchemaScene.getHeight();
                 draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth,newHeight));
-            });
+            });*/
 
         });
     }
@@ -258,8 +260,9 @@ public class GUI extends Application implements ClientUI {
             }else{
                 mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
             }*/
-            mainScene.widthProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
-            mainScene.heightProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
+           // primaryStage.addEventFilter(Event.ANY, e->System.out.println(e));
+            //mainScene.widthProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
+           // mainScene.heightProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
         });
     }
 
