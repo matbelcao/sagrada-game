@@ -6,10 +6,10 @@ import it.polimi.ingsw.client.clientController.QueuedCmdReader;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.textGen;
 import it.polimi.ingsw.client.view.LightBoard;
-import it.polimi.ingsw.client.view.clientUI.uielements.dieContainer;
-import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
 import it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent;
+import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
 import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
+import it.polimi.ingsw.client.view.clientUI.uielements.dieContainer;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
@@ -39,7 +39,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
@@ -394,7 +393,7 @@ public class GUI extends Application implements ClientUI {
         BorderPane frontPane = new BorderPane();
 
         List<dieContainer> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
-        ArrayList<dieContainer> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
+        List<dieContainer> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
         List<dieContainer> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
         sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
         frontPane.setStyle("-fx-background-color: rgba(245,220,112);"); //todo hookup with css

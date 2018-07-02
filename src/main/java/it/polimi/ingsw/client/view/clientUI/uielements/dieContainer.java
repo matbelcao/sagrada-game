@@ -255,6 +255,9 @@ public class dieContainer extends StackPane{
     public void highlightBlue() {
         outerRect.setFill(Color.BLUE);
     }
+    public void highlightOrange() {
+        outerRect.setFill(Color.ORANGE);
+    }
 
     private void hideCellBorders() {
         outerRect.setFill(Color.TRANSPARENT);

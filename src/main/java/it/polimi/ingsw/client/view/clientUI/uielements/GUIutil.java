@@ -136,7 +136,7 @@ public class GUIutil {
     //too slow
    /* public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox track = new HBox();
-        track.setSpacing(5); ////todo dynamic spacing??
+        track.setSpacing(ROUND_TRACK_SPACING);
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             Cell cell = new Cell(cellDim,Place.ROUNDTRACK);
             cell.setVisible(true);
@@ -151,7 +151,7 @@ public class GUIutil {
 
     public HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox multipleDiceTrack = new HBox();
-        multipleDiceTrack.setSpacing(5); ////todo dynamic spacing??
+        multipleDiceTrack.setSpacing(ROUND_TRACK_SPACING);
 
         List<LightDie> multipleDiceList = roundTrack.get(selectedTrackCellIndex);
         int multipleDiceListSize = multipleDiceList.size();
@@ -181,7 +181,7 @@ public class GUIutil {
 
    /* public HBox buildDummyTrack(double cellDim ,List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
         HBox track = new HBox();
-        track.setSpacing(5); ////todo dynamic spacing??
+        track.setSpacing(ROUND_TRACK_SPACING);
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             Cell cell = new Cell(cellDim,Place.ROUNDTRACK);
             cell.setVisible(false);
@@ -232,7 +232,7 @@ public class GUIutil {
         }
 
         for (int i = 0; i < startingIndex; i++) {
-            Canvas c = new Canvas(cellDim, cellDim);
+            dieContainer c = new dieContainer(cellDim);
             multipleDiceTrack.getChildren().add(c);
         }
         for (int i = 0; i < multipleDiceListSize; i++) {
@@ -369,7 +369,7 @@ public class GUIutil {
         double cellDim = getMainSceneCellDim(width,height);
         selectedPlayerPane.setRight(new Rectangle(getCardWidth(cellDim)*NUM_OF_TOOLS,getCardHeight(cellDim),Color.TRANSPARENT)); //the space occupied by cards
         selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT)); //the space occupied by roundtrack
-        ArrayList<dieContainer> selectedPlayerSchema = getSchemaCells(board.getPlayerById(playerId).getSchema(), cellDim);
+        List<dieContainer> selectedPlayerSchema = getSchemaCells(board.getPlayerById(playerId).getSchema(), cellDim);
         Group playerSchema = buildSchema(selectedPlayerSchema,board.getPlayerById(playerId).getFavorTokens(),cellDim);
         StackPane schemaContainer = new StackPane(playerSchema);
         schemaContainer.setStyle("-fx-background-color: rgba(245,220,112);"); //todo hookup with css and make the same as the front pane background
@@ -561,7 +561,6 @@ public class GUIutil {
         return selectDiePane;
     }
 
-    //todo refactor to remove latestdice list and turn state
     public List<dieContainer> getRoundTrackCells(List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList,double cellDim) {
         ArrayList<dieContainer> roundTrackCells = new ArrayList<>();
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
@@ -571,33 +570,25 @@ public class GUIutil {
                     //draw to dice in a cell
                     cell.putDoubleDice(roundTrack.get(i).get(0),roundTrack.get(i).get(1));
                     Event myEvent = new CustomGuiEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
-                    cell.setOnMouseEntered(e -> {
-                        cell.fireEvent(myEvent);
-                        System.out.println("over roundtrack");
-                    });
+                    cell.setOnMouseEntered(e -> cell.fireEvent(myEvent));
                 } else {
                    cell.putDie(roundTrack.get(i).get(0));
                 }
 
-                //todo refactor
-                if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
-                    cell.highlightGreen();
-                }
             }
             roundTrackCells.add(cell);
         }
         return roundTrackCells;
     }
 
-    public ArrayList<dieContainer> getSchemaCells(LightSchemaCard lightSchemaCard,double cellDim) {
+    public List<dieContainer> getSchemaCells(LightSchemaCard lightSchemaCard,double cellDim) {
         ArrayList<dieContainer> gridCells = new ArrayList<>();
-
         for (int i = 0; i < NUM_COLS * NUM_ROWS; i++) {
             dieContainer cell = new dieContainer(cellDim,Place.SCHEMA);
             if (lightSchemaCard.hasConstraintAt(i)) {
                 cell.putConstraint(lightSchemaCard.getConstraintAt(i));
             }
-            if (lightSchemaCard.hasDieAt(i)) {  //todo change it with active cell object
+            if (lightSchemaCard.hasDieAt(i)) {
                 cell.putDie(lightSchemaCard.getDieAt(i));
             }
 
@@ -646,14 +637,14 @@ public class GUIutil {
     }
 
     //todo update
-    public Group buildSchema(ArrayList<dieContainer> gridCells, int favortokens, double cellDim) {
+    public Group buildSchema(List<dieContainer> gridCells, int favortokens, double cellDim) {
         Group grid = schemaToGrid(gridCells);
         Text favorTokens = new Text(uimsg.getMessage(REMAINING_TOKENS)+" "+favortokens);
         favorTokens.setFont(Font.font(FONT, FAVOR_TOKEN_TEXT_TO_CELL_DIM*cellDim));
         return new Group (new VBox(favorTokens,new Group(grid)));
     }
 
-    private Group schemaToGrid(ArrayList<dieContainer> gridCells) {
+    private Group schemaToGrid(List<dieContainer> gridCells) {
         GridPane grid = new GridPane();
         for (int row = 0; row < NUM_ROWS; row++) {
             for (int col = 0; col < NUM_COLS; col++) {
@@ -665,7 +656,7 @@ public class GUIutil {
         return new Group(grid);
     }
 
-    public void addActionListeners(List<dieContainer> draftPoolCells, ArrayList<dieContainer> schemaCells, List<dieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board, double cellDim) {
+    public void addActionListeners(List<dieContainer> draftPoolCells, List<dieContainer> schemaCells, List<dieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board, double cellDim) {
         switch (turnState){
             case CHOOSE_SCHEMA:
                 break;
@@ -693,7 +684,7 @@ public class GUIutil {
         }
 
     }
-    private void addSelectDieStateActionListener(List<dieContainer> draftPoolCells, ArrayList<dieContainer> schemaCells, List<dieContainer> roundTrackCells, LightBoard board, double cellDim) {
+    private void addSelectDieStateActionListener(List<dieContainer> draftPoolCells, List<dieContainer> schemaCells, List<dieContainer> roundTrackCells, LightBoard board, double cellDim) {
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         List<List<LightDie>> roundTrack = board.getRoundTrack();
@@ -719,7 +710,9 @@ public class GUIutil {
             }
         }else if (latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
             for (int i = 0; i < roundTrack.size(); i++) {
-                if (roundTrack.get(i).size() < 2) { //to do check code
+                roundTrackCells.get(i).highlightGreen();
+                if (roundTrack.get(i).size() < 2) {
+                    roundTrackCells.get(i).highlightOrange();
                     int finalI = i;
                     roundTrackCells.get(i).setOnMouseClicked(e -> cmdWrite.write(getMultipleDieTrackCellIndex(finalI, roundTrack) + ""));
                 }
@@ -727,7 +720,7 @@ public class GUIutil {
         }
     }
 
-    private void addChoosePlacementActionListener(List<dieContainer> draftPoolCells, ArrayList<dieContainer> schemaCells, List<dieContainer> roundTrackCells, LightBoard board, double cellDim) {
+    private void addChoosePlacementActionListener(List<dieContainer> draftPoolCells, List<dieContainer> schemaCells, List<dieContainer> roundTrackCells, LightBoard board, double cellDim) {
         IndexedCellContent latestSelectedDie = board.getLatestSelectedDie();
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<Integer> latestPlacementsList = board.getLatestPlacementsList();
