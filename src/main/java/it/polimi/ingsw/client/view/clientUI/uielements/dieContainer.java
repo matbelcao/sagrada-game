@@ -15,7 +15,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 
-public class Cell extends StackPane{
+public class dieContainer extends StackPane{
     private static final double ROUNDTRACK_TEXT_SIZE_TO_CELL = 0.7;
     private static final double BORDER_LINE_TO_CELL = 0.12;
     private static final double DIE_DIM_TO_CELL_DIM = 0.9;
@@ -31,7 +31,7 @@ public class Cell extends StackPane{
     private Text indexText;
     private Canvas content;
 
-    public Cell(double cellDim){
+    public dieContainer(double cellDim){
         this.cellDim = cellDim;
         this.dieDim = cellDim*DIE_DIM_TO_CELL_DIM;
         this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
@@ -44,7 +44,7 @@ public class Cell extends StackPane{
         innerRect.setFill(Color.WHITE);
         this.getChildren().addAll(outerRect,innerRect,indexText,content);
     }
-    public Cell(int index, double cellDim){
+    public dieContainer(int index, double cellDim){
         this(cellDim);
         int displayedIndex = index + 1;
             double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL * cellDim;
@@ -53,7 +53,7 @@ public class Cell extends StackPane{
             indexText.setFill(Color.BLACK);
     }
 
-    public Cell(double cellDim, Place place) {
+    public dieContainer(double cellDim, Place place) {
         this(cellDim);
         switch (place){
             case DRAFTPOOL:
@@ -62,7 +62,7 @@ public class Cell extends StackPane{
         }
     }
 
-    public Cell(CellContent cellContent, double cellDim) {
+    public dieContainer(CellContent cellContent, double cellDim) {
         this(cellDim);
         this.content = indexedCellToCanvas(cellContent,dieDim);
         this.getChildren().add(content);
