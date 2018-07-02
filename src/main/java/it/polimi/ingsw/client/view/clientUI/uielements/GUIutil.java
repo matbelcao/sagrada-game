@@ -34,7 +34,7 @@ import java.util.List;
 
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.MAIN;
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.SELECT_DIE;
-import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.CHOOSE_SCHEMA_2;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.REMAINING_TOKENS;
 import static javafx.geometry.Pos.*;
@@ -142,7 +142,7 @@ public class GUIutil {
             cell.setVisible(true);
             track.getChildren().add(cell);
             if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
-                Event showMultipleDice = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+                Event showMultipleDice = new CustomGuiEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
                 cell.setOnMouseEntered(e -> cell.fireEvent(showMultipleDice));
             }
         }
@@ -187,7 +187,7 @@ public class GUIutil {
             cell.setVisible(false);
             track.getChildren().add(cell);
             if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
-                Event showMultipleDice = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+                Event showMultipleDice = new CustomGuiEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
                 cell.setOnMouseEntered(e -> cell.fireEvent(showMultipleDice));
             }
         }
@@ -205,7 +205,7 @@ public class GUIutil {
                     //to avoid having the same event being fired continuously while the mouse is above a roundtrack cell
                     continue;
                 }
-               Event showMultipleDice = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+               Event showMultipleDice = new CustomGuiEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
                 dummyCell.setOnMouseEntered(e -> {
                     dummyCell.fireEvent(showMultipleDice);
                     System.out.println("entered dummy");
@@ -348,7 +348,7 @@ public class GUIutil {
             if(playerId == board.getMyPlayerId() || playerId == hilighlightedPlayerId){
                 continue;
             }else{
-                Event mouseEnteredPlayerStatusBar = new MyEvent(SELECTED_PLAYER, playerId);
+                Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
                 playerStatusBar.setOnMouseEntered(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
                 playerStatusBar.setOnMouseClicked(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
             }
@@ -376,7 +376,7 @@ public class GUIutil {
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
 
-        Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
+        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
         selectedPlayerPane.getCenter().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
         return selectedPlayerPane;
     }
@@ -549,7 +549,7 @@ public class GUIutil {
             dieContainer c = new dieContainer(selectableDie.getContent(), cellDim);
             c.setOnMouseClicked(e -> {
                 cmdWrite.write(latestDiceList.indexOf(selectableDie) + "");
-                Event exitBackPane = new MyEvent(MOUSE_EXITED_BACK_PANE);
+                Event exitBackPane = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
                 c.fireEvent(exitBackPane);
             });
             c.highlightGreen();
@@ -570,7 +570,7 @@ public class GUIutil {
                 if (roundTrack.get(i).size() > 1) {
                     //draw to dice in a cell
                     cell.putDoubleDice(roundTrack.get(i).get(0),roundTrack.get(i).get(1));
-                    Event myEvent = new MyEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+                    Event myEvent = new CustomGuiEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
                     cell.setOnMouseEntered(e -> {
                         cell.fireEvent(myEvent);
                         System.out.println("over roundtrack");

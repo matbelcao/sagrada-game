@@ -8,7 +8,7 @@ import it.polimi.ingsw.client.textGen;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.dieContainer;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
-import it.polimi.ingsw.client.view.clientUI.uielements.MyEvent;
+import it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent;
 import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.geometry.Pos.TOP_LEFT;
@@ -342,7 +342,7 @@ public class GUI extends Application implements ClientUI {
         BorderPane multipleDicePane = new BorderPane();
         Button b = new Button("prova");
         multipleDicePane.setCenter(b);
-        Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
+        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
         b.setOnAction(e->b.fireEvent(mouseExited));
 
         multipleDicePane.addEventHandler(MOUSE_ENTERED_MULTIPLE_DICE_CELL,e->System.out.println("fidv sdjvsvsjdvsndjkvnsjvvvvvvvvvvkjsndd ddddddddddddddddd"));
@@ -350,7 +350,7 @@ public class GUI extends Application implements ClientUI {
        // HBox d2 = sceneCreator.buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
         //VBox vbox =new VBox(d1,d2);
         //vbox.setSpacing(10); //todo make dynamic?
-        //Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
+        //Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
         //vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
         //backPane.setTop(vbox);
         //vbox.setAlignment(TOP_LEFT);
@@ -373,7 +373,7 @@ public class GUI extends Application implements ClientUI {
         HBox d2 = sceneCreator.buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList);
         VBox vbox =new VBox(d1,d2);
         vbox.setSpacing(10); //todo make dynamic?
-        Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
+        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
         vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
         backPane.setTop(vbox);
         vbox.setAlignment(TOP_LEFT);
