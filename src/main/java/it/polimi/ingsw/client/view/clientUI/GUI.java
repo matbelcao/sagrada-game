@@ -20,6 +20,8 @@ import it.polimi.ingsw.common.serializables.LightPrivObj;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -38,9 +40,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
+import java.util.*;
 
 import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
@@ -83,6 +83,7 @@ public class GUI extends Application implements ClientUI {
             lock.notifyAll();
         }
         this.primaryStage = primaryStage;
+
     }
 
 
@@ -263,6 +264,37 @@ public class GUI extends Application implements ClientUI {
            // primaryStage.addEventFilter(Event.ANY, e->System.out.println(e));
             //mainScene.widthProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
            // mainScene.heightProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
+
+            final ChangeListener<Number> sizeListener = new ChangeListener<Number>()
+            {
+                final Timer timer = new Timer(true); // uses a timer to call resize method
+                TimerTask task = null; // task to execute after defined delay
+                final long delayTime = 2000; // delay that has to pass in order to consider an operation done
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue){
+                    if (task != null){ // there was already a task scheduled from the previous operation ...
+                        task.cancel(); // cancel it, we have a new size to consider
+                    }
+                    task = new TimerTask(){// create new task that calls resize operation
+                        @Override
+                        public void run(){
+                           /* if(sceneCreator.mainSceneNeedsResizing(currentWidth,currentHeight,primaryStage.getWidth(),primaryStage.getHeight())){
+
+                            }*/
+                                System.out.println("resize to " + primaryStage.getWidth() + " " + primaryStage.getHeight());
+                                if(primaryStage == null){
+                                    System.out.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Stage nulll");
+                                }
+                                primaryStage.getScene().setRoot(bulidMainPane(primaryStage.getWidth(),primaryStage.getHeight(),board));
+                        }
+                    };
+                    // schedule new task
+                    timer.schedule(task, delayTime);
+                }
+            };
+            primaryStage.widthProperty().addListener(sizeListener);
+            primaryStage.heightProperty().addListener(sizeListener);
+
         });
     }
 
@@ -338,6 +370,7 @@ public class GUI extends Application implements ClientUI {
     }
 
     private BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
+        System.out.println("showing multiple dice pane");
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
         List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();

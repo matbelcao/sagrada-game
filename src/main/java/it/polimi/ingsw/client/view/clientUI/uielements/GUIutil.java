@@ -862,4 +862,7 @@ public class GUIutil {
     }
 
 
+    public boolean mainSceneNeedsResizing(double currentWidth, double currentHeight, double newWidth, double newHeight) {
+        return newWidth > currentWidth && newHeight > currentHeight || newWidth < currentWidth && newHeight < currentHeight;
+    }
 }
