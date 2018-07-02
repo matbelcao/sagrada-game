@@ -11,6 +11,7 @@ import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
 import it.polimi.ingsw.client.view.clientUI.uielements.MyEvent;
 import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Actions;
@@ -20,8 +21,6 @@ import it.polimi.ingsw.common.serializables.LightPrivObj;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -40,7 +39,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
 
 import static it.polimi.ingsw.client.view.clientUI.uielements.MyEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
@@ -88,9 +89,7 @@ public class GUI extends Application implements ClientUI {
 
 
     @Override
-    public void updateConnectionOk() {
-
-    }
+    public void updateConnectionOk() { messageToUser.setText(uimsg.getMessage(UIMsg.CONNECTION_OK)); }
 
     @Override
     public void showLoginScreen() {
@@ -164,9 +163,7 @@ public class GUI extends Application implements ClientUI {
     }
 
     @Override
-    public void showLatestScreen() {
-
-    }
+    public void showLatestScreen() {/*this method is useful only to CLI*/}
 
     @Override
     public void updateLobby(int numUsers) {
@@ -265,7 +262,7 @@ public class GUI extends Application implements ClientUI {
             //mainScene.widthProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
            // mainScene.heightProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
 
-            final ChangeListener<Number> sizeListener = new ChangeListener<Number>()
+           /* final ChangeListener<Number> sizeListener = new ChangeListener<Number>()
             {
                 final Timer timer = new Timer(true); // uses a timer to call resize method
                 TimerTask task = null; // task to execute after defined delay
@@ -278,9 +275,7 @@ public class GUI extends Application implements ClientUI {
                     task = new TimerTask(){// create new task that calls resize operation
                         @Override
                         public void run(){
-                           /* if(sceneCreator.mainSceneNeedsResizing(currentWidth,currentHeight,primaryStage.getWidth(),primaryStage.getHeight())){
 
-                            }*/
                                 System.out.println("resize to " + primaryStage.getWidth() + " " + primaryStage.getHeight());
                                 if(primaryStage == null){
                                     System.out.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Stage nulll");
@@ -291,16 +286,15 @@ public class GUI extends Application implements ClientUI {
                     // schedule new task
                     timer.schedule(task, delayTime);
                 }
-            };
-            primaryStage.widthProperty().addListener(sizeListener);
-            primaryStage.heightProperty().addListener(sizeListener);
+            };*/
+            //primaryStage.widthProperty().addListener(sizeListener);
+           // primaryStage.heightProperty().addListener(sizeListener);
 
         });
     }
 
     private BorderPane showSelectedPlayer(int playerId, double width, double height, LightBoard board) {
-        BorderPane selectdPlayerSchema = sceneCreator.buildSelectdPlayerPane(playerId,width, height, board);
-        return selectdPlayerSchema;
+        return sceneCreator.buildSelectdPlayerPane(playerId,width, height, board);
     }
 
     StackPane showMultipleDiceScreen(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
@@ -318,13 +312,11 @@ public class GUI extends Application implements ClientUI {
         return p;
     }
 
-    StackPane bulidMainPane(double newWidth, double newHeight, LightBoard board){
+    private StackPane bulidMainPane(double newWidth, double newHeight, LightBoard board){
         BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
         List <Actions> latestOptionsList = board.getLatestOptionsList();
         StackPane p = new StackPane(frontPane);
-        p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e ->{
-            p.getChildren().setAll(frontPane, showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight,board));
-        });
+        p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight,board)));
         p.addEventHandler(SELECTED_PLAYER, e -> {
             p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight,board)); //todo create everything at once? note that two events are executed
             System.out.println("selected player");
@@ -338,7 +330,7 @@ public class GUI extends Application implements ClientUI {
         }
         return p;
     }
-    private BorderPane buildMultipleDicePane (double newWidth, double newHeight, LightBoard board){
+    /*private BorderPane buildMultipleDicePane (double newWidth, double newHeight, LightBoard board){
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
         List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
@@ -367,21 +359,18 @@ public class GUI extends Application implements ClientUI {
 
 
         return multipleDicePane;
-    }
+    }*/
 
     private BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
         System.out.println("showing multiple dice pane");
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
         List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
-        List <Integer>              latestPlacementsList = board.getLatestPlacementsList();
-        IndexedCellContent          latestSelectedDie = board.getLatestSelectedDie();
-        int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
         ClientFSMState              turnState = client.getFsmState();
 
         BorderPane backPane = new BorderPane();
-        HBox d1 = sceneCreator.buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
-        HBox d2 = sceneCreator.buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
+        HBox d1 = sceneCreator.buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack);
+        HBox d2 = sceneCreator.buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList);
         VBox vbox =new VBox(d1,d2);
         vbox.setSpacing(10); //todo make dynamic?
         Event mouseExited = new MyEvent(MOUSE_EXITED_BACK_PANE);
@@ -404,9 +393,9 @@ public class GUI extends Application implements ClientUI {
 
         BorderPane frontPane = new BorderPane();
 
-        ArrayList<Cell> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
+        List<Cell> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
         ArrayList<Cell> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
-        ArrayList<Cell> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
+        List<Cell> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
         sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
         frontPane.setStyle("-fx-background-color: rgba(245,220,112);"); //todo hookup with css
 
@@ -416,7 +405,7 @@ public class GUI extends Application implements ClientUI {
         HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackCells);
         Region separator = new Region();
         HBox.setHgrow(separator,Priority.ALWAYS);
-        VBox menuButtons = sceneCreator.getMenuButtons(turnState);
+        VBox menuButtons = sceneCreator.getMenuButtons();
         roundTrack.getChildren().addAll(separator,menuButtons);
         frontPane.setTop(roundTrack);
 

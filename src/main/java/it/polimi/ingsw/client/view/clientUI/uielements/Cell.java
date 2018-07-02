@@ -93,9 +93,7 @@ public class Cell extends StackPane{
     }
 
     private void drawConstraint(CellContent cell, GraphicsContext gc, double x, double y, double cellDim) {
-        if (cell.isDie()) {
-            return;
-        } else {
+       if (!cell.isDie()) {
             if (cell.hasColor()) {
                 drawColorConstraint(cell.getDieColor(), gc, x, y, cellDim);
             } else {
@@ -152,34 +150,34 @@ public class Cell extends StackPane{
         drawSpots(gc, 0, 0, dieDim, count);
     }
 
-    private void drawSpots(GraphicsContext gc, double xAxisDiePosition, double Y_axis_die_position, double dieDim, int count) {
+    private void drawSpots(GraphicsContext gc, double xAxisDiePosition, double yAxisDiePosition, double dieDim, int count) {
         switch (count) {
             case 1:
-                drawSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
             case 3:
-                drawSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
                 // Fall thru to next case
             case 2:
-                drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
             case 5:
-                drawSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
                 // Fall thru to next case
             case 4:
-                drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
             case 6:
-                drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, 3 * dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
         }
     }
@@ -188,34 +186,34 @@ public class Cell extends StackPane{
         drawConstraintSpots(gc, 0, 0, dieDim, count);
     }
 
-    private void drawConstraintSpots(GraphicsContext gc, double xAxisDiePosition, double Y_axis_die_position, double dieDim, int count) {
+    private void drawConstraintSpots(GraphicsContext gc, double xAxisDiePosition, double yAxisDiePosition, double dieDim, int count) {
         switch (count) {
             case 1:
-                drawConstraintSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawConstraintSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
             case 3:
-                drawConstraintSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawConstraintSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
                 // Fall thru to next case
             case 2:
-                drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
             case 5:
-                drawConstraintSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawConstraintSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
                 // Fall thru to next case
             case 4:
-                drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
             case 6:
-                drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
+                drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, 3 * dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
         }
     }
@@ -258,7 +256,7 @@ public class Cell extends StackPane{
         outerRect.setFill(Color.BLUE);
     }
 
-    public void hideCellBorders() {
+    private void hideCellBorders() {
         outerRect.setFill(Color.TRANSPARENT);
         innerRect.setFill(Color.TRANSPARENT);
     }

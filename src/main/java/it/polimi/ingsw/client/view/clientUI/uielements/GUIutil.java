@@ -19,7 +19,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -52,6 +51,7 @@ public class GUIutil {
 
     private final double SCREEN_WIDTH;
     private final double SCREEN_HEIGHT;
+    private static final String FONT = "Serif";
     //-----login Stage
     private static final double LOGIN_TO_SCREEN_RATIO = 0.18;
     private static final double LOGIN_RATIO = 0.95;
@@ -68,21 +68,14 @@ public class GUIutil {
     private static final double DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO = 0.6;
     private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
 
-    private static final double SCHEMA_W_TO_PRIVOBJ_W = 1.3846;
-    private static final double DRAFTED_CANVAS_SCENE_RATIO = 1.5314;
-    private static final double NUM_OF_DRAFTED_SCHEMAS = 4;
-
-    private static final double COMPLETE_SCHEMA_RATIO = 1.125;
-    private static final double SCHEMA_W_TO_DRAFTED_W = 0.3358;
     private static final double SCHEMA_ARC_TO_WIDTH = 0.0666;
-    private static final double SCHEMA_LINE_TO_WIDTH = 0.02;
     private static final double LINE_TO_CELL = 0.12; //TODO DELETE
     private static final double TEXT_HEIGHT_TO_SCHEMA_H = 0.90;
     private static final double TEXT_DIM_TO_SCHEMA_W = 0.0505;
     private static final double FAVOR_DIAM_TO_SCHEMA_W = 0.038;
     private static final double FAVOR_POS_TO_SCHEMA_W = 0.92;
     //Main game scene
-    private static final double ROUNDTRACK_TEXT_SIZE_TO_CELL = 0.7; //TODO DELETE and check if the others have been eliminated
+    private static final double ROUNDTRACK_SPACING = 5;
     private static final double TEXT_DIM_TO_CELL_DIM = 0.5;
     private static final double MAIN_GAME_SCENE_RATIO = 1.72629;
     private static final double MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH = 0.8265;
@@ -110,10 +103,6 @@ public class GUIutil {
         return SCREEN_WIDTH * LOGIN_TO_SCREEN_RATIO;
     }
 
-    public double getLoginHeight() {
-        return getLoginWidth() / LOGIN_RATIO;
-    }
-
     public double getDraftedSchemasMinHeight() {
         return getDraftedSchemasMinWidth() / DRAFTED_SCHEMAS_SCENE_RATIO;
     }
@@ -130,16 +119,9 @@ public class GUIutil {
         return (getGameSceneMinWidth()/MAIN_GAME_SCENE_RATIO);
     }
 
+    private double getCardWidth(double cellDim) { return cellDim*CARD_WIDTH_TO_CELL_DIM; }
 
-    private double getCardWidth(double cellDim) {
-        double width = cellDim*CARD_WIDTH_TO_CELL_DIM;
-        return width;
-    }
-
-    private double getCardHeight(double cellDim) {
-        double height = cellDim*CARD_HEIGHT_TO_CELL_DIM;
-        return height;
-    }
+    private double getCardHeight(double cellDim) { return cellDim*CARD_HEIGHT_TO_CELL_DIM; }
 
     public double getMainSceneCellDim(double newWidth, double newHeight) {
         double cellDim;
@@ -212,9 +194,9 @@ public class GUIutil {
         return track;
     }*/
 
-    public HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
+    public HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
         HBox track = new HBox();
-        track.setSpacing(5); ////todo dynamic spacing??
+        track.setSpacing(ROUNDTRACK_SPACING);
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             Rectangle dummyCell = dummyRoundTrackCell(cellDim);
             track.getChildren().add(dummyCell);
@@ -238,13 +220,13 @@ public class GUIutil {
         return transparentRect;
     }
 
-    public HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, List<Integer> latestPlacementsList, IndexedCellContent latestSelectedDie, int favorTokens) {
+    public HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList) {
         HBox multipleDiceTrack = new HBox();
-        multipleDiceTrack.setSpacing(5); ////todo dynamic spacing??
+        multipleDiceTrack.setSpacing(ROUNDTRACK_SPACING);
 
         List<LightDie> multipleDiceList = roundTrack.get(selectedTrackCellIndex);
         int multipleDiceListSize = multipleDiceList.size();
-        int startingIndex = selectedTrackCellIndex - (int) Math.round((multipleDiceListSize / 2));
+        int startingIndex = selectedTrackCellIndex -  (multipleDiceListSize / 2);
         if (startingIndex + multipleDiceListSize > ROUNDTRACK_SIZE) {
             startingIndex = ROUNDTRACK_SIZE - multipleDiceListSize;
         }
@@ -282,14 +264,12 @@ public class GUIutil {
         gc.fillText(index + "", cellDim / 2, cellDim / 2);
     }
 
-    public VBox getMenuButtons(ClientFSMState turnState) {
+    public VBox getMenuButtons() {
         Button endTurn = new Button("end turn");
         endTurn.setOnAction(e -> cmdWrite.write("e"));
         Button back = new Button("back");
         back.setOnAction(e -> cmdWrite.write("b"));
-        Label turn = new Label(turnState.toString());
         VBox buttonContainer = new VBox();
-        //buttonContainer.getChildren().addAll(back, endTurn, turnStateIndicator, turn);
         buttonContainer.getChildren().addAll(back, endTurn);
         return buttonContainer;
     }
@@ -311,7 +291,7 @@ public class GUIutil {
             cardContainer.getChildren().setAll(privObjImg,emptyRect1,emptyRect2);
         });
         pub.setOnAction(e -> {
-            ArrayList<Rectangle> cards = new ArrayList();
+            ArrayList<Rectangle> cards = new ArrayList<>();
             for (LightCard pubObjCard : pubObjs) {
                 cards.add(drawCard(pubObjCard, getCardWidth(cellDim), getCardHeight(cellDim)));
 
@@ -319,7 +299,7 @@ public class GUIutil {
             cardContainer.getChildren().setAll(cards);
         });
         tool.setOnAction(e1 -> {
-            ArrayList<Rectangle> cards = new ArrayList();
+            ArrayList<Rectangle> cards = new ArrayList<>();
             for (LightCard toolCard : tools) {
                Rectangle toolRect = drawCard(toolCard, getCardWidth(cellDim), getCardHeight(cellDim));
                 toolRect.setOnMouseClicked(e2 -> {
@@ -403,7 +383,7 @@ public class GUIutil {
 
     private Group getPlayerStatusBar(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
         Text playerName = new Text(username);
-        playerName.setFont(Font.font("Serif", 25));
+        playerName.setFont(Font.font(FONT, 25)); //TODO dynamic
         if(playerId == hilighlightedPlayerId){
             playerName.setFill(Color.DARKBLUE);
         }
@@ -582,7 +562,7 @@ public class GUIutil {
     }
 
     //todo refactor to remove latestdice list and turn state
-    public ArrayList<Cell> getRoundTrackCells(List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList,double cellDim) {
+    public List<Cell> getRoundTrackCells(List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList,double cellDim) {
         ArrayList<Cell> roundTrackCells = new ArrayList<>();
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             Cell cell = new Cell(i, cellDim);
@@ -627,7 +607,7 @@ public class GUIutil {
         return gridCells;
     }
 
-    public ArrayList<Cell> getDraftPoolCells(List<LightDie> draftPool, double cellDim) {
+    public List<Cell> getDraftPoolCells(List<LightDie> draftPool, double cellDim) {
          ArrayList<Cell> poolDice = new ArrayList<>();
         for (int i = 0; i < draftPool.size(); i++) {
             Cell cell = new Cell(cellDim,Place.DRAFTPOOL);
@@ -636,15 +616,15 @@ public class GUIutil {
         }
         return poolDice;
     }
-    public HBox buildRoundTrack(ArrayList<Cell> roundTrackCells) {
+    public HBox buildRoundTrack(List<Cell> roundTrackCells) {
         HBox track = new HBox();
-        track.setSpacing(5); //todo add dynamic spacing
+        track.setSpacing(ROUNDTRACK_SPACING); //todo add dynamic spacing
         track.getChildren().addAll(roundTrackCells);
         track.setAlignment(TOP_LEFT);
         return track;
     }
 
-    public GridPane buildDraftPool(ArrayList<Cell> poolDice) {
+    public GridPane buildDraftPool(List<Cell> poolDice) {
         GridPane pool = new GridPane();
         int i = 0;
         int coloumnIndex = NUM_COLS;
@@ -669,7 +649,7 @@ public class GUIutil {
     public Group buildSchema(ArrayList<Cell> gridCells, int favortokens, double cellDim) {
         Group grid = schemaToGrid(gridCells);
         Text favorTokens = new Text(uimsg.getMessage(REMAINING_TOKENS)+" "+favortokens);
-        favorTokens.setFont(Font.font("Serif", FAVOR_TOKEN_TEXT_TO_CELL_DIM*cellDim));
+        favorTokens.setFont(Font.font(FONT, FAVOR_TOKEN_TEXT_TO_CELL_DIM*cellDim));
         return new Group (new VBox(favorTokens,new Group(grid)));
     }
 
@@ -680,19 +660,21 @@ public class GUIutil {
                 grid.add(gridCells.get(row * NUM_COLS + col), col, row);
             }
         }
-        grid.setStyle("-fx-background-color: rgb(0,0,0);"); //todo hookup with css or consider the pane added underneath
+        grid.setStyle("-fx-background-color: rgb(0,0,0);");
         grid.setAlignment(CENTER);
         return new Group(grid);
     }
 
-    public void addActionListeners(ArrayList<Cell> draftPoolCells, ArrayList<Cell> schemaCells, ArrayList<Cell> roundTrackCells, ClientFSMState turnState, LightBoard board, double cellDim) {
+    public void addActionListeners(List<Cell> draftPoolCells, ArrayList<Cell> schemaCells, List<Cell> roundTrackCells, ClientFSMState turnState, LightBoard board, double cellDim) {
         switch (turnState){
             case CHOOSE_SCHEMA:
+                break;
+            case SCHEMA_CHOSEN:
                 break;
             case NOT_MY_TURN:
                 break;
             case MAIN:
-                addMainStateActionListeners(draftPoolCells,schemaCells,roundTrackCells,board);
+                addMainStateActionListeners(draftPoolCells);
             break;
             case SELECT_DIE:
                 addSelectDieStateActionListener(draftPoolCells,schemaCells,roundTrackCells,board,cellDim);
@@ -706,10 +688,12 @@ public class GUIutil {
                 break;
             case TOOL_CAN_CONTINUE:
                 break;
+            case GAME_ENDED:
+                break;
         }
 
     }
-    private void addSelectDieStateActionListener(ArrayList<Cell> draftPoolCells, ArrayList<Cell> schemaCells, ArrayList<Cell> roundTrackCells, LightBoard board, double cellDim) {
+    private void addSelectDieStateActionListener(List<Cell> draftPoolCells, ArrayList<Cell> schemaCells, List<Cell> roundTrackCells, LightBoard board, double cellDim) {
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         List<List<LightDie>> roundTrack = board.getRoundTrack();
@@ -743,7 +727,7 @@ public class GUIutil {
         }
     }
 
-    private void addChoosePlacementActionListener(ArrayList<Cell> draftPoolCells, ArrayList<Cell> schemaCells, ArrayList<Cell> roundTrackCells, LightBoard board, double cellDim) {
+    private void addChoosePlacementActionListener(List<Cell> draftPoolCells, ArrayList<Cell> schemaCells, List<Cell> roundTrackCells, LightBoard board, double cellDim) {
         IndexedCellContent latestSelectedDie = board.getLatestSelectedDie();
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<Integer> latestPlacementsList = board.getLatestPlacementsList();
@@ -762,7 +746,7 @@ public class GUIutil {
         }
     }
 
-    private void addMainStateActionListeners(ArrayList<Cell> draftPoolCells, ArrayList<Cell> schemaCells, ArrayList<Cell> roundTrackCells, LightBoard board) {
+    private void addMainStateActionListeners(List<Cell> draftPoolCells) {
         for (Cell cell : draftPoolCells) {
             cell.setOnMouseClicked(e -> cmdWrite.write("1"));
         }
@@ -803,7 +787,7 @@ public class GUIutil {
         draftedSchemasPane.setCenter(cardsContainer);
 
         Text selectSchemaText = new Text(uimsg.getMessage(CHOOSE_SCHEMA_2));
-        selectSchemaText.setFont(Font.font("Serif", DRAFTED_SCHEMAS_TEXT_TO_CELL*cellDim));
+        selectSchemaText.setFont(Font.font(FONT, DRAFTED_SCHEMAS_TEXT_TO_CELL*cellDim));
         draftedSchemasPane.setTop(new StackPane(selectSchemaText));
 
         return draftedSchemasPane ;
@@ -854,7 +838,7 @@ public class GUIutil {
 
     private void drawSchemaText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
         double textSize = TEXT_DIM_TO_SCHEMA_W * schemaWidth;
-        gc.setFont(Font.font("Serif", textSize));
+        gc.setFont(Font.font(FONT, textSize));
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.TOP);
         gc.setFill(Color.AZURE);
