@@ -53,7 +53,7 @@ public class GUI extends Application implements ClientUI {
     private static final Object lock = new Object();
     private Text messageToUser = new Text();
     private CmdWriter cmdWrite;
-    private int playerId;
+    private int playerId;// TODO: 03/07/2018  
 
     public GUI() {
         instance = this;
@@ -313,7 +313,7 @@ public class GUI extends Application implements ClientUI {
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
         List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
-        LightSchemaCard             schemaCard = board.getPlayerById(playerId).getSchema();
+        LightSchemaCard             schemaCard = board.getPlayerById(board.getMyPlayerId()).getSchema();
         int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
         ClientFSMState              turnState = client.getFsmState();
 

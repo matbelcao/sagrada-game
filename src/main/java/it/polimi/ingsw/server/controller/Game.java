@@ -603,7 +603,7 @@ public class Game extends Thread implements Iterable  {
 
         if(fsm.getCurState().equals(ServerState.INIT)){
             try {
-                choose(user,1);
+                choose(user,0);
             } catch (IllegalActionException e) {
                 e.printStackTrace();
             }
@@ -630,7 +630,7 @@ public class Game extends Thread implements Iterable  {
 
         if (fsm.getCurState().equals(ServerState.INIT)) {
             try {
-                choose(user, 1);
+                choose(user, 0);
             } catch (IllegalActionException e) {
                 e.printStackTrace();
             }
