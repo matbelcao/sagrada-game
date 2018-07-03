@@ -15,7 +15,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 
-public class dieContainer extends StackPane{
+public class DieContainer extends StackPane{
     private static final double ROUNDTRACK_TEXT_SIZE_TO_CELL = 0.7;
     private static final double BORDER_LINE_TO_CELL = 0.12;
     private static final double DIE_DIM_TO_CELL_DIM = 0.9;
@@ -31,20 +31,20 @@ public class dieContainer extends StackPane{
     private Text indexText;
     private Canvas content;
 
-    public dieContainer(double cellDim){
+    DieContainer(double cellDim){
         this.cellDim = cellDim;
         this.dieDim = cellDim*DIE_DIM_TO_CELL_DIM;
         this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
         this.indexText = new Text();
         this.content = new Canvas(dieDim,dieDim);
-        double lineWidth = cellDim * BORDER_LINE_TO_CELL;
-        double innerCellDim = cellDim - lineWidth;
-        this.innerRect = new Rectangle(lineWidth, lineWidth, innerCellDim, innerCellDim);
+        double lineThickness = cellDim * BORDER_LINE_TO_CELL;
+        double innerCellDim = cellDim - lineThickness;
+        this.innerRect = new Rectangle(lineThickness, lineThickness, innerCellDim, innerCellDim);
         outerRect.setFill(Color.BLACK);
         innerRect.setFill(Color.WHITE);
         this.getChildren().addAll(outerRect,innerRect,indexText,content);
     }
-    public dieContainer(int index, double cellDim){
+    DieContainer(int index, double cellDim){
         this(cellDim);
         int displayedIndex = index + 1;
             double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL * cellDim;
@@ -53,7 +53,7 @@ public class dieContainer extends StackPane{
             indexText.setFill(Color.BLACK);
     }
 
-    public dieContainer(double cellDim, Place place) {
+    DieContainer(double cellDim, Place place) {
         this(cellDim);
         switch (place){
             case DRAFTPOOL:
@@ -62,7 +62,7 @@ public class dieContainer extends StackPane{
         }
     }
 
-    public dieContainer(CellContent cellContent, double cellDim) {
+    DieContainer(CellContent cellContent, double cellDim) {
         this(cellDim);
         this.content = indexedCellToCanvas(cellContent,dieDim);
         this.getChildren().add(content);
@@ -179,6 +179,8 @@ public class dieContainer extends StackPane{
                 drawSpot(gc, dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
                 drawSpot(gc, 3 * dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
+            default:
+                break;
         }
     }
 
@@ -214,6 +216,8 @@ public class dieContainer extends StackPane{
                 drawConstraintSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 drawConstraintSpot(gc, dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
                 drawConstraintSpot(gc, 3 * dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
+                break;
+            default:
                 break;
         }
     }
@@ -255,8 +259,11 @@ public class dieContainer extends StackPane{
     public void highlightBlue() {
         outerRect.setFill(Color.BLUE);
     }
+    public void highlightOrange() {
+        outerRect.setFill(Color.ORANGE);
+    }
 
-    private void hideCellBorders() {
+    public void hideCellBorders() {
         outerRect.setFill(Color.TRANSPARENT);
         innerRect.setFill(Color.TRANSPARENT);
     }
