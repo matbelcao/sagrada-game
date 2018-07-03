@@ -9,7 +9,7 @@ import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
 import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
-import it.polimi.ingsw.client.view.clientUI.uielements.dieContainer;
+import it.polimi.ingsw.client.view.clientUI.uielements.DieContainer;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
@@ -126,7 +126,7 @@ public class GUI extends Application implements ClientUI {
                 try {
                     lock.wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
                 }
             }
         }
@@ -392,9 +392,9 @@ public class GUI extends Application implements ClientUI {
 
         BorderPane frontPane = new BorderPane();
 
-        List<dieContainer> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
-        List<dieContainer> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
-        List<dieContainer> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
+        List<DieContainer> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
+        List<DieContainer> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
+        List<DieContainer> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
         sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
         frontPane.setStyle("-fx-background-color: rgba(245,220,112);"); //todo hookup with css
 
