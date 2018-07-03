@@ -50,7 +50,7 @@ public class RMIServerObject  implements RMIServerInt {
     public void notifyTurnEvent(GameEvent gameEvent, int playerId, int turnNumber){
         if(gameEvent.equals(TURN_START)){
             client.addUpdateTask(new Thread(()->
-            client.updateGameTurnStart(playerId,turnNumber==0) //todo change signature
+            client.updateGameTurnStart(playerId,turnNumber==0)
             ));
         }else if (gameEvent.equals(TURN_END)){
             client.addUpdateTask(new Thread(()->
