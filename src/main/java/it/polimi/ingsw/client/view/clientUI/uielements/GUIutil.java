@@ -66,14 +66,12 @@ public class GUIutil {
     private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
 
     private static final double SCHEMA_ARC_TO_WIDTH = 0.0666;
-    private static final double LINE_TO_CELL = 0.12; //TODO DELETE
     private static final double TEXT_HEIGHT_TO_SCHEMA_H = 0.90;
     private static final double TEXT_DIM_TO_SCHEMA_W = 0.0505;
     private static final double FAVOR_DIAM_TO_SCHEMA_W = 0.038;
     private static final double FAVOR_POS_TO_SCHEMA_W = 0.92;
     //Main game scene
     private static final double ROUNDTRACK_SPACING = 5;
-    private static final double TEXT_DIM_TO_CELL_DIM = 0.5;
     private static final double MAIN_GAME_SCENE_RATIO = 1.72629;
     private static final double MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH = 0.8265;
     private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.137615;
@@ -81,11 +79,8 @@ public class GUIutil {
     private static final double CARD_WIDTH_TO_CELL_DIM = 2.455555555555;
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.33333333333;
     private static final double FAVOR_TOKEN_TEXT_TO_CELL_DIM = 0.27777777;
-    private static final double DIE_ARC_TO_DIM = 0.35; //delete
-    private static final double LINE_TO_DIE = 0.045; ///delete
 
-    //die s..
-    private static final int SPOT_RATIO = 6; //delete
+
     private static final Color OPAQUE_FILL = Color.rgb(0,0,0,0.3);
 
     public GUIutil(Rectangle2D visualBounds, GUI gui, CmdWriter cmdWrite, UIMessages uimsg) {

@@ -292,25 +292,6 @@ public class GUI extends Application implements ClientUI {
         });
     }
 
-    private BorderPane showSelectedPlayer(int playerId, double width, double height, LightBoard board) {
-        return sceneCreator.buildSelectdPlayerPane(playerId,width, height, board);
-    }
-
-    StackPane showMultipleDiceScreen(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
-        BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
-        BorderPane backPane = showMultipleDiceRoundTrack(selectedTrackCellIndex,newWidth,newHeight,board);
-        StackPane p = new StackPane(frontPane,backPane);
-        backPane.toFront();
-        return p;
-    }
-    StackPane bulidOptionScreen(double newWidth, double newHeight, LightBoard board){
-        BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
-        BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,board);
-        StackPane p = new StackPane(backPane,frontPane);
-        backPane.toFront();
-        return p;
-    }
-
     private StackPane bulidMainPane(double newWidth, double newHeight, LightBoard board){
         BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
         List <Actions> latestOptionsList = board.getLatestOptionsList();
@@ -329,36 +310,6 @@ public class GUI extends Application implements ClientUI {
         }
         return p;
     }
-    /*private BorderPane buildMultipleDicePane (double newWidth, double newHeight, LightBoard board){
-        double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
-        List <List<LightDie>>       roundTrack = board.getRoundTrack();
-        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
-        List <Integer>              latestPlacementsList = board.getLatestPlacementsList();
-        IndexedCellContent          latestSelectedDie = board.getLatestSelectedDie();
-        int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
-        ClientFSMState              turnState = client.getFsmState();
-
-        BorderPane multipleDicePane = new BorderPane();
-        Button b = new Button("prova");
-        multipleDicePane.setCenter(b);
-        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-        b.setOnAction(e->b.fireEvent(mouseExited));
-
-        multipleDicePane.addEventHandler(MOUSE_ENTERED_MULTIPLE_DICE_CELL,e->System.out.println("fidv sdjvsvsjdvsndjkvnsjvvvvvvvvvvkjsndd ddddddddddddddddd"));
-       // HBox d1 = sceneCreator.buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
-       // HBox d2 = sceneCreator.buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList,latestPlacementsList,latestSelectedDie,favorTokens);
-        //VBox vbox =new VBox(d1,d2);
-        //vbox.setSpacing(10); //todo make dynamic?
-        //Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-        //vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
-        //backPane.setTop(vbox);
-        //vbox.setAlignment(TOP_LEFT);
-        //backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
-
-
-
-        return multipleDicePane;
-    }*/
 
     private BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
         System.out.println("showing multiple dice pane");
