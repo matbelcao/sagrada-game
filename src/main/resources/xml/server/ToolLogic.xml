@@ -11,7 +11,7 @@
         <from>schema</from>
         <to>schema</to>
         <command>place_die</command>
-        <ignored-constraint>dieColor</ignored-constraint>
+        <ignored-constraint>color</ignored-constraint>
         <quantity>one</quantity>
     </ToolCard>
     <ToolCard id="3">
