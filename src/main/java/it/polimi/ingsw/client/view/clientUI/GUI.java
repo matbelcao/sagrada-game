@@ -7,6 +7,7 @@ import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.DieContainer;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
+import it.polimi.ingsw.client.view.clientUI.uielements.SizeListener;
 import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
@@ -37,6 +38,7 @@ import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.Observable;
+import java.util.Timer;
 
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
@@ -53,7 +55,11 @@ public class GUI extends Application implements ClientUI {
     private static final Object lock = new Object();
     private Text messageToUser = new Text();
     private CmdWriter cmdWrite;
-    private int playerId;// TODO: 03/07/2018  
+    private int playerId;// TODO: 03/07/2018
+    private final Object lockTimerSize =new Object();
+    private Timer timer;
+    private SizeListener sizeListener;
+    private LightBoard tempBoard;
 
     public GUI() {
         instance = this;
@@ -78,6 +84,7 @@ public class GUI extends Application implements ClientUI {
             lock.notifyAll();
         }
         this.primaryStage = primaryStage;
+        sizeListener = new SizeListener(this);
 
     }
 
@@ -159,7 +166,7 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void showLatestScreen() {/*this method is useful only to CLI*/}
 
-    @Override
+    @Override //TODO make another scene
     public void updateLobby(int numUsers) {
         Platform.runLater(() -> {
             messageToUser.setFill(Color.GREEN);
@@ -204,6 +211,7 @@ public class GUI extends Application implements ClientUI {
     }
 
     public void updateBoard(LightBoard board) {
+        tempBoard=board;
         Platform.runLater(() -> {
             if (board == null) {
                 throw new IllegalArgumentException();
@@ -238,6 +246,7 @@ public class GUI extends Application implements ClientUI {
                     System.out.println("tool can continue------------------------------------------------------------------");
                     break;
                 case GAME_ENDED:
+                    System.out.println("game ended------------------------------------------------------------------");
                     break;
             }
             primaryStage.setMinWidth(sceneCreator.getGameSceneMinWidth());
@@ -245,7 +254,7 @@ public class GUI extends Application implements ClientUI {
             double currentWidth = primaryStage.getWidth();
             double currentHeight = primaryStage.getHeight();
             Scene mainScene = primaryStage.getScene();
-            mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
+            mainScene.setRoot(bulidMainPane(currentWidth,currentHeight));
             /*if(mainScene == null){
                 mainScene = new Scene(bulidMainPane(currentWidth,currentHeight,board));
                 primaryStage.setScene(mainScene);
@@ -254,54 +263,36 @@ public class GUI extends Application implements ClientUI {
             }*/
            // primaryStage.addEventFilter(Event.ANY, e->System.out.println(e));
             //mainScene.widthProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
-           // mainScene.heightProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
+           //mainScene.heightProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
 
-           /* final ChangeListener<Number> sizeListener = new ChangeListener<Number>()
-            {
-                final Timer timer = new Timer(true); // uses a timer to call resize method
-                TimerTask task = null; // task to execute after defined delay
-                final long delayTime = 2000; // delay that has to pass in order to consider an operation done
-                @Override
-                public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue){
-                    if (task != null){ // there was already a task scheduled from the previous operation ...
-                        task.cancel(); // cancel it, we have a new size to consider
-                    }
-                    task = new TimerTask(){// create new task that calls resize operation
-                        @Override
-                        public void run(){
+                sizeListener.purgeTimer();
+                redrawWindow();
 
-                                System.out.println("resize to " + primaryStage.getWidth() + " " + primaryStage.getHeight());
-                                if(primaryStage == null){
-                                    System.out.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Stage nulll");
-                                }
-                                primaryStage.getScene().setRoot(bulidMainPane(primaryStage.getWidth(),primaryStage.getHeight(),board));
-                        }
-                    };
-                    // schedule new task
-                    timer.schedule(task, delayTime);
-                }
-            };*/
-            //primaryStage.widthProperty().addListener(sizeListener);
-           // primaryStage.heightProperty().addListener(sizeListener);
+                primaryStage.widthProperty().addListener(sizeListener);
+                primaryStage.heightProperty().addListener(sizeListener);
 
-        });
+            });
     }
 
-    private StackPane bulidMainPane(double newWidth, double newHeight, LightBoard board){
-        BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
-        List <Actions> latestOptionsList = board.getLatestOptionsList();
+    public void redrawWindow(){
+        primaryStage.getScene().setRoot(this.bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight()));
+    }
+
+    public StackPane bulidMainPane(double newWidth, double newHeight){
+        BorderPane frontPane = buildFrontPane(newWidth,newHeight,tempBoard);
+        List <Actions> latestOptionsList = tempBoard.getLatestOptionsList();
         ClientFSMState turnState = client.getFsmState();
         StackPane p = new StackPane(frontPane);
-        p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight,board,turnState)));
+        p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight,tempBoard,turnState)));
         p.addEventHandler(SELECTED_PLAYER, e -> {
-            p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight,board)); //todo create everything at once? note that two events are executed
+            p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight,tempBoard)); //todo create everything at once? note that two events are executed
             System.out.println("selected player");
         });
         p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
 
 
         if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
-            BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,board);
+            BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,tempBoard);
             p.getChildren().add(backPane);
         }
         return p;
