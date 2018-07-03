@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.MAIN;
+import static it.polimi.ingsw.client.clientFSM.ClientFSMState.NOT_MY_TURN;
 import static it.polimi.ingsw.client.clientFSM.ClientFSMState.SELECT_DIE;
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.CHOOSE_SCHEMA_2;
@@ -266,13 +267,15 @@ public class GUIutil {
 
     public VBox buildMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button("end turn");
-        endTurn.setOnAction(e -> cmdWrite.write("e"));
         Button back = new Button("back");
-        if(turnState.equals(MAIN)){ //can't go back when in main
+        if (turnState.equals(NOT_MY_TURN)){
             back.setDisable(true);
-        }else{
-            back.setOnAction(e -> cmdWrite.write("b"));
+            endTurn.setDisable(true);
+        }else if(turnState.equals(MAIN)){ //can't go back when in main
+            back.setDisable(true);
         }
+        endTurn.setOnAction(e -> cmdWrite.write("e"));
+        back.setOnAction(e -> cmdWrite.write("b"));
         VBox buttonContainer = new VBox();
         buttonContainer.getChildren().addAll(back, endTurn);
         return buttonContainer;
