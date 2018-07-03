@@ -234,17 +234,17 @@ public class GUIutil {
 
         for (int i = 0; i < startingIndex; i++) {
             dieContainer c = new dieContainer(cellDim);
+            c.hideCellBorders();
             multipleDiceTrack.getChildren().add(c);
         }
         for (int i = 0; i < multipleDiceListSize; i++) {
-            Canvas c = new Canvas(cellDim, cellDim);
-            GraphicsContext gc = c.getGraphicsContext2D();
-            drawDie(multipleDiceList.get(i), gc, cellDim);
-            multipleDiceTrack.getChildren().add(c);
+            dieContainer cell = new dieContainer(cellDim);
+            cell.putDie(multipleDiceList.get(i));
+            multipleDiceTrack.getChildren().add(cell);
             if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
-                highlight(c, cellDim);
+                cell.highlightOrange();
                 int multipleDieIndex = getMultipleDieTrackCellIndex(selectedTrackCellIndex, roundTrack) + i;
-                c.setOnMouseClicked(e -> cmdWrite.write(multipleDieIndex + ""));
+                cell.setOnMouseClicked(e -> cmdWrite.write(multipleDieIndex + ""));
             }
         }
         return multipleDiceTrack;
