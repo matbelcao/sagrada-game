@@ -371,7 +371,7 @@ public class GUI extends Application implements ClientUI {
         HBox d1 = sceneCreator.buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack);
         HBox d2 = sceneCreator.buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList);
         VBox vbox =new VBox(d1,d2);
-        vbox.setSpacing(10); //todo make dynamic?
+        vbox.setSpacing(5); //todo make dynamiC ADD ROUNDTRACK SPACING
         Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
         vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
         backPane.setTop(vbox);
@@ -381,7 +381,7 @@ public class GUI extends Application implements ClientUI {
     }
 
     private BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board){
-        System.out.println("BULIDING FRONT PANEEEEEEEE");
+        System.out.println("BULIDING FRONT PANE");
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
@@ -404,7 +404,7 @@ public class GUI extends Application implements ClientUI {
         HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackCells);
         Region separator = new Region();
         HBox.setHgrow(separator,Priority.ALWAYS);
-        VBox menuButtons = sceneCreator.getMenuButtons();
+        VBox menuButtons = sceneCreator.buildMenuButtons(turnState);
         roundTrack.getChildren().addAll(separator,menuButtons);
         frontPane.setTop(roundTrack);
 

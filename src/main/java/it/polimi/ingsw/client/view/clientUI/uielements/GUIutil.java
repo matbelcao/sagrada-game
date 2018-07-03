@@ -264,11 +264,15 @@ public class GUIutil {
         gc.fillText(index + "", cellDim / 2, cellDim / 2);
     }
 
-    public VBox getMenuButtons() {
+    public VBox buildMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button("end turn");
         endTurn.setOnAction(e -> cmdWrite.write("e"));
         Button back = new Button("back");
-        back.setOnAction(e -> cmdWrite.write("b"));
+        if(turnState.equals(MAIN)){ //can't go back when in main
+            back.setDisable(true);
+        }else{
+            back.setOnAction(e -> cmdWrite.write("b"));
+        }
         VBox buttonContainer = new VBox();
         buttonContainer.getChildren().addAll(back, endTurn);
         return buttonContainer;
@@ -552,7 +556,7 @@ public class GUIutil {
                 Event exitBackPane = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
                 c.fireEvent(exitBackPane);
             });
-            c.highlightGreen();
+            c.highlightOrange();
             optionBox.getChildren().add(c);
         }
         optionBox.setAlignment(CENTER);
@@ -609,7 +613,7 @@ public class GUIutil {
     }
     public HBox buildRoundTrack(List<dieContainer> roundTrackCells) {
         HBox track = new HBox();
-        track.setSpacing(ROUNDTRACK_SPACING); //todo add dynamic spacing
+        track.setSpacing(ROUNDTRACK_SPACING);
         track.getChildren().addAll(roundTrackCells);
         track.setAlignment(TOP_LEFT);
         return track;
