@@ -4,7 +4,6 @@ import it.polimi.ingsw.client.Client;
 import it.polimi.ingsw.client.clientController.CmdWriter;
 import it.polimi.ingsw.client.clientController.QueuedCmdReader;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
-import it.polimi.ingsw.client.textGen;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.DieContainer;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
@@ -28,7 +27,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -102,13 +100,13 @@ public class GUI extends Application implements ClientUI {
         grid.add(username, 0, 1);
         TextField usernameField = new TextField();
         usernameField.setPromptText("Username");
-        usernameField.setText(textGen.getRandomString()); //TODO delete
+        //usernameField.setText(textGen.getRandomString()); //TODO delete
         grid.add(usernameField, 1, 1);
         Label password = new Label("Password:");
         grid.add(password, 0, 2);
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
-        passwordField.setText(textGen.getRandomString()); //TODO delete
+       // passwordField.setText(textGen.getRandomString()); //TODO delete
         grid.add(passwordField, 1, 2);
         Button button = new Button("Sign in");
         HBox hbBtn = new HBox(10);
@@ -133,7 +131,7 @@ public class GUI extends Application implements ClientUI {
                 client.setUsername(usernameField.getText());
                 client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
         });
-        usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //delete
+       // usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //delete
         primaryStage.setTitle("Login");
         primaryStage.setScene(loginScene);
         primaryStage.setResizable(false);
