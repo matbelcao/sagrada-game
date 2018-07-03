@@ -6,10 +6,9 @@ import it.polimi.ingsw.client.clientController.QueuedCmdReader;
 import it.polimi.ingsw.client.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.textGen;
 import it.polimi.ingsw.client.view.LightBoard;
-import it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent;
+import it.polimi.ingsw.client.view.clientUI.uielements.DieContainer;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
 import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
-import it.polimi.ingsw.client.view.clientUI.uielements.DieContainer;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
@@ -21,7 +20,6 @@ import it.polimi.ingsw.common.serializables.LightPrivObj;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -45,7 +43,6 @@ import java.util.Observable;
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.CENTER;
-import static javafx.geometry.Pos.TOP_LEFT;
 
 public class GUI extends Application implements ClientUI {
     private GUIutil sceneCreator;
@@ -295,8 +292,9 @@ public class GUI extends Application implements ClientUI {
     private StackPane bulidMainPane(double newWidth, double newHeight, LightBoard board){
         BorderPane frontPane = buildFrontPane(newWidth,newHeight,board);
         List <Actions> latestOptionsList = board.getLatestOptionsList();
+        ClientFSMState turnState = client.getFsmState();
         StackPane p = new StackPane(frontPane);
-        p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight,board)));
+        p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight,board,turnState)));
         p.addEventHandler(SELECTED_PLAYER, e -> {
             p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight,board)); //todo create everything at once? note that two events are executed
             System.out.println("selected player");
@@ -309,26 +307,6 @@ public class GUI extends Application implements ClientUI {
             p.getChildren().add(backPane);
         }
         return p;
-    }
-
-    private BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board){
-        System.out.println("showing multiple dice pane");
-        double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
-        List <List<LightDie>>       roundTrack = board.getRoundTrack();
-        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
-        ClientFSMState              turnState = client.getFsmState();
-
-        BorderPane backPane = new BorderPane();
-        HBox d1 = sceneCreator.buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack);
-        HBox d2 = sceneCreator.buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList);
-        VBox vbox =new VBox(d1,d2);
-        vbox.setSpacing(5); //todo make dynamiC ADD ROUNDTRACK SPACING
-        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-        vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
-        backPane.setTop(vbox);
-        vbox.setAlignment(TOP_LEFT);
-        backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
-        return backPane;
     }
 
     private BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board){

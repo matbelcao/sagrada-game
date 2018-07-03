@@ -152,7 +152,7 @@ public class GUIutil {
         return transparentRect;
     }
 
-    public HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList) {
+    private HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList) {
         HBox multipleDiceTrack = new HBox();
         multipleDiceTrack.setSpacing(ROUNDTRACK_SPACING);
 
@@ -164,12 +164,13 @@ public class GUIutil {
         }
 
         for (int i = 0; i < startingIndex; i++) {
-            DieContainer c = new DieContainer(cellDim);
-            c.hideCellBorders();
-            multipleDiceTrack.getChildren().add(c);
+            DieContainer emptyCell = new DieContainer(cellDim);
+            emptyCell.hideCellBorders();
+            multipleDiceTrack.getChildren().add(emptyCell);
         }
         for (int i = 0; i < multipleDiceListSize; i++) {
             DieContainer cell = new DieContainer(cellDim);
+            cell.hideCellBorders();
             cell.putDie(multipleDiceList.get(i));
             multipleDiceTrack.getChildren().add(cell);
             if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
@@ -262,6 +263,25 @@ public class GUIutil {
         Text waitingText = new Text(message);
         StackPane p = new StackPane(waitingText);
         return new Scene(p);
+    }
+
+    public BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board,ClientFSMState turnState){
+        System.out.println("showing multiple dice pane");
+        double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
+        List <List<LightDie>>       roundTrack = board.getRoundTrack();
+        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
+
+        BorderPane backPane = new BorderPane();
+        HBox d1 = buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack);
+        HBox d2 = buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList);
+        VBox vbox =new VBox(d1,d2);
+        vbox.setSpacing(ROUNDTRACK_SPACING);
+        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
+        vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
+        backPane.setTop(vbox);
+        vbox.setAlignment(TOP_LEFT);
+        backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
+        return backPane;
     }
 
     public HBox getPlayersStatusBar(int hilighlightedPlayerId,LightBoard board) {
@@ -488,8 +508,7 @@ public class GUIutil {
                 cell.setOnMouseClicked(e -> cmdWrite.write(latestDiceList.indexOf(activeCell) + ""));
             }
         } else if (latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)) {
-            if (!latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
-            }else {
+            if (latestOptionsList.isEmpty() || (!latestOptionsList.get(0).equals(Actions.SET_SHADE) && !latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
                 for (IndexedCellContent activeCell : latestDiceList) {
                     DieContainer cell = draftPoolCells.get(activeCell.getPosition());
                     cell.highlightGreen();
