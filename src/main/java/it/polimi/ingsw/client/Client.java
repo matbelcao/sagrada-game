@@ -310,15 +310,13 @@ public class Client {
                 authenticator.updateConnected(username);
             }
 
-
             synchronized (lockStatus) {
                 userStatus = UserStatus.LOBBY;
                 lockStatus.notifyAll();
             }
-            //start collecting commands from ui
+
             startUICommandController();
             updateMessagesManager();
-
             //ENABLE PONG
             clientConn.pong();
 
