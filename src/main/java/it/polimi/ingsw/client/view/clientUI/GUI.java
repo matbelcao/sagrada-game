@@ -1,9 +1,9 @@
 package it.polimi.ingsw.client.view.clientUI;
 
-import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.client.clientController.CmdWriter;
-import it.polimi.ingsw.client.clientController.QueuedCmdReader;
-import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.controller.Client;
+import it.polimi.ingsw.client.controller.CmdWriter;
+import it.polimi.ingsw.client.controller.QueuedCmdReader;
+import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.DieContainer;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;

@@ -4,6 +4,7 @@ import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.serializables.IndexedCellContent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.controller.MasterServer;
+import it.polimi.ingsw.server.controller.User;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
@@ -296,7 +297,7 @@ public class Board {
      * @param schemaIndex the index of the schema card (for each player (0 to 3)
      * @return true iff the operation was successful
      */
-    public boolean chooseSchemaCard(User user,int schemaIndex){
+    public boolean chooseSchemaCard(User user, int schemaIndex){
         boolean response;
         if(schemaIndex<0 || schemaIndex >=4){return false;}
         response=getPlayer(user).setSchema(schemaDrafted[(getPlayer(user).getGameId()*Board.NUM_PLAYER_SCHEMAS)+schemaIndex]);

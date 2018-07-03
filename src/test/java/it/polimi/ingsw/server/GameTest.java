@@ -2,9 +2,9 @@ package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
-import it.polimi.ingsw.server.model.User;
+import it.polimi.ingsw.server.controller.User;
 import it.polimi.ingsw.server.controller.Game;
-import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
+import it.polimi.ingsw.common.exceptions.IllegalActionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 

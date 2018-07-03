@@ -2,7 +2,7 @@ package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UserStatus;
-import it.polimi.ingsw.server.model.User;
+import it.polimi.ingsw.server.controller.User;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

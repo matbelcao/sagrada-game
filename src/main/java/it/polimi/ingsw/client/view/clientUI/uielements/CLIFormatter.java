@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
-import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats;
 import it.polimi.ingsw.common.enums.Shade;
 import org.w3c.dom.Document;
@@ -10,7 +10,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 

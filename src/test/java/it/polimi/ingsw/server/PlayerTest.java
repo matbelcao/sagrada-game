@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.server.model.User;
+import it.polimi.ingsw.server.controller.User;
 import it.polimi.ingsw.server.model.*;
 
 import java.util.ArrayList;

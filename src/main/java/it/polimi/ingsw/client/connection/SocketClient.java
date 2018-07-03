@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.connection.SocketString;

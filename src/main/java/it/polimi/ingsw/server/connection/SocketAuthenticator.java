@@ -3,7 +3,7 @@ import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.controller.Validator;
-import it.polimi.ingsw.server.model.User;
+import it.polimi.ingsw.server.controller.User;
 
 import java.io.*;
 import java.net.Socket;

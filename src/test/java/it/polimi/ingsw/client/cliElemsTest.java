@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.clientUI.uielements.CLIFormatter;
 import it.polimi.ingsw.client.view.clientUI.uielements.CLIObjects;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats;

@@ -1,22 +1,23 @@
 package it.polimi.ingsw.server.connection;
 
+import it.polimi.ingsw.common.connection.rmi_interfaces.RMIClientInt;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.GameEvent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.controller.MasterServer;
-import it.polimi.ingsw.server.model.User;
+import it.polimi.ingsw.server.controller.User;
 
 import java.rmi.RemoteException;
 import java.util.List;
 
 public class RMIServer implements ServerConn {
-        private RMIServerInt remoteObj; //client
+        private RMIClientInt remoteObj; //client
         private User user;
         private boolean connectionOk;
         private static final int PING_TIME=5000;
 
 
-    RMIServer(RMIServerInt remoteObj, User user){
+    RMIServer(RMIClientInt remoteObj, User user){
         this.remoteObj = remoteObj;
         this.user = user;
         connectionOk=true;

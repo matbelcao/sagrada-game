@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.DieColor;
+import it.polimi.ingsw.server.controller.User;
 import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
 
 import java.util.List;

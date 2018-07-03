@@ -5,6 +5,7 @@ import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.IndexedCellContent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
+import it.polimi.ingsw.server.controller.User;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import org.junit.jupiter.api.BeforeAll;

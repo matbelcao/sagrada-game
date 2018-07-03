@@ -7,9 +7,10 @@ import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.controller.Game;
 import it.polimi.ingsw.server.controller.MasterServer;
+import it.polimi.ingsw.server.controller.User;
 import it.polimi.ingsw.server.controller.Validator;
 import it.polimi.ingsw.server.model.*;
-import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
+import it.polimi.ingsw.common.exceptions.IllegalActionException;
 
 import java.io.IOException;
 import java.io.PrintWriter;

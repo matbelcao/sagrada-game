@@ -1,14 +1,14 @@
-package it.polimi.ingsw.client.connection;
+package it.polimi.ingsw.common.connection.rmi_interfaces;
 
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;
-import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
+import it.polimi.ingsw.common.exceptions.IllegalActionException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public interface RMIClientInt extends Remote {
+public interface RMIServerInt extends Remote {
 
     List<LightSchemaCard> getSchemaDraft() throws RemoteException, IllegalActionException;
 

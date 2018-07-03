@@ -1,12 +1,11 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMode;
-import it.polimi.ingsw.server.model.User;
-import org.junit.jupiter.api.BeforeAll;
+import it.polimi.ingsw.server.controller.User;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

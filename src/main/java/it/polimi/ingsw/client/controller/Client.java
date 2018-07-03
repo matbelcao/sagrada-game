@@ -1,9 +1,10 @@
-package it.polimi.ingsw.client;
+package it.polimi.ingsw.client.controller;
 
-import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.ClientOptions;
+import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.connection.ClientConn;
 import it.polimi.ingsw.client.connection.RMIClient;
-import it.polimi.ingsw.client.connection.RMIClientInt;
+import it.polimi.ingsw.common.connection.rmi_interfaces.RMIServerInt;
 import it.polimi.ingsw.client.connection.SocketClient;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.CLI;
@@ -14,9 +15,9 @@ import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMode;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
-import it.polimi.ingsw.server.connection.AuthenticationInt;
-import it.polimi.ingsw.server.connection.RMIServerInt;
-import it.polimi.ingsw.server.connection.RMIServerObject;
+import it.polimi.ingsw.common.connection.rmi_interfaces.AuthenticationInt;
+import it.polimi.ingsw.common.connection.rmi_interfaces.RMIClientInt;
+import it.polimi.ingsw.client.connection.RMIClientObject;
 import org.fusesource.jansi.AnsiConsole;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -162,7 +163,7 @@ public class Client {
      * This method sets the wanted uimode
      * @param uiMode the requested UI
      */
-    void setUiMode(UIMode uiMode) {
+    public void setUiMode(UIMode uiMode) {
         this.uiMode = uiMode;
     }
 
@@ -170,7 +171,7 @@ public class Client {
      * This method sets the wanted language
      * @param language the requested language
      */
-    void setLanguage(UILanguage language) {
+    public void setLanguage(UILanguage language) {
         this.language = language;
     }
 
@@ -178,13 +179,13 @@ public class Client {
      * This method sets the wanted connection mode
      * @param connMode the requested connection mode
      */
-    void setConnMode(ConnectionMode connMode) { this.connMode = connMode; }
+    public void setConnMode(ConnectionMode connMode) { this.connMode = connMode; }
 
     /**
      * this method sets the ip of the server to connect to
      * @param serverIP the ipv4 address of the server
      */
-    void setServerIP(String serverIP) { this.serverIP = serverIP; }
+    public void setServerIP(String serverIP) { this.serverIP = serverIP; }
 
     /**
      * this sets the username of the client
@@ -267,7 +268,8 @@ public class Client {
 
 
     /**
-     * This method sets up a connection accordingly to the selected mode and starts the login procedure to gather username and password of the user and try to login to the server.
+     * This method sets up a connection accordingly to the selected mode and starts the login procedure to gather username
+     * and password of the user and try to login to the server.
      * If the login is successful the client will be put in the lobby where he will wait for the beginning of a new match
      */
     private void connectAndLogin() throws InterruptedException {
@@ -364,11 +366,11 @@ public class Client {
         AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+AUTH);
         if(authenticator.authenticate(username,password)){
             //get the stub of the remote object
-            RMIClientInt rmiConnStub = (RMIClientInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+username);
+            RMIServerInt rmiConnStub = (RMIServerInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+username);
             clientConn = new RMIClient(rmiConnStub, this);
-            RMIServerInt rmiServerObject = new RMIServerObject(this);
+            RMIClientInt rmiServerObject = new RMIClientObject(this);
             //check if the method is necessary or just extend unicast remote obj in RMIServerObject
-            RMIServerInt remoteRef = (RMIServerInt) UnicastRemoteObject.exportObject(rmiServerObject, 0);
+            RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiServerObject, 0);
             authenticator.setRemoteReference(remoteRef,username);
             clientUI.updateConnectionOk();
             clientUI.updateLogin(true);
@@ -725,7 +727,7 @@ public class Client {
         Client client;
         client = Client.getNewClient();
         if (args.length>0) {
-            if(!ClientOptions.getOptions(args,options) || options.contains(ClientOptions.HELP)){
+            if(!ClientOptions.getOptions(args,options) || options.contains(ClientOptions.SHORT_HELP)){
                 ClientOptions.printHelpMessage();
                 return;
             }else {

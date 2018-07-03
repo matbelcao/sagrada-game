@@ -1,81 +1,130 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.client.Client;
-import it.polimi.ingsw.common.serializables.GameEvent;
-import it.polimi.ingsw.common.serializables.RankingEntry;
+import it.polimi.ingsw.common.connection.rmi_interfaces.RMIServerInt;
+import it.polimi.ingsw.common.enums.Actions;
+import it.polimi.ingsw.common.serializables.*;
+import it.polimi.ingsw.server.controller.User;
+import it.polimi.ingsw.common.exceptions.IllegalActionException;
 
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-import static it.polimi.ingsw.common.serializables.GameEvent.*;
+public class RMIServerObject extends UnicastRemoteObject implements RMIServerInt {
+    private User user;
 
-public class RMIServerObject  implements RMIServerInt {
-    Client client;
-    public RMIServerObject(Client client) {
-        this.client = client;
+    public RMIServerObject(User user) throws RemoteException {
+        this.user = user;
+    }
+
+    //OK
+    @Override
+    public List<LightSchemaCard> getSchemaDraft() throws IllegalActionException {
+        return user.getGame().getDraftedSchemaCards(user);
     }
 
     @Override
-    public void notifyLobbyUpdate(int n) {
-        client.getClientUI().updateLobby(n);
+    public LightSchemaCard getSchema(int playerId) throws IllegalActionException {
+        return user.getGame().getUserSchemaCard(playerId);
     }
 
     @Override
-    public void notifyGameStart(int n, int id) {
-        client.addUpdateTask(new Thread(()->
-        client.updateGameStart(n,id)
-        ));
+    public LightPrivObj getPrivateObject() {
+        return user.getGame().getPrivCard(user);
     }
 
     @Override
-    public void notifyGameEnd(List<RankingEntry> ranking){
-        client.addUpdateTask(new Thread(()->
-        client.updateGameEnd(ranking)
-        ));
+    public List<LightCard> getPublicObjects() {
+        return user.getGame().getPubCards();
     }
 
     @Override
-    public void notifyRoundEvent(GameEvent gameEvent, int roundNumber){
-        if(gameEvent.equals(ROUND_START)){
-            client.addUpdateTask(new Thread(()->
-            client.updateGameRoundStart(roundNumber)
-            ));
-        }else if (gameEvent.equals(ROUND_END)){
-            client.addUpdateTask(new Thread(()->
-            client.updateGameRoundEnd(roundNumber)
-            ));
-        }
+    public List<LightTool> getTools() {
+        return user.getGame().getToolCards();
     }
 
     @Override
-    public void notifyTurnEvent(GameEvent gameEvent, int playerId, int turnNumber){
-        if(gameEvent.equals(TURN_START)){
-            client.addUpdateTask(new Thread(()->
-            client.updateGameTurnStart(playerId,turnNumber==0)
-            ));
-        }else if (gameEvent.equals(TURN_END)){
-            client.addUpdateTask(new Thread(()->
-            client.updateGameTurnEnd(playerId)
-            ));
-        }
+    public List<LightDie> getDraftPool() throws IllegalActionException {
+        return user.getGame().getDraftedDice();
     }
 
     @Override
-    public void notifyStatusUpdate (GameEvent gameEvent, int id, String userName){
-        client.addUpdateTask(new Thread(()->
-            client.updatePlayerStatus(id, gameEvent,userName)
-        ));
+    public List<List<LightDie>> getRoundTrack() throws IllegalActionException {
+        return user.getGame().getRoundTrackDice();
     }
 
     @Override
-    public void notifyBoardChanged(){
-        client.addUpdateTask(new Thread(()->
-            client.getBoardUpdates()
-        ));
+    public List<LightPlayer> getPlayers() {
+        return user.getGame().getPlayers();
     }
 
     @Override
-    public boolean ping() {
-        client.getClass();
+    public LightGameStatus getGameStatus() {
+        return user.getGame().getGameStatus();
+    }
+
+    @Override
+    public int getFavorTokens(int playerId) {
+        return user.getGame().getFavorTokens(playerId);
+    }
+
+    @Override
+    public List<IndexedCellContent> getDiceList() throws IllegalActionException {
+        return user.getGame().getDiceList();
+    }
+
+    @Override
+    public List<Actions> select(int dieIndex) throws IllegalActionException {
+        return user.getGame().selectDie(dieIndex);
+    }
+
+    @Override
+    public List<Integer> getPlacementsList() throws IllegalActionException {
+        return user.getGame().getPlacements();
+    }
+
+    @Override
+    public boolean choose(int optionIndex) throws IllegalActionException {
+        return user.getGame().choose(user,optionIndex);
+    }
+
+    @Override
+    public boolean enableTool(int toolIndex) throws IllegalActionException {
+        return user.getGame().activeTool(toolIndex);
+    }
+
+    @Override
+    public boolean toolCanContinue() throws IllegalActionException {
+        return user.getGame().toolStatus();
+    }
+
+    @Override
+    public void endTurn() throws IllegalActionException {
+        if(!user.isMyTurn()){ throw new IllegalActionException();}
+        user.getGame().startFlow();
+    }
+
+    @Override
+    public void discard() throws IllegalActionException {
+        if (!user.isMyTurn()) { throw new IllegalActionException(); }
+        user.getGame().discard();
+    }
+
+    @Override
+    public void back() throws IllegalActionException {
+        if (!user.isMyTurn()) {throw new IllegalActionException();}
+        user.getGame().back(true);
+    }
+
+    @Override
+    public void quit() { user.quit(); }
+
+    @Override
+    public void newMatch() { user.newMatch(); }
+
+    @Override
+    public boolean pong() {
+        user.getClass();
         return true;
     }
 }

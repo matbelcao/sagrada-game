@@ -2,7 +2,7 @@
 
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.controller.MasterServer;
-import it.polimi.ingsw.server.model.User;
+import it.polimi.ingsw.server.controller.User;
 
 public class Heartbeat extends Thread{
     private MasterServer master = MasterServer.getMasterServer();

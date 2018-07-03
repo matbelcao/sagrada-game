@@ -4,7 +4,7 @@ import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.enums.ServerState;
-import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
+import it.polimi.ingsw.common.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
 
 import java.util.*;

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
-import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import org.w3c.dom.Document;

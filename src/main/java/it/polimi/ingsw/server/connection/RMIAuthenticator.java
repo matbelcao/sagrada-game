@@ -1,10 +1,11 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.client.connection.RMIClientInt;
-import it.polimi.ingsw.client.connection.RMIClientObject;
+import it.polimi.ingsw.common.connection.rmi_interfaces.RMIClientInt;
+import it.polimi.ingsw.common.connection.rmi_interfaces.AuthenticationInt;
+import it.polimi.ingsw.common.connection.rmi_interfaces.RMIServerInt;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.server.controller.MasterServer;
-import it.polimi.ingsw.server.model.User;
+import it.polimi.ingsw.server.controller.User;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -24,7 +25,7 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
             User user = master.getUser(username);
             user.setConnectionMode(ConnectionMode.RMI);
             try {
-                RMIClientInt RMIclientObj = new RMIClientObject(user);
+                RMIServerInt RMIclientObj = new RMIServerObject(user);
                 LocateRegistry.getRegistry(master.getIpAddress(),MasterServer.getMasterServer().getRMIPort()) ;
                 Naming.rebind("rmi://"+master.getIpAddress()+"/"+username, RMIclientObj);
                 master.printMessage("RMI service for client "+username+" published"); //delete
@@ -33,7 +34,8 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
                 logged = false;
                 user.quit();
             }
-            //master.updateConnected(user);
+            //master.updateConnected(user); todo
+
         }
         return logged;
     }
@@ -45,7 +47,7 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
     }
 
     @Override
-    public void setRemoteReference(RMIServerInt remoteRef, String username) {
+    public void setRemoteReference(RMIClientInt remoteRef, String username) {
         MasterServer master = MasterServer.getMasterServer();
         User user = master.getUser(username);
         user.setServerConn((new RMIServer(remoteRef, user)));

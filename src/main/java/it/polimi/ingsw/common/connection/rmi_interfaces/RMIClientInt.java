@@ -1,4 +1,4 @@
-package it.polimi.ingsw.server.connection;
+package it.polimi.ingsw.common.connection.rmi_interfaces;
 
 import it.polimi.ingsw.common.serializables.GameEvent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
@@ -7,7 +7,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public interface RMIServerInt extends Remote {
+public interface RMIClientInt extends Remote {
 
     void notifyLobbyUpdate(int n) throws RemoteException;
 

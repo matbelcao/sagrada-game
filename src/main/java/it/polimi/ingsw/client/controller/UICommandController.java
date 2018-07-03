@@ -1,9 +1,9 @@
-package it.polimi.ingsw.client;
+package it.polimi.ingsw.client.controller;
 
 import it.polimi.ingsw.common.connection.QueuedReader;
 
 import java.io.IOException;
-import static it.polimi.ingsw.client.ClientFSM.*;
+import static it.polimi.ingsw.client.controller.ClientFSM.*;
 
 /**
  * this class implements the thread that manages the commands coming from the uis to perform changes on the client

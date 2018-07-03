@@ -1,19 +1,20 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;
-import it.polimi.ingsw.server.model.exceptions.IllegalActionException;
+import it.polimi.ingsw.common.exceptions.IllegalActionException;
+import it.polimi.ingsw.common.connection.rmi_interfaces.RMIServerInt;
 
 import java.rmi.RemoteException;
 import java.util.List;
 
 public class RMIClient implements ClientConn{
-    private RMIClientInt remoteObj; //user
+    private RMIServerInt remoteObj; //user
     private Client client;
     private static final int PONG_TIME=5000;
 
-    public RMIClient(RMIClientInt remoteObj, Client client) {
+    public RMIClient(RMIServerInt remoteObj, Client client) {
         this.remoteObj = remoteObj;
         this.client = client;
     }

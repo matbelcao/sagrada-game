@@ -2,10 +2,9 @@ package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.ServerOptions;
-import it.polimi.ingsw.server.connection.AuthenticationInt;
+import it.polimi.ingsw.common.connection.rmi_interfaces.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIAuthenticator;
 import it.polimi.ingsw.server.connection.SocketAuthenticator;
-import it.polimi.ingsw.server.model.User;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;

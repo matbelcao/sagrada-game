@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
-import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.SchemaCard;

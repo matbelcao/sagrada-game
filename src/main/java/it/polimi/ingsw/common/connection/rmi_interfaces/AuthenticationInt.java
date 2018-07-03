@@ -1,4 +1,5 @@
-package it.polimi.ingsw.server.connection;
+package it.polimi.ingsw.common.connection.rmi_interfaces;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -8,5 +9,5 @@ import java.rmi.RemoteException;
 
         void updateConnected(String username) throws RemoteException;
 
-        void setRemoteReference(RMIServerInt remoteRef, String username) throws RemoteException;
+        void setRemoteReference(RMIClientInt remoteRef, String username) throws RemoteException;
     }

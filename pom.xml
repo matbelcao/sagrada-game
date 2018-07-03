@@ -52,7 +52,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>it.polimi.ingsw.client.Client</Main-Class>
+                                        <Main-Class>it.polimi.ingsw.client.controller.Client</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

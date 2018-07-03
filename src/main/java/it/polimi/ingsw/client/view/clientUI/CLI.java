@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI;
 
-import it.polimi.ingsw.client.Client;
+import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.LightBoardEvents;
 import it.polimi.ingsw.client.view.clientUI.uielements.CLIObjects;
@@ -20,7 +20,7 @@ import java.io.Console;
 import java.util.List;
 import java.util.Observable;
 
-import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
+import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.*;
 import static it.polimi.ingsw.common.enums.ErrMsg.ERR;
 import static it.polimi.ingsw.common.enums.ErrMsg.ERROR_RETRIEVING_CONSOLE;
 

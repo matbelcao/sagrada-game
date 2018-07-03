@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.clientController;
+package it.polimi.ingsw.client.controller;
 
 import it.polimi.ingsw.common.connection.QueuedReader;
 

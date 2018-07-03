@@ -1,11 +1,11 @@
-package it.polimi.ingsw.client;
+package it.polimi.ingsw.client.controller;
 
-import it.polimi.ingsw.client.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 
-import static it.polimi.ingsw.client.clientFSM.ClientFSMState.*;
+import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.*;
 
 
 public class ClientFSM {
