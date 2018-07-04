@@ -59,9 +59,9 @@ public class GUIutil {
     private static final double PRIVOBJ_W_TO_CELL_DIM = 3.7518;
     private static final double PRIVATE_OBJ_RATIO = 0.7386;
     private static final double SCHEMA_H_TO_CELL = 4.6176;
-    private static final double DRAFTED_SCHEMAS_SCENE_RATIO = 1.47489;
-    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.061436;
-    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0906;
+    private static final double DRAFTED_SCHEMAS_SCENE_RATIO = 1.47482;
+    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.05488;
+    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0809;
     private static final double DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO = 0.6;
     private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
 
@@ -568,7 +568,6 @@ public class GUIutil {
     }
 
     public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj lightPrivObj, double newWidth, double newHeight){
-        System.out.println("BUILDING DRAFTED SCHEMAS");
         double cellDim = getDraftedSchemasCellDim(newWidth,newHeight);
         double spacing = DRAFTED_SCHEMAS_SPACING_TO_CELL*cellDim;
 

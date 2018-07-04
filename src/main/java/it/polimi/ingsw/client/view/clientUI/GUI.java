@@ -60,6 +60,11 @@ public class GUI extends Application implements ClientUI {
     private SizeListener sizeListener;
     private LightBoard tempBoard;
 
+    // TODO: prendere il riferimento a board
+    private List<LightSchemaCard> tempDraftedSchemas;
+    private LightPrivObj tempPrivObj;
+
+
     public GUI() {
         instance = this;
     }
@@ -197,18 +202,24 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
         Platform.runLater(() -> {
-            sizeListener.disable();
-            primaryStage.setTitle("Sagrada");
-            primaryStage.setResizable(true);
-            double minWidt = sceneCreator.getDraftedSchemasMinWidth();
-            double minHeight = sceneCreator.getDraftedSchemasMinHeight();
-            Scene draftedSchemaScene = primaryStage.getScene();
-            draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas,privObj,minWidt, minHeight));
-            primaryStage.setMinHeight(minHeight);
-            primaryStage.setMinWidth(minWidt);
+                    tempDraftedSchemas = draftedSchemas;
+                    tempPrivObj = privObj;
+                    primaryStage.setTitle("Sagrada");
+                    primaryStage.setResizable(true);
 
+                    double minWidt = sceneCreator.getDraftedSchemasMinWidth();
+                    double minHeight = sceneCreator.getDraftedSchemasMinHeight();
+                    primaryStage.setMinHeight(minHeight);
+                    primaryStage.setMinWidth(minWidt);
 
-            //OLD VERSION
+                    drawMainGameScene();
+
+                    sizeListener.enable();
+
+                /*Scene draftedSchemaScene = primaryStage.getScene();
+            draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas,privObj,minWidt, minHeight));*/
+
+           /* //OLD VERSION
             draftedSchemaScene.widthProperty().addListener((observable, oldValue, newValue) -> {
                 if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)) {
                     double newWidth = draftedSchemaScene.getWidth();
@@ -222,7 +233,7 @@ public class GUI extends Application implements ClientUI {
                     double newHeight = draftedSchemaScene.getHeight();
                     draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth, newHeight));
                 }
-            });
+            });*/
 
         });
     }
@@ -295,7 +306,10 @@ public class GUI extends Application implements ClientUI {
 
     private StackPane bulidMainPane(double newWidth, double newHeight){
         StackPane p = new StackPane();
-        if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
+        if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)){
+            BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(tempDraftedSchemas, tempPrivObj, newWidth, newHeight) ;
+            p.getChildren().add(draftedSchemasPane);
+        }else if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
             BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(newWidth,newHeight,tempBoard.sortFinalPositions());
             p.getChildren().add(gameEndedPane);
         }else{
