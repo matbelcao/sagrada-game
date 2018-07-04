@@ -379,7 +379,7 @@ public class Client implements ClientInt {
      * @return true iff the login had a positive result
      */
     private boolean loginRMI() throws RemoteException, MalformedURLException, NotBoundException {
-        System.setProperty(RMI_HOSTNAME_PROPERTY,serverIP);
+        //System.setProperty(RMI_HOSTNAME_PROPERTY,serverIP);
         AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+":"+port+SLASH+AUTH);
         if(authenticator.authenticate(username,password)){
             //get the stub of the remote object

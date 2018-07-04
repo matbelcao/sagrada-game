@@ -204,8 +204,10 @@ public class MasterServer{
                 synchronized (this.lobby) {
                     lobby.add(user);
                     user.setStatus(UserStatus.LOBBY);
-                    for (User l : lobby) {
-                        l.getServerConn().notifyLobbyUpdate(lobby.size());
+                    ArrayList<User> tempLobby=new ArrayList<>();
+                    tempLobby.addAll(lobby);
+                    for (User l : tempLobby) {
+                        l.getServerConn().notifyLobbyUpdate(tempLobby.size());
                     }
                     if (lobby.size() == MIN_PLAYERS) {
                         System.out.println("TIMER STARTING " + lobbyTime + " sec");

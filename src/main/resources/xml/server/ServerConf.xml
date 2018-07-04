@@ -2,7 +2,7 @@
 <!-- server configuration file -->
 <conf>
 	<address>127.0.0.1</address>
-	<portRMI>1099</portRMI>
+	<portRMI>50100</portRMI>
 	<portSocket>3000</portSocket>
     <timeLobby>30</timeLobby>
     <timeGame>90</timeGame>
