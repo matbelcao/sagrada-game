@@ -540,7 +540,7 @@ public class Board {
             playerScores.get(i).setFinalPosition(i+1);
             getPlayerById(playerScores.get(i).getPlayerId()).setFinalPosition(i+1);
 
-            System.out.println(playerScores.get(i).getPlayerId()+" "+playerScores.get(i).getPoints()+" "+playerScores.get(i).getFinalPosition());
+            //System.out.println(playerScores.get(i).getPlayerId()+" "+playerScores.get(i).getPoints()+" "+playerScores.get(i).getFinalPosition());
         }
 
         //adding disconnected or quitted users in the last position
