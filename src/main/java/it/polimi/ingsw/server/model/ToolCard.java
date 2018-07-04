@@ -247,7 +247,7 @@ public class ToolCard extends Card {
         for(int i=1;i<=6;i++){
             modifiedDie.add(new Die(i,selectedDice.get(0).getColor().toString()));
         }
-        return SerializableServerUtil.toIndexedDieList(Place.DICEBAG,modifiedDie);
+        return SerializableServerUtil.toIndexedDieList(from,modifiedDie); // TODO: 04/07/2018 Place.DICEBAG 
     }
 
     /**
