@@ -128,6 +128,10 @@
         <eng>n › start a new game</eng>
         <ita>n › inizia una nuova partita</ita>
     </newgame-option>
+    <newgame-option-2>
+        <eng>New Game</eng>
+        <ita>Nuova Partita</ita>
+    </newgame-option-2>
     <choose-from-dice-list>
         <eng>Choose one of the dice from the %s :</eng>
         <ita>Scegli uno dei dadi da %s :</ita>
