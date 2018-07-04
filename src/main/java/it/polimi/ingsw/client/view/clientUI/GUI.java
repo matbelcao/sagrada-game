@@ -168,6 +168,7 @@ public class GUI extends Application implements ClientUI {
     @Override //TODO make another scene
     public void updateLobby(int numUsers) {
         Platform.runLater(() -> {
+            System.out.println("updatinggggggggggggggggggg !!!!!!!!!!!!!!!!!!!!!!! LOBBBBBBYYYYYYYYYYYYYYYYYYY");
             messageToUser.setFill(Color.GREEN);
             /* TODO add other text field */
            // messageToUser.setText("lobby "+numUsers);

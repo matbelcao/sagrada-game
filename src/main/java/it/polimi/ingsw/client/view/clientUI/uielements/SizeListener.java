@@ -24,7 +24,7 @@ public class SizeListener implements ChangeListener<Number> {
              {
                 if(timer!=null){
                     timer.cancel();
-                   // System.out.print("CANCELLATO TIMER");
+                   System.out.print("CANCELLATO TIMER");
                 }
                 timer = new Timer();
                 TimerTask task = null; // task to execute after defined delay
@@ -35,9 +35,9 @@ public class SizeListener implements ChangeListener<Number> {
                     task = new TimerTask() {// create new task that calls resize operation
                         @Override
                         public void run() {
-                            //System.out.println("resize to stage");
+                            System.out.println("resize to stage");
 
-                            //System.out.println("resiziiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiing");
+                            System.out.println("resiziiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiing");
 
                             gui.drawMainGameScene();
                         }

@@ -666,6 +666,7 @@ public class GUIutil {
         }
 
         Button newGameButton = new Button(uimsg.getMessage(NEW_GAME_OPTION_2));
+        newGameButton.setOnMouseClicked(e->cmdWrite.write("n"));
 
         VBox v = new VBox(scoreLabel,scoreBoard, newGameButton);
         v.setAlignment(TOP_CENTER);
