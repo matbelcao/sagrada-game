@@ -33,9 +33,7 @@ import java.util.List;
 
 import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.CHOOSE_SCHEMA_2;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.REMAINING_TOKENS;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.SCORE;
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;
 
 public class GUIutil {
@@ -197,7 +195,7 @@ public class GUIutil {
     public VBox buildMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button("end turn");
         Button back = new Button("back");
-        if (turnState.equals(NOT_MY_TURN)){
+        if (turnState.equals(ClientFSMState.NOT_MY_TURN)){
             back.setDisable(true);
             endTurn.setDisable(true);
         }else if(turnState.equals(MAIN)){ //can't go back when in main
@@ -648,26 +646,31 @@ public class GUIutil {
     }
 
     public BorderPane buildGameEndedPane(double newWidth, double newHeight, List<LightPlayer> players) {
-        Label scoreLabel = new Label(uimsg.getMessage(SCORE));
+        Label scoreLabel = new Label(uimsg.getMessage(GAME_END));
         scoreLabel.setAlignment(CENTER);
-        scoreLabel.setFont(Font.font(FONT, 25)); //TODO dynamic
+        scoreLabel.setFont(Font.font(FONT, 60)); //TODO dynamic
 
         GridPane scoreBoard = new GridPane();
         scoreBoard.setHgap(10);
         scoreBoard.setVgap(10);
+        scoreBoard.setPadding(new Insets(50,50,50,50));
         scoreBoard.setAlignment(CENTER);
         for(int i = 0; i < players.size();i++){
             Label name = new Label(players.get(i).getUsername());
             Label points = new Label(players.get(i).getPoints()+"");
-            name.setFont(Font.font(FONT, 25)); //TODO dynamic
-            points.setFont(Font.font(FONT, 25)); //TODO dynamic
+            name.setFont(Font.font(FONT, 50)); //TODO dynamic
+            points.setFont(Font.font(FONT, 50)); //TODO dynamic
             scoreBoard.add(name,0,i);
             scoreBoard.add(points,1,i);
 
         }
 
+        Button newGameButton = new Button(uimsg.getMessage(NEW_GAME_OPTION_2));
+
+        VBox v = new VBox(scoreLabel,scoreBoard, newGameButton);
+        v.setAlignment(TOP_CENTER);
         BorderPane containerPane = new BorderPane();
-        containerPane.setCenter(new VBox(scoreLabel,scoreBoard));
+        containerPane.setCenter(v);
         return containerPane;
     }
 
