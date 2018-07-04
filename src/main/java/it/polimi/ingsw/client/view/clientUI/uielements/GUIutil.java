@@ -504,20 +504,20 @@ public class GUIutil {
         if (latestDiceList.get(0).getPlace().equals(Place.SCHEMA)) {
             for (IndexedCellContent activeCell : latestDiceList) {
                 DieContainer cell = schemaCells.get(activeCell.getPosition());
-                cell.highlightGreen();
+                cell.highlightBlue();
                 cell.setOnMouseClicked(e -> cmdWrite.write(latestDiceList.indexOf(activeCell) + ""));
             }
         } else if (latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)) {
             if (latestOptionsList.isEmpty() || (!latestOptionsList.get(0).equals(Actions.SET_SHADE) && !latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
                 for (IndexedCellContent activeCell : latestDiceList) {
                     DieContainer cell = draftPoolCells.get(activeCell.getPosition());
-                    cell.highlightGreen();
+                    cell.highlightBlue();
                     cell.setOnMouseClicked(e -> cmdWrite.write(draftPoolCells.indexOf(cell) + ""));
                 }
             }
         }else if (latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
             for (int i = 0; i < roundTrack.size(); i++) {
-                roundTrackCells.get(i).highlightGreen();
+                roundTrackCells.get(i).highlightBlue();
                 if (roundTrack.get(i).size() < 2) {
                     roundTrackCells.get(i).highlightOrange();
                     int finalI = i;
@@ -531,18 +531,22 @@ public class GUIutil {
         IndexedCellContent latestSelectedDie = board.getLatestSelectedDie();
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<Integer> latestPlacementsList = board.getLatestPlacementsList();
-        if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL) || !latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)) {
+        if (!latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)) {
             for (DieContainer cell : schemaCells) {
                 if (latestPlacementsList.contains(schemaCells.indexOf(cell))) {
                     cell.highlightGreen();
                     cell.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(cell)) + ""));
                 }
             }
-        }else if(latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
-            if(latestOptionsList.get(0).equals(Actions.SET_SHADE)){
-                return;//todo properly higlight the selected die
+            if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
+                for (DieContainer cell : draftPoolCells) {
+                    cell.setOnMouseClicked(e -> {
+                        System.out.println("selected die");
+                        cmdWrite.write("d");
+                        cmdWrite.write(draftPoolCells.indexOf(cell) + "");
+                    });
+                }
             }
-            draftPoolCells.get(latestSelectedDie.getPosition()).highlightBlue();
         }
     }
 

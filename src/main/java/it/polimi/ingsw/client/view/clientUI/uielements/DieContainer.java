@@ -252,13 +252,12 @@ public class DieContainer extends StackPane{
         gc.strokeRect(x, y, cellDim, cellDim);
     }
 
-    public void highlightGreen() {
-        outerRect.setFill(Color.GREEN);
+    public void highlightBlue() {
+        outerRect.setFill(Color.LIGHTSKYBLUE);
     }
 
-    public void highlightBlue() {
-        outerRect.setFill(Color.BLUE);
-    }
+    public void highlightGreen() { outerRect.setFill(Color.LIGHTGREEN); }
+
     public void highlightOrange() {
         outerRect.setFill(Color.ORANGE);
     }

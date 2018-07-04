@@ -197,6 +197,7 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
         Platform.runLater(() -> {
+            sizeListener.disable();
             primaryStage.setTitle("Sagrada");
             primaryStage.setResizable(true);
             double minWidt = sceneCreator.getDraftedSchemasMinWidth();
@@ -208,16 +209,20 @@ public class GUI extends Application implements ClientUI {
 
 
             //OLD VERSION
-            /*draftedSchemaScene.widthProperty().addListener((observable, oldValue, newValue) -> {
-                double newWidth = draftedSchemaScene.getWidth();
-                double newHeight = draftedSchemaScene.getHeight();
-                draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth,newHeight));
+            draftedSchemaScene.widthProperty().addListener((observable, oldValue, newValue) -> {
+                if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)) {
+                    double newWidth = draftedSchemaScene.getWidth();
+                    double newHeight = draftedSchemaScene.getHeight();
+                    draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth, newHeight));
+                }
             });
             draftedSchemaScene.heightProperty().addListener((observable, oldValue, newValue) -> {
-                double newWidth = draftedSchemaScene.getWidth();
-                double newHeight = draftedSchemaScene.getHeight();
-                draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth,newHeight));
-            });*/
+                if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)) {
+                    double newWidth = draftedSchemaScene.getWidth();
+                    double newHeight = draftedSchemaScene.getHeight();
+                    draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth, newHeight));
+                }
+            });
 
         });
     }
@@ -316,7 +321,6 @@ public class GUI extends Application implements ClientUI {
     }
 
     private BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board){
-        //System.out.println("BULIDING FRONT PANE");
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
