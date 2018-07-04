@@ -12,11 +12,15 @@ import java.util.List;
 public class RMIClient implements ClientConn{
     private RMIServerInt remoteObj; //user
     private Client client;
+    private boolean connectionOk;
+    private final Object lockPing =new Object();
+
     private static final int PONG_TIME=5000;
 
     public RMIClient(RMIServerInt remoteObj, Client client) {
         this.remoteObj = remoteObj;
         this.client = client;
+        connectionOk=false;
     }
 
     /**
@@ -31,7 +35,7 @@ public class RMIClient implements ClientConn{
         try {
             result = remoteObj.getSchemaDraft();
         } catch (RemoteException | IllegalActionException e) {
-            client.disconnect();
+            closeConn();
         }
         return result;
     }
@@ -48,7 +52,7 @@ public class RMIClient implements ClientConn{
         try {
             schema = remoteObj.getSchema(playerId);
         } catch (RemoteException | IllegalActionException e) {
-            client.disconnect();
+            closeConn();
         }
         return schema;
     }
@@ -63,7 +67,7 @@ public class RMIClient implements ClientConn{
         try {
             card = remoteObj.getPrivateObject();
         } catch (RemoteException e) {
-            client.disconnect();
+            closeConn();
         }
         return card;
     }
@@ -78,7 +82,7 @@ public class RMIClient implements ClientConn{
         try {
             result = remoteObj.getPublicObjects();
         } catch (RemoteException e) {
-            client.disconnect();
+            closeConn();
         }
         return result;
     }
@@ -93,7 +97,7 @@ public class RMIClient implements ClientConn{
         try {
             result = remoteObj.getTools();
         } catch (RemoteException e) {
-            client.disconnect();
+            closeConn();
         }
         return result;
     }
@@ -108,7 +112,7 @@ public class RMIClient implements ClientConn{
         try {
             draftPool = remoteObj.getDraftPool();
         } catch (RemoteException | IllegalActionException e) {
-            client.disconnect();
+            closeConn();
         }
         return draftPool;
     }
@@ -123,7 +127,7 @@ public class RMIClient implements ClientConn{
         try {
             roundTrack = remoteObj.getRoundTrack();
         } catch (RemoteException | IllegalActionException e) {
-            client.disconnect();
+            closeConn();
         }
         return roundTrack;
 
@@ -139,7 +143,7 @@ public class RMIClient implements ClientConn{
         try {
             players = remoteObj.getPlayers();
         } catch (RemoteException e) {
-            client.disconnect();
+            closeConn();
         }
         return players;
     }
@@ -155,7 +159,7 @@ public class RMIClient implements ClientConn{
         try {
             status = remoteObj.getGameStatus();
         } catch (RemoteException e) {
-            client.disconnect();
+            closeConn();
         }
         return status;
     }
@@ -171,7 +175,7 @@ public class RMIClient implements ClientConn{
         try{
             favorTokens = remoteObj.getFavorTokens(playerId);
         }catch(RemoteException e){
-            client.disconnect();
+            closeConn();
         }
         return favorTokens;
     }
@@ -187,7 +191,7 @@ public class RMIClient implements ClientConn{
         try{
             diceList = remoteObj.getDiceList();
         }catch(RemoteException | IllegalActionException e){
-            client.disconnect();
+            closeConn();
         }
         return diceList;
     }
@@ -204,7 +208,7 @@ public class RMIClient implements ClientConn{
         try{
             options = remoteObj.select(dieIndex);
         }catch(RemoteException | IllegalActionException e){
-            client.disconnect();
+            closeConn();
         }
         return options;
     }
@@ -220,7 +224,7 @@ public class RMIClient implements ClientConn{
         try{
             placements = remoteObj.getPlacementsList();
         }catch(RemoteException | IllegalActionException e){
-            client.disconnect();
+            closeConn();
         }
         return placements;
     }
@@ -236,7 +240,7 @@ public class RMIClient implements ClientConn{
         try{
             return remoteObj.choose(optionIndex);
         }catch(RemoteException | IllegalActionException e){
-            client.disconnect();
+            closeConn();
         }
         return false;
     }
@@ -252,7 +256,7 @@ public class RMIClient implements ClientConn{
         try{
             return remoteObj.enableTool(toolIndex);
         }catch(RemoteException | IllegalActionException e){
-            client.disconnect();
+            closeConn();
         }
         return false;
     }
@@ -266,7 +270,7 @@ public class RMIClient implements ClientConn{
         try{
             return remoteObj.toolCanContinue();
         }catch(RemoteException | IllegalActionException e){
-            client.disconnect();
+            closeConn();
         }
         return false;
     }
@@ -279,7 +283,7 @@ public class RMIClient implements ClientConn{
         try {
             remoteObj.endTurn();
         } catch (RemoteException | IllegalActionException e) {
-            client.disconnect();
+            closeConn();
         }
     }
 
@@ -292,7 +296,7 @@ public class RMIClient implements ClientConn{
         try {
             remoteObj.discard();
         } catch (RemoteException | IllegalActionException e) {
-            client.disconnect();
+            closeConn();
         }
     }
 
@@ -304,7 +308,7 @@ public class RMIClient implements ClientConn{
         try {
             remoteObj.back();
         } catch (RemoteException | IllegalActionException e) {
-            client.disconnect();
+            closeConn();
         }
     }
 
@@ -316,7 +320,7 @@ public class RMIClient implements ClientConn{
         try {
             remoteObj.quit();
         } catch (RemoteException e) {
-            //do nothing already disconnecting
+            closeConn();
         }
     }
 
@@ -328,7 +332,20 @@ public class RMIClient implements ClientConn{
         try {
             remoteObj.newMatch();
         } catch (RemoteException e) {
-            client.disconnect();
+            closeConn();
+        }
+    }
+
+    /**
+     * Closes the connection if broken
+     */
+    private void closeConn(){
+        synchronized (lockPing){
+            if (connectionOk){
+                client.disconnect();
+                connectionOk=false;
+            }
+            lockPing.notifyAll();
         }
     }
 
@@ -348,10 +365,14 @@ public class RMIClient implements ClientConn{
                         e.printStackTrace();
                     }
                 } catch (RemoteException e) {
-                    if(client.isLogged()) {
-                        client.disconnect();
-                        ping = false;
-                        System.out.println("CONNECTION TIMEOUT!");
+                    synchronized (lockPing) {
+                        if (client.isLogged()) {
+                            client.disconnect();
+                            connectionOk = false;
+                            ping = false;
+                            System.out.println("CONNECTION TIMEOUT!");
+                            lockPing.notifyAll();
+                        }
                     }
                 }
             }

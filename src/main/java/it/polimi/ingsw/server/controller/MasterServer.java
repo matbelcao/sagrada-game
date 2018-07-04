@@ -247,14 +247,16 @@ public class MasterServer{
      * an instance of the object Authenticator
      */
     public void startRMI(){
+        printMessage("--> SERVER STARTING CONNECTIONS VIA RMI");
+        System.setProperty("java.rmi.server.codebase","http://"+getMasterServer().ipAddress+"/it/polimi/ingsw/server"); // TODO: 04/07/2018 find a correct codebase addr
         System.setProperty("java.rmi.server.hostname",ipAddress);
         try {
             AuthenticationInt authenticator = new RMIAuthenticator();
             Registry registry = LocateRegistry.createRegistry(portRMI);
             Naming.rebind("rmi://"+ipAddress+":"+portRMI+"/auth", authenticator);
-            printMessage("--> SERVER WAITING CONNECTIONS VIA RMI");
         }catch (RemoteException | MalformedURLException e){
-            e.printStackTrace();
+            printMessage("Err on instantiating RMI");
+            System.exit(0);
         }
     }
 
@@ -263,11 +265,11 @@ public class MasterServer{
     /**
      * This method starts a SocketListener thread that accepts all socket connection
      */
-    private void startSocket(){
+    private void startSocket (){
         // server infinite loop
         new Thread(() -> {
-            printMessage("--> SERVER WAITING CONNECTIONS VIA SOCKET");
-            while(1==1) {
+            printMessage("--> SERVER STARTING CONNECTIONS VIA SOCKET");
+            while(true) {
                 Socket socket = null;
                 try {
                     try( ServerSocket serverSocket = new ServerSocket(portSocket)) {
@@ -277,7 +279,8 @@ public class MasterServer{
                     SocketAuthenticator authenticator = new SocketAuthenticator(socket);
                     authenticator.start();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    printMessage("Err on instantiating SOCKET");
+                    System.exit(0);
                 }
 
             }
@@ -414,28 +417,26 @@ public class MasterServer{
     }
 
     public static void main(String[] args){
-
         ArrayList<String> options=new ArrayList<>();
         try {
             MasterServer.startMasterServer();
+
+            MasterServer server = MasterServer.getMasterServer();
+            if (args.length > 0) {
+                if (!ServerOptions.getOptions(args, options) || options.contains("h")) {
+                    ServerOptions.printHelpMessage();
+                    return;
+                } else {
+                    ServerOptions.setServerPreferences(options, server);
+                }
+            }
+            server.startRMI();
+            server.startSocket();
         } catch (InstantiationException e) {
             e.printStackTrace();
             System.out.println("ERR: couldn't start the Master Server");
             return;
         }
-        MasterServer server= MasterServer.getMasterServer();
-        if (args.length>0) {
-            if(!ServerOptions.getOptions(args,options) || options.contains("h")){
-                ServerOptions.printHelpMessage();
-                return;
-            }else {
-                ServerOptions.setServerPreferences(options, server);
-            }
-        }
-        System.setProperty("java.rmi.server.codebase","http://"+getMasterServer().ipAddress+"/it/polimi/ingsw/server"); // TODO: 04/07/2018 find a correct codebase addr
-        server.startRMI();
-        server.startSocket();
-        //server.startHeartBeat();
     }
 
 
