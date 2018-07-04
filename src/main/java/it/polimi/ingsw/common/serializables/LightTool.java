@@ -1,7 +1,5 @@
 package it.polimi.ingsw.common.serializables;
 
-import it.polimi.ingsw.server.model.ToolCard;
-
 import java.io.Serializable;
 
 public class LightTool extends LightCard implements Serializable {
@@ -22,10 +20,6 @@ public class LightTool extends LightCard implements Serializable {
 
     public void setUsed(boolean used) {
         this.used = used;
-    }
-
-    public static LightTool toLightTool(ToolCard tool){
-        return new LightTool(tool.getName(),tool.getDescription(),tool.getId(),tool.isAlreadyUsed());
     }
 
     public static LightTool toLightTool(String objective){

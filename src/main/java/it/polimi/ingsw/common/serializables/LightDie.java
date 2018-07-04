@@ -34,15 +34,6 @@ public class LightDie implements CellContent,Serializable {
     }
 
     /**
-     * builds a lightdie from a die
-     * @param die the die to be copied
-     * @return the lightdie
-     */
-    public static LightDie toLightDie(Die die){
-        return new LightDie(die.getShade(),die.getColor());
-    }
-
-    /**
      * Returns the shade of the lightDie
      * @return the shade
      */

@@ -3,6 +3,7 @@ package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.serializables.IndexedCellContent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
+import it.polimi.ingsw.server.SerializableServerUtil;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.controller.User;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
@@ -594,11 +595,11 @@ public class Board {
             die = diceIterator.next().getDie();
             if(!constraint.equals(DieColor.NONE)){
                 if(die.getColor().equals(constraint)){
-                    indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
+                    indexedCell = SerializableServerUtil.toIndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
                     indexedList.add(indexedCell);
                 }
             }else{
-                indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
+                indexedCell = SerializableServerUtil.toIndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
                 indexedList.add(indexedCell);
             }
         }
@@ -617,7 +618,7 @@ public class Board {
 
         for (int index=0;index<draftedDice.size();index++){
             die=draftedDice.get(index);
-            indexedCell=new IndexedCellContent(index,Place.DRAFTPOOL,die);
+            indexedCell=SerializableServerUtil.toIndexedCellContent(index,Place.DRAFTPOOL,die);
             indexedList.add(indexedCell);
         }
         return indexedList;
@@ -635,7 +636,7 @@ public class Board {
         for(int index=0;index<dieTrack.size();index++){
             List<Die> dieList= dieTrack.get(index);
             for(Die d:dieList){
-                indexedCell=new IndexedCellContent(index,Place.ROUNDTRACK,d);
+                indexedCell=SerializableServerUtil.toIndexedCellContent(index,Place.ROUNDTRACK,d);
                 indexedList.add(indexedCell);
             }
         }

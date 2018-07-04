@@ -2,7 +2,6 @@ package it.polimi.ingsw.common.serializables;
 
 import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.Shade;
-import it.polimi.ingsw.server.model.Constraint;
 
 import java.io.Serializable;
 
@@ -38,14 +37,6 @@ public class LightConstraint implements CellContent,Serializable {
         isColorConstraint = true;
     }
 
-    /**
-     * builds a LightConstraint from a constraint
-     * @param constr the constraint to be copied
-     * @return the LightConstraint
-     */
-    public static LightConstraint toLightConstraint(Constraint constr){
-        return new LightConstraint((constr.isColorConstraint() ? constr.getColor().toString() : constr.getShade().toString()));
-    }
     /**
      * Returns a string containing the constraint name regardless of the type of constraint
      * @return the name of the value of the constraint

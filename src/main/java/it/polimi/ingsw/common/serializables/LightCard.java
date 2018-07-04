@@ -1,7 +1,5 @@
 package it.polimi.ingsw.common.serializables;
 
-import it.polimi.ingsw.server.model.Card;
-
 import java.io.Serializable;
 
 public class LightCard implements Serializable {
@@ -14,10 +12,6 @@ public class LightCard implements Serializable {
         this.name = name;
         this.description = description;
         this.id = id;
-    }
-
-    public static LightCard toLightCard(Card objective){
-        return new LightCard(objective.getName(),objective.getDescription(),objective.getId());
     }
 
     public static LightCard toLightCard(String objective){

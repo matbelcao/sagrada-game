@@ -1,7 +1,5 @@
 package it.polimi.ingsw.common.serializables;
 
-import it.polimi.ingsw.server.model.Player;
-
 import java.io.Serializable;
 
 public class LightPlayer implements Serializable {
@@ -20,12 +18,6 @@ public class LightPlayer implements Serializable {
         this.points=0;
         this.finalPosition=0;
         this.status=LightPlayerStatus.PLAYING;
-    }
-
-    public static LightPlayer toLightPlayer(Player player){
-        String username = player.getUsername();
-        int playerId = player.getGameId();
-        return new LightPlayer(username,playerId);
     }
 
     public LightPlayerStatus getStatus(){

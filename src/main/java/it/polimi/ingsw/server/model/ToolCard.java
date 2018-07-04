@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.serializables.IndexedCellContent;
+import it.polimi.ingsw.server.SerializableServerUtil;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
@@ -271,11 +272,11 @@ public class ToolCard extends Card {
             die = diceIterator.next().getDie();
             if(!constraint.equals(DieColor.NONE)){
                 if(die.getColor().equals(constraint)){
-                    indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
+                    indexedCell = SerializableServerUtil.toIndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
                     indexedList.add(indexedCell);
                 }
             }else{
-                indexedCell = new IndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
+                indexedCell = SerializableServerUtil.toIndexedCellContent(diceIterator.getIndex(),Place.SCHEMA, die);
                 indexedList.add(indexedCell);
             }
         }
@@ -355,7 +356,7 @@ public class ToolCard extends Card {
 
         for (int index=0;index<dieList.size();index++){
             die=dieList.get(index);
-            indexedCell=new IndexedCellContent(index,from,die);
+            indexedCell=SerializableServerUtil.toIndexedCellContent(index,from,die);
             indexedList.add(indexedCell);
         }
         return indexedList;

@@ -8,6 +8,7 @@ import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.serializables.*;
+import it.polimi.ingsw.server.SerializableServerUtil;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.model.PrivObjectiveCard;
 import it.polimi.ingsw.server.model.PubObjectiveCard;
@@ -67,10 +68,10 @@ class cliElemsTest {
             AnsiConsole.systemInstall();
         }
 
-        schema0=LightSchemaCard.toLightSchema(new SchemaCard(1,false));
-        schema1=LightSchemaCard.toLightSchema(new SchemaCard(2,false));
-        schema2=LightSchemaCard.toLightSchema(new SchemaCard(3,false));
-        schema3=LightSchemaCard.toLightSchema(new SchemaCard(4,false));
+        schema0=SerializableServerUtil.toLightSchema(new SchemaCard(1,false));
+        schema1=SerializableServerUtil.toLightSchema(new SchemaCard(2,false));
+        schema2=SerializableServerUtil.toLightSchema(new SchemaCard(3,false));
+        schema3=SerializableServerUtil.toLightSchema(new SchemaCard(4,false));
 
         draftpool=new ArrayList<>();
 
@@ -137,19 +138,19 @@ class cliElemsTest {
         roundtrack.get(6).add(new LightDie("FOUR","GREEN"));
         roundtrack.get(6).add(new LightDie("ONE","YELLOW"));
 
-        tools.add(LightTool.toLightTool(new ToolCard(2)));
-        tools.add(LightTool.toLightTool(new ToolCard(3)));
-        tools.add(LightTool.toLightTool(new ToolCard(6)));
+        tools.add(SerializableServerUtil.toLightTool(new ToolCard(2)));
+        tools.add(SerializableServerUtil.toLightTool(new ToolCard(3)));
+        tools.add(SerializableServerUtil.toLightTool(new ToolCard(6)));
         tools.get(2).setUsed(true);
 
         cliview.updateTools(tools);
 
         cliview.updateRoundTrack(roundtrack);
 
-        obj.add(LightCard.toLightCard(new PubObjectiveCard(2,MasterServer.XML_SOURCE+"PubObjectiveCard.xml")));
-        obj.add(LightCard.toLightCard(new PubObjectiveCard(3,MasterServer.XML_SOURCE+"PubObjectiveCard.xml")));
-        obj.add(LightCard.toLightCard(new PubObjectiveCard(4,MasterServer.XML_SOURCE+"PubObjectiveCard.xml")));
-        LightPrivObj privobj =LightPrivObj.toLightPrivObj(new PrivObjectiveCard(2));
+        obj.add(SerializableServerUtil.toLightCard(new PubObjectiveCard(2,MasterServer.XML_SOURCE+"PubObjectiveCard.xml")));
+        obj.add(SerializableServerUtil.toLightCard(new PubObjectiveCard(3,MasterServer.XML_SOURCE+"PubObjectiveCard.xml")));
+        obj.add(SerializableServerUtil.toLightCard(new PubObjectiveCard(4,MasterServer.XML_SOURCE+"PubObjectiveCard.xml")));
+        LightPrivObj privobj =SerializableServerUtil.toLightPrivObj(new PrivObjectiveCard(2));
 
         cliview.updateObjectives(obj,privobj);
 

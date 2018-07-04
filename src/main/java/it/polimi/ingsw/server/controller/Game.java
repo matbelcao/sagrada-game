@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.common.enums.*;
 import it.polimi.ingsw.common.serializables.*;
+import it.polimi.ingsw.server.SerializableServerUtil;
 import it.polimi.ingsw.server.model.*;
 import it.polimi.ingsw.server.model.enums.ServerState;
 import it.polimi.ingsw.common.exceptions.IllegalActionException;
@@ -261,7 +262,7 @@ public class Game extends Thread implements Iterable  {
      * @return the card requested
      */
     public LightPrivObj getPrivCard(User user){
-        return LightPrivObj.toLightPrivObj(board.getPlayer(user).getPrivObjective());
+        return SerializableServerUtil.toLightPrivObj(board.getPlayer(user).getPrivObjective());
     }
 
     /**
@@ -272,7 +273,7 @@ public class Game extends Thread implements Iterable  {
         List<LightCard> lightPubs = new ArrayList<>();
 
         for (int i=0 ; i < Board.NUM_OBJECTIVES ; i++ ) {
-            lightPubs.add(LightCard.toLightCard(board.getPublicObjective(i)));
+            lightPubs.add(SerializableServerUtil.toLightCard(board.getPublicObjective(i)));
         }
         return lightPubs;
     }
@@ -285,7 +286,7 @@ public class Game extends Thread implements Iterable  {
         List<LightTool> lightTools = new ArrayList<>();
 
         for (int i = 0; i < Board.NUM_TOOLS; i++) {
-            lightTools.add(LightTool.toLightTool(board.getToolCard(i)));
+            lightTools.add(SerializableServerUtil.toLightTool(board.getToolCard(i)));
         }
         return lightTools;
     }
@@ -300,7 +301,7 @@ public class Game extends Thread implements Iterable  {
         if(!fsm.getCurState().equals(ServerState.INIT)){ throw new IllegalActionException(); }
         List<LightSchemaCard>  lightSchemas=new ArrayList<>();
         for (int i=0 ; i < Board.NUM_PLAYER_SCHEMAS ; i++ ){
-            lightSchemas.add(LightSchemaCard.toLightSchema(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]));
+            lightSchemas.add(SerializableServerUtil.toLightSchema(draftedSchemas[(users.indexOf(user)* Board.NUM_PLAYER_SCHEMAS)+i]));
         }
         return lightSchemas;
     }
@@ -318,7 +319,7 @@ public class Game extends Thread implements Iterable  {
         if(board.getPlayerById(playerId).getSchema()==null){ throw new IllegalActionException(); }
         if(playerId>=0 && playerId<users.size()){
             SchemaCard schemaCard=board.getUserSchemaCard(playerId);
-            return LightSchemaCard.toLightSchema(schemaCard);
+            return SerializableServerUtil.toLightSchema(schemaCard);
         }
         throw new IllegalActionException();
     }
@@ -348,7 +349,7 @@ public class Game extends Thread implements Iterable  {
         List<LightDie> lightDraftPool=new ArrayList<>();
 
         for(Die d:draftPool) {
-            lightDraftPool.add(LightDie.toLightDie(d));
+            lightDraftPool.add(SerializableServerUtil.toLightDie(d));
         }
         return lightDraftPool;
 
@@ -373,7 +374,7 @@ public class Game extends Thread implements Iterable  {
             dieList=trackList.get(i);
             container = new ArrayList<>();
             for(Die d:dieList){
-                container.add(LightDie.toLightDie(d));
+                container.add(SerializableServerUtil.toLightDie(d));
             }
             roundTrack.add(i, container);
         }
@@ -388,7 +389,7 @@ public class Game extends Thread implements Iterable  {
         List<LightPlayer> lightPlayers = new ArrayList<>();
         for (User u:users){
             Player player=board.getPlayer(u);
-            LightPlayer lightPlayer=new LightPlayer(player.getUsername(),player.getGameId());
+            LightPlayer lightPlayer= SerializableServerUtil.toLightPlayer(player);
             if(u.getStatus().equals(UserStatus.PLAYING) && !u.getGame().equals(this)) {
                 lightPlayer.setStatus(LightPlayerStatus.DISCONNECTED);
             }else{

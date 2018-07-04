@@ -1,8 +1,5 @@
 package it.polimi.ingsw.common.serializables;
 import it.polimi.ingsw.common.connection.SocketString;
-import it.polimi.ingsw.server.model.Cell;
-import it.polimi.ingsw.server.model.Constraint;
-import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -16,6 +13,9 @@ public class LightSchemaCard implements Serializable {
     private final String name;
     private Map<Integer,CellContent> cells=new HashMap<>(30);
     private int initialFavorTokens;
+
+    public static final int NUM_COLS=5;
+    public static final int NUM_ROWS=4;
 
     /**
      * This is the constructor of the class, it's the only way to set dice and constraints where they belong
@@ -43,31 +43,6 @@ public class LightSchemaCard implements Serializable {
         this.cells.putAll(contentMap);
         contentMap.clear();
     }
-
-
-    /**
-     * Returns the light version of the given schema card
-     * @param schemaCard the schema card to be used as a template for the new light schema
-     * @return the newly created LightSchema
-     */
-    public static  LightSchemaCard toLightSchema(SchemaCard schemaCard){
-        HashMap<Integer,CellContent> contentMap = new HashMap<>(30);
-        for(int i=0; i<SchemaCard.NUM_COLS*SchemaCard.NUM_ROWS; i++){
-            Cell cell = schemaCard.getCell(i);
-            if(cell.hasDie()){
-                contentMap.put(i,new LightDie(cell.getDie().getShade(),cell.getDie().getColor()));
-            }else if(cell.hasConstraint()){
-                Constraint constraint = cell.getConstraint();
-                if(constraint.isColorConstraint()){
-                    contentMap.put(i,new LightConstraint(constraint.getColor()));
-                } else {
-                    contentMap.put(i, new LightConstraint(constraint.getShade()));
-                }
-            }
-        }
-        return new LightSchemaCard(schemaCard.getName(),contentMap,schemaCard.getFavorTokens());
-    }
-
 
     public static  LightSchemaCard toLightSchema(String schemaCard){
         String [] parsed= schemaCard.trim().split("\\s+");
@@ -109,7 +84,7 @@ public class LightSchemaCard implements Serializable {
      */
     private boolean hasValidKeys(Map<Integer,CellContent> contentMap) {
         int maxKey=-1;
-        int minKey=SchemaCard.NUM_COLS*SchemaCard.NUM_ROWS;
+        int minKey=NUM_COLS*NUM_ROWS;
         if(contentMap.isEmpty()){ return false; }
         //compute max and min
         for(Map.Entry<Integer,CellContent> entry : contentMap.entrySet()){
@@ -118,7 +93,7 @@ public class LightSchemaCard implements Serializable {
             if(entry.getKey()>maxKey){ maxKey=entry.getKey(); }
         }
 
-        return (maxKey < SchemaCard.NUM_COLS*SchemaCard.NUM_ROWS && minKey >= 0);
+        return (maxKey < NUM_COLS*NUM_ROWS && minKey >= 0);
     }
 
     /**
@@ -146,7 +121,7 @@ public class LightSchemaCard implements Serializable {
      * @return true iff the schema has a die in the position indicated by the @param
      */
     public boolean hasDieAt(int row, int column){
-        int index= row * SchemaCard.NUM_COLS + column;
+        int index= row * NUM_COLS + column;
         return hasDieAt(index);
     }
 
@@ -169,7 +144,7 @@ public class LightSchemaCard implements Serializable {
      * @return true iff the schema has a constraint in the position indicated by the @param
      */
     public boolean hasConstraintAt(int row, int column){
-        int index=row * SchemaCard.NUM_COLS + column;
+        int index=row * NUM_COLS + column;
         return hasConstraintAt(index);
     }
 
@@ -190,7 +165,7 @@ public class LightSchemaCard implements Serializable {
      * @return the die placed there iff there is one
      */
     public LightDie getDieAt(int row,int column){
-        int index=row * SchemaCard.NUM_COLS + column;
+        int index=row * NUM_COLS + column;
         return getDieAt(index);
     }
 
@@ -211,7 +186,7 @@ public class LightSchemaCard implements Serializable {
      * @return the constraint placed there iff there is one
      */
     public LightConstraint getConstraintAt(int row,int column){
-        int index=row * SchemaCard.NUM_COLS + column;
+        int index=row * NUM_COLS + column;
         return getConstraintAt(index);
     }
 

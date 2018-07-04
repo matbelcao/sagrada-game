@@ -1,7 +1,6 @@
 package it.polimi.ingsw.common.serializables;
 
 import it.polimi.ingsw.common.enums.DieColor;
-import it.polimi.ingsw.server.model.PrivObjectiveCard;
 
 import java.io.Serializable;
 
@@ -12,10 +11,6 @@ public class LightPrivObj extends LightCard implements Serializable {
     public LightPrivObj(String name, String description, int id, DieColor dieColor) {
         super(name, description, id);
         this.dieColor = dieColor;
-    }
-
-    public static LightPrivObj toLightPrivObj(PrivObjectiveCard priv){
-        return new LightPrivObj(priv.getName(),priv.getDescription(),priv.getId(),priv.getDieColor());
     }
 
     public static LightPrivObj toLightPrivObj(String objective){
