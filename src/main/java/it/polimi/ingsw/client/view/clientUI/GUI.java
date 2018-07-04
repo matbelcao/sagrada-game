@@ -84,7 +84,7 @@ public class GUI extends Application implements ClientUI {
     public void start(Stage primaryStage) {
         //get the dimensions of the screen
         synchronized (lock) {
-            sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(), this, getCmdWrite() ,uimsg);
+            sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(), getCmdWrite() ,uimsg);
             lock.notifyAll();
         }
         this.primaryStage = primaryStage;

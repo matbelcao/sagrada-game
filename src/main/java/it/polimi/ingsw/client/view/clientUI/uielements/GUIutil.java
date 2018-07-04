@@ -3,7 +3,6 @@ package it.polimi.ingsw.client.view.clientUI.uielements;
 import it.polimi.ingsw.client.controller.CmdWriter;
 import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
-import it.polimi.ingsw.client.view.clientUI.GUI;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.serializables.*;
@@ -40,7 +39,6 @@ import static javafx.geometry.Pos.*;
 public class GUIutil {
     private final CmdWriter cmdWrite;
     private final UIMessages uimsg;
-    private GUI gui;
     //ratio is width/height
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
@@ -50,29 +48,33 @@ public class GUIutil {
     private final double SCREEN_WIDTH;
     private final double SCREEN_HEIGHT;
     private static final String FONT = "Serif";
+    private static final Color OPAQUE_FILL = Color.rgb(0,0,0,0.3);
+
     //-----login Stage
     private static final double LOGIN_TO_SCREEN_RATIO = 0.18;
     private static final double LOGIN_RATIO = 0.95;
+    //-----Lobby
+    private static final double LOBBY_SCENE_RATIO = 1.47482;
+    private static final double LOBBY_SCENE_W_TO_SCREEN_RATIO = 0.6;
+
     //-----Drafted Schema Stage
     private static final double SCHEMA_W_TO_CELL = 5.19481;
-    private static final double DRAFTED_SCHEMAS_TEXT_TO_CELL = 0.7;
-    private static final double SCHEMA_LABEL_TO_CELL_DIM = 0.34632;
-    private static final double PRIVOBJ_W_TO_CELL_DIM = 3.7518;
-    private static final double PRIVATE_OBJ_RATIO = 0.7386;
-    private static final double SCHEMA_H_TO_CELL = 4.6176;
-    private static final double LOBBY_SCENE_RATIO = 1.47482;
-    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.05488;
-    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0809;
-    private static final double LOBBY_SCENE_W_TO_SCREEN_RATIO = 0.6;
-    private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
-
     private static final double SCHEMA_ARC_TO_WIDTH = 0.0666;
     private static final double TEXT_HEIGHT_TO_SCHEMA_H = 0.90;
     private static final double TEXT_DIM_TO_SCHEMA_W = 0.0505;
     private static final double FAVOR_DIAM_TO_SCHEMA_W = 0.038;
     private static final double FAVOR_POS_TO_SCHEMA_W = 0.92;
+
+    private static final double DRAFTED_SCHEMAS_TEXT_TO_CELL = 0.7;
+    private static final double SCHEMA_LABEL_TO_CELL_DIM = 0.34632;
+    private static final double PRIVOBJ_W_TO_CELL_DIM = 3.7518;
+    private static final double PRIVATE_OBJ_RATIO = 0.7386;
+    private static final double SCHEMA_H_TO_CELL = 4.6176;
+    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.05488;
+    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0809;
+    private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
+
     //Main game scene
-    private static final double ROUNDTRACK_SPACING = 5;
     private static final double MAIN_GAME_SCENE_RATIO = 1.72629;
     private static final double MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH = 0.8265;
     private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.137615;
@@ -80,14 +82,12 @@ public class GUIutil {
     private static final double CARD_WIDTH_TO_CELL_DIM = 2.455555555555;
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.33333333333;
     private static final double FAVOR_TOKEN_TEXT_TO_CELL_DIM = 0.27777777;
+    private static final double ROUNDTRACK_SPACING = 5;
 
 
-    private static final Color OPAQUE_FILL = Color.rgb(0,0,0,0.3);
-
-    public GUIutil(Rectangle2D visualBounds, GUI gui, CmdWriter cmdWrite, UIMessages uimsg) {
+    public GUIutil(Rectangle2D visualBounds, CmdWriter cmdWrite, UIMessages uimsg) {
         SCREEN_WIDTH = visualBounds.getWidth();
         SCREEN_HEIGHT = visualBounds.getHeight();
-        this.gui = gui;
         this.cmdWrite = cmdWrite;
         this.uimsg = uimsg;
     }
@@ -470,7 +470,7 @@ public class GUIutil {
 
     public void addActionListeners(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board, double cellDim) {
         switch (turnState){
-            case CHOOSE_SCHEMA:
+            case CHOOSE_SCHEMA: //todo remve empty declarations
                 break;
             case SCHEMA_CHOSEN:
                 break;
