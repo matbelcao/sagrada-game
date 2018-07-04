@@ -74,7 +74,7 @@ public class SocketServer extends Thread implements ServerConn  {
                     return;
                 }
 
-                if(!inSocket.isEmpty() && connectionOk){
+                if(!inSocket.isEmpty()){
                     command=inSocket.getln();
                     if (Validator.isValid(command, parsedResult)) {
                         playing = execute(command,parsedResult);

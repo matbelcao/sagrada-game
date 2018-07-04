@@ -14,6 +14,8 @@ public class RMIServer implements ServerConn {
         private RMIClientInt remoteObj; //client
         private User user;
         private boolean connectionOk;
+        private final Object lockPing =new Object();
+
         private static final int PING_TIME=5000;
 
 
@@ -34,9 +36,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyLobbyUpdate(n);
         } catch (RemoteException e) {
-            e.printStackTrace();
-            user.disconnect();
-            connectionOk=false;
+            closeConn();
         }
 
     }
@@ -52,9 +52,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyGameStart(n, id);
         } catch (RemoteException e) {
-            e.printStackTrace();
-            user.disconnect();
-            connectionOk = false;
+            closeConn();
         }
 
     }
@@ -69,9 +67,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyGameEnd(ranking);
         } catch (RemoteException e) {
-            e.printStackTrace();
-            user.disconnect();
-            connectionOk=false;
+            closeConn();
         }
     }
 
@@ -86,9 +82,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyRoundEvent(gameEvent, roundNumber);
         } catch (RemoteException e) {
-            e.printStackTrace();
-            user.disconnect();
-            connectionOk = false;
+            closeConn();
         }
     }
 
@@ -104,9 +98,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyTurnEvent(gameEvent, playerId, turnNumber);
         } catch (RemoteException e) {
-            e.printStackTrace();
-            user.disconnect();
-            connectionOk = false;
+            closeConn();
         }
 
 
@@ -123,9 +115,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyStatusUpdate(gameEvent, id, userName);
         } catch (RemoteException e) {
-            e.printStackTrace();
-            user.disconnect();
-            connectionOk = false;
+            closeConn();
         }
 
     }
@@ -139,12 +129,23 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyBoardChanged();
         } catch (RemoteException e) {
-            e.printStackTrace();
-            user.disconnect();
-            connectionOk = false;
+            closeConn();
         }
 
 
+    }
+
+    /**
+     * Closes the connection if broken
+     */
+    private void closeConn(){
+        synchronized (lockPing){
+            if (connectionOk){
+                user.disconnect();
+                connectionOk=false;
+            }
+            lockPing.notifyAll();
+        }
     }
 
     /**
@@ -163,12 +164,15 @@ public class RMIServer implements ServerConn {
                         e.printStackTrace();
                     }
                 } catch (RemoteException e) {
-                    e.printStackTrace();
-                    if(user.getStatus()!=UserStatus.DISCONNECTED){
-                        MasterServer.getMasterServer().printMessage("CONNECTION TIMEOUT!");
-                        user.disconnect();
+                    synchronized (lockPing) {
+                        if (user.getStatus() != UserStatus.DISCONNECTED) {
+                            MasterServer.getMasterServer().printMessage("CONNECTION TIMEOUT!");
+                            user.disconnect();
+                            connectionOk = false;
+                        }
+                        ping = false;
+                        lockPing.notifyAll();
                     }
-                    ping=false;
                 }
             }
         }).start();
