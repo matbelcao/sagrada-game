@@ -4,7 +4,9 @@ import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class SerializableServerUtil {
 
@@ -60,5 +62,23 @@ public class SerializableServerUtil {
 
     public static LightTool toLightTool(ToolCard tool){
         return new LightTool(tool.getName(),tool.getDescription(),tool.getId(),tool.isAlreadyUsed());
+    }
+
+    /**
+     * Constructs an indexed list of dice starting from a simple list of dice
+     * @param dieList the original list of dice
+     * @return the new immutable indexed List of dice
+     */
+    public static List<IndexedCellContent> toIndexedDieList(Place from, List<Die> dieList){
+        List<IndexedCellContent> indexedList=new ArrayList<>();
+        IndexedCellContent indexedCell;
+        Die die;
+
+        for (int index=0;index<dieList.size();index++){
+            die=dieList.get(index);
+            indexedCell=SerializableServerUtil.toIndexedCellContent(index,from,die);
+            indexedList.add(indexedCell);
+        }
+        return indexedList;
     }
 }
