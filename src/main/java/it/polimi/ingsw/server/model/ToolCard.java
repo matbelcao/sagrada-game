@@ -47,7 +47,7 @@ public class ToolCard extends Card {
 
 
 
-    public ToolCard(int id) {// TODO: 25/06/2018 remove parser from constructor
+    public ToolCard(int id) {
         super();
         super.xmlReader(id, XML_DESCRIPTION, "ToolCard");
         this.used = false;
@@ -190,7 +190,7 @@ public class ToolCard extends Card {
             modifiedDie.add(tmpDie);
         } catch (IllegalShadeException ignored) { }
 
-        return toIndexedDieList(modifiedDie);
+        return SerializableServerUtil.toIndexedDieList(from,modifiedDie);
     }
 
     /**
@@ -214,7 +214,7 @@ public class ToolCard extends Card {
         List<Die> dieList= new ArrayList<>();
         selectedDice.get(0).reroll();
         dieList.add(selectedDice.get(0));
-        return toIndexedDieList(dieList);
+        return SerializableServerUtil.toIndexedDieList(from,dieList);
     }
 
     /**
@@ -235,7 +235,7 @@ public class ToolCard extends Card {
         List<Die> dieList= new ArrayList<>();
         selectedDice.get(0).flipShade();
         dieList.add(selectedDice.get(0));
-        return toIndexedDieList(dieList);
+        return SerializableServerUtil.toIndexedDieList(from,dieList);
     }
 
     /**
@@ -247,7 +247,7 @@ public class ToolCard extends Card {
         for(int i=1;i<=6;i++){
             modifiedDie.add(new Die(i,selectedDice.get(0).getColor().toString()));
         }
-        return toIndexedDieList(modifiedDie);
+        return SerializableServerUtil.toIndexedDieList(Place.DICEBAG,modifiedDie);
     }
 
     /**
@@ -342,24 +342,6 @@ public class ToolCard extends Card {
             }
         }
         return true;
-    }
-
-    /**
-     * Constructs an indexed list of dice starting from a simple list of dice
-     * @param dieList the originl list of dice
-     * @return the new immutable indexed List of dice
-     */
-    private List<IndexedCellContent> toIndexedDieList(List<Die> dieList){
-        List<IndexedCellContent> indexedList=new ArrayList<>();
-        IndexedCellContent indexedCell;
-        Die die;
-
-        for (int index=0;index<dieList.size();index++){
-            die=dieList.get(index);
-            indexedCell=SerializableServerUtil.toIndexedCellContent(index,from,die);
-            indexedList.add(indexedCell);
-        }
-        return indexedList;
     }
 
     /**

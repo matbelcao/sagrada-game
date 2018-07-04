@@ -550,7 +550,7 @@ public class SocketServer extends Thread implements ServerConn  {
      */
     @Override
     public void ping() {
-        new Thread(() -> {
+        /*new Thread(() -> {
             while(connectionOk) {
                 synchronized (lockPing) {
                     if (pingTimer==null && connectionOk) {
@@ -567,7 +567,7 @@ public class SocketServer extends Thread implements ServerConn  {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        }).start();*/
     }
 
 }

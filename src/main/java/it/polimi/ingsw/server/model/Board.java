@@ -78,9 +78,9 @@ public class Board {
             draftedTools.add(id);
             toolCards[i]=new ToolCard(id);
         }*/
-        toolCards[0]=new ToolCard(1);
-        toolCards[1]=new ToolCard(5);
-        toolCards[2]=new ToolCard(3);
+        toolCards[0]=new ToolCard(7);
+        toolCards[1]=new ToolCard(11);
+        toolCards[2]=new ToolCard(12);
         return toolCards;
     }
 
@@ -497,6 +497,7 @@ public class Board {
      * the execution of a multiple-message command.
      */
     public void discard(){
+        if(fsm.getPlaceFrom().equals(Place.DICEBAG)){return;}
         if(fsm.isToolActive()){
             selectedTool.toolDiscard();
         }
