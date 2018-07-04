@@ -31,7 +31,8 @@ import javafx.scene.text.TextAlignment;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.*;
+import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.MAIN;
+import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.SELECT_DIE;
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;
@@ -59,10 +60,10 @@ public class GUIutil {
     private static final double PRIVOBJ_W_TO_CELL_DIM = 3.7518;
     private static final double PRIVATE_OBJ_RATIO = 0.7386;
     private static final double SCHEMA_H_TO_CELL = 4.6176;
-    private static final double DRAFTED_SCHEMAS_SCENE_RATIO = 1.47482;
+    private static final double LOBBY_SCENE_RATIO = 1.47482;
     private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.05488;
     private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0809;
-    private static final double DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO = 0.6;
+    private static final double LOBBY_SCENE_W_TO_SCREEN_RATIO = 0.6;
     private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
 
     private static final double SCHEMA_ARC_TO_WIDTH = 0.0666;
@@ -95,12 +96,12 @@ public class GUIutil {
         return SCREEN_WIDTH * LOGIN_TO_SCREEN_RATIO;
     }
 
-    public double getDraftedSchemasMinHeight() {
-        return getDraftedSchemasMinWidth() / DRAFTED_SCHEMAS_SCENE_RATIO;
+    public double getLobbyMinHeight() {
+        return getLobbyMinWidth() / LOBBY_SCENE_RATIO;
     }
 
-    public double getDraftedSchemasMinWidth() {
-        return DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO * SCREEN_WIDTH;
+    public double getLobbyMinWidth() {
+        return LOBBY_SCENE_W_TO_SCREEN_RATIO * SCREEN_WIDTH;
     }
 
     public double getGameSceneMinWidth(){
@@ -126,11 +127,19 @@ public class GUIutil {
         return cellDim;
     }
 
+    public StackPane buildLobbyPane(int numUsers) {
+        StackPane p = new StackPane();
+        Label lobbyLabel = new Label(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
+        p.getChildren().add(lobbyLabel);
+        return new StackPane(p);
+    }
+
     public HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
         HBox track = new HBox();
         track.setSpacing(ROUNDTRACK_SPACING);
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
-            Rectangle dummyCell = dummyRoundTrackCell(cellDim);
+            DieContainer dummyCell = new DieContainer(cellDim);
+            dummyCell.hideCellBorders();
             track.getChildren().add(dummyCell);
             if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
                 if(i == selectedTrackCellIndex){
@@ -145,11 +154,6 @@ public class GUIutil {
             }
         }
         return track;
-    }
-    private Rectangle dummyRoundTrackCell(double cellDim) {
-        Rectangle transparentRect = new Rectangle(0, 0, cellDim, cellDim);
-        transparentRect.setFill(Color.TRANSPARENT);
-        return transparentRect;
     }
 
     private HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList) {
@@ -559,7 +563,7 @@ public class GUIutil {
     private double getDraftedSchemasCellDim(double newWidth, double newHeight) {
         double cellDim;
         double sceneRatio = newWidth / newHeight;
-        if (sceneRatio >= DRAFTED_SCHEMAS_SCENE_RATIO) {
+        if (sceneRatio >= LOBBY_SCENE_RATIO) {
             cellDim = newHeight* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT;
         } else {
             cellDim = newWidth* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH;
@@ -677,7 +681,6 @@ public class GUIutil {
         containerPane.setCenter(v);
         return containerPane;
     }
-
 
     /*public boolean mainSceneNeedsResizing(double currentWidth, double currentHeight, double newWidth, double newHeight) {
         return newWidth > currentWidth && newHeight > currentHeight || newWidth < currentWidth && newHeight < currentHeight;
@@ -829,5 +832,11 @@ public class GUIutil {
         double spotDiameter = dieDim / SPOT_RATIO;
         gc.setFill(Color.BLACK);
         gc.fillOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
+    }
+
+    private Rectangle dummyRoundTrackCell(double cellDim) {
+        Rectangle transparentRect = new Rectangle(0, 0, cellDim, cellDim);
+        transparentRect.setFill(Color.TRANSPARENT);
+        return transparentRect;
     }*/
 }
