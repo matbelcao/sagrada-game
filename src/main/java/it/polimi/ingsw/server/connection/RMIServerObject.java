@@ -17,7 +17,6 @@ public class RMIServerObject extends UnicastRemoteObject implements RMIServerInt
         this.user = user;
     }
 
-    //OK
     @Override
     public List<LightSchemaCard> getSchemaDraft() throws IllegalActionException {
         return user.getGame().getDraftedSchemaCards(user);

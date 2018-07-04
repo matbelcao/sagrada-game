@@ -1,23 +1,20 @@
 package it.polimi.ingsw.client.controller;
 
 import it.polimi.ingsw.client.ClientOptions;
+import it.polimi.ingsw.client.connection.*;
 import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
-import it.polimi.ingsw.client.connection.ClientConn;
-import it.polimi.ingsw.client.connection.RMIClient;
-import it.polimi.ingsw.common.connection.rmi_interfaces.RMIServerInt;
-import it.polimi.ingsw.client.connection.SocketClient;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.CLI;
 import it.polimi.ingsw.client.view.clientUI.ClientUI;
 import it.polimi.ingsw.client.view.clientUI.GUI;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMode;
+import it.polimi.ingsw.common.connection.ClientInt;
+import it.polimi.ingsw.common.connection.rmi_interfaces.AuthenticationInt;
+import it.polimi.ingsw.common.connection.rmi_interfaces.RMIServerInt;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
-import it.polimi.ingsw.common.connection.rmi_interfaces.AuthenticationInt;
-import it.polimi.ingsw.common.connection.rmi_interfaces.RMIClientInt;
-import it.polimi.ingsw.client.connection.RMIClientObject;
 import org.fusesource.jansi.AnsiConsole;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,7 +29,6 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +38,7 @@ import static it.polimi.ingsw.common.enums.ErrMsg.*;
  * This class represents a client that can connect to the server and participate to a match of the game.
  * Every client has some preferences that can be set via command line options (-h to see them)
  */
-public class Client {
+public class Client implements ClientInt {
 
     public static final String XML_SOURCE = "xml/client/";
 
@@ -179,7 +175,27 @@ public class Client {
      * This method sets the wanted connection mode
      * @param connMode the requested connection mode
      */
-    public void setConnMode(ConnectionMode connMode) { this.connMode = connMode; }
+    public void setConnMode(ConnectionMode connMode) { this.connMode = connMode;
+        if(this.connMode.equals(ConnectionMode.RMI)) {
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            InputStream xmlFile = classLoader.getResourceAsStream(XML_SOURCE + CONFIGURATION_FILE_NAME);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder;
+            try {
+                dBuilder = dbFactory.newDocumentBuilder();
+                Document doc = dBuilder.parse(xmlFile);
+                doc.getDocumentElement().normalize();
+                Element eElement = (Element) doc.getElementsByTagName(CONFIGURATIONS).item(0);
+                this.port=Integer.parseInt(eElement.getElementsByTagName(RMI_PORT).item(0).getTextContent());
+            }catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     /**
      * this method sets the ip of the server to connect to
@@ -308,7 +324,7 @@ public class Client {
 
             this.fsm=new ClientFSM(this);
             if(connMode.equals(ConnectionMode.RMI)){
-                AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+AUTH);
+                AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+":"+port+SLASH+AUTH);
                 authenticator.updateConnected(username);
             }
 
@@ -323,11 +339,12 @@ public class Client {
             clientConn.pong();
 
         } catch (IOException | NotBoundException e) {
+            e.printStackTrace();
             synchronized (lockStatus) {
                 userStatus = UserStatus.DISCONNECTED;
                 lockStatus.notifyAll();
             }
-            clientUI.updateConnectionBroken();
+            disconnect();
         }
     }
 
@@ -363,15 +380,12 @@ public class Client {
      */
     private boolean loginRMI() throws RemoteException, MalformedURLException, NotBoundException {
         System.setProperty(RMI_HOSTNAME_PROPERTY,serverIP);
-        AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+AUTH);
+        AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+":"+port+SLASH+AUTH);
         if(authenticator.authenticate(username,password)){
             //get the stub of the remote object
-            RMIServerInt rmiConnStub = (RMIServerInt) Naming.lookup(RMI_SLASHSLASH+serverIP+SLASH+username);
+            RMIServerInt rmiConnStub = (RMIServerInt) Naming.lookup(RMI_SLASHSLASH+serverIP+":"+port+SLASH+username);
             clientConn = new RMIClient(rmiConnStub, this);
-            RMIClientInt rmiServerObject = new RMIClientObject(this);
-            //check if the method is necessary or just extend unicast remote obj in RMIServerObject
-            RMIClientInt remoteRef = (RMIClientInt) UnicastRemoteObject.exportObject(rmiServerObject, 0);
-            authenticator.setRemoteReference(remoteRef,username);
+            authenticator.setRemoteReference(new RMIClientObject(this),username);
             clientUI.updateConnectionOk();
             clientUI.updateLogin(true);
             return true;

@@ -249,7 +249,7 @@ public class MasterServer{
         try {
             AuthenticationInt authenticator = new RMIAuthenticator();
             Registry registry = LocateRegistry.createRegistry(portRMI);
-            Naming.rebind("rmi://"+ipAddress+"/auth", authenticator);
+            Naming.rebind("rmi://"+ipAddress+":"+portRMI+"/auth", authenticator);
             printMessage("--> SERVER WAITING CONNECTIONS VIA RMI");
         }catch (RemoteException | MalformedURLException e){
             e.printStackTrace();
@@ -430,6 +430,7 @@ public class MasterServer{
                 ServerOptions.setServerPreferences(options, server);
             }
         }
+        System.setProperty("java.rmi.server.codebase","http://"+getMasterServer().ipAddress+"/it/polimi/ingsw/server"); // TODO: 04/07/2018 find a correct codebase addr
         server.startRMI();
         server.startSocket();
         //server.startHeartBeat();

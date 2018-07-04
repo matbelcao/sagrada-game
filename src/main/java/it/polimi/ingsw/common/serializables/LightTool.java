@@ -2,7 +2,6 @@ package it.polimi.ingsw.common.serializables;
 
 import it.polimi.ingsw.server.model.ToolCard;
 
-import java.io.File;
 import java.io.Serializable;
 
 public class LightTool extends LightCard implements Serializable {

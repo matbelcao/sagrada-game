@@ -1,17 +1,19 @@
 package it.polimi.ingsw.client.connection;
 
-import it.polimi.ingsw.client.controller.Client;
+import it.polimi.ingsw.common.connection.ClientInt;
 import it.polimi.ingsw.common.connection.rmi_interfaces.RMIClientInt;
 import it.polimi.ingsw.common.serializables.GameEvent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
 import static it.polimi.ingsw.common.serializables.GameEvent.*;
 
-public class RMIClientObject implements RMIClientInt {
-    Client client;
-    public RMIClientObject(Client client) {
+public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt {
+    ClientInt client;
+    public RMIClientObject(ClientInt client) throws RemoteException {
         this.client = client;
     }
 

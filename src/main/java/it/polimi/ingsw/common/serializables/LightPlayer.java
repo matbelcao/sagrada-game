@@ -1,10 +1,8 @@
 package it.polimi.ingsw.common.serializables;
 
 import it.polimi.ingsw.server.model.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.Comparator;
 
 public class LightPlayer implements Serializable {
     private String username;
