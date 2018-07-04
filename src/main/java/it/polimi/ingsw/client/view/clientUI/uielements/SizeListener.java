@@ -12,6 +12,7 @@ public class SizeListener implements ChangeListener<Number> {
     private Timer timer;
     private final Object lockTimer;
     private GUI gui;
+    private boolean enabled = false;
 
     public SizeListener(GUI gui){
         this.timer = new Timer();
@@ -38,8 +39,9 @@ public class SizeListener implements ChangeListener<Number> {
                             System.out.println("resize to stage");
 
                             System.out.println("resiziiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiing");
-
-                            gui.drawMainGameScene();
+                            if(enabled) {
+                                gui.drawMainGameScene();
+                            }
                         }
                     };
                     // schedule new task
@@ -57,5 +59,13 @@ public class SizeListener implements ChangeListener<Number> {
                 }
             }
         }
+    }
+
+    public void enable() {
+        this.enabled = true;
+    }
+
+    public void disable() {
+        this.enabled = false;
     }
 }

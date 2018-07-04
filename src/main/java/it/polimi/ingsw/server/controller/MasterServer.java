@@ -248,7 +248,6 @@ public class MasterServer{
      */
     public void startRMI(){
         printMessage("--> SERVER STARTING CONNECTIONS VIA RMI");
-        System.setProperty("java.rmi.server.codebase","http://"+getMasterServer().ipAddress+"/it/polimi/ingsw/server"); // TODO: 04/07/2018 find a correct codebase addr
         System.setProperty("java.rmi.server.hostname",ipAddress);
         try {
             AuthenticationInt authenticator = new RMIAuthenticator();
@@ -430,6 +429,7 @@ public class MasterServer{
                     ServerOptions.setServerPreferences(options, server);
                 }
             }
+            System.setProperty("java.rmi.server.codebase","http://"+getMasterServer().ipAddress+"/it/polimi/ingsw/server"); // TODO: 04/07/2018 find a correct codebase addr
             server.startRMI();
             server.startSocket();
         } catch (InstantiationException e) {

@@ -143,6 +143,12 @@ public class GUI extends Application implements ClientUI {
         primaryStage.setResizable(false);
         primaryStage.setOnCloseRequest(e->client.quit());
         primaryStage.sizeToScene();
+
+        //disable the size listener because login is non resizable
+        sizeListener.disable();
+        //assign the size listener to the stage
+        primaryStage.widthProperty().addListener(sizeListener);
+        primaryStage.heightProperty().addListener(sizeListener);
         primaryStage.show();
         });
     }
@@ -168,13 +174,19 @@ public class GUI extends Application implements ClientUI {
     @Override //TODO make another scene
     public void updateLobby(int numUsers) {
         Platform.runLater(() -> {
-            System.out.println("updatinggggggggggggggggggg !!!!!!!!!!!!!!!!!!!!!!! LOBBBBBBYYYYYYYYYYYYYYYYYYY");
+            sizeListener.disable();
+            primaryStage.getScene().setRoot(buildLobbyPane(numUsers));
             messageToUser.setFill(Color.GREEN);
-            /* TODO add other text field */
-           // messageToUser.setText("lobby "+numUsers);
-            messageToUser.setText(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
         });
 
+    }
+
+    private StackPane buildLobbyPane(int numUsers) {
+        StackPane p = new StackPane();
+        messageToUser.setText(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
+        Label lobbyLabel = new Label(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
+        p.getChildren().add(lobbyLabel);
+        return new StackPane(p);
     }
 
     @Override
@@ -262,23 +274,22 @@ public class GUI extends Application implements ClientUI {
                 mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
             }*/
            // primaryStage.addEventFilter(Event.ANY, e->System.out.println(e));
-
+                sizeListener.enable();
                 sizeListener.purgeTimer();
                 drawMainGameScene();
 
-                primaryStage.widthProperty().addListener(sizeListener);
-                primaryStage.heightProperty().addListener(sizeListener);
+                //primaryStage.widthProperty().addListener(sizeListener);
+                //primaryStage.heightProperty().addListener(sizeListener);
 
             });
     }
 
     public void drawMainGameScene(){
-        primaryStage.getScene().setRoot(this.bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight()));
+        primaryStage.getScene().setRoot(bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight()));
     }
 
     private StackPane bulidMainPane(double newWidth, double newHeight){
         StackPane p = new StackPane();
-        System.out.println(client.getFsmState());
         if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
             BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(newWidth,newHeight,tempBoard.sortFinalPositions());
             p.getChildren().add(gameEndedPane);
