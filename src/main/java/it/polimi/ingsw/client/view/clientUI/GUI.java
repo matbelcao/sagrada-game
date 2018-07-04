@@ -146,7 +146,13 @@ public class GUI extends Application implements ClientUI {
         primaryStage.setTitle("Login");
         primaryStage.setScene(loginScene);
         primaryStage.setResizable(false);
-        primaryStage.setOnCloseRequest(e->client.quit());
+        primaryStage.setOnCloseRequest(e->{
+            if(client.isLogged())
+                client.quit();
+            else{
+                client.disconnect();
+            }
+        });
         primaryStage.sizeToScene();
 
         //disable the size listener because login is non resizable
@@ -176,7 +182,7 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void showLatestScreen() {/*this method is useful only to CLI*/}
 
-    @Override //TODO make another scene
+    @Override
     public void updateLobby(int numUsers) {
         Platform.runLater(() -> {
             primaryStage.setMinWidth(sceneCreator.getLobbyMinWidth());
@@ -210,26 +216,6 @@ public class GUI extends Application implements ClientUI {
                     drawMainGameScene();
 
                     sizeListener.enable();
-
-                /*Scene draftedSchemaScene = primaryStage.getScene();
-            draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas,privObj,minWidt, minHeight));*/
-
-           /* //OLD VERSION
-            draftedSchemaScene.widthProperty().addListener((observable, oldValue, newValue) -> {
-                if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)) {
-                    double newWidth = draftedSchemaScene.getWidth();
-                    double newHeight = draftedSchemaScene.getHeight();
-                    draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth, newHeight));
-                }
-            });
-            draftedSchemaScene.heightProperty().addListener((observable, oldValue, newValue) -> {
-                if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)) {
-                    double newWidth = draftedSchemaScene.getWidth();
-                    double newHeight = draftedSchemaScene.getHeight();
-                    draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth, newHeight));
-                }
-            });*/
-
         });
     }
 
@@ -284,7 +270,6 @@ public class GUI extends Application implements ClientUI {
             }else{
                 mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
             }*/
-           // primaryStage.addEventFilter(Event.ANY, e->System.out.println(e));
                 sizeListener.enable();
                 sizeListener.purgeTimer();
                 drawMainGameScene();
@@ -410,7 +395,6 @@ public class GUI extends Application implements ClientUI {
         }
         return cmdWrite;
     }
-
 
     @Override
     public void update(Observable o, Object arg) {
