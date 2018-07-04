@@ -60,6 +60,11 @@ public class GUI extends Application implements ClientUI {
     private SizeListener sizeListener;
     private LightBoard tempBoard;
 
+    // TODO: prendere il riferimento a board
+    private List<LightSchemaCard> tempDraftedSchemas;
+    private LightPrivObj tempPrivObj;
+
+
     public GUI() {
         instance = this;
     }
@@ -174,19 +179,14 @@ public class GUI extends Application implements ClientUI {
     @Override //TODO make another scene
     public void updateLobby(int numUsers) {
         Platform.runLater(() -> {
+            primaryStage.setMinWidth(sceneCreator.getLobbyMinWidth());
+            primaryStage.setMinHeight(sceneCreator.getLobbyMinHeight());
+            primaryStage.setResizable(false); //it was already set but I set it anyway
             sizeListener.disable();
-            primaryStage.getScene().setRoot(buildLobbyPane(numUsers));
+            primaryStage.getScene().setRoot(sceneCreator.buildLobbyPane(numUsers));
             messageToUser.setFill(Color.GREEN);
         });
 
-    }
-
-    private StackPane buildLobbyPane(int numUsers) {
-        StackPane p = new StackPane();
-        messageToUser.setText(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
-        Label lobbyLabel = new Label(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
-        p.getChildren().add(lobbyLabel);
-        return new StackPane(p);
     }
 
     @Override
@@ -197,26 +197,37 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
         Platform.runLater(() -> {
-            primaryStage.setTitle("Sagrada");
-            primaryStage.setResizable(true);
-            double minWidt = sceneCreator.getDraftedSchemasMinWidth();
-            double minHeight = sceneCreator.getDraftedSchemasMinHeight();
-            Scene draftedSchemaScene = primaryStage.getScene();
-            draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas,privObj,minWidt, minHeight));
-            primaryStage.setMinHeight(minHeight);
-            primaryStage.setMinWidth(minWidt);
+                    tempDraftedSchemas = draftedSchemas;
+                    tempPrivObj = privObj;
+                    primaryStage.setTitle("Sagrada");
+                    primaryStage.setResizable(true);
+                    //the initial size is the minimum size and it's also the same size as lobby scene
+                    double minWidt = sceneCreator.getLobbyMinWidth();
+                    double minHeight = sceneCreator.getLobbyMinHeight();
+                    primaryStage.setMinHeight(minHeight);
+                    primaryStage.setMinWidth(minWidt);
 
+                    drawMainGameScene();
 
-            //OLD VERSION
-            /*draftedSchemaScene.widthProperty().addListener((observable, oldValue, newValue) -> {
-                double newWidth = draftedSchemaScene.getWidth();
-                double newHeight = draftedSchemaScene.getHeight();
-                draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth,newHeight));
+                    sizeListener.enable();
+
+                /*Scene draftedSchemaScene = primaryStage.getScene();
+            draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas,privObj,minWidt, minHeight));*/
+
+           /* //OLD VERSION
+            draftedSchemaScene.widthProperty().addListener((observable, oldValue, newValue) -> {
+                if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)) {
+                    double newWidth = draftedSchemaScene.getWidth();
+                    double newHeight = draftedSchemaScene.getHeight();
+                    draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth, newHeight));
+                }
             });
             draftedSchemaScene.heightProperty().addListener((observable, oldValue, newValue) -> {
-                double newWidth = draftedSchemaScene.getWidth();
-                double newHeight = draftedSchemaScene.getHeight();
-                draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth,newHeight));
+                if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)) {
+                    double newWidth = draftedSchemaScene.getWidth();
+                    double newHeight = draftedSchemaScene.getHeight();
+                    draftedSchemaScene.setRoot(sceneCreator.buildDraftedSchemasPane(draftedSchemas, privObj, newWidth, newHeight));
+                }
             });*/
 
         });
@@ -290,7 +301,13 @@ public class GUI extends Application implements ClientUI {
 
     private StackPane bulidMainPane(double newWidth, double newHeight){
         StackPane p = new StackPane();
-        if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
+        if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)){
+            BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(tempDraftedSchemas, tempPrivObj, newWidth, newHeight) ;
+            p.getChildren().add(draftedSchemasPane);
+        }else if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
+            primaryStage.setMinWidth(sceneCreator.getLobbyMinWidth());
+            primaryStage.setMinHeight(sceneCreator.getLobbyMinHeight());
+            //primaryStage.setResizable(false);
             BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(newWidth,newHeight,tempBoard.sortFinalPositions());
             p.getChildren().add(gameEndedPane);
         }else{
@@ -316,7 +333,6 @@ public class GUI extends Application implements ClientUI {
     }
 
     private BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board){
-        //System.out.println("BULIDING FRONT PANE");
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();

@@ -22,24 +22,24 @@ public class SizeListener implements ChangeListener<Number> {
     @Override
     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
         synchronized (lockTimer) {
-             {
-                if(timer!=null){
-                    timer.cancel();
-                   System.out.print("CANCELLATO TIMER");
-                }
-                timer = new Timer();
-                TimerTask task = null; // task to execute after defined delay
-                final long delayTime = DELAY_TIME; // delay that has to pass in order to consider an operation done
+                if (enabled) {
+                    if (timer != null) {
+                        timer.cancel();
+                        //System.out.print("CANCELLATO TIMER");
+                    }
+                    timer = new Timer();
+                    TimerTask task = null; // task to execute after defined delay
+                    final long delayTime = DELAY_TIME; // delay that has to pass in order to consider an operation done
                     if (task != null) { // there was already a task scheduled from the previous operation ...
                         task.cancel(); // cancel it, we have a new size to consider
                     }
                     task = new TimerTask() {// create new task that calls resize operation
                         @Override
                         public void run() {
-                            System.out.println("resize to stage");
+                            //System.out.println("resize to stage");
 
-                            System.out.println("resiziiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiing");
-                            if(enabled) {
+                            //System.out.println("resiziiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiing");
+                            if (enabled) {
                                 gui.drawMainGameScene();
                             }
                         }

@@ -31,7 +31,8 @@ import javafx.scene.text.TextAlignment;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.*;
+import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.MAIN;
+import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.SELECT_DIE;
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;
@@ -59,10 +60,10 @@ public class GUIutil {
     private static final double PRIVOBJ_W_TO_CELL_DIM = 3.7518;
     private static final double PRIVATE_OBJ_RATIO = 0.7386;
     private static final double SCHEMA_H_TO_CELL = 4.6176;
-    private static final double DRAFTED_SCHEMAS_SCENE_RATIO = 1.47489;
-    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.061436;
-    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0906;
-    private static final double DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO = 0.6;
+    private static final double LOBBY_SCENE_RATIO = 1.47482;
+    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.05488;
+    private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0809;
+    private static final double LOBBY_SCENE_W_TO_SCREEN_RATIO = 0.6;
     private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
 
     private static final double SCHEMA_ARC_TO_WIDTH = 0.0666;
@@ -95,12 +96,12 @@ public class GUIutil {
         return SCREEN_WIDTH * LOGIN_TO_SCREEN_RATIO;
     }
 
-    public double getDraftedSchemasMinHeight() {
-        return getDraftedSchemasMinWidth() / DRAFTED_SCHEMAS_SCENE_RATIO;
+    public double getLobbyMinHeight() {
+        return getLobbyMinWidth() / LOBBY_SCENE_RATIO;
     }
 
-    public double getDraftedSchemasMinWidth() {
-        return DRAFTED_SCHEMAS_SCENE_W_TO_SCREEN_RATIO * SCREEN_WIDTH;
+    public double getLobbyMinWidth() {
+        return LOBBY_SCENE_W_TO_SCREEN_RATIO * SCREEN_WIDTH;
     }
 
     public double getGameSceneMinWidth(){
@@ -126,11 +127,19 @@ public class GUIutil {
         return cellDim;
     }
 
+    public StackPane buildLobbyPane(int numUsers) {
+        StackPane p = new StackPane();
+        Label lobbyLabel = new Label(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
+        p.getChildren().add(lobbyLabel);
+        return new StackPane(p);
+    }
+
     public HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
         HBox track = new HBox();
         track.setSpacing(ROUNDTRACK_SPACING);
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
-            Rectangle dummyCell = dummyRoundTrackCell(cellDim);
+            DieContainer dummyCell = new DieContainer(cellDim);
+            dummyCell.hideCellBorders();
             track.getChildren().add(dummyCell);
             if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
                 if(i == selectedTrackCellIndex){
@@ -145,11 +154,6 @@ public class GUIutil {
             }
         }
         return track;
-    }
-    private Rectangle dummyRoundTrackCell(double cellDim) {
-        Rectangle transparentRect = new Rectangle(0, 0, cellDim, cellDim);
-        transparentRect.setFill(Color.TRANSPARENT);
-        return transparentRect;
     }
 
     private HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList) {
@@ -504,20 +508,20 @@ public class GUIutil {
         if (latestDiceList.get(0).getPlace().equals(Place.SCHEMA)) {
             for (IndexedCellContent activeCell : latestDiceList) {
                 DieContainer cell = schemaCells.get(activeCell.getPosition());
-                cell.highlightGreen();
+                cell.highlightBlue();
                 cell.setOnMouseClicked(e -> cmdWrite.write(latestDiceList.indexOf(activeCell) + ""));
             }
         } else if (latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)) {
             if (latestOptionsList.isEmpty() || (!latestOptionsList.get(0).equals(Actions.SET_SHADE) && !latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
                 for (IndexedCellContent activeCell : latestDiceList) {
                     DieContainer cell = draftPoolCells.get(activeCell.getPosition());
-                    cell.highlightGreen();
+                    cell.highlightBlue();
                     cell.setOnMouseClicked(e -> cmdWrite.write(draftPoolCells.indexOf(cell) + ""));
                 }
             }
         }else if (latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
             for (int i = 0; i < roundTrack.size(); i++) {
-                roundTrackCells.get(i).highlightGreen();
+                roundTrackCells.get(i).highlightBlue();
                 if (roundTrack.get(i).size() < 2) {
                     roundTrackCells.get(i).highlightOrange();
                     int finalI = i;
@@ -531,18 +535,22 @@ public class GUIutil {
         IndexedCellContent latestSelectedDie = board.getLatestSelectedDie();
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<Integer> latestPlacementsList = board.getLatestPlacementsList();
-        if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL) || !latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)) {
+        if (!latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)) {
             for (DieContainer cell : schemaCells) {
                 if (latestPlacementsList.contains(schemaCells.indexOf(cell))) {
                     cell.highlightGreen();
                     cell.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(cell)) + ""));
                 }
             }
-        }else if(latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
-            if(latestOptionsList.get(0).equals(Actions.SET_SHADE)){
-                return;//todo properly higlight the selected die
+            if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
+                for (DieContainer cell : draftPoolCells) {
+                    cell.setOnMouseClicked(e -> {
+                        System.out.println("selected die");
+                        cmdWrite.write("d");
+                        cmdWrite.write(draftPoolCells.indexOf(cell) + "");
+                    });
+                }
             }
-            draftPoolCells.get(latestSelectedDie.getPosition()).highlightBlue();
         }
     }
 
@@ -555,7 +563,7 @@ public class GUIutil {
     private double getDraftedSchemasCellDim(double newWidth, double newHeight) {
         double cellDim;
         double sceneRatio = newWidth / newHeight;
-        if (sceneRatio >= DRAFTED_SCHEMAS_SCENE_RATIO) {
+        if (sceneRatio >= LOBBY_SCENE_RATIO) {
             cellDim = newHeight* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT;
         } else {
             cellDim = newWidth* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH;
@@ -564,7 +572,6 @@ public class GUIutil {
     }
 
     public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj lightPrivObj, double newWidth, double newHeight){
-        System.out.println("BUILDING DRAFTED SCHEMAS");
         double cellDim = getDraftedSchemasCellDim(newWidth,newHeight);
         double spacing = DRAFTED_SCHEMAS_SPACING_TO_CELL*cellDim;
 
@@ -674,157 +681,4 @@ public class GUIutil {
         containerPane.setCenter(v);
         return containerPane;
     }
-
-
-    /*public boolean mainSceneNeedsResizing(double currentWidth, double currentHeight, double newWidth, double newHeight) {
-        return newWidth > currentWidth && newHeight > currentHeight || newWidth < currentWidth && newHeight < currentHeight;
-    }
-    private void drawRoundTrackNumber(GraphicsContext gc, int index, double cellDim) {
-        double textSize = TEXT_DIM_TO_CELL_DIM * cellDim;
-        gc.setFont(Font.font("Calibri", textSize));
-        //gc.setTextAlign(TextAlignment.CENTER);
-        gc.fillText(index + "", cellDim / 2, cellDim / 2);
-    }
-
-    private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
-        drawDie(lightDie, graphicsContext2D, 0, 0, dieDim);
-    }
-
-     private void highlight(Canvas cell, double cellDim) {
-        GraphicsContext gc = cell.getGraphicsContext2D();
-        gc.setStroke(Color.ORANGE);
-        gc.setLineWidth(cellDim * LINE_TO_CELL);
-        gc.strokeRect(0, 0, cellDim, cellDim);
-    }
-
-     private void drawWhiteCell(GraphicsContext gc, double x, double y, double cellDim) {
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(cellDim * LINE_TO_CELL);
-        gc.fillRect(x, y, cellDim, cellDim);
-        gc.strokeRect(x, y, cellDim, cellDim);
-    }
-    private void drawConstraint(LightConstraint constraint, GraphicsContext gc, double x, double y, double cellDim) {
-        if (constraint.hasColor()) {
-            drawColorConstraint(constraint.getDieColor(), gc, x, y, cellDim);
-        } else {
-            drawShadeConstraint(constraint.getShade(), gc, x, y, cellDim);
-        }
-    }
-
-    private void drawShadeConstraint(Shade shade, GraphicsContext gc, double x, double y, double cellDim) {
-        gc.setFill(Color.LIGHTGRAY);
-        gc.fillRect(x, y, cellDim, cellDim);
-        drawConstraintSpots(gc, x, y, cellDim, shade.toInt());
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(cellDim * LINE_TO_CELL);
-        gc.strokeRect(x, y, cellDim, cellDim);
-    }
-
-    private void drawColorConstraint(DieColor dieColor, GraphicsContext gc, double x, double y, double cellDim) {
-        gc.setFill(dieColor.getFXConstraintColor());
-        gc.fillRect(x, y, cellDim, cellDim);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(cellDim * LINE_TO_CELL);
-        gc.strokeRect(x, y, cellDim, cellDim);
-    }
-
-
-
-    private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double dieDim) {
-        double lineWidth = LINE_TO_DIE * dieDim;
-        gc.setFill(Color.BLACK);
-        gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        gc.setFill(lightDie.getDieColor().getFXColor());
-        gc.fillRoundRect(x + lineWidth, y + lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        drawSpots(gc, x, y, dieDim, lightDie.getShade().toInt());
-    }
-
-    private void drawDie(DieColor dieColor, Shade shade, GraphicsContext gc, double x, double y, double dieDim) {
-        double lineWidth = LINE_TO_DIE * dieDim;
-        gc.setFill(Color.BLACK);
-        gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        gc.setFill(dieColor.getFXColor());
-        gc.fillRoundRect(x + lineWidth, y + lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        drawSpots(gc, x, y, dieDim, shade.toInt());
-    }
-
-
-    private void drawSpots(GraphicsContext gc, double xAxisDiePosition, double Y_axis_die_position, double dieDim, int count) {
-        switch (count) {
-            case 1:
-                drawSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                break;
-            case 3:
-                drawSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                // Fall thru to next case
-            case 2:
-                drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                break;
-            case 5:
-                drawSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                // Fall thru to next case
-            case 4:
-                drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                break;
-            case 6:
-                drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawSpot(gc, 3 * dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                break;
-        }
-    }
-
-   private void drawConstraintSpots(GraphicsContext gc, double xAxisDiePosition, double Y_axis_die_position, double dieDim, int count) {
-        switch (count) {
-            case 1:
-                drawConstraintSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                break;
-            case 3:
-                drawConstraintSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                // Fall thru to next case
-            case 2:
-                drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                break;
-            case 5:
-                drawConstraintSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                // Fall thru to next case
-            case 4:
-                drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                break;
-            case 6:
-                drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                drawConstraintSpot(gc, 3 * dieDim / 4, dieDim / 2, dieDim, xAxisDiePosition, Y_axis_die_position);
-                break;
-        }
-    }
-    private void drawConstraintSpot(GraphicsContext gc, double x, double y, double dieDim, double xAxisDiePosition, double yAxisDiePosition) {
-        double spotDiameter = dieDim / SPOT_RATIO;
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(spotDiameter / 5);
-        gc.fillOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
-        gc.strokeOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
-    }
-
-    private void drawSpot(GraphicsContext gc, double x, double y, double dieDim, double xAxisDiePosition, double yAxisDiePosition) {
-        double spotDiameter = dieDim / SPOT_RATIO;
-        gc.setFill(Color.BLACK);
-        gc.fillOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
-    }*/
 }
