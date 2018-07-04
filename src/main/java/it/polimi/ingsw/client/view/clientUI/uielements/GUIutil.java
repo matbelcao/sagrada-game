@@ -17,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -34,6 +35,7 @@ import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.CHOOSE_SCHEMA_2;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.REMAINING_TOKENS;
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.SCORE;
 import static javafx.geometry.Pos.*;
 
 public class GUIutil {
@@ -643,6 +645,30 @@ public class GUIutil {
         gc.setTextBaseline(VPos.TOP);
         gc.setFill(Color.AZURE);
         gc.fillText(lightSchemaCard.getName(), x, y);
+    }
+
+    public BorderPane buildGameEndedPane(double newWidth, double newHeight, List<LightPlayer> players) {
+        Label scoreLabel = new Label(uimsg.getMessage(SCORE));
+        scoreLabel.setAlignment(CENTER);
+        scoreLabel.setFont(Font.font(FONT, 25)); //TODO dynamic
+
+        GridPane scoreBoard = new GridPane();
+        scoreBoard.setHgap(10);
+        scoreBoard.setVgap(10);
+        scoreBoard.setAlignment(CENTER);
+        for(int i = 0; i < players.size();i++){
+            Label name = new Label(players.get(i).getUsername());
+            Label points = new Label(players.get(i).getPoints()+"");
+            name.setFont(Font.font(FONT, 25)); //TODO dynamic
+            points.setFont(Font.font(FONT, 25)); //TODO dynamic
+            scoreBoard.add(name,0,i);
+            scoreBoard.add(points,1,i);
+
+        }
+
+        BorderPane containerPane = new BorderPane();
+        containerPane.setCenter(new VBox(scoreLabel,scoreBoard));
+        return containerPane;
     }
 
 

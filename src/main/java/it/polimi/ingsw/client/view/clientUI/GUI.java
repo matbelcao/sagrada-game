@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.client.controller.CmdWriter;
 import it.polimi.ingsw.client.controller.QueuedCmdReader;
 import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.textGen;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.DieContainer;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
@@ -28,6 +29,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -38,7 +40,6 @@ import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.Observable;
-import java.util.Timer;
 
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
@@ -56,8 +57,6 @@ public class GUI extends Application implements ClientUI {
     private Text messageToUser = new Text();
     private CmdWriter cmdWrite;
     private int playerId;// TODO: 03/07/2018
-    private final Object lockTimerSize =new Object();
-    private Timer timer;
     private SizeListener sizeListener;
     private LightBoard tempBoard;
 
@@ -107,13 +106,13 @@ public class GUI extends Application implements ClientUI {
         grid.add(username, 0, 1);
         TextField usernameField = new TextField();
         usernameField.setPromptText("Username");
-        //usernameField.setText(textGen.getRandomString()); //TODO delete
+        usernameField.setText(textGen.getRandomString()); //TODO delete
         grid.add(usernameField, 1, 1);
         Label password = new Label("Password:");
         grid.add(password, 0, 2);
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
-       // passwordField.setText(textGen.getRandomString()); //TODO delete
+       passwordField.setText(textGen.getRandomString()); //TODO delete
         grid.add(passwordField, 1, 2);
         Button button = new Button("Sign in");
         HBox hbBtn = new HBox(10);
@@ -138,7 +137,7 @@ public class GUI extends Application implements ClientUI {
                 client.setUsername(usernameField.getText());
                 client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
         });
-       // usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //delete
+       usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //todo delete
         primaryStage.setTitle("Login");
         primaryStage.setScene(loginScene);
         primaryStage.setResizable(false);
@@ -251,10 +250,10 @@ public class GUI extends Application implements ClientUI {
             }
             primaryStage.setMinWidth(sceneCreator.getGameSceneMinWidth());
             primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight());
-            double currentWidth = primaryStage.getWidth();
-            double currentHeight = primaryStage.getHeight();
-            Scene mainScene = primaryStage.getScene();
-            mainScene.setRoot(bulidMainPane(currentWidth,currentHeight));
+            //double currentWidth = primaryStage.getWidth();
+            //double currentHeight = primaryStage.getHeight();
+           // primaryStage.getScene().setRoot(bulidMainPane(currentWidth,currentHeight));
+
             /*if(mainScene == null){
                 mainScene = new Scene(bulidMainPane(currentWidth,currentHeight,board));
                 primaryStage.setScene(mainScene);
@@ -262,11 +261,9 @@ public class GUI extends Application implements ClientUI {
                 mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
             }*/
            // primaryStage.addEventFilter(Event.ANY, e->System.out.println(e));
-            //mainScene.widthProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
-           //mainScene.heightProperty().addListener((observable, oldValue, newValue) -> mainScene.setRoot(bulidMainPane(mainScene.getWidth(),mainScene.getHeight(),board)));
 
                 sizeListener.purgeTimer();
-                redrawWindow();
+                drawMainGameScene();
 
                 primaryStage.widthProperty().addListener(sizeListener);
                 primaryStage.heightProperty().addListener(sizeListener);
@@ -274,32 +271,40 @@ public class GUI extends Application implements ClientUI {
             });
     }
 
-    public void redrawWindow(){
+    public void drawMainGameScene(){
         primaryStage.getScene().setRoot(this.bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight()));
     }
 
-    public StackPane bulidMainPane(double newWidth, double newHeight){
-        BorderPane frontPane = buildFrontPane(newWidth,newHeight,tempBoard);
-        List <Actions> latestOptionsList = tempBoard.getLatestOptionsList();
-        ClientFSMState turnState = client.getFsmState();
-        StackPane p = new StackPane(frontPane);
-        p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight,tempBoard,turnState)));
-        p.addEventHandler(SELECTED_PLAYER, e -> {
-            p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight,tempBoard)); //todo create everything at once? note that two events are executed
-            System.out.println("selected player");
-        });
-        p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
+    private StackPane bulidMainPane(double newWidth, double newHeight){
+        StackPane p = new StackPane();
+        System.out.println(client.getFsmState());
+        if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
+            BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(newWidth,newHeight,tempBoard.sortFinalPositions());
+            p.getChildren().add(gameEndedPane);
+        }else{
+            BorderPane frontPane = buildFrontPane(newWidth,newHeight,tempBoard);
+            List <Actions> latestOptionsList = tempBoard.getLatestOptionsList();
+            ClientFSMState turnState = client.getFsmState();
+            p.getChildren().add(frontPane);
+            //the pane listens for custom events to know when it has to which layer
+            p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight,tempBoard,turnState)));
+            p.addEventHandler(SELECTED_PLAYER, e -> {
+                p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight,tempBoard)); //todo create everything at once? note that two events are executed
+                System.out.println("selected player");
+            });
+            p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
 
 
-        if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
-            BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,tempBoard);
-            p.getChildren().add(backPane);
+            if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
+                BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,tempBoard);
+                p.getChildren().add(backPane);
+            }
         }
         return p;
     }
 
     private BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board){
-        System.out.println("BULIDING FRONT PANE");
+        //System.out.println("BULIDING FRONT PANE");
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
