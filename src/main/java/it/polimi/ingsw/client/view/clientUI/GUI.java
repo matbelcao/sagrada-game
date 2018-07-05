@@ -200,8 +200,8 @@ public class GUI extends Application implements ClientUI {
         this.playerId = playerId;
     }
 
-    @Override
-    public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
+
+    void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
         Platform.runLater(() -> {
                     tempDraftedSchemas = draftedSchemas;
                     tempPrivObj = privObj;

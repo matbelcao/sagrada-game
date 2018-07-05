@@ -260,7 +260,7 @@ public class Client implements ClientInt {
             new Thread(() -> GUI.launch(this, language)).start();
             while(GUI.getGUI() == null){
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -303,7 +303,7 @@ public class Client implements ClientInt {
             do{
                 
                 synchronized (lockCredentials) {
-                    while (username == null|| password == null) {
+                    while (username == null || password == null) {
                         lockCredentials.wait();
                     }
                 }
@@ -478,9 +478,11 @@ public class Client implements ClientInt {
         board.setPrivObj(clientConn.getPrivateObject());
         board.setDraftedSchemas(clientConn.getSchemaDraft());
         board.addObserver(clientUI);
-
+        assert(fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA));
         clientUI.updateGameStart(numPlayers,playerId);
-        clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
+
+        board.notifyObservers();
+        //clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
 
     }
 
@@ -633,11 +635,9 @@ public class Client implements ClientInt {
         }
         board.updateStatus(playerId, status);
 
-        if(isPlayingTurns()) {
-            board.notifyObservers();
-        }else if(fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA)){
-            clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
-        }
+
+        board.notifyObservers();
+
     }
 
     /**

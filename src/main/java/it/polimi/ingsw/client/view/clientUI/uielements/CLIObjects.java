@@ -98,7 +98,7 @@ public class CLIObjects {
         builder.append(NEW_LINE+NEW_LINE);
         builder.append(printList(appendRows(appendRows(buildWall(drafted.size(), SCHEMA_WIDTH+10, SPACE),drafted),priv))).append(NEW_LINE+NEW_LINE+NEW_LINE);
         builder.append(uiMsg.getMessage(CHOOSE_SCHEMA)).append(NEW_LINE+NEW_LINE);
-        builder.append(getPrompt(ClientFSMState.CHOOSE_SCHEMA));
+        builder.append(getPrompt(ClientFSMState.CHOOSE_SCHEMA,Place.NONE ));
         latestScreen =builder.toString();
         schemas.clear();
         return latestScreen;
@@ -110,9 +110,10 @@ public class CLIObjects {
     /**
      * this builds the main game view according to the state of the players
      * @param state the state of the player
+     * @param latestDiePlace the place of the latest selected die
      * @return the string containing the whole screen
      */
-    public  String printMainView(ClientFSMState state){
+    public  String printMainView(ClientFSMState state,Place latestDiePlace){
         StringBuilder builder=new StringBuilder();
         builder.append(resetScreenPosition());
         builder.append(printList(buildRoundTrack())).append(SPACE+SEPARATOR+NEW_LINE);
@@ -125,9 +126,18 @@ public class CLIObjects {
 
         builder.append(printList(buildBottomSection())).append(NEW_LINE);
 
-        builder.append(getPrompt(state));
+        builder.append(getPrompt(state, latestDiePlace));
         latestScreen =builder.toString();
         return latestScreen;
+    }
+
+    /**
+     * this builds the main game view according to the state of the players
+     * @param state the state of the player
+     * @return the string containing the whole screen
+     */
+    public  String printMainView(ClientFSMState state){
+        return printMainView(state,Place.NONE);
     }
 
 
@@ -137,7 +147,7 @@ public class CLIObjects {
         builder.append(printList(buildGameRanking()));
 
         builder.append(NEW_LINE);
-        builder.append(getPrompt(ClientFSMState.GAME_ENDED));
+        builder.append(getPrompt(ClientFSMState.GAME_ENDED, Place.NONE));
         latestScreen = builder.toString();
         return latestScreen;
     }
@@ -342,9 +352,10 @@ public class CLIObjects {
     /**
      * this builds the prompt according to the state of the client
      * @param state the client's state
+     * @param latestDiePlace
      * @return the prompt line
      */
-    private String getPrompt(ClientFSMState state) {
+    private String getPrompt(ClientFSMState state, Place latestDiePlace) {
         return String.format(cliFormatter.getElem(PROMPT), buildPromptOptions(state));
     }
 
