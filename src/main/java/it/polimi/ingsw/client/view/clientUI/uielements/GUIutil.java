@@ -304,21 +304,11 @@ public class GUIutil {
         return backPane;
     }
 
-    public Group getPlayersStatusBar(int myPlayerId, LightBoard board) {
+    public VBox getPlayersAndInfoPane(int myPlayerId, LightBoard board){
         Text turnText = new Text();
         Text currentlyPlaying = new Text();
-        HBox playerSelector = new HBox();
-        for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
-            Group playerStatusBar = getPlayerStatusBar(playerId,myPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
-            playerSelector.getChildren().add(playerStatusBar);
-            if(playerId == board.getMyPlayerId() || playerId == myPlayerId){
-                continue;
-            }else{
-                Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
-                playerStatusBar.setOnMouseEntered(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
-                playerStatusBar.setOnMouseClicked(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
-            }
-        }
+        HBox playerSelector = getPlayersStatusBar(myPlayerId, board);
+
         int font = 24; //todo set dynamic
 
         if(board.getIsFirstTurn()) {
@@ -334,17 +324,34 @@ public class GUIutil {
         }
         turnText.setFont(new Font(FONT,font));
         currentlyPlaying.setFont(new Font(FONT,font));
-        playerSelector.setAlignment(Pos.BOTTOM_LEFT);
 
-        VBox playerSelecorAndMessage = new VBox(turnText,currentlyPlaying,playerSelector);
-        playerSelecorAndMessage.setAlignment(Pos.BOTTOM_LEFT);
-        return  new Group(playerSelecorAndMessage);
+        VBox playerSelectorAndMessage = new VBox(turnText,currentlyPlaying,playerSelector);
+        playerSelectorAndMessage.setAlignment(Pos.BOTTOM_LEFT);
+        return  playerSelectorAndMessage;
+    }
+
+    public HBox getPlayersStatusBar(int myPlayerId, LightBoard board) {
+
+        HBox playerSelector = new HBox();
+        for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
+            Group playerStatusBar = getPlayerStatusBar(playerId,myPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
+            playerSelector.getChildren().add(playerStatusBar);
+            if(playerId == board.getMyPlayerId() || playerId == myPlayerId){
+                continue;
+            }else{
+                Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
+                playerStatusBar.setOnMouseEntered(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
+                playerStatusBar.setOnMouseClicked(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
+            }
+            //playerSelector.setAlignment(Pos.BOTTOM_LEFT);
+        }
+        return playerSelector;
     }
 
     //todo update
     public BorderPane buildSelectdPlayerPane(int playerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
-        Group playersSelector = getPlayersStatusBar(playerId,board);
+        HBox playersSelector = getPlayersStatusBar(playerId,board);
         Region spacer = new Region();
         HBox.setHgrow(spacer,Priority.ALWAYS);
         HBox bottomContainer = new HBox(playersSelector,spacer);
