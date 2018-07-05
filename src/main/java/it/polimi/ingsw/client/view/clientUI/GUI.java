@@ -331,7 +331,7 @@ public class GUI extends Application implements ClientUI {
 
         //Center side of the border pane
         Group schema = sceneCreator.buildSchema(schemaCells,favorTokens,cellDim);
-        HBox playersStatusBar = sceneCreator.getPlayersStatusBar(board.getMyPlayerId(),board);
+        Group playersStatusBar = sceneCreator.getPlayersStatusBar(board.getMyPlayerId(),board);
         StackPane schemaContainer = new StackPane(schema);
         VBox.setVgrow(schemaContainer,Priority.ALWAYS);
         frontPane.setCenter(new VBox(schemaContainer,playersStatusBar));
