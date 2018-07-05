@@ -270,8 +270,10 @@ public class GUIutil {
 
     public StackPane buildWaitingForGameStartScene(double width, double height) { //todo make dynamic
         String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
-        Text waitingText = new Text(message);
+        Label waitingText = new Label(message);
+        waitingText.setId("lobby-message");
         StackPane stackPane = new StackPane(waitingText);
+        stackPane.setStyle("-fx-background-image: url('img/wall.png');");
         return stackPane;
     }
 
