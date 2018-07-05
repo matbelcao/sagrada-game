@@ -80,6 +80,10 @@
         <eng>Draftpool</eng>
         <ita>Riserva</ita>
     </draftpool>
+    <dicebag>
+        <eng>Dicebag</eng>
+        <ita>Sacchetto</ita>
+    </dicebag>
     <roundtrack>
         <eng>Round track</eng>
         <ita>Tracciato dei round</ita>

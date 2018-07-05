@@ -40,10 +40,12 @@ public class ClientFSM {
 
                 case QUIT:
                     client.quit();
+
                     break;
                 case END_TURN:
                     if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(GAME_ENDED))) {
                         client.getClientConn().endTurn();
+                        state=state.nextState(false, false, true, false);
                     }else{
                         invalidInput();
                     }
@@ -51,14 +53,17 @@ public class ClientFSM {
                 case BACK:
                     if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(GAME_ENDED)||state.equals(MAIN))){
                         client.getClientConn().back();
+                        state=state.nextState(false, true, false, false);
                     }else{
                         invalidInput();
                     }
                     break;
                 case DISCARD:
-                    if (state.equals(CHOOSE_PLACEMENT)) {
+                    if (state.equals(CHOOSE_PLACEMENT)
+                            && !client.getBoard().getLatestSelectedDie().getPlace().equals(Place.DICEBAG)) {
                         client.getClientConn().discard();
                         client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
+                        state=state.nextState(false, false, false, true);
                     }else{
                         invalidInput();
                     }
@@ -77,9 +82,7 @@ public class ClientFSM {
                     invalidInput();
                     return;
             }
-            //state update
 
-            state=state.nextState(false, option==BACK, option==END_TURN, option==DISCARD);
             lockState.notifyAll();
         }
         if(option != QUIT) {

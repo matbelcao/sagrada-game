@@ -158,17 +158,6 @@ public class CLI implements ClientUI {
 
     }
 
-    /**
-     * this method is called right after the message that signals the start of a game and shows to the user elements
-     * of the board and the drafted schemas to be able to make a choice of the schema based on them
-     * @param draftedSchemas the schemas that have been drafted for this player
-     * @param privObj the private objective of the player
-     */
-    void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
-        view.updateDraftedSchemas(draftedSchemas);
-        view.updatePrivObj(privObj);
-        printToScreen(view.printSchemaChoiceView());
-    }
 
     /**
      * this method updates the view to the latest changes in the lightboard and/or state of the client
@@ -220,7 +209,9 @@ public class CLI implements ClientUI {
         switch (client.getFsmState()) {
 
             case CHOOSE_SCHEMA:
-                showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
+                view.updateDraftedSchemas(board.getDraftedSchemas());
+                view.updatePrivObj(board.getPrivObj());
+                printToScreen(view.printSchemaChoiceView());
                 break;
 
             case NOT_MY_TURN:
