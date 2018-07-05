@@ -242,7 +242,7 @@ public class ToolCard extends Card {
      * Returns the possible faces that the die (which the player wants to change) can take
      * @return the indexed list of possible face-changing options
      */
-    public List<IndexedCellContent> chooseShade(){
+    public List<IndexedCellContent> setShade(){
         List <Die> modifiedDie=new ArrayList<>();
         for(int i=1;i<=6;i++){
             modifiedDie.add(new Die(i,selectedDice.get(0).getColor().toString()));

@@ -51,7 +51,7 @@ public class GUIutil {
     private static final Color OPAQUE_FILL = Color.rgb(0,0,0,0.3);
 
     //-----login Stage
-    private static final double LOGIN_TO_SCREEN_RATIO = 0.18;
+    private static final double LOGIN_TO_SCREEN_RATIO = 0.25;
     private static final double LOGIN_RATIO = 0.95;
     //-----Lobby
     private static final double LOBBY_SCENE_RATIO = 1.47482;
@@ -94,6 +94,10 @@ public class GUIutil {
 
     public double getLoginWidth() {
         return SCREEN_WIDTH * LOGIN_TO_SCREEN_RATIO;
+    }
+
+    public double getLoginHeight() {
+        return SCREEN_WIDTH * LOGIN_TO_SCREEN_RATIO * LOGIN_RATIO;
     }
 
     public double getLobbyMinHeight() {

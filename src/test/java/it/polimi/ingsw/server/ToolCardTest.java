@@ -332,7 +332,7 @@ class ToolCardTest {
         assertFalse(tool.isInternalSchemaPlacement());
 
         tool.selectDie(die1);
-        List<IndexedCellContent> diceList=tool.chooseShade();
+        List<IndexedCellContent> diceList=tool.setShade();
         assertEquals(6,diceList.size());
         for(int i=0;i<diceList.size();i++){
             assertEquals("PURPLE",diceList.get(i).getContent().getDieColor().toString());
