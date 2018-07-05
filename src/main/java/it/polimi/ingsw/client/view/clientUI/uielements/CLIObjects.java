@@ -356,7 +356,7 @@ public class CLIObjects {
      * @return the prompt line
      */
     private String getPrompt(ClientFSMState state, Place latestDiePlace) {
-        return String.format(cliFormatter.getElem(PROMPT), buildPromptOptions(state));
+        return String.format(cliFormatter.getElem(PROMPT), buildPromptOptions(state,latestDiePlace));
     }
 
 
@@ -507,15 +507,18 @@ public class CLIObjects {
     /**
      * this builds the prompt line according to the state of the match/turn
      * @param state the turn/match state
+     * @param latestDiePlace
      * @return the prompt line
      */
-    private String buildPromptOptions(ClientFSMState state) {
+    private String buildPromptOptions(ClientFSMState state, Place latestDiePlace) {
         StringBuilder promptLine= new StringBuilder();
 
         switch (state){
 
             case CHOOSE_PLACEMENT:
-                promptLine.append(discardOption());
+                if(!latestDiePlace.equals(Place.DICEBAG)) {
+                    promptLine.append(discardOption());
+                }
                 promptLine.append(backOption());
                 promptLine.append(endTurnOption());
                 promptLine.append(quitOption());

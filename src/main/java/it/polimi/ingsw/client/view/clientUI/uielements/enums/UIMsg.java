@@ -22,6 +22,7 @@ public enum UIMsg {
     YOUR_TURN("your-turn"),
     DRAFTPOOL("draftpool"),
     ROUNDTRACK("roundtrack"),
+    DICEBAG("dicebag"),
     SCHEMA("schema"),
     CAN_BE_PLACED("can-be-placed"),
     ROW("row"),
