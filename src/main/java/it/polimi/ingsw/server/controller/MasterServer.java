@@ -5,6 +5,7 @@ import it.polimi.ingsw.server.ServerOptions;
 import it.polimi.ingsw.common.connection.rmi_interfaces.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIAuthenticator;
 import it.polimi.ingsw.server.connection.SocketAuthenticator;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -12,6 +13,8 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -33,6 +36,7 @@ import java.util.TimerTask;
  * This class is the server, it handles the login of the clients and the beginning of matches
  */
 public class MasterServer{
+    public static final String SERVER_CONF_XML = "./ServerConf.xml";
     private static MasterServer instance;
     private String ipAddress;
     private int portRMI;
@@ -47,6 +51,7 @@ public class MasterServer{
     private final ArrayList <Game> games;
     public static final int MIN_PLAYERS=2;
     public static final int MAX_PLAYERS=4;
+    private final Object lockGames= new Object();
 
     /**
      * This is the constructor of the server, it initializes the address of the port for socket and RMI connection,
@@ -68,8 +73,23 @@ public class MasterServer{
     }
 
     private static MasterServer parser(){
+        MasterServer master;
+        try (InputStream xmlFile= new FileInputStream(SERVER_CONF_XML)){
+            master=readConfFile(xmlFile);
+            if(master!=null){
+                return master;
+            }
+        } catch (IOException e) {
+            master=null;
+        }
+
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         InputStream xmlFile=classLoader.getResourceAsStream(XML_SOURCE + CONFIGURATION_FILE_NAME);
+        return readConfFile(xmlFile);
+    }
+
+    @Nullable
+    private static MasterServer readConfFile(InputStream xmlFile) {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -89,10 +109,6 @@ public class MasterServer{
             e1.printStackTrace();
             return null;
         }
-
-
-
-
     }
 
     /**
@@ -148,7 +164,7 @@ public class MasterServer{
     /**
      * Updates the lobby queue and instantiate the new Games
      */
-    protected void updateLobby() {
+    void updateLobby() {
 
         ArrayList<User> players = new ArrayList<>();
         boolean lobbyChanged = false;
@@ -162,7 +178,10 @@ public class MasterServer{
                     players.add(u);
                 }
                 game = new Game(players, additionalSchemas);
-                games.add(game);
+                synchronized (lockGames) {
+                    games.add(game);
+                    lockGames.notifyAll();
+                }
                 game.start();
                 lobby.removeAll(players);
                 players=new ArrayList<>();
@@ -174,7 +193,10 @@ public class MasterServer{
             if (lobby.size() >= MIN_PLAYERS) {
                 players.addAll(lobby);
                 game = new Game(players, additionalSchemas);
-                games.add(game);
+                synchronized (lockGames) {
+                    games.add(game);
+                    lockGames.notifyAll();
+                }
                 game.start();
                 lobby.clear();
                 lobbyChanged = true;
@@ -260,7 +282,6 @@ public class MasterServer{
     }
 
 
-
     /**
      * This method starts a SocketListener thread that accepts all socket connection
      */
@@ -284,14 +305,6 @@ public class MasterServer{
 
             }
         }).start();
-    }
-
-    /**
-     * Starts the HeartBeat service to detect the broken connections
-     */
-    private void startHeartBeat(){
-        //Heartbeat heartbeat = new Heartbeat();
-        //heartbeat.start();
     }
 
     /**
@@ -367,7 +380,11 @@ public class MasterServer{
     }
 
     public void endGame(Game game){
-        games.remove(game);
+
+        synchronized (lockGames) {
+            games.remove(game);
+            lockGames.notifyAll();
+        }
     }
 
 

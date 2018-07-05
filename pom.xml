@@ -20,7 +20,6 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.1.1</version>
                 <configuration>
-                    <outputDirectory>Deliverables</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -30,7 +29,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>LM_7_client</finalName>
+                            <outputFile>Deliverables/LM7Client/LM_7_client.jar</outputFile>
                             <filters>
                                 <filter>
                                     <artifact>it.polimi.ingsw</artifact>
@@ -84,7 +83,7 @@
                                     </excludes>
                                 </filter>
                             </filters>
-                            <finalName>LM_7_server</finalName>
+                            <outputFile>Deliverables/LM7Server/LM_7_server.jar</outputFile>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>

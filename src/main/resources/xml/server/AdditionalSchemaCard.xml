@@ -3,12 +3,12 @@
 <Cards>
     <!-- SchemaCards personalized, to add with progressive ID (odd -> front , even -> back) -->
     <SchemaCard id="1">
-        <name>Personal - Monochrome</name>
-        <token>8</token>
+        <name>Personal - N</name>
+        <token>6</token>
         <constraint>
             <row>0</row>
             <col>0</col>
-            <data>GREEN</data>
+            <data>BLUE</data>
         </constraint>
         <constraint>
             <row>0</row>
@@ -28,12 +28,12 @@
         <constraint>
             <row>1</row>
             <col>2</col>
-            <data>GREEN</data>
+            <data>RED</data>
         </constraint>
         <constraint>
             <row>1</row>
             <col>4</col>
-            <data>GREEN</data>
+            <data>BLUE</data>
         </constraint>
         <constraint>
             <row>2</row>
@@ -43,17 +43,17 @@
         <constraint>
             <row>2</row>
             <col>2</col>
-            <data>GREEN</data>
+            <data>YELLOW</data>
         </constraint>
         <constraint>
             <row>2</row>
             <col>4</col>
-            <data>GREEN</data>
+            <data>RED</data>
         </constraint>
         <constraint>
             <row>3</row>
             <col>0</col>
-            <data>GREEN</data>
+            <data>PURPLE</data>
         </constraint>
         <constraint>
             <row>3</row>
@@ -63,7 +63,7 @@
         <constraint>
             <row>3</row>
             <col>4</col>
-            <data>GREEN</data>
+            <data>YELLOW</data>
         </constraint>
     </SchemaCard>
     <SchemaCard id="2">
