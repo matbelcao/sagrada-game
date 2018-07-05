@@ -333,13 +333,13 @@ public class GUI extends Application implements ClientUI {
 
         //Center side of the border pane
         Group schema = sceneCreator.buildSchema(schemaCells,favorTokens,cellDim);
-        VBox playersStatusBar = sceneCreator.getPlayersAndInfoPane(board.getMyPlayerId(),board);
+        HBox playersStatusBar = sceneCreator.getPlayersStatusBar(board.getMyPlayerId(),board);
         StackPane schemaContainer = new StackPane(schema);
         VBox.setVgrow(schemaContainer,Priority.ALWAYS);
         frontPane.setCenter(new VBox(schemaContainer,playersStatusBar));
 
         //Right side of the border pane
-        VBox cards = sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState,board.getIsFirstTurn());
+        VBox cards = sceneCreator.drawCards(tempBoard,cellDim,turnState);
         StackPane cardsContainer = new StackPane(cards);
         cards.setAlignment(CENTER);
         GridPane draftpool = sceneCreator.buildDraftPool(draftPoolCells);
