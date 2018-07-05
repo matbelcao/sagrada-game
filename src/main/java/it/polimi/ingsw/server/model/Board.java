@@ -337,7 +337,7 @@ public class Board {
                 case SET_SHADE:
                     fsm.setPlaceFrom(Place.DICEBAG);
                     selectedDie=getDraftPool().putInBagAndExtract(selectedDie);
-                    diceList=selectedTool.chooseShade();
+                    diceList=selectedTool.setShade();
                     enableToolList =true;
                     response=diceList != null;
                     break;
