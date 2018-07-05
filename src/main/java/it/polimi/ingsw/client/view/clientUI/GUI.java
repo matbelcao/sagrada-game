@@ -54,7 +54,7 @@ public class GUI extends Application implements ClientUI {
     private Stage primaryStage;
     private static GUI instance;
     private static final Object lock = new Object();
-    private Text messageToUser = new Text();
+    private Label messageToUser = new Label();
     private CmdWriter cmdWrite;
     private int playerId;// TODO: 03/07/2018
     private SizeListener sizeListener;
@@ -122,9 +122,11 @@ public class GUI extends Application implements ClientUI {
         hbBtn.getChildren().add(button);
         grid.add(hbBtn, 1, 4);
 
-        messageToUser.setId("login-message");
         VBox vbox = new VBox();
+        vbox.setAlignment(Pos.TOP_CENTER);
+        vbox.setSpacing(60);
         vbox.getChildren().addAll(grid,messageToUser);
+
         synchronized (lock) {
             while (sceneCreator == null) {
                 try {
@@ -173,13 +175,13 @@ public class GUI extends Application implements ClientUI {
     public void updateLogin(boolean logged) {
         if (logged) {
             Platform.runLater(() -> {
-                messageToUser.setFill(Color.GREEN);
-                messageToUser.setText(String.format(uimsg.getMessage(LOGIN_OK),client.getUsername()));
+                messageToUser.setId("login-ok");
+                messageToUser.setText(" "+String.format(uimsg.getMessage(LOGIN_OK),client.getUsername())+" ");
             });
         } else {
             Platform.runLater(() -> {
-                messageToUser.setFill(Color.FIREBRICK);
-                messageToUser.setText(uimsg.getMessage(LOGIN_KO));
+                messageToUser.setId("login-ko");
+                messageToUser.setText(" "+uimsg.getMessage(LOGIN_KO)+" ");
             });
         }
     }
