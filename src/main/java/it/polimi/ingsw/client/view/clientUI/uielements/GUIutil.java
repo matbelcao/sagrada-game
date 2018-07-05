@@ -597,6 +597,8 @@ public class GUIutil {
         double spacing = DRAFTED_SCHEMAS_SPACING_TO_CELL*cellDim;
 
         BorderPane draftedSchemasPane = new BorderPane();
+        draftedSchemasPane.setStyle("-fx-background-image: url('img/wall.png');");
+
         GridPane schemasGrid = new GridPane();
         for(int i = 0; i < 2; i++){
             for(int j = 0; j < 2; j++){
@@ -614,7 +616,10 @@ public class GUIutil {
         cardsContainer.setAlignment(CENTER);
         draftedSchemasPane.setCenter(cardsContainer);
 
-        Text selectSchemaText = new Text(uimsg.getMessage(CHOOSE_SCHEMA_2));
+        Label selectSchemaText = new Label(uimsg.getMessage(CHOOSE_SCHEMA_2));
+        selectSchemaText.setId("drafted-message");
+        selectSchemaText.setAlignment(CENTER);
+        selectSchemaText.setMinWidth(newWidth);
         selectSchemaText.setFont(Font.font(FONT, DRAFTED_SCHEMAS_TEXT_TO_CELL*cellDim));
         draftedSchemasPane.setTop(new StackPane(selectSchemaText));
 
