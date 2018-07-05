@@ -47,7 +47,6 @@ public class Client implements ClientInt {
 
     private static final String EMPTY_STRING="";
     private static final String CONFIGURATION_FILE_NAME= "ClientConf.xml";
-    private static final String RMI_HOSTNAME_PROPERTY = "java.rmi.server.hostname";
     private static final String OS_NAME_PROPERTY = "os.name" ;
     private static final String WINDOWS_OS = "Windows" ;
     private static final String CONFIGURATIONS = "conf";
@@ -568,8 +567,7 @@ public class Client implements ClientInt {
      * @param numRound the number of the round that just ended
      */
     public void updateGameRoundEnd(int numRound){
-
-
+        //not implemented
     }
 
     /**

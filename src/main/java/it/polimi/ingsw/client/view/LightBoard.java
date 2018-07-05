@@ -76,7 +76,7 @@ public class LightBoard extends Observable {
      */
     public void setDraftedSchemas(List<LightSchemaCard> draftedSchemas) {
         this.draftedSchemas = draftedSchemas;
-        addToChanges(LightBoardEvents.DraftedSchemas);
+        addToChanges(LightBoardEvents.DRAFTED_SCHEMAS);
         setChanged();
     }
 
@@ -94,7 +94,7 @@ public class LightBoard extends Observable {
      */
     public void setMyPlayerId(int myPlayerId) {
         this.myPlayerId = myPlayerId;
-        addToChanges(LightBoardEvents.MyPlayerId);
+        addToChanges(LightBoardEvents.MY_PLAYER_ID);
         setChanged();
     }
 
@@ -112,7 +112,7 @@ public class LightBoard extends Observable {
      */
     public void setNowPlaying(int nowPlaying) {
         this.nowPlaying = nowPlaying;
-        addToChanges(LightBoardEvents.NowPlaying);
+        addToChanges(LightBoardEvents.NOW_PLAYING);
         setChanged();
     }
 
@@ -141,7 +141,7 @@ public class LightBoard extends Observable {
      */
     public void setPrivObj(LightPrivObj privObj) {
         this.privObj = privObj;
-        addToChanges(LightBoardEvents.PrivObj);
+        addToChanges(LightBoardEvents.PRIV_OBJ);
         setChanged();
     }
 
@@ -152,7 +152,7 @@ public class LightBoard extends Observable {
      */
     public void setTools(List<LightTool> tools) {
         this.tools = tools;
-        addToChanges(LightBoardEvents.Tools);
+        addToChanges(LightBoardEvents.TOOLS);
         setChanged();
     }
 
@@ -163,7 +163,7 @@ public class LightBoard extends Observable {
      */
     public void setPubObjs(List<LightCard> pubObjs) {
         this.pubObj = pubObjs;
-        addToChanges(LightBoardEvents.PubObjs);
+        addToChanges(LightBoardEvents.PUB_OBJ);
         setChanged();
     }
 
@@ -203,7 +203,7 @@ public class LightBoard extends Observable {
      */
     public void setDraftPool(List<LightDie> draftPool) {
         this.draftPool = draftPool;
-        addToChanges(LightBoardEvents.DraftPool);
+        addToChanges(LightBoardEvents.DRAFT_POOL);
         setChanged();
 
     }
@@ -222,14 +222,14 @@ public class LightBoard extends Observable {
      */
     public void setRoundTrack(List<List<LightDie>> roundTrack) {
         this.roundTrack = roundTrack;
-        addToChanges(LightBoardEvents.RoundTrack);
+        addToChanges(LightBoardEvents.ROUND_TRACK);
         setChanged();
     }
 
     public void setRoundNumber(int roundNumber) {
 
         this.roundNumber = roundNumber;
-        addToChanges(LightBoardEvents.RoundNumber);
+        addToChanges(LightBoardEvents.ROUND_NUMBER);
         setChanged();
     }
 
@@ -240,7 +240,7 @@ public class LightBoard extends Observable {
      */
     public void updateSchema(int playerId, LightSchemaCard schema){
         players.get(playerId).setSchema(schema);
-        addToChanges(LightBoardEvents.Schema);
+        addToChanges(LightBoardEvents.SCHEMA);
         setChanged();
     }
 
@@ -251,7 +251,7 @@ public class LightBoard extends Observable {
      */
     public void updateFavorTokens(int playerId, int favorTokens){
         players.get(playerId).setFavorTokens(favorTokens);
-        addToChanges(LightBoardEvents.FavorTokens);
+        addToChanges(LightBoardEvents.FAVOR_TOKENS);
         setChanged();
     }
 
@@ -262,7 +262,7 @@ public class LightBoard extends Observable {
      */
     public void updateStatus(int playerId, LightPlayerStatus status){
         players.get(playerId).setStatus(status);
-        addToChanges(LightBoardEvents.Status);
+        addToChanges(LightBoardEvents.STATUS);
         setChanged();
     }
 
@@ -292,13 +292,13 @@ public class LightBoard extends Observable {
      */
     public void setIsFirstTurn(boolean isFirstTurn) {
         this.isFirstTurn = isFirstTurn;
-        addToChanges(LightBoardEvents.IsFirstTurn);
+        addToChanges(LightBoardEvents.IS_FIRST_TURN);
         setChanged();
     }
 
 
     public void stateChanged(){
-        addToChanges(LightBoardEvents.StateChanged);
+        addToChanges(LightBoardEvents.STATE_CHANGED);
         setChanged();
     }
     /**
@@ -314,7 +314,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestOptionsList(List<Actions> optionsList) {
         this.latestOptionsList = optionsList;
-        addToChanges(LightBoardEvents.Option);
+        addToChanges(LightBoardEvents.OPTION);
         setChanged();
     }
 
@@ -338,7 +338,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestDiceList(List<IndexedCellContent> latestDiceList) {
         this.latestDiceList = latestDiceList;
-        addToChanges(LightBoardEvents.DiceList);
+        addToChanges(LightBoardEvents.DICE_LIST);
         setChanged();
     }
 
@@ -348,7 +348,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestPlacementsList(List<Integer> placementsList) {
         this.latestPlacementsList = placementsList;
-        addToChanges(LightBoardEvents.PlacementsList);
+        addToChanges(LightBoardEvents.PLACEMENTS_LIST);
         setChanged();
     }
 
@@ -365,7 +365,7 @@ public class LightBoard extends Observable {
      */
     public void setLatestSelectedDie(IndexedCellContent  latestSelectedDie) {
         this.latestSelectedDie = latestSelectedDie;
-        addToChanges(LightBoardEvents.SelectedDie);
+        addToChanges(LightBoardEvents.SELECT_DIE);
         setChanged();
     }
 

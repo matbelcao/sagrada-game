@@ -20,7 +20,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -139,7 +138,7 @@ public class GUIutil {
         return new StackPane(p);
     }
 
-    public HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
+    private HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
         HBox track = new HBox();
         track.setSpacing(ROUNDTRACK_SPACING);
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
@@ -221,7 +220,7 @@ public class GUIutil {
     }
 
 
-    public VBox drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState,boolean isFirstTurn) {
+    public VBox drawCards(LightBoard board, double cellDim, ClientFSMState turnState) {
         Button priv = new Button("Private Objective");
         Button pub = new Button("Public Objectives");
         Button tool = new Button("Tools");
@@ -231,17 +230,24 @@ public class GUIutil {
         pub.setId("tab");
         tool.setId("tab");
 
-
         Label turnIndicator = new Label();
-        turnIndicator.setId("turn-indicator"); //todo add css
-        if(isFirstTurn) {
+        turnIndicator.setId("turn-indicator");
+        if(board.getIsFirstTurn()) {
             turnIndicator.setText(uimsg.getMessage(FIRST_TURN));
         }else{
-                turnIndicator.setText(uimsg.getMessage(SECOND_TURN));
+            turnIndicator.setText(uimsg.getMessage(SECOND_TURN));
+        }
+
+        Text currentlyPlaying = new Text();
+        currentlyPlaying.setId("currently-playing");
+        if(board.getNowPlaying() == board.getMyPlayerId()){
+            currentlyPlaying.setText("E' il tuo turno");
+        }else{
+            currentlyPlaying.setText("1234567890123 sta giocando");
         }
 
 
-        HBox buttonContainer = new HBox(priv, pub, tool, turnIndicator);
+        HBox buttonContainer = new HBox(priv, pub, tool, turnIndicator,currentlyPlaying);
         buttonContainer.setId("tab-container");
 
         HBox cardContainer = new HBox();
@@ -249,14 +255,14 @@ public class GUIutil {
 
         cardContainer.setId("card-container");
         priv.setOnAction(e -> {
-            Rectangle privObjImg = drawCard(privObj, getCardWidth(cellDim), getCardHeight(cellDim));
+            Rectangle privObjImg = drawCard(board.getPrivObj(), getCardWidth(cellDim), getCardHeight(cellDim));
             Rectangle emptyRect1 = new Rectangle(getCardWidth(cellDim), getCardHeight(cellDim),Color.TRANSPARENT);
             Rectangle emptyRect2 = new Rectangle(getCardWidth(cellDim), getCardHeight(cellDim),Color.TRANSPARENT);
             cardContainer.getChildren().setAll(privObjImg,emptyRect1,emptyRect2);
         });
         pub.setOnAction(e -> {
             ArrayList<Rectangle> cards = new ArrayList<>();
-            for (LightCard pubObjCard : pubObjs) {
+            for (LightCard pubObjCard : board.getPubObjs()) {
                 cards.add(drawCard(pubObjCard, getCardWidth(cellDim), getCardHeight(cellDim)));
 
             }
@@ -264,12 +270,12 @@ public class GUIutil {
         });
         tool.setOnAction(e1 -> {
             ArrayList<Rectangle> cards = new ArrayList<>();
-            for (LightCard toolCard : tools) {
+            for (LightCard toolCard : board.getTools()) {
                Rectangle toolRect = drawCard(toolCard, getCardWidth(cellDim), getCardHeight(cellDim));
                 toolRect.setOnMouseClicked(e2 -> {
                     if (turnState.equals(MAIN)) {
                         cmdWrite.write("0");
-                        cmdWrite.write(tools.indexOf(toolCard) + "");
+                        cmdWrite.write(board.getTools().indexOf(toolCard) + "");
                     }
                 });
                 toolRect.setId("card");
@@ -318,38 +324,22 @@ public class GUIutil {
         return backPane;
     }
 
-    public VBox getPlayersAndInfoPane(int myPlayerId, LightBoard board){ //todo change name
-        Text currentlyPlaying = new Text();
-        HBox playerSelector = getPlayersStatusBar(myPlayerId, board);
-
-        int font = 24; //todo set dynamic
-
-        if(board.getNowPlaying() == myPlayerId){
-            currentlyPlaying.setText("E' il tuo turno");
-        }else{
-            currentlyPlaying.setText("1234567890123 sta giocando");
-        }
-        currentlyPlaying.setFont(new Font(FONT,font));
-
-        VBox playerSelectorAndMessage = new VBox(currentlyPlaying,playerSelector);
-        playerSelectorAndMessage.setAlignment(Pos.BOTTOM_LEFT);
-        return  playerSelectorAndMessage;
-    }
-
     public HBox getPlayersStatusBar(int myPlayerId, LightBoard board) {
-
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
-            Group playerStatusBar = getPlayerStatusBar(playerId,myPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
+            Button playerStatusBar = getPlayerStatusButton(playerId,myPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
             playerSelector.getChildren().add(playerStatusBar);
             if(playerId == board.getMyPlayerId() || playerId == myPlayerId){
                 continue;
             }else{
+                Event mouseExitedMouseExitedBackPane = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
                 Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
-                playerStatusBar.setOnMouseEntered(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
-                playerStatusBar.setOnMouseClicked(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
+                playerStatusBar.setOnAction(e -> {
+                    //playerStatusBar.fireEvent(mouseExitedMouseExitedBackPane);
+                    //playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar);
+                });
             }
-            //playerSelector.setAlignment(Pos.BOTTOM_LEFT);
+            playerSelector.setAlignment(Pos.BOTTOM_LEFT);
         }
         return playerSelector;
     }
@@ -373,13 +363,13 @@ public class GUIutil {
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
 
-        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-        selectedPlayerPane.getCenter().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
+        //Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
+        //selectedPlayerPane.getCenter().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
         return selectedPlayerPane;
     }
 
-    private Group getPlayerStatusBar(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
-        Text playerName = new Text(username);
+    private Button getPlayerStatusButton(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
+        /*Text playerName = new Text(username);
         playerName.setFont(Font.font(FONT, 25)); //TODO dynamic
         if(playerId == hilighlightedPlayerId){
             playerName.setFill(Color.DARKBLUE);
@@ -397,7 +387,17 @@ public class GUIutil {
         playerName.setTextAlignment(TextAlignment.CENTER);
         statusAndName.setStyle("-fx-background-color: rgb(125,125,125,0.3);");
         StackPane p = new StackPane(statusAndName);
-        return new Group(p);
+        return new Group(p);*/
+        Button player = new Button(username);
+        if(playerId == nowPlaying ){
+            player.setId("playing-player"); //todo add css
+        }else if(status.equals(LightPlayerStatus.DISCONNECTED) || status.equals(LightPlayerStatus.QUITTED)){
+            player.setId("disconnected-player"); //todo add css
+        }else{
+            player.setId("not-playing-player"); //todo add css
+        }
+
+        return player;
     }
 
     //todo add Text

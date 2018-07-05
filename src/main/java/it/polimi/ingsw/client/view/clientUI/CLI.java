@@ -170,19 +170,19 @@ public class CLI implements ClientUI {
         }
         List<Integer> changes=board.getChanges();
 
-        if(changes.contains(LightBoardEvents.PrivObj))
+        if(changes.contains(LightBoardEvents.PRIV_OBJ))
             view.updatePrivObj(board.getPrivObj());
 
-        if(changes.contains(LightBoardEvents.Tools))
+        if(changes.contains(LightBoardEvents.TOOLS))
             view.updateTools(board.getTools());
 
-        if(changes.contains(LightBoardEvents.PubObjs))
+        if(changes.contains(LightBoardEvents.PUB_OBJ))
             view.updateObjectives(board.getPubObjs(), board.getPrivObj());
 
-        if(changes.contains(LightBoardEvents.Status)
-                || changes.contains(LightBoardEvents.StateChanged)
-                || changes.contains(LightBoardEvents.FavorTokens)
-                || changes.contains(LightBoardEvents.Schema)) {
+        if(changes.contains(LightBoardEvents.STATUS)
+                || changes.contains(LightBoardEvents.STATE_CHANGED)
+                || changes.contains(LightBoardEvents.FAVOR_TOKENS)
+                || changes.contains(LightBoardEvents.SCHEMA)) {
             view.setMatchInfo(board.getMyPlayerId(), board.getNumPlayers());
             if (client.isPlayingTurns()) {
                 for (int i = 0; i < board.getNumPlayers(); i++) {
@@ -191,19 +191,19 @@ public class CLI implements ClientUI {
             }
         }
 
-        if(changes.contains(LightBoardEvents.DraftPool))
+        if(changes.contains(LightBoardEvents.DRAFT_POOL))
             view.updateDraftPool(board.getDraftPool());
 
-        if(changes.contains(LightBoardEvents.RoundNumber))
+        if(changes.contains(LightBoardEvents.ROUND_NUMBER))
             view.updateRoundNumber(board.getRoundNumber());
 
-        if(changes.contains(LightBoardEvents.IsFirstTurn))
+        if(changes.contains(LightBoardEvents.IS_FIRST_TURN))
             view.updateIsFirstTurn(board.getIsFirstTurn());
 
-        if(changes.contains(LightBoardEvents.RoundTrack))
+        if(changes.contains(LightBoardEvents.ROUND_TRACK))
             view.updateRoundTrack(board.getRoundTrack());
 
-        if(changes.contains(LightBoardEvents.NowPlaying))
+        if(changes.contains(LightBoardEvents.NOW_PLAYING))
             view.updateNowPlaying(board.getNowPlaying());
 
         switch (client.getFsmState()) {
