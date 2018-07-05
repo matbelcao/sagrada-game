@@ -12,7 +12,6 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -267,10 +266,11 @@ public class GUIutil {
         return imgRect;
     }
 
-    public Scene waitingForGameStartScene(String message) {
+    public StackPane buildWaitingForGameStartScene(double width, double height) { //todo make dynamic
+        String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
         Text waitingText = new Text(message);
-        StackPane p = new StackPane(waitingText);
-        return new Scene(p);
+        StackPane stackPane = new StackPane(waitingText);
+        return stackPane;
     }
 
     public BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board,ClientFSMState turnState){
