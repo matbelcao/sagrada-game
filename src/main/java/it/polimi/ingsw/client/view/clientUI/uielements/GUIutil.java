@@ -204,6 +204,9 @@ public class GUIutil {
     public VBox buildMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button("end turn");
         Button back = new Button("back");
+        endTurn.setId("game-button");
+        back.setId("game-button");
+
         if (turnState.equals(ClientFSMState.NOT_MY_TURN)){
             back.setDisable(true);
             endTurn.setDisable(true);
@@ -222,6 +225,10 @@ public class GUIutil {
         Button priv = new Button("Private Objective");
         Button pub = new Button("Public Objectives");
         Button tool = new Button("Tools");
+
+        priv.setId("tab");
+        pub.setId("tab");
+        tool.setId("tab");
 
         HBox buttonContainer = new HBox(priv, pub, tool);
         HBox cardContainer = new HBox();
@@ -265,6 +272,7 @@ public class GUIutil {
         Rectangle imgRect = new Rectangle(imageWidth, imageHeight);
         ImagePattern imagePattern = new ImagePattern(image);
         imgRect.setFill(imagePattern);
+        imgRect.setId("card");
         return imgRect;
     }
 
@@ -707,6 +715,7 @@ public class GUIutil {
 
         Button newGameButton = new Button(uimsg.getMessage(NEW_GAME_OPTION_2));
         newGameButton.setOnMouseClicked(e->cmdWrite.write("n"));
+        newGameButton.setId("game-button");
 
         VBox v = new VBox(scoreLabel,scoreBoard, newGameButton);
         v.setAlignment(TOP_CENTER);
