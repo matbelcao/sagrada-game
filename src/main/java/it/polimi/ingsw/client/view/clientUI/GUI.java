@@ -103,28 +103,31 @@ public class GUI extends Application implements ClientUI {
         grid.setAlignment(CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
-        Text scenetitle = new Text("Sagrada");
-        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-        grid.add(scenetitle, 0, 0, 2, 1);
-        Label username = new Label("Username:");
-        grid.add(username, 0, 1);
+        grid.setPadding(new Insets(sceneCreator.getLoginHeight()*0.35, 25, 25, 25));
+
         TextField usernameField = new TextField();
         usernameField.setPromptText("Username");
-        usernameField.setText(textGen.getRandomString()); //TODO delete
+        usernameField.setMinHeight(sceneCreator.getLoginWidth()*0.08);
+        usernameField.setMinWidth(sceneCreator.getLoginWidth()*0.75);
         grid.add(usernameField, 1, 1);
-        Label password = new Label("Password:");
-        grid.add(password, 0, 2);
+
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
-       passwordField.setText(textGen.getRandomString()); //TODO delete
+        passwordField.setMinHeight(sceneCreator.getLoginWidth()*0.08);
+        passwordField.setMinWidth(sceneCreator.getLoginWidth()*0.75);
         grid.add(passwordField, 1, 2);
-        Button button = new Button("Sign in");
+
+        Button button = new Button("LOGIN");
+        button.setMinHeight(sceneCreator.getLoginWidth()*0.1);
+        button.setMinWidth(sceneCreator.getLoginWidth()*0.3);
+        button.setId("login-button");
+
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(button);
         grid.add(hbBtn, 1, 4);
-        messageToUser.setFont(new Font(10));
+
+        messageToUser.setId("login-message");
         VBox vbox = new VBox();
         vbox.getChildren().addAll(grid,messageToUser);
         synchronized (lock) {
@@ -136,24 +139,30 @@ public class GUI extends Application implements ClientUI {
                 }
             }
         }
-            Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(), sceneCreator.getLoginWidth());
+        vbox.setStyle("-fx-background-image: url('img/Login/background.png');"+
+                      "-fx-background-size: "+sceneCreator.getLoginWidth()+" " +sceneCreator.getLoginHeight()+";" +
+                      "-fx-background-position: center center;");
+
+        Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(),sceneCreator.getLoginHeight());
+
+        loginScene.getStylesheets().add("css/style.css");
 
             button.setOnAction(e -> {
                 client.setUsername(usernameField.getText());
                 client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
         });
-       usernameField.addEventHandler(KeyEvent.ANY, e->button.fire()); //todo delete
+
         primaryStage.setTitle("Login");
         primaryStage.setScene(loginScene);
         primaryStage.setResizable(false);
         primaryStage.setOnCloseRequest(e->client.quit());
-        primaryStage.sizeToScene();
 
         //disable the size listener because login is non resizable
         sizeListener.disable();
         //assign the size listener to the stage
         primaryStage.widthProperty().addListener(sizeListener);
         primaryStage.heightProperty().addListener(sizeListener);
+
         primaryStage.show();
         });
     }

@@ -52,7 +52,7 @@ public class GUIutil {
 
     //-----login Stage
     private static final double LOGIN_TO_SCREEN_RATIO = 0.25;
-    private static final double LOGIN_RATIO = 0.95;
+    private static final double LOGIN_RATIO = 0.663;
     //-----Lobby
     private static final double LOBBY_SCENE_RATIO = 1.47482;
     private static final double LOBBY_SCENE_W_TO_SCREEN_RATIO = 0.6;
@@ -97,7 +97,7 @@ public class GUIutil {
     }
 
     public double getLoginHeight() {
-        return SCREEN_WIDTH * LOGIN_TO_SCREEN_RATIO * LOGIN_RATIO;
+        return getLoginWidth() / LOGIN_RATIO;
     }
 
     public double getLobbyMinHeight() {
