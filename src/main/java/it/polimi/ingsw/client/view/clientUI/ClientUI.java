@@ -40,14 +40,6 @@ public interface ClientUI extends Observer {
      */
     void updateGameStart(int numUsers, int playerId);
 
-    /**
-     * this method is called right after the message that signals the start of a game and shows to the user elements
-     * of the board and the drafted schemas to be able to make a choice of the schema based on them
-     * @param draftedSchemas the schemas that have been drafted for this player
-     * @param privObj the private objective of the player
-     */
-    void showDraftedSchemas(List<LightSchemaCard> draftedSchemas,LightPrivObj privObj);
-
 
     /**
      * this notifies the client that wanted to quit that his connection has been closed and he has successfully quit

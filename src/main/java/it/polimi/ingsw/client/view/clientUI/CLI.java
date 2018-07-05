@@ -164,8 +164,7 @@ public class CLI implements ClientUI {
      * @param draftedSchemas the schemas that have been drafted for this player
      * @param privObj the private objective of the player
      */
-    @Override
-    public void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
+    void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
         view.updateDraftedSchemas(draftedSchemas);
         view.updatePrivObj(privObj);
         printToScreen(view.printSchemaChoiceView());
@@ -219,7 +218,9 @@ public class CLI implements ClientUI {
             view.updateNowPlaying(board.getNowPlaying());
 
         switch (client.getFsmState()) {
+
             case CHOOSE_SCHEMA:
+                showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
                 break;
 
             case NOT_MY_TURN:
@@ -246,7 +247,7 @@ public class CLI implements ClientUI {
                 break;
             case CHOOSE_PLACEMENT:
                 view.updateMenuListPlacements(board.getLatestPlacementsList(), board.getLatestSelectedDie().getContent());
-                printToScreen(view.printMainView(CHOOSE_PLACEMENT));
+                printToScreen(view.printMainView(CHOOSE_PLACEMENT,board.getLatestSelectedDie().getPlace()));
                 break;
             case TOOL_CAN_CONTINUE:
                 break;
