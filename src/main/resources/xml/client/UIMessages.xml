@@ -29,8 +29,8 @@
         <ita>La connessione è stata chiusa correttamente!%n</ita>
     </closed-connection>
     <lobby-update>
-        <eng>%n%nWaiting for other players to connect ... %n %d players are waiting for the start of the game ...</eng>
-        <ita>%n%nIn attesa della connessione di altri giocatori ... %n %d giocatori stanno aspettando di iniziare la partita ...</ita>
+        <eng>Waiting for other players to connect ... %n %d players are waiting for the start of the game ...</eng>
+        <ita>In attesa della connessione di altri giocatori ... %n %d giocatori stanno aspettando di iniziare la partita ...</ita>
     </lobby-update>
     <game-start>
         <eng>A new match is starting right now with %d players %nYou are player number %d %n%n          Good luck!</eng>
