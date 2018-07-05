@@ -4,9 +4,10 @@ import it.polimi.ingsw.client.view.clientUI.ClientUI;
 import it.polimi.ingsw.common.serializables.GameEvent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 
+import java.io.Serializable;
 import java.util.List;
 
-public interface ClientInt {
+public interface ClientInt extends Serializable {
     ClientUI getClientUI();
     void addUpdateTask(Thread newUpdate);
     void updateGameStart(int numPlayers, int playerId);
