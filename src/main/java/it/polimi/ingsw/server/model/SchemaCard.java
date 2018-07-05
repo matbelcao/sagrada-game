@@ -87,7 +87,6 @@ public class SchemaCard implements Iterable<Cell>  {
                     return schema;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
 
             }
 

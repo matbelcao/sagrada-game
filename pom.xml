@@ -79,6 +79,7 @@
                                         <exclude>META-INF/*.RSA</exclude>
                                         <exclude>META-INF/LICENSE</exclude>
                                         <exclude>img/**</exclude>
+                                        <exclude>css/**</exclude>
                                         <exclude>xml/client/**</exclude>
                                     </excludes>
                                 </filter>
