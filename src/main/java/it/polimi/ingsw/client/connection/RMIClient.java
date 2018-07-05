@@ -380,7 +380,7 @@ public class RMIClient implements ClientConn{
     }
 
     /*
-     *  Disabled for RMI
+     *  Disabled for RMI_SLASHSLASH
      */
     @Override
     public boolean login(String username, char[] password) {

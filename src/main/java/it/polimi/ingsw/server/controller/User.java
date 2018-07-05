@@ -87,7 +87,7 @@ public class User{
     }
 
     /**
-     * Sets the user connection mode ( RMI or SOCKET )
+     * Sets the user connection mode ( RMI_SLASHSLASH or SOCKET )
      * @param connectionMode the connection mode to be set
      */
     public void setConnectionMode(ConnectionMode connectionMode){
@@ -95,7 +95,7 @@ public class User{
     }
 
     /**
-     * Returns the user's connection mode ( RMI or SOCKET )
+     * Returns the user's connection mode ( RMI_SLASHSLASH or SOCKET )
      * @return the user's connection mode
      */
     public ConnectionMode getConnectionMode() {

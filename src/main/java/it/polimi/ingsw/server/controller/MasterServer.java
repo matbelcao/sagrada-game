@@ -38,6 +38,28 @@ public class MasterServer{
     public static final String SERVER_CONF_XML =
             (new File(MasterServer.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParentFile().getAbsolutePath()
             +File.separator+CONFIGURATION_FILE_NAME;
+    private static final String CONF = "conf";
+    private static final String IPV4_ADDRESS = "address";
+    private static final String PORT_RMI = "portRMI";
+    private static final String PORT_SOCKET = "portSocket";
+    private static final String TIME_LOBBY = "timeLobby";
+    private static final String TIME_GAME = "timeGame";
+    private static final String ADDITIONAL_SCHEMAS = "additionalSchemas";
+    private static final String STARTING_MASTER_SERVER = "--> STARTING :  Master Server";
+    private static final String TIMER_STARTING = "TIMER STARTING ";
+    private static final String SEC = " sec";
+    private static final String SERVER_STARTING_CONNECTIONS_VIA_RMI = "--> SERVER STARTING CONNECTIONS VIA RMI_SLASHSLASH";
+    private static final String JAVA_RMI_SERVER_HOSTNAME = "java.rmi.server.hostname";
+    private static final String RMI_SLASHSLASH = "rmi://";
+    private static final String AUTH = "/auth";
+    private static final String SERVER_STARTING_CONNECTIONS_VIA_SOCKET = "--> SERVER STARTING CONNECTIONS VIA SOCKET";
+    private static final String NEW_CONNECTION_ESTABLISHED_VIA_SOCKET = "New connection established via Socket!";
+    private static final String LOGGED = "Logged : ";
+    private static final String WRONG_PASSWORD = "Wrong password : ";
+    private static final String USER_ALREADY_LOGGED_IN = "User already logged in : ";
+    private static final String ERR_STARTING_SOCKET = "ERR: starting SOCKET";
+    private static final String ERR_START_MASTER_SERVER = "ERR: couldn't start the Master Server";
+    private static final String ERR_STARTING_RMI = "ERR: starting rmi";
     private static MasterServer instance;
     private String ipAddress;
     private int portRMI;
@@ -55,7 +77,7 @@ public class MasterServer{
     private final Object lockGames= new Object();
 
     /**
-     * This is the constructor of the server, it initializes the address of the port for socket and RMI connection,
+     * This is the constructor of the server, it initializes the address of the port for socket and RMI_SLASHSLASH connection,
      * it's made private as MasterServer is a Singleton
      */
     private MasterServer(String ipAddress, int portSocket,int portRMI, boolean additionalSchemas, int lobbyTime, int turnTime) {
@@ -69,7 +91,7 @@ public class MasterServer{
         users = new ArrayList<>();
         lobby = new ArrayList<>();
         games = new ArrayList<>();
-        printMessage("--> STARTING :  Master Server");
+        printMessage(STARTING_MASTER_SERVER);
         new LobbyHandler();
     }
 
@@ -98,13 +120,13 @@ public class MasterServer{
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
 
-            Element eElement = (Element)doc.getElementsByTagName("conf").item(0);
-            String setipAddress=eElement.getElementsByTagName("address").item(0).getTextContent();
-            int setportRMI=Integer.parseInt(eElement.getElementsByTagName("portRMI").item(0).getTextContent());
-            int setportSocket=Integer.parseInt(eElement.getElementsByTagName("portSocket").item(0).getTextContent());
-            int setlobbyTime=Integer.parseInt(eElement.getElementsByTagName("timeLobby").item(0).getTextContent());
-            int setturnTime=Integer.parseInt(eElement.getElementsByTagName("timeGame").item(0).getTextContent());
-            boolean setadditionalSchemas=Boolean.parseBoolean(eElement.getElementsByTagName("additionalSchemas").item(0).getTextContent());
+            Element eElement = (Element)doc.getElementsByTagName(CONF).item(0);
+            String setipAddress=eElement.getElementsByTagName(IPV4_ADDRESS).item(0).getTextContent();
+            int setportRMI=Integer.parseInt(eElement.getElementsByTagName(PORT_RMI).item(0).getTextContent());
+            int setportSocket=Integer.parseInt(eElement.getElementsByTagName(PORT_SOCKET).item(0).getTextContent());
+            int setlobbyTime=Integer.parseInt(eElement.getElementsByTagName(TIME_LOBBY).item(0).getTextContent());
+            int setturnTime=Integer.parseInt(eElement.getElementsByTagName(TIME_GAME).item(0).getTextContent());
+            boolean setadditionalSchemas=Boolean.parseBoolean(eElement.getElementsByTagName(ADDITIONAL_SCHEMAS).item(0).getTextContent());
             return new MasterServer(setipAddress,setportSocket,setportRMI,setadditionalSchemas,setlobbyTime,setturnTime);
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
@@ -233,7 +255,7 @@ public class MasterServer{
                         l.getServerConn().notifyLobbyUpdate(tempLobby.size());
                     }
                     if (lobby.size() == MIN_PLAYERS) {
-                        System.out.println("TIMER STARTING " + lobbyTime + " sec");
+                        System.out.println(TIMER_STARTING + lobbyTime + SEC);
                         Timer timer = new Timer();
                         timer.schedule(new LobbyHandler(), lobbyTime * 1000);
                     }
@@ -266,18 +288,18 @@ public class MasterServer{
     }
 
     /**
-     * This method makes the MasterServer available for RMI connection. It publishes in the rmi registry
+     * This method makes the MasterServer available for RMI_SLASHSLASH connection. It publishes in the rmi registry
      * an instance of the object Authenticator
      */
     public void startRMI(){
-        printMessage("--> SERVER STARTING CONNECTIONS VIA RMI");
-        System.setProperty("java.rmi.server.hostname",ipAddress);
+        printMessage(SERVER_STARTING_CONNECTIONS_VIA_RMI);
+        System.setProperty(JAVA_RMI_SERVER_HOSTNAME,ipAddress);
         try {
             AuthenticationInt authenticator = new RMIAuthenticator();
             Registry registry = LocateRegistry.createRegistry(portRMI);
-            Naming.rebind("rmi://"+ipAddress+":"+portRMI+"/auth", authenticator);
+            Naming.rebind(RMI_SLASHSLASH +ipAddress+":"+portRMI+ AUTH, authenticator);
         }catch (RemoteException | MalformedURLException e){
-            printMessage("Err on instantiating RMI");
+            printMessage(ERR_STARTING_RMI);
             System.exit(0);
         }
     }
@@ -289,18 +311,18 @@ public class MasterServer{
     private void startSocket (){
         // server infinite loop
         new Thread(() -> {
-            printMessage("--> SERVER STARTING CONNECTIONS VIA SOCKET");
+            printMessage(SERVER_STARTING_CONNECTIONS_VIA_SOCKET);
             while(true) {
                 Socket socket = null;
                 try {
                     try( ServerSocket serverSocket = new ServerSocket(portSocket)) {
                         socket = serverSocket.accept();
                     }
-                    printMessage("New connection established via Socket!");
+                    printMessage(NEW_CONNECTION_ESTABLISHED_VIA_SOCKET);
                     SocketAuthenticator authenticator = new SocketAuthenticator(socket);
                     authenticator.start();
                 } catch (IOException e) {
-                    printMessage("Err on instantiating SOCKET");
+                    printMessage(ERR_STARTING_SOCKET);
                     System.exit(0);
                 }
 
@@ -329,18 +351,18 @@ public class MasterServer{
                 user = getUser(username);
                 if (Arrays.equals(password, user.getPassword()) && (user.getStatus() == UserStatus.DISCONNECTED)) {
                     user.setStatus(UserStatus.CONNECTED);
-                    this.printMessage("Logged : "+username);
+                    this.printMessage(LOGGED +username);
                     return true;
                 }
                 if(!Arrays.equals(password, user.getPassword())){
-                    this.printMessage("Wrong password : "+username);
+                    this.printMessage(WRONG_PASSWORD +username);
                 }else{
-                    this.printMessage("User already logged in : "+username);
+                    this.printMessage(USER_ALREADY_LOGGED_IN +username);
                 }
             } else {
                 user = new User(username, password);
                 users.add(user);
-                this.printMessage("Logged : "+username);
+                this.printMessage(LOGGED+username);
                 return true;
             }
         }
@@ -447,12 +469,11 @@ public class MasterServer{
                     ServerOptions.setServerPreferences(options, server);
                 }
             }
-            //System.setProperty("java.rmi.server.codebase","http://"+getMasterServer().ipAddress+"/it/polimi/ingsw/server"); // TODO: 04/07/2018 find a correct codebase addr
             server.startRMI();
             server.startSocket();
         } catch (InstantiationException e) {
             e.printStackTrace();
-            System.out.println("ERR: couldn't start the Master Server");
+            System.err.println(ERR_START_MASTER_SERVER);
             return;
         }
     }
