@@ -221,16 +221,30 @@ public class GUIutil {
     }
 
 
-    public VBox drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState) {
+    public VBox drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState,boolean isFirstTurn) {
         Button priv = new Button("Private Objective");
         Button pub = new Button("Public Objectives");
         Button tool = new Button("Tools");
 
+<<<<<<< HEAD
         priv.setId("tab");
         pub.setId("tab");
         tool.setId("tab");
 
         HBox buttonContainer = new HBox(priv, pub, tool);
+=======
+        Label turnIndicator = new Label();
+        turnIndicator.setId("turn-indicator"); //todo add css
+        if(isFirstTurn) {
+            turnIndicator.setText(uimsg.getMessage(FIRST_TURN));
+        }else{
+                turnIndicator.setText(uimsg.getMessage(SECOND_TURN));
+        }
+
+        Region spacer = new Region();
+        HBox buttonContainer = new HBox(priv, pub, tool, spacer, turnIndicator);
+        HBox.setHgrow(spacer,Priority.ALWAYS);
+>>>>>>> 136400704de2edb058c0f81bb87c02e84eea8aec
         HBox cardContainer = new HBox();
         VBox primaryContainer = new VBox(buttonContainer, cardContainer);
 
@@ -304,28 +318,20 @@ public class GUIutil {
         return backPane;
     }
 
-    public VBox getPlayersAndInfoPane(int myPlayerId, LightBoard board){
-        Text turnText = new Text();
+    public VBox getPlayersAndInfoPane(int myPlayerId, LightBoard board){ //todo change name
         Text currentlyPlaying = new Text();
         HBox playerSelector = getPlayersStatusBar(myPlayerId, board);
 
         int font = 24; //todo set dynamic
-
-        if(board.getIsFirstTurn()) {
-            turnText.setText("Turno 1");//todo hookup with uimsg
-        }else{
-            turnText.setText("Turno 2");
-        }
 
         if(board.getNowPlaying() == myPlayerId){
             currentlyPlaying.setText("E' il tuo turno");
         }else{
             currentlyPlaying.setText("1234567890123 sta giocando");
         }
-        turnText.setFont(new Font(FONT,font));
         currentlyPlaying.setFont(new Font(FONT,font));
 
-        VBox playerSelectorAndMessage = new VBox(turnText,currentlyPlaying,playerSelector);
+        VBox playerSelectorAndMessage = new VBox(currentlyPlaying,playerSelector);
         playerSelectorAndMessage.setAlignment(Pos.BOTTOM_LEFT);
         return  playerSelectorAndMessage;
     }
@@ -626,6 +632,7 @@ public class GUIutil {
             for(int j = 0; j < 2; j++){
                 int schemaIndex =i*2+j;
                 Group completeSchema = buildCompleteSchema(draftedSchemas.get(schemaIndex),cellDim);
+                completeSchema.setId("drafted-schemas"); //todo add css
                 schemasGrid.add(completeSchema,j,i);
                 completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
             }
@@ -663,20 +670,12 @@ public class GUIutil {
         drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
         drawFavorTokens(gc, 0, y, schemaWidth, lightSchemaCard);
 
-        //acttion on mouse pass
-        Rectangle highlightRect = new Rectangle(0,0,schemaWidth,schemaHeight);
-        highlightRect.setArcWidth(arcCurvature);
-        highlightRect.setArcHeight(arcCurvature);
-        highlightRect.setFill(Color.TRANSPARENT);
-        highlightRect.setOnMouseEntered(e-> highlightRect.setFill(OPAQUE_FILL));
-        highlightRect.setOnMouseExited(e-> highlightRect.setFill(Color.TRANSPARENT));
-
         Group g = schemaToGrid(getSchemaCells(lightSchemaCard,cellDim));
         Rectangle spacer = new Rectangle(nameLabelSize,nameLabelSize);
         spacer.setVisible(false);
         Group cells = new Group(new VBox(g, spacer));
 
-        return new Group(new StackPane(c,cells,highlightRect));
+        return new Group(new StackPane(c,cells));
     }
 
     private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {

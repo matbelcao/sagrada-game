@@ -18,7 +18,6 @@
 #game-button {
     -fx-min-width: 110;
     -fx-background-color: #0086fc;
-
     -fx-background-radius: 10;
     -fx-padding: 12 8 12 8;
     -fx-background-insets: 2;
@@ -48,8 +47,14 @@
     -fx-background-color: #99ddff;
 }
 
-#card:hover {
+#card{
+    -fx-background-color: #ffffff;
+    -fx-background-insets: 2;
+    -fx-padding: 2;
 
+}
+#card:hover {
+    -fx-opacity: 0.9;
 }
 #login-ok{
     -fx-background-color: rgba(255,255,255,0.9);

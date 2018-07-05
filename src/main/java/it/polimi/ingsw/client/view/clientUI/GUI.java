@@ -339,7 +339,7 @@ public class GUI extends Application implements ClientUI {
         frontPane.setCenter(new VBox(schemaContainer,playersStatusBar));
 
         //Right side of the border pane
-        VBox cards = sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState);
+        VBox cards = sceneCreator.drawCards(board.getPrivObj(),board.getPubObjs(),board.getTools(),cellDim,turnState,board.getIsFirstTurn());
         StackPane cardsContainer = new StackPane(cards);
         cards.setAlignment(CENTER);
         GridPane draftpool = sceneCreator.buildDraftPool(draftPoolCells);
