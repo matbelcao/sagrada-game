@@ -224,9 +224,9 @@ public class GUIutil {
         Button tool = new Button("Tools");
 
         Label turnIndicator = new Label();
-        turnIndicator.setId("turn-indicator");
+        turnIndicator.setId("turn-indicator"); //todo add css
         if(isFirstTurn) {
-            turnIndicator.setText(uimsg.getMessage(FIRST_TURN));//todo hookup with uimsg
+            turnIndicator.setText(uimsg.getMessage(FIRST_TURN));
         }else{
                 turnIndicator.setText(uimsg.getMessage(SECOND_TURN));
         }
@@ -620,6 +620,7 @@ public class GUIutil {
             for(int j = 0; j < 2; j++){
                 int schemaIndex =i*2+j;
                 Group completeSchema = buildCompleteSchema(draftedSchemas.get(schemaIndex),cellDim);
+                completeSchema.setId("drafted-schemas"); //todo add css
                 schemasGrid.add(completeSchema,j,i);
                 completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
             }
@@ -657,20 +658,12 @@ public class GUIutil {
         drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
         drawFavorTokens(gc, 0, y, schemaWidth, lightSchemaCard);
 
-        //acttion on mouse pass
-        Rectangle highlightRect = new Rectangle(0,0,schemaWidth,schemaHeight);
-        highlightRect.setArcWidth(arcCurvature);
-        highlightRect.setArcHeight(arcCurvature);
-        highlightRect.setFill(Color.TRANSPARENT);
-        highlightRect.setOnMouseEntered(e-> highlightRect.setFill(OPAQUE_FILL));
-        highlightRect.setOnMouseExited(e-> highlightRect.setFill(Color.TRANSPARENT));
-
         Group g = schemaToGrid(getSchemaCells(lightSchemaCard,cellDim));
         Rectangle spacer = new Rectangle(nameLabelSize,nameLabelSize);
         spacer.setVisible(false);
         Group cells = new Group(new VBox(g, spacer));
 
-        return new Group(new StackPane(c,cells,highlightRect));
+        return new Group(new StackPane(c,cells));
     }
 
     private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
