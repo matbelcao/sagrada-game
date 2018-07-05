@@ -30,7 +30,7 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
                 RMIServerObject serverObj=new RMIServerObject(user);
                 Naming.rebind("rmi://"+master.getIpAddress()+":"+master.getRMIPort()+"/"+username, serverObj);
 
-                master.printMessage("RMI service for client "+username+" published"); //delete
+                master.printMessage("RMI_SLASHSLASH service for client "+username+" published"); //delete
             }catch (RemoteException |MalformedURLException e){
                 e.printStackTrace();
                 logged = false;
