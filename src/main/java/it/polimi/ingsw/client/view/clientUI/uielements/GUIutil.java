@@ -294,7 +294,8 @@ public class GUIutil {
         return backPane;
     }
 
-    public HBox getPlayersStatusBar(int hilighlightedPlayerId,LightBoard board) {
+    public Group getPlayersStatusBar(int hilighlightedPlayerId, LightBoard board) {
+        Text turnText = new Text();
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
             Group playerStatusBar = getPlayerStatusBar(playerId,hilighlightedPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
@@ -307,14 +308,18 @@ public class GUIutil {
                 playerStatusBar.setOnMouseClicked(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
             }
         }
+
+        turnText.setText("prova");
         playerSelector.setAlignment(Pos.BOTTOM_LEFT);
-        return  playerSelector;
+        VBox playerSelecorAndMessage = new VBox(turnText,playerSelector);
+        playerSelecorAndMessage.setAlignment(Pos.BOTTOM_LEFT);
+        return  new Group(playerSelecorAndMessage);
     }
 
     //todo update
     public BorderPane buildSelectdPlayerPane(int playerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
-        HBox playersSelector = getPlayersStatusBar(playerId,board);
+        Group playersSelector = getPlayersStatusBar(playerId,board);
         Region spacer = new Region();
         HBox.setHgrow(spacer,Priority.ALWAYS);
         HBox bottomContainer = new HBox(playersSelector,spacer);

@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.client.controller.CmdWriter;
 import it.polimi.ingsw.client.controller.QueuedCmdReader;
 import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.textGen;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.DieContainer;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
@@ -95,6 +96,7 @@ public class GUI extends Application implements ClientUI {
         grid.setPadding(new Insets(sceneCreator.getLoginHeight()*0.35, 25, 25, 25));
 
         TextField usernameField = new TextField();
+        usernameField.setText(textGen.getRandomString()); //TODO delete
         usernameField.setPromptText("Username");
         usernameField.setMinHeight(sceneCreator.getLoginWidth()*0.08);
         usernameField.setMinWidth(sceneCreator.getLoginWidth()*0.75);
@@ -331,7 +333,7 @@ public class GUI extends Application implements ClientUI {
 
         //Center side of the border pane
         Group schema = sceneCreator.buildSchema(schemaCells,favorTokens,cellDim);
-        HBox playersStatusBar = sceneCreator.getPlayersStatusBar(board.getMyPlayerId(),board);
+        Group playersStatusBar = sceneCreator.getPlayersStatusBar(board.getMyPlayerId(),board);
         StackPane schemaContainer = new StackPane(schema);
         VBox.setVgrow(schemaContainer,Priority.ALWAYS);
         frontPane.setCenter(new VBox(schemaContainer,playersStatusBar));
