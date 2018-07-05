@@ -4,7 +4,6 @@ import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.client.controller.CmdWriter;
 import it.polimi.ingsw.client.controller.QueuedCmdReader;
 import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
-import it.polimi.ingsw.client.textGen;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.DieContainer;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
@@ -28,12 +27,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -89,7 +83,7 @@ public class GUI extends Application implements ClientUI {
 
 
     @Override
-    public void updateConnectionOk() { messageToUser.setText(uimsg.getMessage(UIMsg.CONNECTION_OK)); }
+    public void updateConnectionOk() { Platform.runLater(()->messageToUser.setText(uimsg.getMessage(UIMsg.CONNECTION_OK))); }
 
     @Override
     public void showLoginScreen() {
