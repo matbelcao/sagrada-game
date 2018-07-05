@@ -60,11 +60,6 @@ public class GUI extends Application implements ClientUI {
     private SizeListener sizeListener;
     private LightBoard tempBoard;
 
-    // TODO: prendere il riferimento a board
-    private List<LightSchemaCard> tempDraftedSchemas;
-    private LightPrivObj tempPrivObj;
-
-
     public GUI() {
         instance = this;
     }
@@ -185,12 +180,13 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void updateLobby(int numUsers) {
         Platform.runLater(() -> {
+            //sizeListener.disable();
+            primaryStage.setTitle("Sagrada");
             primaryStage.setMinWidth(sceneCreator.getLobbyMinWidth());
             primaryStage.setMinHeight(sceneCreator.getLobbyMinHeight());
-            primaryStage.setResizable(false); //it was already set but I set it anyway
-            sizeListener.disable();
+            primaryStage.setResizable(true); //it was already set but I set it anyway
             primaryStage.getScene().setRoot(sceneCreator.buildLobbyPane(numUsers));
-            messageToUser.setFill(Color.GREEN);
+            //messageToUser.setFill(Color.GREEN);
         });
 
     }
@@ -203,19 +199,7 @@ public class GUI extends Application implements ClientUI {
 
     void showDraftedSchemas(List<LightSchemaCard> draftedSchemas, LightPrivObj privObj) {
         Platform.runLater(() -> {
-                    tempDraftedSchemas = draftedSchemas;
-                    tempPrivObj = privObj;
-                    primaryStage.setTitle("Sagrada");
-                    primaryStage.setResizable(true);
-                    //the initial size is the minimum size and it's also the same size as lobby scene
-                    double minWidt = sceneCreator.getLobbyMinWidth();
-                    double minHeight = sceneCreator.getLobbyMinHeight();
-                    primaryStage.setMinHeight(minHeight);
-                    primaryStage.setMinWidth(minWidt);
 
-                    drawMainGameScene();
-
-                    sizeListener.enable();
         });
     }
 
@@ -270,11 +254,13 @@ public class GUI extends Application implements ClientUI {
             }else{
                 mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
             }*/
-                sizeListener.enable();
-                sizeListener.purgeTimer();
-                drawMainGameScene();
+            sizeListener.purgeTimer();
+            System.out.println("dentro update board" + client.getFsmState());
+            drawMainGameScene();
+            sizeListener.enable();
 
-                //primaryStage.widthProperty().addListener(sizeListener);
+
+            //primaryStage.widthProperty().addListener(sizeListener);
                 //primaryStage.heightProperty().addListener(sizeListener);
 
             });
@@ -286,15 +272,17 @@ public class GUI extends Application implements ClientUI {
 
     private StackPane bulidMainPane(double newWidth, double newHeight){
         StackPane p = new StackPane();
+        System.out.println(client.getFsmState());
         if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)){
-            BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(tempDraftedSchemas, tempPrivObj, newWidth, newHeight) ;
+            sizeListener.enable();
+            BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(tempBoard.getDraftedSchemas(),tempBoard.getPrivObj(), newWidth, newHeight) ;
             p.getChildren().add(draftedSchemasPane);
+        }else if(client.getFsmState().equals(ClientFSMState.SCHEMA_CHOSEN)){
+            ;
         }else if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
-            primaryStage.setMinWidth(sceneCreator.getLobbyMinWidth());
-            primaryStage.setMinHeight(sceneCreator.getLobbyMinHeight());
-            //primaryStage.setResizable(false);
             BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(newWidth,newHeight,tempBoard.sortFinalPositions());
             p.getChildren().add(gameEndedPane);
+            sizeListener.enable();
         }else{
             BorderPane frontPane = buildFrontPane(newWidth,newHeight,tempBoard);
             List <Actions> latestOptionsList = tempBoard.getLatestOptionsList();
@@ -307,7 +295,6 @@ public class GUI extends Application implements ClientUI {
                 System.out.println("selected player");
             });
             p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
-
 
             if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
                 BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,tempBoard);
@@ -374,7 +361,7 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void showWaitingForGameStartScreen() {
-        Platform.runLater(() -> {
+       Platform.runLater(() -> {
             String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
             primaryStage.setScene(sceneCreator.waitingForGameStartScene(message));
         });
