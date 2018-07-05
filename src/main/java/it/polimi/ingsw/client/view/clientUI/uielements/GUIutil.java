@@ -139,7 +139,7 @@ public class GUIutil {
         return new StackPane(p);
     }
 
-    public HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
+    private HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
         HBox track = new HBox();
         track.setSpacing(ROUNDTRACK_SPACING);
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
@@ -221,7 +221,7 @@ public class GUIutil {
     }
 
 
-    public VBox drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState,boolean isFirstTurn) {
+    public VBox drawCards(LightBoard board, double cellDim, ClientFSMState turnState) {
         Button priv = new Button("Private Objective");
         Button pub = new Button("Public Objectives");
         Button tool = new Button("Tools");
@@ -231,17 +231,24 @@ public class GUIutil {
         pub.setId("tab");
         tool.setId("tab");
 
-
         Label turnIndicator = new Label();
-        turnIndicator.setId("turn-indicator"); //todo add css
-        if(isFirstTurn) {
+        turnIndicator.setId("turn-indicator");
+        if(board.getIsFirstTurn()) {
             turnIndicator.setText(uimsg.getMessage(FIRST_TURN));
         }else{
-                turnIndicator.setText(uimsg.getMessage(SECOND_TURN));
+            turnIndicator.setText(uimsg.getMessage(SECOND_TURN));
+        }
+
+        Text currentlyPlaying = new Text();
+        currentlyPlaying.setId("currently-playing");
+        if(board.getNowPlaying() == board.getMyPlayerId()){
+            currentlyPlaying.setText("E' il tuo turno");
+        }else{
+            currentlyPlaying.setText("1234567890123 sta giocando");
         }
 
 
-        HBox buttonContainer = new HBox(priv, pub, tool, turnIndicator);
+        HBox buttonContainer = new HBox(priv, pub, tool, turnIndicator,currentlyPlaying);
         buttonContainer.setId("tab-container");
         HBox.setHgrow(turnIndicator,Priority.ALWAYS);
 
@@ -250,14 +257,14 @@ public class GUIutil {
 
         cardContainer.setId("card-container");
         priv.setOnAction(e -> {
-            Rectangle privObjImg = drawCard(privObj, getCardWidth(cellDim), getCardHeight(cellDim));
+            Rectangle privObjImg = drawCard(board.getPrivObj(), getCardWidth(cellDim), getCardHeight(cellDim));
             Rectangle emptyRect1 = new Rectangle(getCardWidth(cellDim), getCardHeight(cellDim),Color.TRANSPARENT);
             Rectangle emptyRect2 = new Rectangle(getCardWidth(cellDim), getCardHeight(cellDim),Color.TRANSPARENT);
             cardContainer.getChildren().setAll(privObjImg,emptyRect1,emptyRect2);
         });
         pub.setOnAction(e -> {
             ArrayList<Rectangle> cards = new ArrayList<>();
-            for (LightCard pubObjCard : pubObjs) {
+            for (LightCard pubObjCard : board.getPubObjs()) {
                 cards.add(drawCard(pubObjCard, getCardWidth(cellDim), getCardHeight(cellDim)));
 
             }
@@ -265,12 +272,12 @@ public class GUIutil {
         });
         tool.setOnAction(e1 -> {
             ArrayList<Rectangle> cards = new ArrayList<>();
-            for (LightCard toolCard : tools) {
+            for (LightCard toolCard : board.getTools()) {
                Rectangle toolRect = drawCard(toolCard, getCardWidth(cellDim), getCardHeight(cellDim));
                 toolRect.setOnMouseClicked(e2 -> {
                     if (turnState.equals(MAIN)) {
                         cmdWrite.write("0");
-                        cmdWrite.write(tools.indexOf(toolCard) + "");
+                        cmdWrite.write(board.getTools().indexOf(toolCard) + "");
                     }
                 });
                 toolRect.setId("card");
@@ -317,24 +324,6 @@ public class GUIutil {
         vbox.setAlignment(TOP_LEFT);
         backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
         return backPane;
-    }
-
-    public VBox getPlayersAndInfoPane(int myPlayerId, LightBoard board){ //todo change name
-        Text currentlyPlaying = new Text();
-        HBox playerSelector = getPlayersStatusBar(myPlayerId, board);
-
-        int font = 24; //todo set dynamic
-
-        if(board.getNowPlaying() == myPlayerId){
-            currentlyPlaying.setText("E' il tuo turno");
-        }else{
-            currentlyPlaying.setText("1234567890123 sta giocando");
-        }
-        currentlyPlaying.setFont(new Font(FONT,font));
-
-        VBox playerSelectorAndMessage = new VBox(currentlyPlaying,playerSelector);
-        playerSelectorAndMessage.setAlignment(Pos.BOTTOM_LEFT);
-        return  playerSelectorAndMessage;
     }
 
     public HBox getPlayersStatusBar(int myPlayerId, LightBoard board) {
