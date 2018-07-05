@@ -2,7 +2,6 @@ package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.connection.rmi_interfaces.AuthenticationInt;
 import it.polimi.ingsw.common.connection.rmi_interfaces.RMIClientInt;
-import it.polimi.ingsw.common.connection.rmi_interfaces.RMIServerInt;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.controller.User;
@@ -11,10 +10,13 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class RMIAuthenticator extends UnicastRemoteObject implements AuthenticationInt {
+
+    public static final String RMI_SLASHSLASH = "rmi://";
+    public static final String RMI_SERVICE_FOR_CLIENT = "rmi service for client ";
+    public static final String PUBLISHED = " published";
 
     public RMIAuthenticator() throws RemoteException {}
 
@@ -28,9 +30,9 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
             try {
                 LocateRegistry.getRegistry(master.getIpAddress(),MasterServer.getMasterServer().getRMIPort()) ;
                 RMIServerObject serverObj=new RMIServerObject(user);
-                Naming.rebind("rmi://"+master.getIpAddress()+":"+master.getRMIPort()+"/"+username, serverObj);
+                Naming.rebind(RMI_SLASHSLASH +master.getIpAddress()+":"+master.getRMIPort()+"/"+username, serverObj);
 
-                master.printMessage("RMI_SLASHSLASH service for client "+username+" published"); //delete
+                master.printMessage(RMI_SERVICE_FOR_CLIENT +username+ PUBLISHED); //delete
             }catch (RemoteException |MalformedURLException e){
                 e.printStackTrace();
                 logged = false;

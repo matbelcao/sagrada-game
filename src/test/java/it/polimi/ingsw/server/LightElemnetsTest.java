@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * This test checks the correct instantiation of the light elements used for the RMI transport
+ * This test checks the correct instantiation of the light elements used for the RMI_SLASHSLASH transport
  */
 class LightElemnetsTest {
 
