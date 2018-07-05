@@ -132,7 +132,9 @@ public class GUIutil {
 
     public StackPane buildLobbyPane(int numUsers) {
         StackPane p = new StackPane();
+        p.setStyle("-fx-background-image: url('img/glass.jpg');");
         Label lobbyLabel = new Label(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
+        lobbyLabel.setId("lobby-message");
         p.getChildren().add(lobbyLabel);
         return new StackPane(p);
     }
