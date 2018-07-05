@@ -204,6 +204,9 @@ public class GUIutil {
     public VBox buildMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button("end turn");
         Button back = new Button("back");
+        endTurn.setId("game-button");
+        back.setId("game-button");
+
         if (turnState.equals(ClientFSMState.NOT_MY_TURN)){
             back.setDisable(true);
             endTurn.setDisable(true);
@@ -218,12 +221,29 @@ public class GUIutil {
     }
 
 
-    public VBox drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState) {
+    public VBox drawCards(LightCard privObj, List<LightCard> pubObjs, List<LightTool> tools, double cellDim, ClientFSMState turnState,boolean isFirstTurn) {
         Button priv = new Button("Private Objective");
         Button pub = new Button("Public Objectives");
         Button tool = new Button("Tools");
 
-        HBox buttonContainer = new HBox(priv, pub, tool);
+
+        priv.setId("tab");
+        pub.setId("tab");
+        tool.setId("tab");
+
+
+        Label turnIndicator = new Label();
+        turnIndicator.setId("turn-indicator"); //todo add css
+        if(isFirstTurn) {
+            turnIndicator.setText(uimsg.getMessage(FIRST_TURN));
+        }else{
+                turnIndicator.setText(uimsg.getMessage(SECOND_TURN));
+        }
+
+        Region spacer = new Region();
+        HBox buttonContainer = new HBox(priv, pub, tool, spacer, turnIndicator);
+        HBox.setHgrow(spacer,Priority.ALWAYS);
+
         HBox cardContainer = new HBox();
         VBox primaryContainer = new VBox(buttonContainer, cardContainer);
 
@@ -265,6 +285,7 @@ public class GUIutil {
         Rectangle imgRect = new Rectangle(imageWidth, imageHeight);
         ImagePattern imagePattern = new ImagePattern(image);
         imgRect.setFill(imagePattern);
+        imgRect.setId("card");
         return imgRect;
     }
 
@@ -296,9 +317,26 @@ public class GUIutil {
         return backPane;
     }
 
-    public Group getPlayersStatusBar(int myPlayerId, LightBoard board) {
-        Text turnText = new Text();
+    public VBox getPlayersAndInfoPane(int myPlayerId, LightBoard board){ //todo change name
         Text currentlyPlaying = new Text();
+        HBox playerSelector = getPlayersStatusBar(myPlayerId, board);
+
+        int font = 24; //todo set dynamic
+
+        if(board.getNowPlaying() == myPlayerId){
+            currentlyPlaying.setText("E' il tuo turno");
+        }else{
+            currentlyPlaying.setText("1234567890123 sta giocando");
+        }
+        currentlyPlaying.setFont(new Font(FONT,font));
+
+        VBox playerSelectorAndMessage = new VBox(currentlyPlaying,playerSelector);
+        playerSelectorAndMessage.setAlignment(Pos.BOTTOM_LEFT);
+        return  playerSelectorAndMessage;
+    }
+
+    public HBox getPlayersStatusBar(int myPlayerId, LightBoard board) {
+
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
             Group playerStatusBar = getPlayerStatusBar(playerId,myPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
@@ -310,33 +348,15 @@ public class GUIutil {
                 playerStatusBar.setOnMouseEntered(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
                 playerStatusBar.setOnMouseClicked(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
             }
+            //playerSelector.setAlignment(Pos.BOTTOM_LEFT);
         }
-        int font = 24; //todo set dynamic
-
-        if(board.getIsFirstTurn()) {
-            turnText.setText("Turno 1");//todo hookup with uimsg
-        }else{
-            turnText.setText("Turno 2");
-        }
-
-        if(board.getNowPlaying() == myPlayerId){
-            currentlyPlaying.setText("E' il tuo turno");
-        }else{
-            currentlyPlaying.setText("1234567890123 sta giocando");
-        }
-        turnText.setFont(new Font(FONT,font));
-        currentlyPlaying.setFont(new Font(FONT,font));
-        playerSelector.setAlignment(Pos.BOTTOM_LEFT);
-
-        VBox playerSelecorAndMessage = new VBox(turnText,currentlyPlaying,playerSelector);
-        playerSelecorAndMessage.setAlignment(Pos.BOTTOM_LEFT);
-        return  new Group(playerSelecorAndMessage);
+        return playerSelector;
     }
 
     //todo update
     public BorderPane buildSelectdPlayerPane(int playerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
-        Group playersSelector = getPlayersStatusBar(playerId,board);
+        HBox playersSelector = getPlayersStatusBar(playerId,board);
         Region spacer = new Region();
         HBox.setHgrow(spacer,Priority.ALWAYS);
         HBox bottomContainer = new HBox(playersSelector,spacer);
@@ -639,8 +659,8 @@ public class GUIutil {
         double nameLabelSize = SCHEMA_LABEL_TO_CELL_DIM*cellDim;
         double arcCurvature = SCHEMA_ARC_TO_WIDTH * schemaWidth;
 
-        Canvas c = new Canvas(schemaWidth,schemaHeight);
-        GraphicsContext gc = c.getGraphicsContext2D();
+        Canvas schemaBlackBorders = new Canvas(schemaWidth,schemaHeight);
+        GraphicsContext gc = schemaBlackBorders.getGraphicsContext2D();
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(0, 0, schemaWidth, schemaHeight, arcCurvature, arcCurvature);
         double x = schemaWidth / 2;
@@ -648,20 +668,19 @@ public class GUIutil {
         drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
         drawFavorTokens(gc, 0, y, schemaWidth, lightSchemaCard);
 
-        //acttion on mouse pass
-        Rectangle highlightRect = new Rectangle(0,0,schemaWidth,schemaHeight);
-        highlightRect.setArcWidth(arcCurvature);
-        highlightRect.setArcHeight(arcCurvature);
-        highlightRect.setFill(Color.TRANSPARENT);
-        highlightRect.setOnMouseEntered(e-> highlightRect.setFill(OPAQUE_FILL));
-        highlightRect.setOnMouseExited(e-> highlightRect.setFill(Color.TRANSPARENT));
+        Rectangle backgroundRect = new Rectangle(0,0,schemaWidth,schemaHeight);
+        backgroundRect.setArcWidth(arcCurvature);
+        backgroundRect.setArcHeight(arcCurvature);
+        backgroundRect.setFill(Color.WHITE);
 
         Group g = schemaToGrid(getSchemaCells(lightSchemaCard,cellDim));
         Rectangle spacer = new Rectangle(nameLabelSize,nameLabelSize);
         spacer.setVisible(false);
         Group cells = new Group(new VBox(g, spacer));
+        Group completeSchema = new Group(new StackPane(schemaBlackBorders,cells));
+        completeSchema.setId("drafted-schemas");
 
-        return new Group(new StackPane(c,cells,highlightRect));
+        return new Group(new StackPane(backgroundRect,completeSchema));
     }
 
     private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
@@ -707,6 +726,7 @@ public class GUIutil {
 
         Button newGameButton = new Button(uimsg.getMessage(NEW_GAME_OPTION_2));
         newGameButton.setOnMouseClicked(e->cmdWrite.write("n"));
+        newGameButton.setId("game-button");
 
         VBox v = new VBox(scoreLabel,scoreBoard, newGameButton);
         v.setAlignment(TOP_CENTER);
