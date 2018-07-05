@@ -24,6 +24,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,7 +60,8 @@ public class Client implements ClientInt {
     private static final String RMI_SLASHSLASH ="rmi://";
     private static final String SLASH ="/";
     private static final String AUTH = "auth" ;
-    public static final String CLIENT_CONF_XML = "./ClientConf.xml";
+    public static final String CLIENT_CONF_XML = (new File(Client.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParentFile().getAbsolutePath()
+            +File.separator+CONFIGURATION_FILE_NAME;
 
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
@@ -118,6 +120,7 @@ public class Client implements ClientInt {
                 return client;
             }
         } catch (IOException e) {
+            e.printStackTrace();
             client=null;
         }
 

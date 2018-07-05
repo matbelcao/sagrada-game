@@ -1,8 +1,8 @@
 package it.polimi.ingsw.server.controller;
 
+import it.polimi.ingsw.common.connection.rmi_interfaces.AuthenticationInt;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.ServerOptions;
-import it.polimi.ingsw.common.connection.rmi_interfaces.AuthenticationInt;
 import it.polimi.ingsw.server.connection.RMIAuthenticator;
 import it.polimi.ingsw.server.connection.SocketAuthenticator;
 import org.jetbrains.annotations.Nullable;
@@ -13,8 +13,8 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -29,19 +29,20 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
-//import it.polimi.ingsw.server.connection.Heartbeat;
-
 
 /**
  * This class is the server, it handles the login of the clients and the beginning of matches
  */
 public class MasterServer{
-    public static final String SERVER_CONF_XML = "./ServerConf.xml";
+    private static final String CONFIGURATION_FILE_NAME="ServerConf.xml";
+    public static final String SERVER_CONF_XML =
+            (new File(MasterServer.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParentFile().getAbsolutePath()
+            +File.separator+CONFIGURATION_FILE_NAME;
     private static MasterServer instance;
     private String ipAddress;
     private int portRMI;
     private int portSocket;
-    private static final String CONFIGURATION_FILE_NAME="ServerConf.xml";
+
     private boolean additionalSchemas; //to be used for additional schemas FA
     public static final String XML_SOURCE = "xml/server/"; //append class name + ".xml" to obtain complete path
     private int lobbyTime;
@@ -80,6 +81,7 @@ public class MasterServer{
                 return master;
             }
         } catch (IOException e) {
+            e.printStackTrace();
             master=null;
         }
 

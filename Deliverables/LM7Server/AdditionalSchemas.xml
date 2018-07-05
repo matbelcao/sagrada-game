@@ -38,7 +38,7 @@
         <constraint>
             <row>2</row>
             <col>0</col>
-            <data>GREEN</data>
+            <data>RED</data>
         </constraint>
         <constraint>
             <row>2</row>
@@ -77,6 +77,69 @@
         <constraint>
             <row>2</row>
             <col>2</col>
+            <data>RED</data>
+        </constraint>
+    </SchemaCard>
+    <SchemaCard id="1">
+        <name>Personal - N</name>
+        <token>4</token>
+        <constraint>
+            <row>1</row>
+            <col>2</col>
+            <data>RED</data>
+        </constraint>
+        <constraint>
+            <row>1</row>
+            <col>4</col>
+            <data>SIX</data>
+        </constraint>
+        <constraint>
+            <row>2</row>
+            <col>0</col>
+            <data>GREEN</data>
+        </constraint>
+        <constraint>
+            <row>2</row>
+            <col>2</col>
+            <data>THREE</data>
+        </constraint>
+        <constraint>
+            <row>2</row>
+            <col>4</col>
+            <data>RED</data>
+        </constraint>
+        <constraint>
+            <row>3</row>
+            <col>0</col>
+            <data>FOUR</data>
+        </constraint>
+        <constraint>
+            <row>3</row>
+            <col>4</col>
+            <data>YELLOW</data>
+        </constraint>
+    </SchemaCard>
+    <SchemaCard id="4">
+        <name>Personal - Sun</name>
+        <token>2</token>
+        <constraint>
+            <row>1</row>
+            <col>1</col>
+            <data>YELLOW</data>
+        </constraint>
+        <constraint>
+            <row>2</row>
+            <col>3</col>
+            <data>YELLOW</data>
+        </constraint>
+        <constraint>
+            <row>1</row>
+            <col>3</col>
+            <data>RED</data>
+        </constraint>
+        <constraint>
+            <row>2</row>
+            <col>1</col>
             <data>RED</data>
         </constraint>
     </SchemaCard>

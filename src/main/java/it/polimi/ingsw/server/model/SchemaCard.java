@@ -6,6 +6,7 @@ import it.polimi.ingsw.server.model.enums.IgnoredConstraint;
 import it.polimi.ingsw.server.model.exceptions.IllegalDieException;
 import it.polimi.ingsw.server.model.iterators.FullCellIterator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -14,7 +15,9 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -24,6 +27,9 @@ import java.util.function.Consumer;
  * This class represents a schema card of the game
  */
 public class SchemaCard implements Iterable<Cell>  {
+    public static final String EXTERNAL_ADDITIONAL_SCHEMAS_XML =
+            (new File(MasterServer.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParentFile().getAbsolutePath()
+                    +File.separator+"AdditionalSchemas.xml";
     private String name;
     private int id;
     private int favorTokens;
@@ -33,8 +39,8 @@ public class SchemaCard implements Iterable<Cell>  {
     public static final int NUM_COLS=5;
     public static final int NUM_ROWS=4;
     public static final int NUM_SCHEMA=24;
-    private static String xmlSchema=MasterServer.XML_SOURCE+"SchemaCard.xml";
-    private static String xmlAdditionalSchema=MasterServer.XML_SOURCE+"AdditionalSchemaCard.xml";
+    private static final String XML_SCHEMAS =MasterServer.XML_SOURCE+"SchemaCard.xml";
+    private static final String XML_ADDITIONAL_SCHEMAS =MasterServer.XML_SOURCE+"AdditionalSchemas.xml";
 
     /**
      * Retrieves the SchemaCard(id) data from the xml file and instantiates it
@@ -72,21 +78,38 @@ public class SchemaCard implements Iterable<Cell>  {
      * @return the bulit SchemaCard
      */
     public static SchemaCard parser(int id,boolean additionalSchema){
-        InputStream xmlFile=null;
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 
+        SchemaCard schema;
         if(additionalSchema){
-            xmlFile= classLoader.getResourceAsStream(xmlAdditionalSchema);
+            try (InputStream xmlFile= new FileInputStream(EXTERNAL_ADDITIONAL_SCHEMAS_XML)){
+                schema=readSchema(id,xmlFile);
+                if(schema!=null){
+                    return schema;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            InputStream xmlFile=classLoader.getResourceAsStream(XML_ADDITIONAL_SCHEMAS);
+
+            return readSchema(id,xmlFile);
 
         }else{
-            xmlFile=classLoader.getResourceAsStream(xmlSchema);
-
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            InputStream xmlFile=classLoader.getResourceAsStream(XML_SCHEMAS);
+            return readSchema(id, xmlFile);
         }
 
-        String name="";
-        int favorTokens=0;
-        Cell[][] cells= new Cell[NUM_ROWS][NUM_COLS];
+    }
 
+
+    @Nullable
+    private static SchemaCard readSchema(int id, InputStream xmlFile) {
+        String name;
+        int favorTokens;
+        Cell[][] cells= new Cell[NUM_ROWS][NUM_COLS];
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -95,22 +118,16 @@ public class SchemaCard implements Iterable<Cell>  {
             doc.getDocumentElement().normalize();
 
             NodeList nodeList = doc.getElementsByTagName("SchemaCard");
-            for (int temp1 = 0; temp1 < nodeList.getLength() && (temp1-1)!=id; temp1++) {
+            Element eElement = (Element)nodeList.item(id-1);
 
-                Element eElement = (Element)nodeList.item(temp1);
+            name=eElement.getElementsByTagName("name").item(0).getTextContent();
 
-                if(Integer.parseInt(eElement.getAttribute("id"))==id){
-                    name=eElement.getElementsByTagName("name").item(0).getTextContent();
+            favorTokens = Integer.parseInt(eElement.getElementsByTagName("token").item(0).getTextContent());
 
-                    favorTokens = Integer.parseInt(eElement.getElementsByTagName("token").item(0).getTextContent());
-
-
-                    for (int temp2 = 0; temp2 < eElement.getElementsByTagName("data").getLength(); temp2++) {
-                        int row = Integer.parseInt(eElement.getElementsByTagName("row").item(temp2).getTextContent());
-                        int column = Integer.parseInt(eElement.getElementsByTagName("col").item(temp2).getTextContent());
-                        cells[row][column]=new Cell(eElement.getElementsByTagName("data").item(temp2).getTextContent());
-                    }
-                }
+            for (int temp2 = 0; temp2 < eElement.getElementsByTagName("data").getLength(); temp2++) {
+                int row = Integer.parseInt(eElement.getElementsByTagName("row").item(temp2).getTextContent());
+                int column = Integer.parseInt(eElement.getElementsByTagName("col").item(temp2).getTextContent());
+                cells[row][column]=new Cell(eElement.getElementsByTagName("data").item(temp2).getTextContent());
             }
 
             for (int i=0; i<NUM_ROWS ; i++){
@@ -133,12 +150,22 @@ public class SchemaCard implements Iterable<Cell>  {
      * @return the number of SchemaCards
      */
     public static int getAdditionalSchemaSize(){
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File xmlFile= new File(classLoader.getResource(xmlAdditionalSchema).getFile());
 
+        try (InputStream xmlFile= new FileInputStream(EXTERNAL_ADDITIONAL_SCHEMAS_XML)){
+            return countAdditionalSchemas(xmlFile);
+        } catch (IOException e) {
+
+        }
+
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        InputStream xmlFile= classLoader.getResourceAsStream(XML_ADDITIONAL_SCHEMAS);
+
+        return countAdditionalSchemas(xmlFile);
+    }
+
+    private static int countAdditionalSchemas(InputStream xmlFile) {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
-
         try {
 
             dBuilder = dbFactory.newDocumentBuilder();
