@@ -40,17 +40,16 @@ public abstract class Card {
 
             nodeList = doc.getElementsByTagName(type);
 
-            for (int temp = 0; temp < nodeList.getLength() && (temp-1)!=id; temp++) {
-                Element eElement = (Element)nodeList.item(temp);
-                if(Integer.parseInt(eElement.getAttribute("id"))==id){
-                    this.id=id;
-                    this.name=eElement.getElementsByTagName("name").item(0).getTextContent();
-                    this.imgSrc= eElement.getElementsByTagName("imgSrc").item(0).getTextContent().replace("::",File.separator);
-                    this.description=eElement.getElementsByTagName("description").item(0).getTextContent();
+            Element eElement = (Element)nodeList.item(id-1);
+            if(Integer.parseInt(eElement.getAttribute("id"))==id){
+                this.id=id;
+                this.name=eElement.getElementsByTagName("name").item(0).getTextContent();
+                this.imgSrc= eElement.getElementsByTagName("imgSrc").item(0).getTextContent().replace("::",File.separator);
+                this.description=eElement.getElementsByTagName("description").item(0).getTextContent();
 
-                    return type.equals("PrivObjectiveCard")? eElement.getElementsByTagName("dieColor").item(0).getTextContent() : null;
-                }
+                return type.equals("PrivObjectiveCard")? eElement.getElementsByTagName("dieColor").item(0).getTextContent() : null;
             }
+
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             e1.printStackTrace();
         }

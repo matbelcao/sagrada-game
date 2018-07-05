@@ -81,7 +81,6 @@ public class MasterServer{
                 return master;
             }
         } catch (IOException e) {
-            e.printStackTrace();
             master=null;
         }
 
