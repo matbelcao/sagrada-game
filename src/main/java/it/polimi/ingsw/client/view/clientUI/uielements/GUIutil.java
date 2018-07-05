@@ -240,13 +240,15 @@ public class GUIutil {
                 turnIndicator.setText(uimsg.getMessage(SECOND_TURN));
         }
 
-        Region spacer = new Region();
-        HBox buttonContainer = new HBox(priv, pub, tool, spacer, turnIndicator);
-        HBox.setHgrow(spacer,Priority.ALWAYS);
+
+        HBox buttonContainer = new HBox(priv, pub, tool, turnIndicator);
+        buttonContainer.setId("tab-container");
+        HBox.setHgrow(turnIndicator,Priority.ALWAYS);
 
         HBox cardContainer = new HBox();
         VBox primaryContainer = new VBox(buttonContainer, cardContainer);
 
+        cardContainer.setId("card-container");
         priv.setOnAction(e -> {
             Rectangle privObjImg = drawCard(privObj, getCardWidth(cellDim), getCardHeight(cellDim));
             Rectangle emptyRect1 = new Rectangle(getCardWidth(cellDim), getCardHeight(cellDim),Color.TRANSPARENT);
@@ -271,6 +273,7 @@ public class GUIutil {
                         cmdWrite.write(tools.indexOf(toolCard) + "");
                     }
                 });
+                toolRect.setId("card");
                 cards.add(toolRect);
             }
             cardContainer.getChildren().setAll(cards);
@@ -285,7 +288,6 @@ public class GUIutil {
         Rectangle imgRect = new Rectangle(imageWidth, imageHeight);
         ImagePattern imagePattern = new ImagePattern(image);
         imgRect.setFill(imagePattern);
-        imgRect.setId("card");
         return imgRect;
     }
 
@@ -425,6 +427,7 @@ public class GUIutil {
         ArrayList<DieContainer> roundTrackCells = new ArrayList<>();
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             DieContainer cell = new DieContainer(i, cellDim);
+            cell.setId("roundtrack-cell");
             if (i < roundTrack.size()) {
                 if (roundTrack.get(i).size() > 1) {
                     //draw to dice in a cell
