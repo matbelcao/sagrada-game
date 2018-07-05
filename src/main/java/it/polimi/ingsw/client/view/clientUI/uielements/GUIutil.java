@@ -46,7 +46,7 @@ public class GUIutil {
 
     private final double SCREEN_WIDTH;
     private final double SCREEN_HEIGHT;
-    private static final String FONT = "Serif";
+    private static final String FONT = "Sans-Serif";
     private static final Color OPAQUE_FILL = Color.rgb(0,0,0,0.3);
 
     //-----login Stage
@@ -294,6 +294,7 @@ public class GUIutil {
 
     public Group getPlayersStatusBar(int hilighlightedPlayerId, LightBoard board) {
         Text turnText = new Text();
+        Text currentlyPlaying = new Text();
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
             Group playerStatusBar = getPlayerStatusBar(playerId,hilighlightedPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
@@ -306,10 +307,19 @@ public class GUIutil {
                 playerStatusBar.setOnMouseClicked(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
             }
         }
-
-        turnText.setText("prova");
+        int font = 25;
+        if(board.getIsFirstTurn()) {
+            turnText.setText("Turno 1");
+        }else{
+            turnText.setText("Turno 2");
+        }
+        //turnText.setText("E' il tuo turno");
+        currentlyPlaying.setText("1234567890123 sta giocando");
+        turnText.setFont(new Font(FONT,font));
         playerSelector.setAlignment(Pos.BOTTOM_LEFT);
-        VBox playerSelecorAndMessage = new VBox(turnText,playerSelector);
+        currentlyPlaying.setFont(new Font(FONT,font));
+
+        VBox playerSelecorAndMessage = new VBox(turnText,currentlyPlaying,playerSelector);
         playerSelecorAndMessage.setAlignment(Pos.BOTTOM_LEFT);
         return  new Group(playerSelecorAndMessage);
     }
