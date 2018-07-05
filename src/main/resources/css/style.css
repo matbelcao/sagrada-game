@@ -9,9 +9,22 @@
     -fx-font-weight: bold;
 }
 
-#login-message{
+#login-ok{
+    -fx-border-width: 4;
+    -fx-border-color: black;
+    -fx-background-color: lightgrey;
     -fx-text-alignment: center;
-    -fx-text-fill: white;
+    -fx-text-fill: green;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+#login-ko{
+    -fx-border-width: 4;
+    -fx-border-color: black;
+    -fx-background-color: lightgrey;
+    -fx-text-alignment: center;
+    -fx-text-fill: red;
     -fx-font-size: 18px;
     -fx-font-weight: bold;
 }
