@@ -88,82 +88,85 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void showLoginScreen() {
+
         Platform.runLater(() -> {
-        GridPane grid = new GridPane();
-        grid.setAlignment(CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(sceneCreator.getLoginHeight()*0.35, 25, 25, 25));
-
-        TextField usernameField = new TextField();
-        usernameField.setText(textGen.getRandomString()); //TODO delete
-        usernameField.setPromptText("Username");
-        usernameField.setMinHeight(sceneCreator.getLoginWidth()*0.08);
-        usernameField.setMinWidth(sceneCreator.getLoginWidth()*0.75);
-        grid.add(usernameField, 1, 1);
-
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Password");
-        passwordField.setMinHeight(sceneCreator.getLoginWidth()*0.08);
-        passwordField.setMinWidth(sceneCreator.getLoginWidth()*0.75);
-        grid.add(passwordField, 1, 2);
-
-        Button button = new Button("LOGIN");
-        button.setMinHeight(sceneCreator.getLoginWidth()*0.1);
-        button.setMinWidth(sceneCreator.getLoginWidth()*0.3);
-        button.setId("login-button");
-
-        HBox hbBtn = new HBox(10);
-        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-        hbBtn.getChildren().add(button);
-        grid.add(hbBtn, 1, 4);
-
-        VBox vbox = new VBox();
-        vbox.setAlignment(Pos.TOP_CENTER);
-        vbox.setSpacing(60);
-        vbox.getChildren().addAll(grid,messageToUser);
-
-        synchronized (lock) {
-            while (sceneCreator == null) {
-                try {
-                    lock.wait();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+            synchronized (lock) {
+                while (sceneCreator == null) {
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
-        }
-        vbox.setStyle("-fx-background-image: url('img/Login/background.png');"+
-                      "-fx-background-size: "+sceneCreator.getLoginWidth()+" " +sceneCreator.getLoginHeight()+";" +
-                      "-fx-background-position: center center;");
+            GridPane grid = new GridPane();
+            grid.setAlignment(CENTER);
+            grid.setHgap(10);
+            grid.setVgap(10);
 
-        Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(),sceneCreator.getLoginHeight());
+            grid.setPadding(new Insets(sceneCreator.getLoginHeight() * 0.35, 25, 25, 25));
 
-        loginScene.getStylesheets().add("css/style.css");
+            TextField usernameField = new TextField();
+            usernameField.setText(textGen.getRandomString()); //TODO delete
+            usernameField.setPromptText("Username");
+            usernameField.setMinHeight(sceneCreator.getLoginWidth() * 0.08);
+            usernameField.setMinWidth(sceneCreator.getLoginWidth() * 0.75);
+            grid.add(usernameField, 1, 1);
+
+            PasswordField passwordField = new PasswordField();
+            passwordField.setPromptText("Password");
+            passwordField.setMinHeight(sceneCreator.getLoginWidth() * 0.08);
+            passwordField.setMinWidth(sceneCreator.getLoginWidth() * 0.75);
+            grid.add(passwordField, 1, 2);
+
+            Button button = new Button("LOGIN");
+            button.setMinHeight(sceneCreator.getLoginWidth() * 0.1);
+            button.setMinWidth(sceneCreator.getLoginWidth() * 0.3);
+            button.setId("login-button");
+
+            HBox hbBtn = new HBox(10);
+            hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+            hbBtn.getChildren().add(button);
+            grid.add(hbBtn, 1, 4);
+
+            VBox vbox = new VBox();
+            vbox.setAlignment(Pos.TOP_CENTER);
+            vbox.setSpacing(60);
+            vbox.getChildren().addAll(grid, messageToUser);
+
+
+            vbox.setStyle("-fx-background-image: url('img/Login/background.png');" +
+                    "-fx-background-size: " + sceneCreator.getLoginWidth() + " " + sceneCreator.getLoginHeight() + ";" +
+                    "-fx-background-position: center center;");
+
+            Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(), sceneCreator.getLoginHeight());
+
+            loginScene.getStylesheets().add("css/style.css");
 
             button.setOnAction(e -> {
                 client.setUsername(usernameField.getText());
                 client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
-        });
+            });
 
-        primaryStage.setTitle("Login");
-        primaryStage.setScene(loginScene);
-        primaryStage.setResizable(false);
+            primaryStage.setTitle("Login");
+            primaryStage.setScene(loginScene);
+            primaryStage.setResizable(false);
 
-        primaryStage.setOnCloseRequest(e->{
-            if(client.isLogged())
-                client.quit();
-            else{
-                client.disconnect();
-            }
-        });
+            primaryStage.setOnCloseRequest(e -> {
+                if (client.isLogged())
+                    client.quit();
+                else {
+                    client.disconnect();
+                }
+            });
 
-        //disable the size listener because login is non resizable
-        sizeListener.disable();
-        //assign the size listener to the stage
-        primaryStage.widthProperty().addListener(sizeListener);
-        primaryStage.heightProperty().addListener(sizeListener);
+            //disable the size listener because login is non resizable
+            sizeListener.disable();
+            //assign the size listener to the stage
+            primaryStage.widthProperty().addListener(sizeListener);
+            primaryStage.heightProperty().addListener(sizeListener);
 
-        primaryStage.show();
+            primaryStage.show();
         });
     }
 
@@ -269,7 +272,9 @@ public class GUI extends Application implements ClientUI {
     }
 
     public void drawMainGameScene(){
-        primaryStage.getScene().setRoot(bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight()));
+        Platform.runLater(()->
+            primaryStage.getScene().setRoot(bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight()))
+        );
     }
 
     private StackPane bulidMainPane(double newWidth, double newHeight){
@@ -315,11 +320,12 @@ public class GUI extends Application implements ClientUI {
 
         BorderPane frontPane = new BorderPane();
 
+        frontPane.setStyle("-fx-background-image: url('img/blue-wall.png')");
+
         List<DieContainer> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
         List<DieContainer> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
         List<DieContainer> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
         sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
-        frontPane.setStyle("-fx-background-color: rgba(245,220,112);"); //todo hookup with css
 
 
 

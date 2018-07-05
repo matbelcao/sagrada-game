@@ -17,24 +17,24 @@
 
 #game-button {
     -fx-min-width: 110;
-    -fx-background-color: #0086fc;
+    -fx-background-color: #ffffff;
     -fx-background-radius: 10;
     -fx-padding: 12 8 12 8;
     -fx-background-insets: 2;
-    -fx-text-fill: white;
+    -fx-text-fill: #333333;
     -fx-font-size: 16 vmin;
     -fx-font-weight: bold;
 }
 #game-button:hover{
-    -fx-background-color: #66bbff;
+    -fx-background-color: #fafafa;
 }
 #game-button:pressed{
-    -fx-background-color: #99ddff;
+    -fx-background-color: #dddddd;
 }
 #tab {
     -fx-background-color: #0086fc;
     -fx-background-radius: 10 10 0 0;
-    -fx-background-insets: 2 0 0 2 ;
+    -fx-background-insets: 0 2 0 0 ;
     -fx-padding: 12 ;
     -fx-text-fill: white;
     -fx-font-size: 16 vmin;
@@ -98,8 +98,9 @@
 
 #turn-indicator{
     -fx-font-size: 16 vmin;
-    -fx-text-alignment: center;
-    -fx-padding: 12 ;
+    -fx-text-alignment: right;
+    -fx-padding:12 48 12 48;
+    -fx-min-width: 300;
     -fx-font-weight: bold;
 }
 
@@ -108,13 +109,16 @@
 }
 
 #tab-container{
-    -fx-background-color: rgba(255,255,255,0.8);
-    -fx-background-radius: 10 10 0 0;
+    -fx-background-color: rgba(255,255,255,0.95);
+    -fx-background-radius: 16 16 0 0;
+    -fx-border-radius: 16 16 0 0;
+    -fx-border-width: 4 4 0 4 ;
+    -fx-border-color: rgba(255,255,255,0.9);
 }
 #card-container{
-    -fx-background-color: rgba(255,255,255,0.8);
-    -fx-border-image-width: 0 4 4 4 ;
-    -fx-border-color: white;
+    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-border-width: 0 4 4 4 ;
+    -fx-border-color: rgba(255,255,255,0.95);
 }
 #roundtrack-cell{
 

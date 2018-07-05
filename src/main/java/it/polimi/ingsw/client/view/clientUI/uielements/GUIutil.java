@@ -243,7 +243,6 @@ public class GUIutil {
 
         HBox buttonContainer = new HBox(priv, pub, tool, turnIndicator);
         buttonContainer.setId("tab-container");
-        HBox.setHgrow(turnIndicator,Priority.ALWAYS);
 
         HBox cardContainer = new HBox();
         VBox primaryContainer = new VBox(buttonContainer, cardContainer);
@@ -674,7 +673,7 @@ public class GUIutil {
         Rectangle backgroundRect = new Rectangle(0,0,schemaWidth,schemaHeight);
         backgroundRect.setArcWidth(arcCurvature);
         backgroundRect.setArcHeight(arcCurvature);
-        backgroundRect.setFill(Color.WHITE);
+        backgroundRect.setFill(Color.BLACK);
 
         Group g = schemaToGrid(getSchemaCells(lightSchemaCard,cellDim));
         Rectangle spacer = new Rectangle(nameLabelSize,nameLabelSize);
