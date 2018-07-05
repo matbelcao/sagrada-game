@@ -55,7 +55,7 @@ public class MasterServer{
     private static final String SERVER_STARTING_CONNECTIONS_VIA_SOCKET = "--> SERVER STARTING CONNECTIONS VIA SOCKET";
     private static final String NEW_CONNECTION_ESTABLISHED_VIA_SOCKET = "New connection established via Socket!";
     private static final String LOGGED = "Logged : ";
-    private static final String WRONG_PASSWORD = "Wrong password : ";
+    private static final String WRONG_PASS = "Wrong password : ";
     private static final String USER_ALREADY_LOGGED_IN = "User already logged in : ";
     private static final String ERR_STARTING_SOCKET = "ERR: starting SOCKET";
     private static final String ERR_START_MASTER_SERVER = "ERR: couldn't start the Master Server";
@@ -355,7 +355,7 @@ public class MasterServer{
                     return true;
                 }
                 if(!Arrays.equals(password, user.getPassword())){
-                    this.printMessage(WRONG_PASSWORD +username);
+                    this.printMessage(WRONG_PASS +username);
                 }else{
                     this.printMessage(USER_ALREADY_LOGGED_IN +username);
                 }
