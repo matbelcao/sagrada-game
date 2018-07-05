@@ -226,13 +226,12 @@ public class GUIutil {
         Button pub = new Button("Public Objectives");
         Button tool = new Button("Tools");
 
-<<<<<<< HEAD
+
         priv.setId("tab");
         pub.setId("tab");
         tool.setId("tab");
 
-        HBox buttonContainer = new HBox(priv, pub, tool);
-=======
+
         Label turnIndicator = new Label();
         turnIndicator.setId("turn-indicator"); //todo add css
         if(isFirstTurn) {
@@ -244,7 +243,7 @@ public class GUIutil {
         Region spacer = new Region();
         HBox buttonContainer = new HBox(priv, pub, tool, spacer, turnIndicator);
         HBox.setHgrow(spacer,Priority.ALWAYS);
->>>>>>> 136400704de2edb058c0f81bb87c02e84eea8aec
+
         HBox cardContainer = new HBox();
         VBox primaryContainer = new VBox(buttonContainer, cardContainer);
 
