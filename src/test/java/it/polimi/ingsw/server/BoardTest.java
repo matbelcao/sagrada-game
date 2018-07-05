@@ -18,11 +18,17 @@ import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BoardTest {
+/**
+ * This test class performs tests on the execution flow of the board, that contains the other model objects
+ */
+class BoardTest {
     private static ArrayList<User> users1,users2;
     private static User u3,u6;
     private static boolean additionalSchemas=false;
 
+    /**
+     * Tries to instantiate the board for a match
+     */
     @BeforeAll
     static void setUp(){
         User u1 = new User("Mario", "pass1".toCharArray());
@@ -44,6 +50,9 @@ public class BoardTest {
         users2.add(u6);
     }
 
+    /**
+     * Checks the constructor and the getter/setters
+     */
     @Test
     void testBoardConstructor(){
         Board board1=new Board(users1, additionalSchemas);
@@ -67,6 +76,9 @@ public class BoardTest {
         assertNotEquals(board1.getPublicObjective(0),board1.getPublicObjective(2));
     }
 
+    /**
+     * Checks the schema drafting with and without the additional schemas FA
+     */
     @Test
     void testDraftSchemas(){
         Board board1=new Board(users1, additionalSchemas);
@@ -76,6 +88,9 @@ public class BoardTest {
         assertEquals(8,board3.draftSchemas().length);
     }
 
+    /**
+     * Test the placing action with and without the toolcards enabled
+     */
     @Test
     void testInternalPlacement(){
         Board board=new Board(users1, additionalSchemas);
@@ -121,7 +136,7 @@ public class BoardTest {
         board.discard();
         assertFalse(board.choosePlacement(3));
         assertFalse(board.choosePlacement(1));
-        assertEquals(null, schema.getCell(11).getDie());
+        assertNull(schema.getCell(11).getDie());
 
         assertEquals(Actions.PLACE_DIE,board.selectDie(0).get(0));
         assertTrue(board.chooseOption(0));
@@ -130,6 +145,9 @@ public class BoardTest {
         assertEquals("RED"+File.separator+"FOUR", schema.getCell(11).getDie().toString());
     }
 
+    /**
+     * Tests the choosing of a schema during the INIT iof the game
+     */
     @Test
     void testChooseSchema(){
         Board board=new Board(users1, additionalSchemas);
@@ -145,6 +163,9 @@ public class BoardTest {
         assertEquals(schema,board.getUserSchemaCard(player1.getGameId()));
     }
 
+    /**
+     * Tests the dice list retrieval at the beginning of the move
+     */
     @Test
     void indexedListTest(){
         Board board=new Board(users2, additionalSchemas);
@@ -168,6 +189,9 @@ public class BoardTest {
         assertEquals(Place.ROUNDTRACK,board.getDiceList().get(0).getPlace());
     }
 
+    /**
+     * Checks the classification algorithm
+     */
     @Test
     void testFinalScore(){
         //It's not possible to test the final score != 0 because the public objectives are random

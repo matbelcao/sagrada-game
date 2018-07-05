@@ -13,11 +13,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.NoSuchElementException;
 
-public class FullCellIteratorTest {
+/**
+ * This test class performs tests on the execution flow of the cell iterator used by the schema card
+ */
+class FullCellIteratorTest {
     private static SchemaCard schema;
     private static FullCellIterator iter;
     private static Die[] die;
 
+    /**
+     * Checks the correct instantiation of the iterator, then operation with and without the color constraint
+     */
     @BeforeAll
     static void setUp(){
         //Aurorae Magnificus schema

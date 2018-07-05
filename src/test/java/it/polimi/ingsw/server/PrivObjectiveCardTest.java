@@ -8,7 +8,14 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This test checks the instantiation and the score algorithm for the private objective cards
+ */
 class PrivObjectiveCardTest {
+
+    /**
+     * Checks the correct instantiation of the cards from the xml file
+     */
     @Test
     void  testPrivObjectiveCardConstructor(){
         PrivObjectiveCard priv1 = new PrivObjectiveCard(1);
@@ -26,6 +33,9 @@ class PrivObjectiveCardTest {
         assertEquals("PURPLE",priv2.getDieColor().toString());
     }
 
+    /**
+     * Tests the score calculating algorithms for all the cards
+     */
     @Test
     void testGetCardScore(){
         SchemaCard schema1 = new SchemaCard(1,false);

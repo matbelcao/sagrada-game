@@ -10,8 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * This test class performs general tests on the constructor and the getter and setter methods of the User class
  */
-public class UserTest {
+class UserTest {
 
+    /**
+     * General test of getter and setter
+     */
     @Test
     void testConstructor(){
         User user=new User("User1","Password1".toCharArray());

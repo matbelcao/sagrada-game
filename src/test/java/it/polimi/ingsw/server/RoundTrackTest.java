@@ -9,7 +9,14 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RoundTrackTest {
+/**
+ * This test class checks the roundtrack methods
+ */
+class RoundTrackTest {
+
+    /**
+     * Tries to put some dice in the roundtrack and then tries to retrieve the list of dice
+     */
     @Test
     void testRoundTrack(){
         RoundTrack roundTrack=new RoundTrack();

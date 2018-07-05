@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This test class checks the client-side FSM execution
+ */
 class ClientFSMStateTest {
 
     /**

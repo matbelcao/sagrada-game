@@ -14,15 +14,16 @@ import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
-public class RoundIteratorTest {
+/**
+ * This test class checks the iterator of the match's players
+ */
+class RoundIteratorTest {
     private static Game controller;
     private static ArrayList<User> users;
     private static RoundIterator round;
 
     @BeforeAll
     static void setUp(){
-
         users=new ArrayList<>();
         users.add(new User("giuda","santana".toCharArray()));
         users.add(new User("marcello","password1".toCharArray()));
@@ -35,8 +36,11 @@ public class RoundIteratorTest {
         round = (RoundIterator) controller.iterator();
     }
 
+    /**
+     * Tests that the round iterator do exactly 10 rounds
+     */
     @Test
-    void testRoundIteratorWhile() throws NoSuchMethodException {
+    void testRoundIteratorWhile() {
         int turns=0;
         int rounds=0;
         while(round.hasNextRound()){
@@ -47,15 +51,16 @@ public class RoundIteratorTest {
                 turns++;
             }
         }
-
         assertEquals(60, turns);
         assertEquals(10, rounds);
         assertEquals(9, round.getRoundNumber());
-
-
     }
+
+    /**
+     * Checks the execution flow of the rounds and shifts up to the tenth
+     */
     @Test
-    void testRoundIteratorRules() throws NoSuchMethodException {
+    void testRoundIteratorRules() {
         User next;
         //round 1
         next=round.next();

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * This test class performs general tests of the Shade enum
  */
-public class ShadeTest {
+class ShadeTest {
     @Test
     void testContainsMethod(){
         assertTrue(Shade.contains("ONE"));
@@ -32,11 +32,11 @@ public class ShadeTest {
         assertEquals(Shade.valueOf(6), Shade.SIX);
     }
     @Test
-    public void testIllegalException() {
+    void testIllegalException() {
         assertThrows(IllegalArgumentException.class,()-> Shade.valueOf(7));
     }
     @Test
-    public void testNullException() {
+    void testNullException() {
         assertThrows(NullPointerException.class,()-> Shade.valueOf(null));
     }
 

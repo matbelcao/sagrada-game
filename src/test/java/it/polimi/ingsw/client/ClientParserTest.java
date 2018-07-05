@@ -7,13 +7,19 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ClientParserTest {
+/**
+ * This test class aims to verify the correct recognition by the parser of the strings entering the socket, and to
+ * discard those with an incorrect syntax
+ */
+class ClientParserTest {
     private static ArrayList<String> parsedResult = new ArrayList<>();
     private static String command;
 
+    /**
+     * Checks if the LOGIN message syntax is correct
+     */
     @Test
     void testCheckLogin(){
-
         assertTrue(ClientParser.parse("LOGIN ok", parsedResult));
         assertEquals("LOGIN",parsedResult.get(0));
         assertEquals("ok",parsedResult.get(1));
@@ -26,6 +32,9 @@ public class ClientParserTest {
         assertFalse(ClientParser.parse("LOGIN", parsedResult));
     }
 
+    /**
+     * Checks if the LOBBY message syntax is correct
+     */
     @Test
     void testCheckLobby(){
 
@@ -37,6 +46,9 @@ public class ClientParserTest {
         assertFalse(ClientParser.parse("LOBBY 1 1", parsedResult));
     }
 
+    /**
+     * Checks if the GAME message syntax is correct
+     */
     @Test
     void testCheckGame(){
 
@@ -89,6 +101,9 @@ public class ClientParserTest {
         assertFalse(ClientParser.parse("GAME turn_start 2", parsedResult));
     }
 
+    /**
+     * Checks if the SEND message syntax is correct
+     */
     @Test
     void testCheckSend(){
 
@@ -160,6 +175,9 @@ public class ClientParserTest {
         assertTrue(ClientParser.parse("SEND players", parsedResult));
     }
 
+    /**
+     * Checks if the various LIST messages syntax is correct
+     */
     @Test
     void testCheckList(){
         assertTrue(ClientParser.parse("LIST_DICE 2,TWO,RED", parsedResult));
@@ -185,9 +203,11 @@ public class ClientParserTest {
         assertFalse(ClientParser.parse("LIST_DICE draftpool 1,2,greeN,TWO,SIX", parsedResult));
     }
 
+    /**
+     * Checks if the CHOICE message syntax is correct
+     */
     @Test
     void testCheckChoice(){
-
         assertTrue(ClientParser.parse("CHOICE ok", parsedResult));
         assertEquals("CHOICE",parsedResult.get(0));
         assertEquals("ok",parsedResult.get(1));
@@ -201,9 +221,11 @@ public class ClientParserTest {
         assertFalse(ClientParser.parse("CHOICE ok ko", parsedResult));
     }
 
+    /**
+     * Checks if the TOOL message syntax is correct
+     */
     @Test
     void testCheckTool(){
-
         assertTrue(ClientParser.isTool("TOOL ok"));
         assertTrue(ClientParser.parse("TOOL ok", parsedResult));
         assertEquals("TOOL",parsedResult.get(0));
@@ -218,8 +240,11 @@ public class ClientParserTest {
         assertFalse(ClientParser.parse("TOOL ok ko", parsedResult));
     }
 
+    /**
+     * Checks if the PING message syntax is correct
+     */
     @Test
-    void testCheckPinf(){
+    void testCheckPing(){
         assertTrue(ClientParser.isPing("PING"));
         assertTrue(ClientParser.parse("PING", parsedResult));
         assertEquals("PING",parsedResult.get(0));
@@ -227,6 +252,9 @@ public class ClientParserTest {
         assertFalse(ClientParser.parse("PING PING", parsedResult));
     }
 
+    /**
+     * Checks if the STATUS message syntax is correct
+     */
     @Test
     void testCheckStatus(){
 

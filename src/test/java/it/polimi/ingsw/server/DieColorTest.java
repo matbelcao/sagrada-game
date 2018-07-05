@@ -6,7 +6,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DieColorTest {
+/**
+ * This test class performs general tests of the DieColor enum
+ */
+class DieColorTest {
     @Test
     void testContainsMethod(){
         assertTrue(DieColor.contains("RED"));
@@ -17,7 +20,5 @@ public class DieColorTest {
         assertTrue(DieColor.contains("NONE"));
         assertFalse(DieColor.contains(""));
         assertFalse(DieColor.contains("a")); //random test case
-
     }
-
 }

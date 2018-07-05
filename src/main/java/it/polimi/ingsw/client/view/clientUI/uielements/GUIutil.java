@@ -634,7 +634,6 @@ public class GUIutil {
             for(int j = 0; j < 2; j++){
                 int schemaIndex =i*2+j;
                 Group completeSchema = buildCompleteSchema(draftedSchemas.get(schemaIndex),cellDim);
-                completeSchema.setId("drafted-schemas"); //todo add css
                 schemasGrid.add(completeSchema,j,i);
                 completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
             }
@@ -663,8 +662,8 @@ public class GUIutil {
         double nameLabelSize = SCHEMA_LABEL_TO_CELL_DIM*cellDim;
         double arcCurvature = SCHEMA_ARC_TO_WIDTH * schemaWidth;
 
-        Canvas c = new Canvas(schemaWidth,schemaHeight);
-        GraphicsContext gc = c.getGraphicsContext2D();
+        Canvas schemaBlackBorders = new Canvas(schemaWidth,schemaHeight);
+        GraphicsContext gc = schemaBlackBorders.getGraphicsContext2D();
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(0, 0, schemaWidth, schemaHeight, arcCurvature, arcCurvature);
         double x = schemaWidth / 2;
@@ -672,12 +671,19 @@ public class GUIutil {
         drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
         drawFavorTokens(gc, 0, y, schemaWidth, lightSchemaCard);
 
+        Rectangle backgroundRect = new Rectangle(0,0,schemaWidth,schemaHeight);
+        backgroundRect.setArcWidth(arcCurvature);
+        backgroundRect.setArcHeight(arcCurvature);
+        backgroundRect.setFill(Color.WHITE);
+
         Group g = schemaToGrid(getSchemaCells(lightSchemaCard,cellDim));
         Rectangle spacer = new Rectangle(nameLabelSize,nameLabelSize);
         spacer.setVisible(false);
         Group cells = new Group(new VBox(g, spacer));
+        Group completeSchema = new Group(new StackPane(schemaBlackBorders,cells));
+        completeSchema.setId("drafted-schemas");
 
-        return new Group(new StackPane(c,cells));
+        return new Group(new StackPane(backgroundRect,completeSchema));
     }
 
     private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {

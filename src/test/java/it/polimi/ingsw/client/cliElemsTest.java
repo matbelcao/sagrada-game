@@ -24,15 +24,18 @@ import java.util.List;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats.FILLED;
 import static it.polimi.ingsw.common.enums.Shade.*;
 
+/**
+ * This class tests the correct displaying of the various objects of the cli
+ */
 class cliElemsTest {
     private static CLIFormatter cliel;
     private static String OS = null;
-    static String getOsName()
+    private static String getOsName()
     {
         if(OS == null) { OS = System.getProperty("os.name"); }
         return OS;
     }
-    static boolean isWindows()
+    private static boolean isWindows()
     {
         return getOsName().startsWith("Windows");
     }
@@ -47,16 +50,6 @@ class cliElemsTest {
     }
 
     private static CLIObjects cliview;
-    private static LightPlayer player0;
-    private static LightPlayer player1;
-    private static LightPlayer player2;
-    private static LightPlayer player3;
-    private static LightSchemaCard schema0;
-    private static LightSchemaCard schema1;
-    private static LightSchemaCard schema2;
-    private static LightSchemaCard schema3;
-    private static List<LightDie> draftpool;
-    private static List<List<LightDie>> roundtrack ;
     private static List<LightCard> obj= new ArrayList<>();
     private static List<LightTool> tools= new ArrayList<>();
     private static List<Integer> list= new ArrayList<>();
@@ -68,12 +61,12 @@ class cliElemsTest {
             AnsiConsole.systemInstall();
         }
 
-        schema0=SerializableServerUtil.toLightSchema(new SchemaCard(1,false));
-        schema1=SerializableServerUtil.toLightSchema(new SchemaCard(2,false));
-        schema2=SerializableServerUtil.toLightSchema(new SchemaCard(3,false));
-        schema3=SerializableServerUtil.toLightSchema(new SchemaCard(4,false));
+        LightSchemaCard schema0 = SerializableServerUtil.toLightSchema(new SchemaCard(1, false));
+        LightSchemaCard schema1 = SerializableServerUtil.toLightSchema(new SchemaCard(2, false));
+        LightSchemaCard schema2 = SerializableServerUtil.toLightSchema(new SchemaCard(3, false));
+        LightSchemaCard schema3 = SerializableServerUtil.toLightSchema(new SchemaCard(4, false));
 
-        draftpool=new ArrayList<>();
+        List<LightDie> draftpool = new ArrayList<>();
 
         draftpool.add(new LightDie("FOUR","RED"));
         draftpool.add(new LightDie("SIX","RED"));
@@ -81,10 +74,10 @@ class cliElemsTest {
         draftpool.add(new LightDie("TWO","RED"));
         draftpool.add(new LightDie("ONE","YELLOW"));
 
-        player0= new LightPlayer("aaaaaaaaaaaaaaaa",0);
-        player1= new LightPlayer("bubba354627yhdge",1);
-        player2= new LightPlayer("boby",2);
-        player3= new LightPlayer("cocco",3);
+        LightPlayer player0 = new LightPlayer("aaaaaaaaaaaaaaaa", 0);
+        LightPlayer player1 = new LightPlayer("bubba354627yhdge", 1);
+        LightPlayer player2 = new LightPlayer("boby", 2);
+        LightPlayer player3 = new LightPlayer("cocco", 3);
 
         player0.setSchema(schema0);
         player1.setSchema(schema1);
@@ -92,12 +85,10 @@ class cliElemsTest {
         player3.setSchema(schema3);
         player3.setStatus(LightPlayerStatus.DISCONNECTED);
 
-
-            cliview= new CLIObjects(UILanguage.ita);
-
+        cliview= new CLIObjects(UILanguage.ita);
 
         cliview.setMatchInfo(1,4);
-        cliview.setClientInfo(ConnectionMode.SOCKET,player1.getUsername());
+        cliview.setClientInfo(ConnectionMode.SOCKET, player1.getUsername());
         cliview.updateSchema(player0);
         cliview.updateSchema(player1);
         cliview.updateSchema(player2);
@@ -119,7 +110,7 @@ class cliElemsTest {
         list.add(16);
         cliview.updateMenuListPlacements(list,new LightDie("FOUR","GREEN"));
 
-        roundtrack= new ArrayList<>();
+        List<List<LightDie>> roundtrack = new ArrayList<>();
         roundtrack.add(new ArrayList<>());
         roundtrack.add(new ArrayList<>());
         roundtrack.add(new ArrayList<>());
@@ -153,7 +144,6 @@ class cliElemsTest {
         LightPrivObj privobj =SerializableServerUtil.toLightPrivObj(new PrivObjectiveCard(2));
 
         cliview.updateObjectives(obj,privobj);
-
     }
     @Test
     void  testGetOne(){
@@ -177,10 +167,6 @@ class cliElemsTest {
 
 
         System.out.printf(cliview.printMainView(ClientFSMState.CHOOSE_PLACEMENT));
-
-
-
-
     }
 
 }

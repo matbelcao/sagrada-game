@@ -9,7 +9,14 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This test checks the instantiation and the score algorithm for the public objective cards
+ */
 class PubObjectiveCardTest {
+
+    /**
+     * Checks the correct instantiation from the xml file
+     */
     @Test
     void  testPubObjectiveCardConstructor(){
         PubObjectiveCard pub1 = new PubObjectiveCard(1,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
@@ -25,8 +32,11 @@ class PubObjectiveCardTest {
         assertEquals("Set di dadi di ogni colore ovunque",pub2.getDescription());
     }
 
+    /**
+     * Tests the score calculating algorithms for all the cards (with all the cell full)
+     */
     @Test
-    void testGetCardScore1() { //Test the getCardScore method with all the cell full
+    void testGetCardScore1() {
         //Aurorae Magnificus schema
         SchemaCard schema = new SchemaCard(11,false);
 
@@ -87,8 +97,11 @@ class PubObjectiveCardTest {
         assertEquals(12,pub10.getCardScore(schema));
     }
 
+    /**
+     * Tests the score calculating algorithms for all the cards (with some cells empty)
+     */
     @Test
-    void testGetCardScore2() { //Test the getCardScore method with some cells empty
+    void testGetCardScore2() {
         //Aurorae Magnificus schema
         SchemaCard schema = new SchemaCard(11,false);
 
