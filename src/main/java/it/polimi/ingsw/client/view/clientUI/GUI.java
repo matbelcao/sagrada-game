@@ -242,8 +242,8 @@ public class GUI extends Application implements ClientUI {
                     System.out.println("game ended------------------------------------------------------------------");
                     break;
             }
-            //primaryStage.setMinWidth(sceneCreator.getGameSceneMinWidth());
-            //primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight()); //todo decide if I want to keep it
+            primaryStage.setMinWidth(sceneCreator.getGameSceneMinWidth());
+            primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight()); //todo decide if I want to keep it
 
 
             //double currentWidth = primaryStage.getWidth();
