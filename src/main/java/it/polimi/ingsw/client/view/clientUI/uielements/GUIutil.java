@@ -294,14 +294,14 @@ public class GUIutil {
         return backPane;
     }
 
-    public Group getPlayersStatusBar(int hilighlightedPlayerId, LightBoard board) {
+    public Group getPlayersStatusBar(int myPlayerId, LightBoard board) {
         Text turnText = new Text();
         Text currentlyPlaying = new Text();
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
-            Group playerStatusBar = getPlayerStatusBar(playerId,hilighlightedPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
+            Group playerStatusBar = getPlayerStatusBar(playerId,myPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
             playerSelector.getChildren().add(playerStatusBar);
-            if(playerId == board.getMyPlayerId() || playerId == hilighlightedPlayerId){
+            if(playerId == board.getMyPlayerId() || playerId == myPlayerId){
                 continue;
             }else{
                 Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
@@ -309,17 +309,22 @@ public class GUIutil {
                 playerStatusBar.setOnMouseClicked(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
             }
         }
-        int font = 25;
+        int font = 24; //todo set dynamic
+
         if(board.getIsFirstTurn()) {
-            turnText.setText("Turno 1");
+            turnText.setText("Turno 1");//todo hookup with uimsg
         }else{
             turnText.setText("Turno 2");
         }
-        //turnText.setText("E' il tuo turno");
-        currentlyPlaying.setText("1234567890123 sta giocando");
+
+        if(board.getNowPlaying() == myPlayerId){
+            currentlyPlaying.setText("E' il tuo turno");
+        }else{
+            currentlyPlaying.setText("1234567890123 sta giocando");
+        }
         turnText.setFont(new Font(FONT,font));
-        playerSelector.setAlignment(Pos.BOTTOM_LEFT);
         currentlyPlaying.setFont(new Font(FONT,font));
+        playerSelector.setAlignment(Pos.BOTTOM_LEFT);
 
         VBox playerSelecorAndMessage = new VBox(turnText,currentlyPlaying,playerSelector);
         playerSelecorAndMessage.setAlignment(Pos.BOTTOM_LEFT);
