@@ -66,6 +66,7 @@ public class SizeListener implements ChangeListener<Number> {
     }
 
     public void disable() {
+        purgeTimer();
         this.enabled = false;
     }
 }

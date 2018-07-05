@@ -16,6 +16,7 @@ import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
 import org.fusesource.jansi.AnsiConsole;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -23,6 +24,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -57,6 +59,7 @@ public class Client implements ClientInt {
     private static final String RMI_SLASHSLASH ="rmi://";
     private static final String SLASH ="/";
     private static final String AUTH = "auth" ;
+    public static final String CLIENT_CONF_XML = "./ClientConf.xml";
 
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
@@ -107,8 +110,25 @@ public class Client implements ClientInt {
      * @return the newly created client
      */
     private static Client parser(){
+
+        Client  client;
+        try (InputStream xmlFile= new FileInputStream(CLIENT_CONF_XML)){
+            client=readConfFile(xmlFile);
+            if(client!=null){
+                return client;
+            }
+        } catch (IOException e) {
+            client=null;
+        }
+
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         InputStream xmlFile=classLoader.getResourceAsStream(XML_SOURCE + CONFIGURATION_FILE_NAME);
+        return readConfFile(xmlFile);
+
+    }
+
+    @NotNull
+    private static Client readConfFile(InputStream xmlFile) {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
@@ -131,7 +151,6 @@ public class Client implements ClientInt {
             System.exit(1);
             return null;
         }
-
     }
 
     /**

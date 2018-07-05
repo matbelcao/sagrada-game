@@ -178,6 +178,7 @@ public class Game extends Thread implements Iterable  {
                 MasterServer.getMasterServer().printMessage("End match: "+u.getUsername());
             }
         }
+        MasterServer.getMasterServer().endGame(this);
     }
 
     public boolean isGameEnded(){
