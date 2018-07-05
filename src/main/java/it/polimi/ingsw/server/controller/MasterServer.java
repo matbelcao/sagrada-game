@@ -77,7 +77,7 @@ public class MasterServer{
     private final Object lockGames= new Object();
 
     /**
-     * This is the constructor of the server, it initializes the address of the port for socket and RMI_SLASHSLASH connection,
+     * This is the constructor of the server, it initializes the address of the port for socket and rmi connection,
      * it's made private as MasterServer is a Singleton
      */
     private MasterServer(String ipAddress, int portSocket,int portRMI, boolean additionalSchemas, int lobbyTime, int turnTime) {
@@ -288,7 +288,7 @@ public class MasterServer{
     }
 
     /**
-     * This method makes the MasterServer available for RMI_SLASHSLASH connection. It publishes in the rmi registry
+     * This method makes the MasterServer available for rmi connection. It publishes in the rmi registry
      * an instance of the object Authenticator
      */
     public void startRMI(){
