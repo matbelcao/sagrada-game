@@ -113,6 +113,9 @@ class SchemaCardTest {
 
     }
 
+    /**
+     * Tests the list of possible placements with the swap option enabled
+     */
     @Test
     void testListPlacementsSwap(){
         SchemaCard schema1 = new SchemaCard(1,false);
@@ -140,6 +143,9 @@ class SchemaCardTest {
 
     }
 
+    /**
+     * Tests the list of possible placements with the swap option enabled
+     */
     @Test
     void testDiePlacement(){
         SchemaCard schema1 = new SchemaCard(1,false);
@@ -208,6 +214,9 @@ class SchemaCardTest {
         assertEquals(die2,schema1.getCell(8).getDie());
     }
 
+    /**
+     * Tests that the lists of dice returns the correct updated data
+     */
     @Test
     void testListGenerator(){
         SchemaCard schema1 = new SchemaCard(1,false);
@@ -243,8 +252,6 @@ class SchemaCardTest {
         assertEquals(9,schema1.getDiePosition(die1));
         assertEquals(8,schema1.getDiePosition(die2));
 
-
-
         schema1.removeDie(9);
         List<Die> schemaContent3=schema1.getSchemaDiceList(DieColor.RED);
         assertEquals(1,schemaContent3.size());
@@ -252,6 +259,5 @@ class SchemaCardTest {
 
         schema1.removeDie(3);
         assertEquals(2,schema1.getSchemaDiceList(DieColor.NONE).size());
-
     }
 }

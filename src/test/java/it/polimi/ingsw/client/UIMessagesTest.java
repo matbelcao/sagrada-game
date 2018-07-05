@@ -6,12 +6,19 @@ import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+/**
+ * This class checks the correct retrieval of the messages for the UI
+ */
 class UIMessagesTest {
     private static UIMessages uimsg;
     @BeforeAll
     static void setUp(){
         uimsg=new UIMessages(UILanguage.eng);
     }
+
+    /**
+     * This class checks the correct retrieval of the messages from the xml file
+     */
     @Test
     void testGetMessage() {
 

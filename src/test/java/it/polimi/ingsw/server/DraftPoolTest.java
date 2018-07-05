@@ -9,7 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
-public class DraftPoolTest {
+/**
+ * This test class checks the draftpool methods
+ */
+class DraftPoolTest {
+
+    /**
+     * Checks the correct instantiation, and the dice extraction/clearing
+     */
     @Test
     void testDraftPool(){
         DraftPool draftPool=new DraftPool();
@@ -37,6 +44,5 @@ public class DraftPoolTest {
 
         Die die=new Die("ONE","NONE");
         assertNotEquals(die.getColor().toString(),draftPool.putInBagAndExtract(die));
-
     }
 }

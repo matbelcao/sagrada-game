@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * This test class aims to verify the correct recognition by the parser of the strings entering the socket, and to
  * discard those with an incorrect syntax
  */
-public class ValidatorTest {
+class ValidatorTest {
     private static ArrayList<String> parsedResult = new ArrayList<>();
     private static String command;
 
@@ -19,7 +19,7 @@ public class ValidatorTest {
      * Checks if the LOGIN message syntax is correct
      */
     @Test
-    public void testCheckLogin(){
+    void testCheckLogin(){
         String keyword;
         //testing normal valid login with non standard spacing
         assertTrue(Validator.isValid("   LOGIN    MR   RM  ",parsedResult));
@@ -47,7 +47,7 @@ public class ValidatorTest {
      * Checks if the GET message syntax is correct
      */
     @Test
-    public void testCheckGetSchema(){
+    void testCheckGetSchema(){
         String keyword;
 
         //correct command
@@ -102,7 +102,7 @@ public class ValidatorTest {
      * Checks if the SELECT message syntax is correct
      */
     @Test
-    public void testCheckSelect(){
+    void testCheckSelect(){
 
         command= "          SELECT  9  ";
         assertTrue(Validator.isValid(command,parsedResult));
@@ -123,7 +123,7 @@ public class ValidatorTest {
      * Checks if the PONG message syntax is correct
      */
     @Test
-    public void testCheckPong(){
+    void testCheckPong(){
         command= "     PONG  ";
         assertTrue(Validator.isValid(command,parsedResult));
 
@@ -138,7 +138,7 @@ public class ValidatorTest {
      * Checks if the CHOOSE message syntax is correct
      */
     @Test
-    public void testCheckChoose() {
+    void testCheckChoose() {
 
         assertTrue(Validator.isValid("GET_DICE_LIST", parsedResult));
         assertEquals("GET_DICE_LIST",parsedResult.get(0));
@@ -169,7 +169,7 @@ public class ValidatorTest {
      * Checks if the GET_PLACEMENTS_LIST message syntax is correct
      */
     @Test
-    public void testGetPlacementsList(){
+    void testGetPlacementsList(){
         assertTrue(Validator.isValid("GET_PLACEMENTS_LIST", parsedResult));
         assertEquals("GET_PLACEMENTS_LIST",parsedResult.get(0));
     }
@@ -178,7 +178,7 @@ public class ValidatorTest {
      * Tests some cases of username not valid
      */
     @Test
-    public void testIsValidUsername(){
+    void testIsValidUsername(){
         assertTrue(Validator.isValidUsername("luca"));
         assertFalse(Validator.isValidUsername("luca.ssd"));
         assertFalse(Validator.isValidUsername("...luca"));

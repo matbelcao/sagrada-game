@@ -10,6 +10,9 @@ import java.io.File;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * This class checks the correct instantiation of the dice and the relative methods to manipulate it
+ */
 class DieTest {
     private static Die test;
 
@@ -18,6 +21,9 @@ class DieTest {
         test = new Die("ONE", "RED");
     }
 
+    /**
+     * Tests the correct instantiation of a die (part 1)
+     */
     @Test
     void testAltConstructor(){
         Die die=new Die(1,"RED");
@@ -25,6 +31,9 @@ class DieTest {
         assertEquals("RED", die.getColor().toString());
     }
 
+    /**
+     * Tests the correct instantiation of a die (part 2)
+     */
     @Test
     void init() {
         assertEquals("ONE", test.getShade().toString());
@@ -32,6 +41,9 @@ class DieTest {
         assertEquals("\u001B[91m\u2680\u001B[0m", test.toUtf());
     }
 
+    /**
+     * Tests the correct action of increasing/decreasing the shade of the die
+     */
     @Test
     void testIncreaseDecrease() throws IllegalShadeException {
         test.increaseShade();
@@ -42,6 +54,9 @@ class DieTest {
         assertEquals("RED", test.getColor().toString());
     }
 
+    /**
+     * Tests the correct action of setting the shade of the die
+     */
     @Test
     void testSetShade() throws IllegalShadeException {
         test.setShade(6);
@@ -49,6 +64,9 @@ class DieTest {
         assertEquals("RED", test.getColor().toString());
     }
 
+    /**
+     * Tests the correct action of flipping the shade of the die
+     */
     @Test
     void testflip() throws IllegalShadeException {
         test.flipShade();
@@ -68,27 +86,42 @@ class DieTest {
         assertEquals("THREE", test.getShade().toString());
     }
 
+    /**
+     * Checks the toString() overrided method
+     */
     @Test
     void TestToString(){
         assertEquals("RED" + File.separator + "ONE",test.toString());
     }
 
+    /**
+     * Tests the correct throwing exception if the die has shade ONE
+     */
     @Test
     void decreaseException() {
         assertThrows(IllegalShadeException.class,() -> test.decreaseShade());
     }
 
+    /**
+     * Tests the correct throwing exception if the die has shade SIX
+     */
     @Test
     void increaseException(){
         test.setShade(6);
         assertThrows(IllegalShadeException.class,() -> test.increaseShade());
     }
 
+    /**
+     * Tests the correct throwing exception if the shade to set is not valid
+     */
     @Test
     void setException(){
         assertThrows(IllegalArgumentException.class,() ->test.setShade(0));
     }
 
+    /**
+     * Tests the correct action of swapping the shade of the die
+     */
     @Test
     void testSwap(){
         Die die1=new Die("ONE","RED");

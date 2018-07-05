@@ -9,8 +9,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DiceBagTest {
+/**
+ * This test class checks the dicebag methods
+ */
+class DiceBagTest {
 
+    /**
+     * Tests the constructor and the possibility of extracting a maximum of 90 dice
+     */
     @Test
     void testRep() throws EmptyDiceBagException {
         DiceBag testBag = new DiceBag();
@@ -47,9 +53,12 @@ public class DiceBagTest {
         assertEquals(0,yellow);
         assertEquals(0,blue);
         assertEquals(0,purple);
-        assertThrows(EmptyDiceBagException.class,()->testBag.draftDie());
+        assertThrows(EmptyDiceBagException.class, testBag::draftDie);
     }
 
+    /**
+     * Tries to put a dice back in the bag and to take out a new one
+     */
     @Test
     void testDrafting(){
         DiceBag testBag = new DiceBag();

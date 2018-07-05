@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * This test class performs general tests of the command line configurations
  */
 class ServerOptionsTest {
-    List<String> result=new ArrayList<>();
+    private List<String> result=new ArrayList<>();
 
     /**
      * here we test some valid combinations of options for the server
@@ -25,6 +25,9 @@ class ServerOptionsTest {
         assertTrue(ServerOptions.getOptions("-l 129 -t 222 -a 12.21.2.12".trim().split("\\s+"),result));
     }
 
+    /**
+     * here we test some invalid combinations of options for the server
+     */
     @Test
     void testInvalidOptions(){
         //option that requires a parameter is not place at the end of a group of shortened options

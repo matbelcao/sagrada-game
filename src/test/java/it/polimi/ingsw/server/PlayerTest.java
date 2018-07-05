@@ -11,7 +11,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PlayerTest {
+/**
+ * This test class performs general tests on the Player data
+ */
+class PlayerTest {
     private static User u1,u2;
     private static Board board;
     private static SchemaCard schema;
@@ -31,6 +34,9 @@ public class PlayerTest {
         schema = new SchemaCard(1,false);
     }
 
+    /**
+     * Tests the correct instantiation of the player and the set/unset of some flag with the public methods
+     */
     @Test
     void testGameConstructor(){
         Player player = board.getPlayer(u1);

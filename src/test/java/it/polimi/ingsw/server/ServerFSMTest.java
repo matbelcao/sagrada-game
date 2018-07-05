@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * This test class checks the server-side FSM execution
  */
-public class ServerFSMTest {
+class ServerFSMTest {
 
     /**
      * Tests the FSM flow of a normal placement

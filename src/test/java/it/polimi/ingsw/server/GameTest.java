@@ -12,8 +12,14 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GameTest {
+/**
+ * This test class performs tests on the Game controller (limited by the network components invoked)
+ */
+class GameTest {
 
+    /**
+     * Tests the constructor and the getters/setters
+     */
     @Test
     static void testGetter(){
         ArrayList <User> users= new ArrayList<>();
