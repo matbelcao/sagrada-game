@@ -20,7 +20,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -327,19 +326,21 @@ public class GUIutil {
     }
 
     public HBox getPlayersStatusBar(int myPlayerId, LightBoard board) {
-
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
-            Group playerStatusBar = getPlayerStatusBar(playerId,myPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
+            Button playerStatusBar = getPlayerStatusButton(playerId,myPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
             playerSelector.getChildren().add(playerStatusBar);
             if(playerId == board.getMyPlayerId() || playerId == myPlayerId){
                 continue;
             }else{
+                Event mouseExitedMouseExitedBackPane = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
                 Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
-                playerStatusBar.setOnMouseEntered(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
-                playerStatusBar.setOnMouseClicked(e -> playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
+                playerStatusBar.setOnAction(e -> {
+                    //playerStatusBar.fireEvent(mouseExitedMouseExitedBackPane);
+                    //playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar);
+                });
             }
-            //playerSelector.setAlignment(Pos.BOTTOM_LEFT);
+            playerSelector.setAlignment(Pos.BOTTOM_LEFT);
         }
         return playerSelector;
     }
@@ -363,13 +364,13 @@ public class GUIutil {
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
 
-        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-        selectedPlayerPane.getCenter().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
+        //Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
+        //selectedPlayerPane.getCenter().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
         return selectedPlayerPane;
     }
 
-    private Group getPlayerStatusBar(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
-        Text playerName = new Text(username);
+    private Button getPlayerStatusButton(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
+        /*Text playerName = new Text(username);
         playerName.setFont(Font.font(FONT, 25)); //TODO dynamic
         if(playerId == hilighlightedPlayerId){
             playerName.setFill(Color.DARKBLUE);
@@ -387,7 +388,17 @@ public class GUIutil {
         playerName.setTextAlignment(TextAlignment.CENTER);
         statusAndName.setStyle("-fx-background-color: rgb(125,125,125,0.3);");
         StackPane p = new StackPane(statusAndName);
-        return new Group(p);
+        return new Group(p);*/
+        Button player = new Button(username);
+        if(playerId == nowPlaying ){
+            player.setId("playing-player"); //todo add css
+        }else if(status.equals(LightPlayerStatus.DISCONNECTED) || status.equals(LightPlayerStatus.QUITTED)){
+            player.setId("disconnected-player"); //todo add css
+        }else{
+            player.setId("not-playing-player"); //todo add css
+        }
+
+        return player;
     }
 
     //todo add Text
