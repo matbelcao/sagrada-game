@@ -6,6 +6,10 @@ import it.polimi.ingsw.common.enums.Place;
 
 import static it.polimi.ingsw.client.controller.ClientFSMState.*;
 
+/**
+ * this class implements a simple fsm for the client aimed at optimizing  and simplyfying the experience
+ * of interacting with the server during the game
+ */
 
 public class ClientFSM {
 
@@ -24,6 +28,9 @@ public class ClientFSM {
         this.client=client;
     }
 
+    /**
+     * @return true if the fsm is in a state that actually means something, based on the status of the client
+     */
     boolean isAlive(){
         return client.isLogged();
     }
@@ -43,16 +50,14 @@ public class ClientFSM {
                     break;
                 case END_TURN:
                     if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(SCHEMA_CHOSEN)||state.equals(GAME_ENDED))) {
-                        client.getClientConn().endTurn();
-                        state=state.nextState(false, false, true, false);
+                        endTurn();
                     }else{
                         invalidInput();
                     }
                     break;
                 case BACK:
                     if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(SCHEMA_CHOSEN)||state.equals(GAME_ENDED)||state.equals(MAIN))){
-                        client.getClientConn().back();
-                        state=state.nextState(false, true, false, false);
+                        back();
                     }else{
                         invalidInput();
                     }
@@ -60,19 +65,15 @@ public class ClientFSM {
                 case DISCARD:
                     if (state.equals(CHOOSE_PLACEMENT)
                             && !client.getBoard().getLatestSelectedDie().getPlace().equals(Place.DICEBAG)) {
-                        client.getClientConn().discard();
-                        client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
-                        state=state.nextState(false, false, false, true);
+                        discard();
                     }else{
                         invalidInput();
                     }
                     break;
                 case NEW_GAME:
                     if (state.equals(GAME_ENDED)) {
-                        synchronized (lockState){
-                            state=GAME_ENDED.nextState(true);
-                        }
-                        client.prepareForNewGame();
+
+                        newGame();
                     }else{
                        invalidInput();
                     }
@@ -89,6 +90,43 @@ public class ClientFSM {
         }
     }
 
+    /**
+     * prepares fsm and client for a new game
+     */
+    private void newGame() {
+        state=GAME_ENDED.nextState(true);
+        client.prepareForNewGame();
+    }
+
+    /**
+     * sets new state and sends ent turn message
+     */
+    private void endTurn() {
+        client.getClientConn().endTurn();
+        state=state.nextState(false, false, true, false);
+    }
+
+    /**
+     * sends back message and sets state accordingly
+     */
+    private void back() {
+        client.getClientConn().back();
+        state=state.nextState(false, true, false, false);
+    }
+
+    /**
+     * sends discard message re-gets the dicelist and sets the proper state
+     */
+    private void discard() {
+        client.getClientConn().discard();
+        client.getBoard().setLatestDiceList(client.getClientConn().getDiceList());
+        state=state.nextState(false, false, false, true);
+    }
+
+    /**
+     * prints the latest valid screen
+
+     */
     void invalidInput() {
         client.getClientUI().showLatestScreen();
     }
@@ -345,7 +383,7 @@ public class ClientFSM {
         return state;
     }
 
-    public void setNotMyTurn() {
+    void setNotMyTurn() {
         synchronized (lockState) {
             state = NOT_MY_TURN;
 
