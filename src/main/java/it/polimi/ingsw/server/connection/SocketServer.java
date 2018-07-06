@@ -49,6 +49,10 @@ public class SocketServer extends Thread implements ServerConn  {
         start();
     }
 
+    /**
+     * Ensures the sending of the message without concurrency problems
+     * @param message the message to send using socket
+     */
     private void syncedSocketWrite(String message){
         synchronized (lockOutSocket){
             outSocket.println(message);
@@ -327,7 +331,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Sends the client a text containing his amount of favor tokens
      */
-    public void sendFavorTokens(int playerId) {
+    private void sendFavorTokens(int playerId) {
         syncedSocketWrite(SocketString.SEND_TOKENS+user.getGame().getFavorTokens(playerId));
 
     }
@@ -521,7 +525,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * If triggered, it means that the connection has broken
      */
-    private class connectionTimeout extends TimerTask {
+    private class ConnectionTimeout extends TimerTask {
         @Override
         public void run(){
             synchronized (lockPing) {
@@ -557,7 +561,7 @@ public class SocketServer extends Thread implements ServerConn  {
                         syncedSocketWrite(SocketString.PING);
 
                         pingTimer = new Timer();
-                        pingTimer.schedule(new connectionTimeout(), PING_TIME);
+                        pingTimer.schedule(new ConnectionTimeout(), PING_TIME);
                     }
                     lockPing.notifyAll();
                 }
