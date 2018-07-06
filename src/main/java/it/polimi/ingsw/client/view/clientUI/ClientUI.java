@@ -33,13 +33,6 @@ public interface ClientUI extends Observer {
      */
     void updateLobby(int numUsers);
 
-    /**
-     * this method notifies the beginning of a new match
-     * @param numUsers the number of participants
-     * @param playerId the id of the user
-     */
-    void updateGameStart(int numUsers, int playerId);
-
 
     /**
      * this notifies the client that wanted to quit that his connection has been closed and he has successfully quit

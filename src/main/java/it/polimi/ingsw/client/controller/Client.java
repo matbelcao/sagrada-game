@@ -500,10 +500,8 @@ public class Client implements ClientInt {
         board.setDraftedSchemas(clientConn.getSchemaDraft());
         board.addObserver(clientUI);
         assert(fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA));
-        clientUI.updateGameStart(numPlayers,playerId);
 
         board.notifyObservers();
-        //clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
 
     }
 

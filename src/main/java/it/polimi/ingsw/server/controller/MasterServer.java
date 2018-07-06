@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -64,6 +66,8 @@ public class MasterServer{
     private String ipAddress;
     private int portRMI;
     private int portSocket;
+
+    private Logger logger= Logger.getAnonymousLogger();
 
     private boolean additionalSchemas; //to be used for additional schemas FA
     public static final String XML_SOURCE = "xml/server/"; //append class name + ".xml" to obtain complete path
@@ -335,7 +339,7 @@ public class MasterServer{
      * @param message the message to be printed
      */
     public void printMessage(String message) {
-        System.out.println(message);
+        logger.log(Level.INFO,message);
     }
 
     /**
