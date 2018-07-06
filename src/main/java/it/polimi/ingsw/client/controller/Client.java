@@ -141,7 +141,7 @@ public class Client implements ClientInt {
             UIMode uiMode=UIMode.valueOf(eElement.getElementsByTagName(UI).item(0).getTextContent());
             String serverIP=eElement.getElementsByTagName(IPV4_ADDRESS).item(0).getTextContent();
             ConnectionMode connMode=ConnectionMode.valueOf(eElement.getElementsByTagName(CONNECTION_MODE).item(0).getTextContent());
-            UILanguage lang=UILanguage.valueOf(eElement.getElementsByTagName(LANG).item(0).getTextContent());
+            UILanguage lang=UILanguage.getLang(eElement.getElementsByTagName(LANG).item(0).getTextContent());
             int port;
             if(connMode.equals(ConnectionMode.RMI)){
                 port=Integer.parseInt(eElement.getElementsByTagName(RMI_PORT).item(0).getTextContent());
