@@ -85,7 +85,7 @@ class cliElemsTest {
         player3.setSchema(schema3);
         player3.setStatus(LightPlayerStatus.DISCONNECTED);
 
-        cliview= new CLIObjects(UILanguage.ita);
+        cliview= new CLIObjects(UILanguage.ITA);
 
         cliview.setMatchInfo(1,4);
         cliview.setClientInfo(ConnectionMode.SOCKET, player1.getUsername());

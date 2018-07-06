@@ -207,8 +207,8 @@ public class ClientOptions {
         if(options.contains(SHORT_SOCKET)){ client.setConnMode(ConnectionMode.SOCKET);}
         if(options.contains(SHORT_GUI)){ client.setUiMode(UIMode.GUI);}
         if(options.contains(SHORT_CLI)){ client.setUiMode(UIMode.CLI);}
-        if(options.contains(SHORT_ENG)){ client.setLanguage(UILanguage.eng);}
-        if(options.contains(SHORT_ITA)){ client.setLanguage(UILanguage.ita);}
+        if(options.contains(SHORT_ENG)){ client.setLanguage(UILanguage.ENG);}
+        if(options.contains(SHORT_ITA)){ client.setLanguage(UILanguage.ITA);}
         if(options.contains(SHORT_ADDRESS)){ client.setServerIP(options.get(options.indexOf(SHORT_ADDRESS)+1));}
     }
 }

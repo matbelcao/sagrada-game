@@ -13,7 +13,7 @@ class UIMessagesTest {
     private static UIMessages uimsg;
     @BeforeAll
     static void setUp(){
-        uimsg=new UIMessages(UILanguage.eng);
+        uimsg=new UIMessages(UILanguage.ENG);
     }
 
     /**
@@ -24,7 +24,7 @@ class UIMessagesTest {
 
         System.out.printf(uimsg.getMessage(UIMsg.GAME_START),4,2);
 
-        UIMessages uita = new UIMessages(UILanguage.ita);
+        UIMessages uita = new UIMessages(UILanguage.ITA);
         System.out.printf(uita.getMessage(UIMsg.GAME_START),4,2);
     }
 
