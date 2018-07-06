@@ -417,8 +417,11 @@ public class Board {
             placements = schema.listPossiblePlacements(selectedDie,constraint);
         }
 
-
-        status=fsm.nextState(selectedCommand);
+        if(fsm.getPlaceFrom().equals(Place.DICEBAG)&&placements.isEmpty()){
+            status=fsm.endTool();
+        }else{
+            status = fsm.nextState(selectedCommand);
+        }
         return placements;
     }
 
