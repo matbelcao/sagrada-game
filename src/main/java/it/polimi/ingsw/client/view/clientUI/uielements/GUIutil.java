@@ -38,8 +38,8 @@ import static javafx.geometry.Pos.*;
 public class GUIutil {
     private final CmdWriter cmdWrite;
     private final UIMessages uimsg;
-    private static double screenWidth;
-    private static double screenHeight;
+    private double screenWidth;
+    private double screenHeight;
 
     //ratio is width/height
     public static final int NUM_COLS = 5;
@@ -160,7 +160,6 @@ public class GUIutil {
                Event showMultipleDice = new CustomGuiEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
                 dummyCell.setOnMouseEntered(e -> {
                     dummyCell.fireEvent(showMultipleDice);
-                    System.out.println("entered dummy");
                 });
             }
         }
