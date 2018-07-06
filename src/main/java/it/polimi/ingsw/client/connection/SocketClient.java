@@ -264,16 +264,18 @@ public class SocketClient implements ClientConn {
     }
 
     private void waitForTheRightOne() {
-        lockin.notifyAll();
-        try {
-            lockin.wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        try{
-            inSocket.waitForLine();
-        }catch (IOException e){
-            e.printStackTrace();
+        synchronized (lockin) {
+            lockin.notifyAll();
+            try {
+                lockin.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            try {
+                inSocket.waitForLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }
