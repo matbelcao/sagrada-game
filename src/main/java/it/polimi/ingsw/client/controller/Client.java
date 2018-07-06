@@ -500,10 +500,8 @@ public class Client implements ClientInt {
         board.setDraftedSchemas(clientConn.getSchemaDraft());
         board.addObserver(clientUI);
         assert(fsm.getState().equals(ClientFSMState.CHOOSE_SCHEMA));
-        clientUI.updateGameStart(numPlayers,playerId);
 
         board.notifyObservers();
-        //clientUI.showDraftedSchemas(board.getDraftedSchemas(),board.getPrivObj());
 
     }
 
@@ -745,10 +743,12 @@ public class Client implements ClientInt {
      */
     public void disconnect(){
         synchronized (lockStatus) {
-            userStatus = UserStatus.DISCONNECTED;
-            lockStatus.notifyAll();
+            if(!userStatus.equals(UserStatus.DISCONNECTED)) {
+                clientUI.updateConnectionBroken();
+                userStatus = UserStatus.DISCONNECTED;
+                lockStatus.notifyAll();
+            }
         }
-        clientUI.updateConnectionBroken();
         System.exit(0);
     }
 

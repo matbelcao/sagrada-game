@@ -24,6 +24,10 @@
         <eng>Something went wrong with your connection to the server...%n</eng>
         <ita>Si sono verificati dei problemi alla connessione verso il server...%n</ita>
     </broken-connection>
+    <broken-connection-title>
+        <eng>Connection Broken</eng>
+        <ita>Errore di connessione</ita>
+    </broken-connection-title>
     <closed-connection>
         <eng>The connection was successfully closed!%n</eng>
         <ita>La connessione è stata chiusa correttamente!%n</ita>
@@ -113,8 +117,8 @@
         <ita>Digita qui le tue mosse</ita>
     </prompt-message>
     <quit-option>
-        <eng>q › abandon the match</eng>
-        <ita>q › abbandona partita</ita>
+        <eng>q › abandon the game</eng>
+        <ita>q › abbandona il gioco</ita>
     </quit-option>
     <discard-option>
         <eng>d › select another die</eng>

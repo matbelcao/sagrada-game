@@ -15,7 +15,6 @@ import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Actions;
-import it.polimi.ingsw.common.serializables.IndexedCellContent;
 import it.polimi.ingsw.common.serializables.LightDie;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
 import javafx.application.Application;
@@ -28,7 +27,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -36,31 +37,30 @@ import java.util.List;
 import java.util.Observable;
 
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.LOGIN_KO;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.LOGIN_OK;
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.CENTER;
 
 public class GUI extends Application implements ClientUI {
-    private GUIutil sceneCreator;
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
+
     private static Client client;
+    private LightBoard board;
+    private GUIutil sceneCreator;
+    private CmdWriter cmdWrite;
     private static UIMessages uimsg;
     private Stage primaryStage;
     private static GUI instance;
+    private SizeListener sizeListener;
     private static final Object lock = new Object();
     private Label messageToUser = new Label();
-    private CmdWriter cmdWrite;
-    private int playerId;// TODO: 03/07/2018
-    private SizeListener sizeListener;
-    private LightBoard tempBoard;
-
-    public GUI() {
-        instance = this;
-    }
 
     public static GUI getGUI() {
-        return instance;
+        if(instance == null){
+            return null;
+        }else{
+            return instance;
+        }
     }
 
 
@@ -74,11 +74,14 @@ public class GUI extends Application implements ClientUI {
     public void start(Stage primaryStage) {
         //get the dimensions of the screen
         synchronized (lock) {
+            instance = this;
             sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(), getCmdWrite() ,uimsg);
             lock.notifyAll();
         }
-        this.primaryStage = primaryStage;
+        primaryStage.setX(sceneCreator.getStageX());
+        primaryStage.setY(sceneCreator.getStageY());
         sizeListener = new SizeListener(this);
+        this.primaryStage = primaryStage;
 
     }
 
@@ -88,7 +91,6 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void showLoginScreen() {
-
         Platform.runLater(() -> {
             synchronized (lock) {
                 while (sceneCreator == null) {
@@ -140,6 +142,12 @@ public class GUI extends Application implements ClientUI {
                     "-fx-background-position: center center;");
 
             Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(), sceneCreator.getLoginHeight());
+            //I can trigger the login also pressing ENTER
+            loginScene.setOnKeyPressed(e -> {
+                if (e.getCode() == KeyCode.ENTER) {
+                    button.fire();
+                }
+            });
 
             loginScene.getStylesheets().add("css/style.css");
 
@@ -159,13 +167,11 @@ public class GUI extends Application implements ClientUI {
                     client.disconnect();
                 }
             });
-
             //disable the size listener because login is non resizable
             sizeListener.disable();
             //assign the size listener to the stage
             primaryStage.widthProperty().addListener(sizeListener);
             primaryStage.heightProperty().addListener(sizeListener);
-
             primaryStage.show();
         });
     }
@@ -201,13 +207,8 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-    @Override
-    public void updateGameStart(int numUsers, int playerId) {
-        this.playerId = playerId;
-    }
-
     private void updateBoard(LightBoard board) {
-        tempBoard=board;
+        this.board =board;
         Platform.runLater(() -> {
             if (board == null) {
                 throw new IllegalArgumentException();
@@ -247,62 +248,39 @@ public class GUI extends Application implements ClientUI {
             }
             primaryStage.setMinWidth(sceneCreator.getGameSceneMinWidth());
             primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight()); //todo decide if I want to keep it
-
-
-            //double currentWidth = primaryStage.getWidth();
-            //double currentHeight = primaryStage.getHeight();
-           // primaryStage.getScene().setRoot(bulidMainPane(currentWidth,currentHeight));
-
-            /*if(mainScene == null){
-                mainScene = new Scene(bulidMainPane(currentWidth,currentHeight,board));
-                primaryStage.setScene(mainScene);
-            }else{
-                mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
-            }*/
             sizeListener.purgeTimer();
-            System.out.println("dentro update board" + client.getFsmState());
             drawMainGameScene();
             sizeListener.enable();
-
-
-            //primaryStage.widthProperty().addListener(sizeListener);
-                //primaryStage.heightProperty().addListener(sizeListener);
 
             });
     }
 
     public void drawMainGameScene(){
-        Platform.runLater(()->
-            primaryStage.getScene().setRoot(bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight()))
-        );
+        Platform.runLater(()-> primaryStage.getScene().setRoot(bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight())));
     }
 
     private StackPane bulidMainPane(double newWidth, double newHeight){
         StackPane p = new StackPane();
-        System.out.println(client.getFsmState());
         if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)){
-            BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(tempBoard.getDraftedSchemas(),tempBoard.getPrivObj(), newWidth, newHeight) ;
+            BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(board.getDraftedSchemas(), board.getPrivObj(), newWidth, newHeight) ;
             p.getChildren().add(draftedSchemasPane);
         }else if(client.getFsmState().equals(ClientFSMState.SCHEMA_CHOSEN)){
             p.getChildren().add(sceneCreator.buildWaitingForGameStartScene(newWidth, newHeight));
         }else if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
-            BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(newWidth,newHeight,tempBoard.sortFinalPositions());
+            BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(newWidth,newHeight, board.sortFinalPositions());
             p.getChildren().add(gameEndedPane);
         }else{
-            BorderPane frontPane = buildFrontPane(newWidth,newHeight,tempBoard);
-            List <Actions> latestOptionsList = tempBoard.getLatestOptionsList();
+            BorderPane frontPane = buildFrontPane(newWidth,newHeight, board);
+            List <Actions> latestOptionsList = board.getLatestOptionsList();
             ClientFSMState turnState = client.getFsmState();
             p.getChildren().add(frontPane);
             //the pane listens for custom events to know when it has to which layer
-            p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight,tempBoard,turnState)));
-            p.addEventHandler(SELECTED_PLAYER, e -> {
-                p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight,tempBoard)); //todo create everything at once? note that two events are executed
-                System.out.println("selected player");
-            });
+            p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight, board,turnState)));
+            p.addEventHandler(SELECTED_PLAYER, e -> p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight, board)));
             p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
 
             if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
-                BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,tempBoard);
+                BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight, board);
                 p.getChildren().add(backPane);
             }
         }
@@ -313,7 +291,6 @@ public class GUI extends Application implements ClientUI {
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
-        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
         LightSchemaCard             schemaCard = board.getPlayerById(board.getMyPlayerId()).getSchema();
         int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
         ClientFSMState              turnState = client.getFsmState();
@@ -324,10 +301,8 @@ public class GUI extends Application implements ClientUI {
 
         List<DieContainer> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
         List<DieContainer> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
-        List<DieContainer> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
+        List<DieContainer> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,cellDim);
         sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
-
-
 
         //Top side of the border pane
         HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackCells);
@@ -345,7 +320,7 @@ public class GUI extends Application implements ClientUI {
         frontPane.setCenter(new VBox(schemaContainer,playersStatusBar));
 
         //Right side of the border pane
-        VBox cards = sceneCreator.drawCards(tempBoard,cellDim,turnState);
+        VBox cards = sceneCreator.drawCards(this.board,cellDim,turnState);
         StackPane cardsContainer = new StackPane(cards);
         cards.setAlignment(CENTER);
         GridPane draftpool = sceneCreator.buildDraftPool(draftPoolCells);
@@ -356,13 +331,23 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void updateConnectionClosed() {
-
+        //It's always the client that closes the connection
     }
 
     @Override
-    public void updateConnectionBroken() {
-
+    public void updateConnectionBroken(){
+        Platform.runLater(()->{
+            sizeListener.disable(); //defensive programming
+            Stage connectionBrokStage = new Stage();
+            connectionBrokStage.initModality(Modality.APPLICATION_MODAL);
+            connectionBrokStage.setTitle(uimsg.getMessage(BROKEN_CONNECTION_TITLE));
+            connectionBrokStage.setResizable(false);
+            primaryStage.setScene(sceneCreator.buildConnecionBrokenScene());
+            connectionBrokStage.sizeToScene();
+            primaryStage.showAndWait();
+        });
     }
+
 
 
     @Override

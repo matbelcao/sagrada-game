@@ -43,7 +43,7 @@ public class ClientFSM {
 
                     break;
                 case END_TURN:
-                    if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(GAME_ENDED))) {
+                    if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(SCHEMA_CHOSEN)||state.equals(GAME_ENDED))) {
                         client.getClientConn().endTurn();
                         state=state.nextState(false, false, true, false);
                     }else{
@@ -51,7 +51,7 @@ public class ClientFSM {
                     }
                     break;
                 case BACK:
-                    if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(GAME_ENDED)||state.equals(MAIN))){
+                    if(!(state.equals(NOT_MY_TURN)||state.equals(CHOOSE_SCHEMA)||state.equals(SCHEMA_CHOSEN)||state.equals(GAME_ENDED)||state.equals(MAIN))){
                         client.getClientConn().back();
                         state=state.nextState(false, true, false, false);
                     }else{
@@ -106,9 +106,6 @@ public class ClientFSM {
                 chooseSchemaAction(index);
                 break;
 
-            case NOT_MY_TURN:
-                break;
-
             case MAIN:
                 mainChoiceAction(index);
                 break;
@@ -129,9 +126,6 @@ public class ClientFSM {
                 choosePlacementAction(index);
                 break;
 
-
-            case TOOL_CAN_CONTINUE:
-                break;
             default:
                 invalidInput();
                 break;

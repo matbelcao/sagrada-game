@@ -93,6 +93,7 @@ public class CLIObjects {
         List<String> drafted = new ArrayList<>(buildDraftedSchemas());
         priv.add(0,boldify(uiMsg.getMessage(PRIVATE_OBJ)));
         priv.add(EMPTY_STRING);
+        builder.append(resetScreenPosition());
         builder.append(NEW_LINE+NEW_LINE);
         builder.append(clientInfo);
         builder.append(NEW_LINE+NEW_LINE);

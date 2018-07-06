@@ -47,6 +47,8 @@ public enum UIMsg {
     SECOND_TURN("second-turn"),
     BROKEN_CONNECTION("broken-connection"),
     CLOSED_CONNECTION("closed-connection"),
+    BROKEN_CONNECTION_TITLE("broken-connection-title"),
+
     QUITTED("quitted"),
     DISCONNECTED("disconnected"), GAME_END("game-end"),
     SCORE("score"),

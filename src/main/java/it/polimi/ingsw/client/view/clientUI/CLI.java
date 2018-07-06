@@ -143,21 +143,6 @@ public class CLI implements ClientUI {
         printToScreen(view.printLatestScreen());
     }
 
-    /**
-     * this method notifies the start of the game
-     * @param numUsers the number of participants
-     * @param playerId the id of the user
-     */
-    @Override
-    public synchronized void updateGameStart(int numUsers, int playerId){
-
-        resetScreen();
-        view.setLatestScreen(String.format(String.format(STRING_NEWLINE, uimsg.getMessage(UIMsg.GAME_START)),numUsers,playerId));
-        printToScreen(view.printLatestScreen());
-        view.setMatchInfo(playerId,numUsers);
-
-    }
-
 
     /**
      * this method updates the view to the latest changes in the lightboard and/or state of the client
@@ -169,6 +154,10 @@ public class CLI implements ClientUI {
             throw new IllegalArgumentException();
         }
         List<Integer> changes=board.getChanges();
+
+        if(changes.contains(LightBoardEvents.MY_PLAYER_ID)){
+            view.setMatchInfo(board.getMyPlayerId(),board.getNumPlayers());
+        }
 
         if(changes.contains(LightBoardEvents.PRIV_OBJ))
             view.updatePrivObj(board.getPrivObj());

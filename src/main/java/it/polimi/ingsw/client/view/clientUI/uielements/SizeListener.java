@@ -8,7 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class SizeListener implements ChangeListener<Number> {
-    private static final int DELAY_TIME = 250;
+    private static final int DELAY_TIME = 250; // delay that has to pass in order to consider an operation done
     private Timer timer;
     private final Object lockTimer;
     private GUI gui;
@@ -25,39 +25,28 @@ public class SizeListener implements ChangeListener<Number> {
                 if (enabled) {
                     if (timer != null) {
                         timer.cancel();
-                        //System.out.print("CANCELLATO TIMER");
                     }
                     timer = new Timer();
-                    TimerTask task = null; // task to execute after defined delay
-                    final long delayTime = DELAY_TIME; // delay that has to pass in order to consider an operation done
-                    if (task != null) { // there was already a task scheduled from the previous operation ...
-                        task.cancel(); // cancel it, we have a new size to consider
-                    }
+                    TimerTask task; // task to execute after defined delay
                     task = new TimerTask() {// create new task that calls resize operation
                         @Override
                         public void run() {
-                            //System.out.println("resize to stage");
-
-                            //System.out.println("resiziiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiing");
                             if (enabled) {
                                 gui.drawMainGameScene();
                             }
                         }
                     };
                     // schedule new task
-                    timer.schedule(task, delayTime);
+                    timer.schedule(task, DELAY_TIME);
                 }
             }
     }
 
     public void purgeTimer(){
         synchronized (lockTimer) {
-            {
-                if(timer!=null){
-                    timer.cancel();
-                    //System.out.print("CANCELLATO TIMER");
-                }
-            }
+          if(timer!=null){
+             timer.cancel();
+          }
         }
     }
 

@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -37,16 +38,15 @@ import static javafx.geometry.Pos.*;
 public class GUIutil {
     private final CmdWriter cmdWrite;
     private final UIMessages uimsg;
+    private double screenWidth;
+    private double screenHeight;
+
     //ratio is width/height
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
     private static final double NUM_OF_TOOLS = 3;
     private static final int ROUNDTRACK_SIZE = 10;
-
-    private final double SCREEN_WIDTH;
-    private final double SCREEN_HEIGHT;
     private static final String FONT = "Sans-Serif";
-    private static final Color OPAQUE_FILL = Color.rgb(0,0,0,0.3);
 
     //-----login Stage
     private static final double LOGIN_TO_SCREEN_RATIO = 0.25;
@@ -81,17 +81,24 @@ public class GUIutil {
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.33333333333;
     private static final double FAVOR_TOKEN_TEXT_TO_CELL_DIM = 0.27777777;
     private static final double ROUNDTRACK_SPACING = 5;
+    //Connection Broken
+    private static final double CONN_BROKEN_FONT_TO_SCREEN = 0.018;
+
 
 
     public GUIutil(Rectangle2D visualBounds, CmdWriter cmdWrite, UIMessages uimsg) {
-        SCREEN_WIDTH = visualBounds.getWidth();
-        SCREEN_HEIGHT = visualBounds.getHeight();
+        screenWidth = visualBounds.getWidth();
+        screenHeight = visualBounds.getHeight();
         this.cmdWrite = cmdWrite;
         this.uimsg = uimsg;
     }
 
+    public double getStageX() { return (screenWidth - getGameSceneMinWidth())/2; }
+
+    public double getStageY() { return (screenHeight -getGameSceneMinHeight())/2;}
+
     public double getLoginWidth() {
-        return SCREEN_WIDTH * LOGIN_TO_SCREEN_RATIO;
+        return screenWidth * LOGIN_TO_SCREEN_RATIO;
     }
 
     public double getLoginHeight() {
@@ -103,11 +110,11 @@ public class GUIutil {
     }
 
     public double getLobbyMinWidth() {
-        return LOBBY_SCENE_W_TO_SCREEN_RATIO * SCREEN_WIDTH;
+        return LOBBY_SCENE_W_TO_SCREEN_RATIO * screenWidth;
     }
 
     public double getGameSceneMinWidth(){
-        return MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH*SCREEN_WIDTH;
+        return MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH* screenWidth;
     }
 
     public double getGameSceneMinHeight(){
@@ -153,7 +160,6 @@ public class GUIutil {
                Event showMultipleDice = new CustomGuiEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
                 dummyCell.setOnMouseEntered(e -> {
                     dummyCell.fireEvent(showMultipleDice);
-                    System.out.println("entered dummy");
                 });
             }
         }
@@ -306,7 +312,6 @@ public class GUIutil {
     }
 
     public BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board,ClientFSMState turnState){
-        System.out.println("showing multiple dice pane");
         double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
         List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
@@ -324,20 +329,19 @@ public class GUIutil {
         return backPane;
     }
 
-    public HBox getPlayersStatusBar(int myPlayerId, LightBoard board) {
+    public HBox getPlayersStatusBar(int showingPlayerId, LightBoard board) { //todo remove my player id
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
-            Button playerStatusBar = getPlayerStatusButton(playerId,myPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
+            Button playerStatusBar = getPlayerStatusButton(playerId,showingPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
             playerSelector.getChildren().add(playerStatusBar);
-            if(playerId == board.getMyPlayerId() || playerId == myPlayerId){
+            if( playerId == showingPlayerId){
                 continue;
+            }else if(playerId == board.getMyPlayerId()){
+                Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
+                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseExited));
             }else{
-                Event mouseExitedMouseExitedBackPane = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
                 Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
-                playerStatusBar.setOnAction(e -> {
-                    //playerStatusBar.fireEvent(mouseExitedMouseExitedBackPane);
-                    //playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar);
-                });
+                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
             }
             playerSelector.setAlignment(Pos.BOTTOM_LEFT);
         }
@@ -345,9 +349,9 @@ public class GUIutil {
     }
 
     //todo update
-    public BorderPane buildSelectdPlayerPane(int playerId, double width, double height, LightBoard board){
+    public BorderPane buildSelectdPlayerPane(int showingPlayerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
-        HBox playersSelector = getPlayersStatusBar(playerId,board);
+        HBox playersSelector = getPlayersStatusBar(showingPlayerId,board);
         Region spacer = new Region();
         HBox.setHgrow(spacer,Priority.ALWAYS);
         HBox bottomContainer = new HBox(playersSelector,spacer);
@@ -356,38 +360,16 @@ public class GUIutil {
         double cellDim = getMainSceneCellDim(width,height);
         selectedPlayerPane.setRight(new Rectangle(getCardWidth(cellDim)*NUM_OF_TOOLS,getCardHeight(cellDim),Color.TRANSPARENT)); //the space occupied by cards
         selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT)); //the space occupied by roundtrack
-        List<DieContainer> selectedPlayerSchema = getSchemaCells(board.getPlayerById(playerId).getSchema(), cellDim);
-        Group playerSchema = buildSchema(selectedPlayerSchema,board.getPlayerById(playerId).getFavorTokens(),cellDim);
+        List<DieContainer> selectedPlayerSchema = getSchemaCells(board.getPlayerById(showingPlayerId).getSchema(), cellDim);
+        Group playerSchema = buildSchema(selectedPlayerSchema,board.getPlayerById(showingPlayerId).getFavorTokens(),cellDim);
         StackPane schemaContainer = new StackPane(playerSchema);
-        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112);"); //todo hookup with css and make the same as the front pane background
+        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112,0);"); //todo hookup with css and make the same as the front pane background
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
-
-        //Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-        //selectedPlayerPane.getCenter().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
         return selectedPlayerPane;
     }
 
     private Button getPlayerStatusButton(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
-        /*Text playerName = new Text(username);
-        playerName.setFont(Font.font(FONT, 25)); //TODO dynamic
-        if(playerId == hilighlightedPlayerId){
-            playerName.setFill(Color.DARKBLUE);
-        }
-        Circle statusCircle = new Circle(10);
-        if(playerId == nowPlaying ){
-            statusCircle.setFill(Color.GREEN);
-        }else if(status.equals(LightPlayerStatus.DISCONNECTED) || status.equals(LightPlayerStatus.QUITTED)){
-            statusCircle.setFill(Color.RED);
-        }else{
-            statusCircle.setFill(Color.GRAY);
-        }
-        HBox statusAndName= new HBox(statusCircle,playerName);
-        statusAndName.setAlignment(Pos.CENTER);
-        playerName.setTextAlignment(TextAlignment.CENTER);
-        statusAndName.setStyle("-fx-background-color: rgb(125,125,125,0.3);");
-        StackPane p = new StackPane(statusAndName);
-        return new Group(p);*/
         Button player = new Button(username);
         if(playerId == nowPlaying ){
             player.setId("playing-player"); //todo add css
@@ -396,7 +378,6 @@ public class GUIutil {
         }else{
             player.setId("not-playing-player"); //todo add css
         }
-
         return player;
     }
 
@@ -422,7 +403,7 @@ public class GUIutil {
         return selectDiePane;
     }
 
-    public List<DieContainer> getRoundTrackCells(List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, double cellDim) {
+    public List<DieContainer> getRoundTrackCells(List<List<LightDie>> roundTrack, double cellDim) {
         ArrayList<DieContainer> roundTrackCells = new ArrayList<>();
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             DieContainer cell = new DieContainer(i, cellDim);
@@ -530,14 +511,14 @@ public class GUIutil {
                 addMainStateActionListeners(draftPoolCells);
             break;
             case SELECT_DIE:
-                addSelectDieStateActionListener(draftPoolCells,schemaCells,roundTrackCells,board,cellDim);
+                addSelectDieStateActionListener(draftPoolCells,schemaCells,roundTrackCells,board);
                 break;
             case CHOOSE_OPTION:
                 break;
             case CHOOSE_TOOL:
                 break;
             case CHOOSE_PLACEMENT:
-                addChoosePlacementActionListener(draftPoolCells,schemaCells,roundTrackCells,board,cellDim);
+                addChoosePlacementActionListener(draftPoolCells,schemaCells,board);
                 break;
             case TOOL_CAN_CONTINUE:
                 break;
@@ -546,7 +527,7 @@ public class GUIutil {
         }
 
     }
-    private void addSelectDieStateActionListener(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, LightBoard board, double cellDim) {
+    private void addSelectDieStateActionListener(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, LightBoard board) {
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         List<List<LightDie>> roundTrack = board.getRoundTrack();
@@ -581,7 +562,7 @@ public class GUIutil {
         }
     }
 
-    private void addChoosePlacementActionListener(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, LightBoard board, double cellDim) {
+    private void addChoosePlacementActionListener(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, LightBoard board) {
         IndexedCellContent latestSelectedDie = board.getLatestSelectedDie();
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<Integer> latestPlacementsList = board.getLatestPlacementsList();
@@ -595,7 +576,6 @@ public class GUIutil {
             if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
                 for (DieContainer cell : draftPoolCells) {
                     cell.setOnMouseClicked(e -> {
-                        System.out.println("selected die");
                         cmdWrite.write("d");
                         cmdWrite.write(draftPoolCells.indexOf(cell) + "");
                     });
@@ -742,4 +722,12 @@ public class GUIutil {
         containerPane.setStyle("-fx-background-image: url('img/wall.png');");
         return containerPane;
     }
+
+    public Scene buildConnecionBrokenScene() {
+        Text connectionBrokeMessage = new Text(uimsg.getMessage(BROKEN_CONNECTION));
+        connectionBrokeMessage.setFont(new Font(FONT, screenWidth *CONN_BROKEN_FONT_TO_SCREEN));
+        StackPane layout = new StackPane(connectionBrokeMessage);
+        return new Scene(layout);
+    }
+
 }
