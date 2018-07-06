@@ -7,6 +7,7 @@ import it.polimi.ingsw.common.exceptions.IllegalActionException;
 import it.polimi.ingsw.common.connection.rmi_interfaces.RMIServerInt;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RMIClient implements ClientConn{
@@ -31,7 +32,7 @@ public class RMIClient implements ClientConn{
      */
     @Override
     public List<LightSchemaCard> getSchemaDraft() {
-        List <LightSchemaCard>result = null;
+        List <LightSchemaCard>result = new ArrayList<>();
         try {
             result = remoteObj.getSchemaDraft();
         } catch (RemoteException | IllegalActionException e) {
@@ -78,7 +79,7 @@ public class RMIClient implements ClientConn{
      */
     @Override
     public List<LightCard> getPublicObjectives() {
-        List<LightCard> result = null;
+        List<LightCard> result = new ArrayList<>();
         try {
             result = remoteObj.getPublicObjects();
         } catch (RemoteException e) {
@@ -93,7 +94,7 @@ public class RMIClient implements ClientConn{
      */
     @Override
     public List<LightTool> getTools() {
-        List<LightTool> result = null;
+        List<LightTool> result = new ArrayList<>();
         try {
             result = remoteObj.getTools();
         } catch (RemoteException e) {
@@ -108,7 +109,7 @@ public class RMIClient implements ClientConn{
      */
     @Override
     public List<LightDie> getDraftPool() {
-        List<LightDie> draftPool = null;
+        List<LightDie> draftPool =new ArrayList<>();
         try {
             draftPool = remoteObj.getDraftPool();
         } catch (RemoteException | IllegalActionException e) {
@@ -123,7 +124,7 @@ public class RMIClient implements ClientConn{
      */
     @Override
     public List<List<LightDie>> getRoundtrack() {
-        List<List<LightDie>> roundTrack=null;
+        List<List<LightDie>> roundTrack=new ArrayList<>();
         try {
             roundTrack = remoteObj.getRoundTrack();
         } catch (RemoteException | IllegalActionException e) {
@@ -139,7 +140,7 @@ public class RMIClient implements ClientConn{
      */
     @Override
     public List<LightPlayer> getPlayers() {
-        List<LightPlayer> players = null;
+        List<LightPlayer> players = new ArrayList<>();
         try {
             players = remoteObj.getPlayers();
         } catch (RemoteException e) {
@@ -187,10 +188,11 @@ public class RMIClient implements ClientConn{
      */
     @Override
     public List<IndexedCellContent> getDiceList() {
-        List<IndexedCellContent> diceList=null;
+        List<IndexedCellContent> diceList=new ArrayList<>();
         try{
             diceList = remoteObj.getDiceList();
         }catch(RemoteException | IllegalActionException e){
+            e.printStackTrace();
             closeConn();
         }
         return diceList;
@@ -204,7 +206,7 @@ public class RMIClient implements ClientConn{
      */
     @Override
     public List<Actions> select(int dieIndex) {
-        List<Actions> options=null;
+        List<Actions> options=new ArrayList<>();
         try{
             options = remoteObj.select(dieIndex);
         }catch(RemoteException | IllegalActionException e){
@@ -220,7 +222,7 @@ public class RMIClient implements ClientConn{
      */
     @Override
     public List<Integer> getPlacementsList() {
-        List<Integer> placements=null;
+        List<Integer> placements=new ArrayList<>();
         try{
             placements = remoteObj.getPlacementsList();
         }catch(RemoteException | IllegalActionException e){

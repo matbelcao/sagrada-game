@@ -8,29 +8,28 @@
     -fx-font-size: 16 vmin;
     -fx-font-weight: bold;
 }
+
 #login-button:hover{
     -fx-background-color: #55bbff;
 }
+
 #login-button:pressed{
     -fx-background-color: #99ddff;
 }
 
 #game-button {
     -fx-min-width: 110;
-    -fx-background-color: #ffffff;
+    -fx-background-color: #0086fc;
     -fx-background-radius: 10;
-    -fx-padding: 12 8 12 8;
-    -fx-background-insets: 2;
-    -fx-text-fill: #333333;
+    -fx-padding: 22 10 14 10;
+    -fx-background-insets: 12 4 4 4;
+    -fx-text-fill: #ffffff;
     -fx-font-size: 16 vmin;
     -fx-font-weight: bold;
+
 }
-#game-button:hover{
-    -fx-background-color: #fafafa;
-}
-#game-button:pressed{
-    -fx-background-color: #dddddd;
-}
+
+
 #tab {
     -fx-background-color: #0086fc;
     -fx-background-radius: 10 10 0 0;
@@ -40,24 +39,25 @@
     -fx-font-size: 16 vmin;
     -fx-font-weight: bold;
 }
-#tab:hover{
+#tab:hover,#game-button:hover{
     -fx-background-color: #66bbff;
 
 }
-#tab:pressed{
+#tab:pressed,#game-button:pressed{
     -fx-background-color: #99ddff;
 }
 
 #card{
     -fx-background-color: #ffffff;
-    -fx-background-insets: 2;
+    -fx-background-insets: 2 2 2 2;
     -fx-padding: 2;
 
 }
 #card:hover {
     -fx-opacity: 0.8;
 }
-#login-ok{
+
+#login-ko,#lobby-message,#login-ok,#drafted-message{
     -fx-background-color: rgba(255,255,255,0.9);
     -fx-background-radius: 10;
     -fx-padding: 20px;
@@ -68,40 +68,13 @@
 }
 
 #login-ko{
-    -fx-background-color: rgba(255,255,255,0.9);
-    -fx-background-radius: 10;
-    -fx-padding: 20px;
-    -fx-text-alignment: center;
     -fx-text-fill: red;
-    -fx-font-size: 14 vmin;
-    -fx-font-weight: bold;
-}
-
-#lobby-message{
-    -fx-background-color: rgba(255,255,255,0.9);
-    -fx-background-radius: 10;
-    -fx-padding: 20px;
-    -fx-text-alignment: center;
-    -fx-text-fill: black;
-    -fx-font-size: 18 vmin;
-    -fx-font-weight: bold;
 }
 
 #drafted-message{
-    -fx-background-color: rgba(255,255,255,0.9);
-    -fx-padding: 10px;
     -fx-text-alignment: left;
-    -fx-text-fill: black;
     -fx-font-size: 24 vmin;
-    -fx-font-weight: bold;
-}
-
-#turn-indicator{
-    -fx-font-size: 16 vmin;
-    -fx-text-alignment: right;
-    -fx-padding:12 48 12 48;
-    -fx-min-width: 300;
-    -fx-font-weight: bold;
+    -fx-background-radius: 0 0 0 0;
 }
 
 #drafted-schemas:hover{
@@ -110,17 +83,14 @@
 
 #tab-container{
     -fx-background-color: rgba(255,255,255,0.95);
-    -fx-background-radius: 16 16 0 0;
-    -fx-border-radius: 16 16 0 0;
-    -fx-border-width: 4 4 0 4 ;
-    -fx-border-color: rgba(255,255,255,0.9);
+    -fx-background-radius: 16 16  0 0;
+    -fx-padding: 6 6 0 6;
+
 }
 #card-container{
     -fx-background-color: rgba(255,255,255,0.9);
-    -fx-border-width: 0 4 4 4 ;
-    -fx-border-color: rgba(255,255,255,0.95);
-}
-#roundtrack-cell{
+    -fx-background-radius: 0 0  16 16;
+    -fx-padding: 0 6 20 6;
 
 }
 
@@ -132,3 +102,74 @@
     -fx-text-fill: black;
     -fx-font-weight: bold;
 }
+
+#turn-indicator,#currently-playing{
+    -fx-font-size: 16 vmin;
+    -fx-padding:12;
+    -fx-font-weight: bold;
+}
+
+#player-playing,#player-disconnected,#player-quitted,#player-info {
+    -fx-background-radius: 10 10 0 0;
+    -fx-background-insets: 0 0 0 0 ;
+    -fx-padding: 12 ;
+    -fx-text-fill: white;
+    -fx-font-size: 16 vmin;
+    -fx-font-weight: bold;
+}
+
+
+#player-playing{
+     -fx-background-color: #229922;
+ }
+#player-quitted{
+    -fx-background-color: #ff4848;
+}
+#player-disconnected{
+    -fx-background-color: #949494;
+}
+#player-info{
+    -fx-text-fill: #444444;
+    -fx-background-color: #ffffff;
+}
+
+
+#player-playing:hover{
+    -fx-background-color: #22aa22;
+}
+#player-quitted:hover{
+    -fx-background-color: #ff6666;
+}
+#player-disconnected:hover{
+    -fx-text-fill: #444444;
+    -fx-background-color: #aaaaaa;
+}
+#player-info:hover{
+    -fx-text-fill: #444444;
+    -fx-background-color: #f8f8f8;
+}
+
+
+#player-playing:pressed{
+    -fx-background-color: #66dd66;
+}
+#player-quitted:pressed{
+    -fx-background-color: #ff8888;
+}
+#player-disconnected:pressed{
+    -fx-text-fill: #444444;
+    -fx-background-color: #bbbbbb;
+}
+#player-info:pressed{
+    -fx-text-fill: #444444;
+    -fx-background-color: #f4f4f4;
+}
+
+#top-section{
+    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-padding: 20 20 30 20;
+
+}
+
+
+

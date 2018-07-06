@@ -6,12 +6,12 @@ import javafx.scene.paint.Color;
  * it also contains the ansi code to apply color to text in the CLI
  */
 public enum DieColor { //need to add png address combined with Shade's ones
-    RED("\u001B[91m",   Color.web("#bb331a"), Color.RED   ),
-    GREEN("\u001B[92m", Color.web("#579b55"), Color.GREEN   ),
-    YELLOW("\u001B[93m",Color.web("#e3d107"), Color.YELLOW   ),
-    BLUE("\u001B[94m",  Color.web("#5faab9"), Color.BLUE   ),
-    PURPLE("\u001B[95m",Color.web("#a5468c"), Color.PURPLE   ),
-    NONE ("\u001B[0m",  Color.web("#9e9e9e"), Color.BLACK   ); //to be used (also) in shade restrictions
+    RED("\u001B[91m",   Color.web("#bb331a"), Color.web("#ff142b")   ),
+    GREEN("\u001B[92m", Color.web("#579b55"), Color.web("#1dd62d")   ),
+    YELLOW("\u001B[93m",Color.web("#e3d107"), Color.web("#fffb16")   ),
+    BLUE("\u001B[94m",  Color.web("#5faab9"), Color.web("#146eff")  ),
+    PURPLE("\u001B[95m",Color.web("#a5468c"), Color.web("#ce16ac")   ),
+    NONE ("\u001B[0m",  Color.web("#9e9e9e"), Color.web("#333333")   ); //to be used (also) in shade restrictions
 
     private final String utf;
     private final Color constraintColor;

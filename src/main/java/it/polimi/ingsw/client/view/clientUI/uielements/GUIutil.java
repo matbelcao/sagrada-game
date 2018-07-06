@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.view.clientUI.uielements;
 import it.polimi.ingsw.client.controller.CmdWriter;
 import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
+import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.serializables.*;
@@ -75,10 +76,10 @@ public class GUIutil {
     //Main game scene
     private static final double MAIN_GAME_SCENE_RATIO = 1.72629;
     private static final double MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH = 0.8265;
-    private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.137615;
-    private static final double MAIN_GAME_CELL_DIM_TO_WIDTH = 0.0797171;
-    private static final double CARD_WIDTH_TO_CELL_DIM = 2.455555555555;
-    private static final double CARD_HEIGHT_TO_CELL_DIM = 3.33333333333;
+    private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.0957615;
+    private static final double MAIN_GAME_CELL_DIM_TO_WIDTH = 0.0607171;
+    private static final double CARD_WIDTH_TO_CELL_DIM = 2.65;
+    private static final double CARD_HEIGHT_TO_CELL_DIM = 3.6;
     private static final double FAVOR_TOKEN_TEXT_TO_CELL_DIM = 0.27777777;
     private static final double ROUNDTRACK_SPACING = 5;
     //Connection Broken
@@ -227,9 +228,9 @@ public class GUIutil {
 
 
     public VBox drawCards(LightBoard board, double cellDim, ClientFSMState turnState) {
-        Button priv = new Button("Private Objective");
-        Button pub = new Button("Public Objectives");
-        Button tool = new Button("Tools");
+        Button priv = new Button(uimsg.getMessage(UIMsg.PRIVATE_OBJ).replaceFirst(":",""));
+        Button pub = new Button(uimsg.getMessage(UIMsg.PUBLIC_OBJ).replaceFirst(":",""));
+        Button tool = new Button(uimsg.getMessage(UIMsg.TOOLS).replaceFirst(":",""));
 
 
         priv.setId("tab");
@@ -244,12 +245,12 @@ public class GUIutil {
             turnIndicator.setText(uimsg.getMessage(SECOND_TURN));
         }
 
-        Text currentlyPlaying = new Text();
+        Label currentlyPlaying = new Label();
         currentlyPlaying.setId("currently-playing");
         if(board.getNowPlaying() == board.getMyPlayerId()){
             currentlyPlaying.setText("E' il tuo turno");
         }else{
-            currentlyPlaying.setText("1234567890123 sta giocando");
+            currentlyPlaying.setText("1234567890123 sta giocando"); // TODO: 06/07/2018 set correct player
         }
 
 
@@ -372,11 +373,13 @@ public class GUIutil {
     private Button getPlayerStatusButton(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
         Button player = new Button(username);
         if(playerId == nowPlaying ){
-            player.setId("playing-player"); //todo add css
-        }else if(status.equals(LightPlayerStatus.DISCONNECTED) || status.equals(LightPlayerStatus.QUITTED)){
-            player.setId("disconnected-player"); //todo add css
+            player.setId("player-playing");
+        }else if(status.equals(LightPlayerStatus.DISCONNECTED)){
+            player.setId("player-disconnected");
+        }if(status.equals(LightPlayerStatus.QUITTED)){
+            player.setId("player-quitted");
         }else{
-            player.setId("not-playing-player"); //todo add css
+            player.setId("player-info");
         }
         return player;
     }

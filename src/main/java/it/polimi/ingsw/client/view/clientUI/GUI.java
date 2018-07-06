@@ -305,12 +305,13 @@ public class GUI extends Application implements ClientUI {
         sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
 
         //Top side of the border pane
-        HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackCells);
+        HBox topSection = sceneCreator.buildRoundTrack(roundTrackCells);
         Region separator = new Region();
         HBox.setHgrow(separator,Priority.ALWAYS);
         VBox menuButtons = sceneCreator.buildMenuButtons(turnState);
-        roundTrack.getChildren().addAll(separator,menuButtons);
-        frontPane.setTop(roundTrack);
+        topSection.getChildren().addAll(separator,menuButtons);
+        topSection.setId("top-section");
+        frontPane.setTop(topSection);
 
         //Center side of the border pane
         Group schema = sceneCreator.buildSchema(schemaCells,favorTokens,cellDim);
