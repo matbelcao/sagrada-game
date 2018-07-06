@@ -324,20 +324,19 @@ public class GUIutil {
         return backPane;
     }
 
-    public HBox getPlayersStatusBar(int myPlayerId, LightBoard board) {
+    public HBox getPlayersStatusBar(int showingPlayerId, LightBoard board) { //todo remove my player id
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
-            Button playerStatusBar = getPlayerStatusButton(playerId,myPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
+            Button playerStatusBar = getPlayerStatusButton(playerId,showingPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
             playerSelector.getChildren().add(playerStatusBar);
-            if(playerId == board.getMyPlayerId() || playerId == myPlayerId){
+            if( playerId == showingPlayerId){
                 continue;
+            }else if(playerId == board.getMyPlayerId()){
+                Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
+                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseExited));
             }else{
-                Event mouseExitedMouseExitedBackPane = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
                 Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
-                playerStatusBar.setOnAction(e -> {
-                    //playerStatusBar.fireEvent(mouseExitedMouseExitedBackPane);
-                    //playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar);
-                });
+                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
             }
             playerSelector.setAlignment(Pos.BOTTOM_LEFT);
         }
@@ -345,9 +344,9 @@ public class GUIutil {
     }
 
     //todo update
-    public BorderPane buildSelectdPlayerPane(int playerId, double width, double height, LightBoard board){
+    public BorderPane buildSelectdPlayerPane(int showingPlayerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
-        HBox playersSelector = getPlayersStatusBar(playerId,board);
+        HBox playersSelector = getPlayersStatusBar(showingPlayerId,board);
         Region spacer = new Region();
         HBox.setHgrow(spacer,Priority.ALWAYS);
         HBox bottomContainer = new HBox(playersSelector,spacer);
@@ -356,38 +355,16 @@ public class GUIutil {
         double cellDim = getMainSceneCellDim(width,height);
         selectedPlayerPane.setRight(new Rectangle(getCardWidth(cellDim)*NUM_OF_TOOLS,getCardHeight(cellDim),Color.TRANSPARENT)); //the space occupied by cards
         selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT)); //the space occupied by roundtrack
-        List<DieContainer> selectedPlayerSchema = getSchemaCells(board.getPlayerById(playerId).getSchema(), cellDim);
-        Group playerSchema = buildSchema(selectedPlayerSchema,board.getPlayerById(playerId).getFavorTokens(),cellDim);
+        List<DieContainer> selectedPlayerSchema = getSchemaCells(board.getPlayerById(showingPlayerId).getSchema(), cellDim);
+        Group playerSchema = buildSchema(selectedPlayerSchema,board.getPlayerById(showingPlayerId).getFavorTokens(),cellDim);
         StackPane schemaContainer = new StackPane(playerSchema);
-        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112);"); //todo hookup with css and make the same as the front pane background
+        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112,0);"); //todo hookup with css and make the same as the front pane background
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
-
-        //Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-        //selectedPlayerPane.getCenter().setOnMouseExited(e->selectedPlayerPane.fireEvent(mouseExited));
         return selectedPlayerPane;
     }
 
     private Button getPlayerStatusButton(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
-        /*Text playerName = new Text(username);
-        playerName.setFont(Font.font(FONT, 25)); //TODO dynamic
-        if(playerId == hilighlightedPlayerId){
-            playerName.setFill(Color.DARKBLUE);
-        }
-        Circle statusCircle = new Circle(10);
-        if(playerId == nowPlaying ){
-            statusCircle.setFill(Color.GREEN);
-        }else if(status.equals(LightPlayerStatus.DISCONNECTED) || status.equals(LightPlayerStatus.QUITTED)){
-            statusCircle.setFill(Color.RED);
-        }else{
-            statusCircle.setFill(Color.GRAY);
-        }
-        HBox statusAndName= new HBox(statusCircle,playerName);
-        statusAndName.setAlignment(Pos.CENTER);
-        playerName.setTextAlignment(TextAlignment.CENTER);
-        statusAndName.setStyle("-fx-background-color: rgb(125,125,125,0.3);");
-        StackPane p = new StackPane(statusAndName);
-        return new Group(p);*/
         Button player = new Button(username);
         if(playerId == nowPlaying ){
             player.setId("playing-player"); //todo add css
@@ -396,7 +373,6 @@ public class GUIutil {
         }else{
             player.setId("not-playing-player"); //todo add css
         }
-
         return player;
     }
 

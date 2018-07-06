@@ -326,8 +326,6 @@ public class GUI extends Application implements ClientUI {
         List<DieContainer> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
         sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
 
-
-
         //Top side of the border pane
         HBox roundTrack = sceneCreator.buildRoundTrack(roundTrackCells);
         Region separator = new Region();
