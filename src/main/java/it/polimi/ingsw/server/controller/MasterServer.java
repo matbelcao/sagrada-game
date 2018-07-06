@@ -67,7 +67,7 @@ public class MasterServer{
     private int portRMI;
     private int portSocket;
 
-    private Logger logger= Logger.getAnonymousLogger();
+    private static Logger logger= Logger.getAnonymousLogger();
 
     private boolean additionalSchemas; //to be used for additional schemas FA
     public static final String XML_SOURCE = "xml/server/"; //append class name + ".xml" to obtain complete path
@@ -339,7 +339,7 @@ public class MasterServer{
      * @param message the message to be printed
      */
     public void printMessage(String message) {
-        logger.log(Level.INFO,message);
+        System.out.println(message);
     }
 
     /**
@@ -477,7 +477,7 @@ public class MasterServer{
             server.startSocket();
         } catch (InstantiationException e) {
             e.printStackTrace();
-            System.err.println(ERR_START_MASTER_SERVER);
+            logger.log(Level.INFO,ERR_START_MASTER_SERVER);
             return;
         }
     }
