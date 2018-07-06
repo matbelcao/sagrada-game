@@ -41,26 +41,30 @@ import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.LOGIN_
 import static javafx.geometry.Pos.CENTER;
 
 public class GUI extends Application implements ClientUI {
-    private GUIutil sceneCreator;
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
+
     private static Client client;
+    private LightBoard board;
+    private GUIutil sceneCreator;
+    private CmdWriter cmdWrite;
     private static UIMessages uimsg;
     private Stage primaryStage;
     private static GUI instance;
+    private SizeListener sizeListener;
+
     private static final Object lock = new Object();
     private Label messageToUser = new Label();
-    private CmdWriter cmdWrite;
     private int playerId;// TODO: 03/07/2018
-    private SizeListener sizeListener;
-    private LightBoard tempBoard;
 
-    public GUI() {
-        instance = this;
-    }
+
 
     public static GUI getGUI() {
-        return instance;
+        if(instance == null){
+            return null;
+        }else{
+            return instance;
+        }
     }
 
 
@@ -74,6 +78,7 @@ public class GUI extends Application implements ClientUI {
     public void start(Stage primaryStage) {
         //get the dimensions of the screen
         synchronized (lock) {
+            instance = this;
             sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(), getCmdWrite() ,uimsg);
             lock.notifyAll();
         }
@@ -207,7 +212,7 @@ public class GUI extends Application implements ClientUI {
     }
 
     private void updateBoard(LightBoard board) {
-        tempBoard=board;
+        this.board =board;
         Platform.runLater(() -> {
             if (board == null) {
                 throw new IllegalArgumentException();
@@ -281,28 +286,28 @@ public class GUI extends Application implements ClientUI {
         StackPane p = new StackPane();
         System.out.println(client.getFsmState());
         if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)){
-            BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(tempBoard.getDraftedSchemas(),tempBoard.getPrivObj(), newWidth, newHeight) ;
+            BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(board.getDraftedSchemas(), board.getPrivObj(), newWidth, newHeight) ;
             p.getChildren().add(draftedSchemasPane);
         }else if(client.getFsmState().equals(ClientFSMState.SCHEMA_CHOSEN)){
             p.getChildren().add(sceneCreator.buildWaitingForGameStartScene(newWidth, newHeight));
         }else if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
-            BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(newWidth,newHeight,tempBoard.sortFinalPositions());
+            BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(newWidth,newHeight, board.sortFinalPositions());
             p.getChildren().add(gameEndedPane);
         }else{
-            BorderPane frontPane = buildFrontPane(newWidth,newHeight,tempBoard);
-            List <Actions> latestOptionsList = tempBoard.getLatestOptionsList();
+            BorderPane frontPane = buildFrontPane(newWidth,newHeight, board);
+            List <Actions> latestOptionsList = board.getLatestOptionsList();
             ClientFSMState turnState = client.getFsmState();
             p.getChildren().add(frontPane);
             //the pane listens for custom events to know when it has to which layer
-            p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight,tempBoard,turnState)));
+            p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight, board,turnState)));
             p.addEventHandler(SELECTED_PLAYER, e -> {
-                p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight,tempBoard)); //todo create everything at once? note that two events are executed
+                p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight, board)); //todo create everything at once? note that two events are executed
                 System.out.println("selected player");
             });
             p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
 
             if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
-                BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight,tempBoard);
+                BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight, board);
                 p.getChildren().add(backPane);
             }
         }
@@ -343,7 +348,7 @@ public class GUI extends Application implements ClientUI {
         frontPane.setCenter(new VBox(schemaContainer,playersStatusBar));
 
         //Right side of the border pane
-        VBox cards = sceneCreator.drawCards(tempBoard,cellDim,turnState);
+        VBox cards = sceneCreator.drawCards(this.board,cellDim,turnState);
         StackPane cardsContainer = new StackPane(cards);
         cards.setAlignment(CENTER);
         GridPane draftpool = sceneCreator.buildDraftPool(draftPoolCells);
