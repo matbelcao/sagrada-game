@@ -117,36 +117,6 @@ class SchemaCardTest {
      * Tests the list of possible placements with the swap option enabled
      */
     @Test
-    void testListPlacementsSwap(){
-        SchemaCard schema1 = new SchemaCard(1,false);
-
-        try {
-            schema1.putDie(2,new Die("FOUR","RED"));
-            schema1.putDie(6,new Die("ONE","YELLOW"));
-        } catch (IllegalDieException e) {
-            e.printStackTrace();
-        }
-
-        List<Integer> list =new ArrayList<>();
-        list.add(2);
-        List<Integer> listTemp = schema1.listPossiblePlacements(new Die("TWO","RED"));
-        list.addAll(listTemp);
-
-        assertEquals(list,schema1.listPossiblePlacementsSwap(new Die("TWO","RED"), DieColor.RED));
-
-        try {
-            schema1.putDie(7,new Die("FIVE","RED"),IgnoredConstraint.FORCE);
-        } catch (IllegalDieException e) {
-            e.printStackTrace();
-        }
-        assertTrue(schema1.getCell(7).hasDie());
-
-    }
-
-    /**
-     * Tests the list of possible placements with the swap option enabled
-     */
-    @Test
     void testDiePlacement(){
         SchemaCard schema1 = new SchemaCard(1,false);
         Die die1= new Die("FOUR","RED");

@@ -27,7 +27,7 @@ import java.util.function.Consumer;
  * This class represents a schema card of the game
  */
 public class SchemaCard implements Iterable<Cell>  {
-    public static final String EXTERNAL_ADDITIONAL_SCHEMAS_XML =
+    private static final String EXTERNAL_ADDITIONAL_SCHEMAS_XML =
             (new File(MasterServer.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParentFile().getAbsolutePath()
                     +File.separator+"AdditionalSchemas.xml";
     private String name;
@@ -38,7 +38,7 @@ public class SchemaCard implements Iterable<Cell>  {
     private Boolean additionalSchema;
     public static final int NUM_COLS=5;
     public static final int NUM_ROWS=4;
-    public static final int NUM_SCHEMA=24;
+    static final int NUM_SCHEMA=24;
     private static final String XML_SCHEMAS =MasterServer.XML_SOURCE+"SchemaCard.xml";
     private static final String XML_ADDITIONAL_SCHEMAS =MasterServer.XML_SOURCE+"AdditionalSchemas.xml";
 
@@ -77,7 +77,7 @@ public class SchemaCard implements Iterable<Cell>  {
      * @param additionalSchema true to enable a personalized SchemaCard instantiation
      * @return the bulit SchemaCard
      */
-    public static SchemaCard parser(int id,boolean additionalSchema){
+    private static SchemaCard parser(int id, boolean additionalSchema){
 
         SchemaCard schema;
         if(additionalSchema){
@@ -86,9 +86,7 @@ public class SchemaCard implements Iterable<Cell>  {
                 if(schema!=null){
                     return schema;
                 }
-            } catch (IOException e) {
-
-            }
+            } catch (IOException ignored) { }
 
             ClassLoader classLoader = ClassLoader.getSystemClassLoader();
             InputStream xmlFile=classLoader.getResourceAsStream(XML_ADDITIONAL_SCHEMAS);
@@ -148,13 +146,11 @@ public class SchemaCard implements Iterable<Cell>  {
      * Returns the number of custom SchemasCards present in the XML file
      * @return the number of SchemaCards
      */
-    public static int getAdditionalSchemaSize(){
+    static int getAdditionalSchemaSize(){
 
         try (InputStream xmlFile= new FileInputStream(EXTERNAL_ADDITIONAL_SCHEMAS_XML)){
             return countAdditionalSchemas(xmlFile);
-        } catch (IOException e) {
-
-        }
+        } catch (IOException ignored){ }
 
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         InputStream xmlFile= classLoader.getResourceAsStream(XML_ADDITIONAL_SCHEMAS);
@@ -260,49 +256,6 @@ public class SchemaCard implements Iterable<Cell>  {
                 }
             }
         }
-        Collections.sort(list);
-        return list;
-    }
-
-    public List<Integer> listPossiblePlacementsSwap(Die die, DieColor fixedDieColor){
-        if(!fixedDieColor.equals(DieColor.NONE) && !die.getColor().equals(fixedDieColor)){
-            throw new IllegalArgumentException();
-        }
-        List <Integer> list= new ArrayList<>();
-        FullCellIterator diceIterator;
-        diceIterator= (FullCellIterator) this.iterator();
-        while(diceIterator.hasNext()){
-            diceIterator.next();
-            checkCloseCells(die, diceIterator, list, IgnoredConstraint.NONE);
-        }
-
-        diceIterator= (FullCellIterator)this.iterator();
-
-        while(diceIterator.hasNext()){
-            Cell celll=diceIterator.next();
-
-            if(celll.getDie().getColor().equals(fixedDieColor) || fixedDieColor.equals(DieColor.NONE)){
-                SchemaCard tempschema=cloneSchema();
-                tempschema.removeDie(diceIterator.getIndex());
-
-                if(tempschema.listPossiblePlacements(die).contains(diceIterator.getIndex())) {
-
-                    try {
-                        tempschema.putDie(diceIterator.getIndex(), die);
-                    } catch (IllegalDieException e) {
-
-                    }
-
-                    if (!tempschema.listPossiblePlacements(celll.getDie()).isEmpty()) {
-                        list.add(diceIterator.getIndex());
-                    }
-                }
-
-                checkCloseCells(die,diceIterator,list,IgnoredConstraint.NONE);
-
-            }
-        }
-
         Collections.sort(list);
         return list;
     }
@@ -466,7 +419,7 @@ public class SchemaCard implements Iterable<Cell>  {
      * Cretes a copy of the SchemaCard instantiated
      * @return the copy reference
      */
-    public SchemaCard cloneSchema(){
+    SchemaCard cloneSchema(){
         SchemaCard temp= new SchemaCard(this.id,additionalSchema);
         FullCellIterator iter= (FullCellIterator) iterator();
         Cell tempCell;

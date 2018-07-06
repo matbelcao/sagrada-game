@@ -45,7 +45,7 @@ public class Cell {
      * @param ignoreConstraint signals if none, one type or all types of constraint can be ignored
      * @return true iff the die respects the Cell constraint
      */
-    public Boolean canAcceptDie(Die die, IgnoredConstraint ignoreConstraint){
+    Boolean canAcceptDie(Die die, IgnoredConstraint ignoreConstraint){
         if(die==null){throw new IllegalArgumentException();}
         if(this.constraint==null ) {
             return true;
@@ -95,13 +95,13 @@ public class Cell {
      * Sets the new die in place.
      * @param die die to be placed in the Cell
      */
-    public void setDie(Die die,IgnoredConstraint ignoreConstraint) {
+    void setDie(Die die, IgnoredConstraint ignoreConstraint) {
 
         assert canAcceptDie(die,ignoreConstraint) || ignoreConstraint.equals(IgnoredConstraint.FORCE);
         this.die=die;
     }
 
-    public Boolean checkNeighbor(Die die){
+    Boolean checkNeighbor(Die die){
         return (this.getDie().getColor().toString().equals(die.getColor().toString()) || this.getDie().getShade().toString().equals(die.getShade().toString()));
     }
 
