@@ -113,7 +113,7 @@
     -fx-background-radius: 10 10 0 0;
     -fx-background-insets: 0 0 0 0 ;
     -fx-padding:12 8 12 8 ;
-    -fx-max-width: 150;
+    -fx-max-width: 160;
     -fx-text-fill: white;
     -fx-font-size: 14 vmax;
 
@@ -180,8 +180,7 @@
 }
 
 #favor-tokens{
-
-    -fx-text-fill: #292929;
+    -fx-text-fill: white;
     -fx-background-radius: 16 16  0 0;
     -fx-padding: 12 20 8 20;
     -fx-font-size: 16 vmax;
@@ -193,7 +192,7 @@
 #player-schema{
 
     -fx-padding: 0 0 80 0;
-    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-background-color: #000;
     -fx-background-radius: 16;
     -fx-background-insets: 0 0 54 0;
 

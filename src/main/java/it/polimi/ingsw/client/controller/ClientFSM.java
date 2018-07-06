@@ -272,10 +272,11 @@ public class ClientFSM {
 
                 client.getBoard().setLatestPlacementsList(client.getClientConn().getPlacementsList());
 
-                if(client.getBoard().getLatestPlacementsList().isEmpty()){
-                    if(isToolEnabled()) {
-                        toolContinue();
-                    }
+                if(client.getBoard().getLatestPlacementsList().isEmpty()
+                    && client.getBoard().getLatestSelectedDie().getPlace().equals(Place.DICEBAG)
+                    && isToolEnabled()) {
+
+                    toolContinue();
                 }
             } else {
                 synchronized (lockState) {
