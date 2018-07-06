@@ -28,7 +28,7 @@ public class LightTool extends LightCard implements Serializable {
     }
 
     @Override
-    public LightTool clone(){
+    public LightTool copy(){
         return new LightTool(this.getName(),this.getDescription(),this.getId(),this.isUsed());
     }
 }

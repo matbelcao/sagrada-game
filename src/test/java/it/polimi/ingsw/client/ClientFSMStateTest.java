@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.controller.ClientFSMState;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
-import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.controller.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;

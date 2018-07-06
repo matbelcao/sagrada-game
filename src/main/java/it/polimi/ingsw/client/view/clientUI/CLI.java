@@ -12,15 +12,13 @@ import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
-import it.polimi.ingsw.common.serializables.LightPrivObj;
-import it.polimi.ingsw.common.serializables.LightSchemaCard;
 
 import java.io.BufferedReader;
 import java.io.Console;
 import java.util.List;
 import java.util.Observable;
 
-import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.*;
+import static it.polimi.ingsw.client.controller.ClientFSMState.*;
 import static it.polimi.ingsw.common.enums.ErrMsg.ERR;
 import static it.polimi.ingsw.common.enums.ErrMsg.ERROR_RETRIEVING_CONSOLE;
 

@@ -1,7 +1,7 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import it.polimi.ingsw.client.controller.CmdWriter;
-import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
+import it.polimi.ingsw.client.controller.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.enums.Actions;
@@ -30,8 +30,8 @@ import javafx.scene.text.TextAlignment;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.MAIN;
-import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.SELECT_DIE;
+import static it.polimi.ingsw.client.controller.ClientFSMState.MAIN;
+import static it.polimi.ingsw.client.controller.ClientFSMState.SELECT_DIE;
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;

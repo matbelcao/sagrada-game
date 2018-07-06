@@ -2,7 +2,6 @@ package it.polimi.ingsw.client.controller;
 
 import it.polimi.ingsw.client.ClientOptions;
 import it.polimi.ingsw.client.connection.*;
-import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.CLI;
 import it.polimi.ingsw.client.view.clientUI.ClientUI;

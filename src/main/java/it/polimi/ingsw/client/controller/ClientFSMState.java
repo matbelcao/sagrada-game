@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.controller.clientFSM;
+package it.polimi.ingsw.client.controller;
 
 /**
  * this class contains the information needed to know which state the FSM of the client is in, and retrieve the next one

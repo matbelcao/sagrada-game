@@ -37,7 +37,7 @@ public class LightCard implements Serializable {
 
 
 
-    public LightCard clone(){
+    public LightCard copy(){
         return new LightCard(this.getName(),this.getDescription(),this.getId());
     }
 }

@@ -1,11 +1,10 @@
 package it.polimi.ingsw.client.controller;
 
-import it.polimi.ingsw.client.controller.clientFSM.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 
-import static it.polimi.ingsw.client.controller.clientFSM.ClientFSMState.*;
+import static it.polimi.ingsw.client.controller.ClientFSMState.*;
 
 
 public class ClientFSM {
@@ -346,7 +345,7 @@ public class ClientFSM {
         return state;
     }
 
-    void setNotMyTurn() {
+    public void setNotMyTurn() {
         synchronized (lockState) {
             state = NOT_MY_TURN;
 
