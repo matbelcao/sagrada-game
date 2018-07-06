@@ -373,11 +373,13 @@ public class GUIutil {
 
     private Button getPlayerStatusButton(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
         Button player = new Button(username);
+        System.out.println(playerId +"   "+ nowPlaying);
         if(playerId == nowPlaying ){
+            System.out.println(playerId +"   "+ nowPlaying);
             player.setId("player-playing");
         }else if(status.equals(LightPlayerStatus.DISCONNECTED)){
             player.setId("player-disconnected");
-        }if(status.equals(LightPlayerStatus.QUITTED)){
+        }else if(status.equals(LightPlayerStatus.QUITTED)){
             player.setId("player-quitted");
         }else{
             player.setId("player-info");
