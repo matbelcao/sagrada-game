@@ -38,15 +38,15 @@ import static javafx.geometry.Pos.*;
 public class GUIutil {
     private final CmdWriter cmdWrite;
     private final UIMessages uimsg;
+    private static double screenWidth;
+    private static double screenHeight;
+
     //ratio is width/height
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
     private static final double NUM_OF_TOOLS = 3;
     private static final int ROUNDTRACK_SIZE = 10;
-
-    private final double SCREEN_WIDTH;
     private static final String FONT = "Sans-Serif";
-    private static final Color OPAQUE_FILL = Color.rgb(0,0,0,0.3);
 
     //-----login Stage
     private static final double LOGIN_TO_SCREEN_RATIO = 0.25;
@@ -87,13 +87,18 @@ public class GUIutil {
 
 
     public GUIutil(Rectangle2D visualBounds, CmdWriter cmdWrite, UIMessages uimsg) {
-        SCREEN_WIDTH = visualBounds.getWidth();
+        screenWidth = visualBounds.getWidth();
+        screenHeight = visualBounds.getHeight();
         this.cmdWrite = cmdWrite;
         this.uimsg = uimsg;
     }
 
+    public double getStageX() { return (screenWidth - getGameSceneMinWidth())/2; }
+
+    public double getStageY() { return (screenHeight -getGameSceneMinHeight())/2;}
+
     public double getLoginWidth() {
-        return SCREEN_WIDTH * LOGIN_TO_SCREEN_RATIO;
+        return screenWidth * LOGIN_TO_SCREEN_RATIO;
     }
 
     public double getLoginHeight() {
@@ -105,11 +110,11 @@ public class GUIutil {
     }
 
     public double getLobbyMinWidth() {
-        return LOBBY_SCENE_W_TO_SCREEN_RATIO * SCREEN_WIDTH;
+        return LOBBY_SCENE_W_TO_SCREEN_RATIO * screenWidth;
     }
 
     public double getGameSceneMinWidth(){
-        return MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH*SCREEN_WIDTH;
+        return MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH* screenWidth;
     }
 
     public double getGameSceneMinHeight(){
@@ -716,8 +721,9 @@ public class GUIutil {
 
     public Scene buildConnecionBrokenScene() {
         Text connectionBrokeMessage = new Text(uimsg.getMessage(BROKEN_CONNECTION));
-        connectionBrokeMessage.setFont(new Font(FONT,SCREEN_WIDTH*CONN_BROKEN_FONT_TO_SCREEN));
+        connectionBrokeMessage.setFont(new Font(FONT, screenWidth *CONN_BROKEN_FONT_TO_SCREEN));
         StackPane layout = new StackPane(connectionBrokeMessage);
         return new Scene(layout);
     }
+
 }

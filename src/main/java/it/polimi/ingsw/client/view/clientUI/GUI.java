@@ -56,8 +56,6 @@ public class GUI extends Application implements ClientUI {
     private static final Object lock = new Object();
     private Label messageToUser = new Label();
 
-
-
     public static GUI getGUI() {
         if(instance == null){
             return null;
@@ -81,8 +79,10 @@ public class GUI extends Application implements ClientUI {
             sceneCreator = new GUIutil(Screen.getPrimary().getVisualBounds(), getCmdWrite() ,uimsg);
             lock.notifyAll();
         }
-        this.primaryStage = primaryStage;
+        primaryStage.setX(sceneCreator.getStageX());
+        primaryStage.setY(sceneCreator.getStageY());
         sizeListener = new SizeListener(this);
+        this.primaryStage = primaryStage;
 
     }
 
@@ -92,7 +92,6 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void showLoginScreen() {
-
         Platform.runLater(() -> {
             synchronized (lock) {
                 while (sceneCreator == null) {
@@ -163,13 +162,11 @@ public class GUI extends Application implements ClientUI {
                     client.disconnect();
                 }
             });
-
             //disable the size listener because login is non resizable
             sizeListener.disable();
             //assign the size listener to the stage
             primaryStage.widthProperty().addListener(sizeListener);
             primaryStage.heightProperty().addListener(sizeListener);
-
             primaryStage.show();
         });
     }
@@ -254,9 +251,7 @@ public class GUI extends Application implements ClientUI {
     }
 
     public void drawMainGameScene(){
-        Platform.runLater(()->
-            primaryStage.getScene().setRoot(bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight()))
-        );
+        Platform.runLater(()-> primaryStage.getScene().setRoot(bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight())));
     }
 
     private StackPane bulidMainPane(double newWidth, double newHeight){
