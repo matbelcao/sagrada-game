@@ -155,6 +155,10 @@ public class RMIServer implements ServerConn {
     public void ping(){
         new Thread(() -> {
             boolean ping=true;
+            synchronized (lockPing) {
+                connectionOk = true;
+                lockPing.notifyAll();
+            }
             while(ping && connectionOk) {
                 try {
                     ping = remoteObj.ping();

@@ -48,7 +48,7 @@ public class MasterServer{
     private static final String STARTING_MASTER_SERVER = "--> STARTING :  Master Server";
     private static final String TIMER_STARTING = "TIMER STARTING ";
     private static final String SEC = " sec";
-    private static final String SERVER_STARTING_CONNECTIONS_VIA_RMI = "--> SERVER STARTING CONNECTIONS VIA RMI_SLASHSLASH";
+    private static final String SERVER_STARTING_CONNECTIONS_VIA_RMI = "--> SERVER STARTING CONNECTIONS VIA RMI";
     private static final String JAVA_RMI_SERVER_HOSTNAME = "java.rmi.server.hostname";
     private static final String RMI_SLASHSLASH = "rmi://";
     private static final String AUTH = "/auth";
