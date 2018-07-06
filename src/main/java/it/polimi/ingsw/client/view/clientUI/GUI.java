@@ -27,6 +27,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
@@ -36,9 +37,7 @@ import java.util.List;
 import java.util.Observable;
 
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.BROKEN_CONNECTION_TITLE;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.LOGIN_KO;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.LOGIN_OK;
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.CENTER;
 
 public class GUI extends Application implements ClientUI {
@@ -143,6 +142,12 @@ public class GUI extends Application implements ClientUI {
                     "-fx-background-position: center center;");
 
             Scene loginScene = new Scene(vbox, sceneCreator.getLoginWidth(), sceneCreator.getLoginHeight());
+            //I can trigger the login also pressing ENTER
+            loginScene.setOnKeyPressed(e -> {
+                if (e.getCode() == KeyCode.ENTER) {
+                    button.fire();
+                }
+            });
 
             loginScene.getStylesheets().add("css/style.css");
 
@@ -271,9 +276,7 @@ public class GUI extends Application implements ClientUI {
             p.getChildren().add(frontPane);
             //the pane listens for custom events to know when it has to which layer
             p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight, board,turnState)));
-            p.addEventHandler(SELECTED_PLAYER, e -> {
-                p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight, board)); //todo create everything at once? note that two events are executed
-            });
+            p.addEventHandler(SELECTED_PLAYER, e -> p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight, board)));
             p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
 
             if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {

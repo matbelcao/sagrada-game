@@ -511,14 +511,14 @@ public class GUIutil {
                 addMainStateActionListeners(draftPoolCells);
             break;
             case SELECT_DIE:
-                addSelectDieStateActionListener(draftPoolCells,schemaCells,roundTrackCells,board,cellDim);
+                addSelectDieStateActionListener(draftPoolCells,schemaCells,roundTrackCells,board);
                 break;
             case CHOOSE_OPTION:
                 break;
             case CHOOSE_TOOL:
                 break;
             case CHOOSE_PLACEMENT:
-                addChoosePlacementActionListener(draftPoolCells,schemaCells,roundTrackCells,board,cellDim);
+                addChoosePlacementActionListener(draftPoolCells,schemaCells,board);
                 break;
             case TOOL_CAN_CONTINUE:
                 break;
@@ -527,7 +527,7 @@ public class GUIutil {
         }
 
     }
-    private void addSelectDieStateActionListener(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, LightBoard board, double cellDim) {
+    private void addSelectDieStateActionListener(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, LightBoard board) {
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         List<List<LightDie>> roundTrack = board.getRoundTrack();
@@ -562,7 +562,7 @@ public class GUIutil {
         }
     }
 
-    private void addChoosePlacementActionListener(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, LightBoard board, double cellDim) {
+    private void addChoosePlacementActionListener(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, LightBoard board) {
         IndexedCellContent latestSelectedDie = board.getLatestSelectedDie();
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<Integer> latestPlacementsList = board.getLatestPlacementsList();
@@ -576,7 +576,6 @@ public class GUIutil {
             if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
                 for (DieContainer cell : draftPoolCells) {
                     cell.setOnMouseClicked(e -> {
-                        System.out.println("selected die");
                         cmdWrite.write("d");
                         cmdWrite.write(draftPoolCells.indexOf(cell) + "");
                     });
