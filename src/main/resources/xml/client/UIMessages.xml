@@ -24,6 +24,10 @@
         <eng>Something went wrong with your connection to the server...%n</eng>
         <ita>Si sono verificati dei problemi alla connessione verso il server...%n</ita>
     </broken-connection>
+    <broken-connection-title>
+        <eng>Connection Broken</eng>
+        <ita>Errore di connessione</ita>
+    </broken-connection-title>
     <closed-connection>
         <eng>The connection was successfully closed!%n</eng>
         <ita>La connessione è stata chiusa correttamente!%n</ita>

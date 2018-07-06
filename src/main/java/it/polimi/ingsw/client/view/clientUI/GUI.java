@@ -15,7 +15,6 @@ import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Actions;
-import it.polimi.ingsw.common.serializables.IndexedCellContent;
 import it.polimi.ingsw.common.serializables.LightDie;
 import it.polimi.ingsw.common.serializables.LightSchemaCard;
 import javafx.application.Application;
@@ -29,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Observable;
 
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
+import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.BROKEN_CONNECTION_TITLE;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.LOGIN_KO;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.LOGIN_OK;
 import static javafx.geometry.Pos.CENTER;
@@ -52,10 +53,8 @@ public class GUI extends Application implements ClientUI {
     private Stage primaryStage;
     private static GUI instance;
     private SizeListener sizeListener;
-
     private static final Object lock = new Object();
     private Label messageToUser = new Label();
-    private int playerId;// TODO: 03/07/2018
 
 
 
@@ -206,10 +205,6 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-    public void updateGameStart(int numUsers, int playerId) {
-        this.playerId = playerId;
-    }// TODO: 06/07/2018 delete
-
     private void updateBoard(LightBoard board) {
         this.board =board;
         Platform.runLater(() -> {
@@ -251,26 +246,9 @@ public class GUI extends Application implements ClientUI {
             }
             primaryStage.setMinWidth(sceneCreator.getGameSceneMinWidth());
             primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight()); //todo decide if I want to keep it
-
-
-            //double currentWidth = primaryStage.getWidth();
-            //double currentHeight = primaryStage.getHeight();
-           // primaryStage.getScene().setRoot(bulidMainPane(currentWidth,currentHeight));
-
-            /*if(mainScene == null){
-                mainScene = new Scene(bulidMainPane(currentWidth,currentHeight,board));
-                primaryStage.setScene(mainScene);
-            }else{
-                mainScene.setRoot(bulidMainPane(currentWidth,currentHeight,board));
-            }*/
             sizeListener.purgeTimer();
-            System.out.println("dentro update board" + client.getFsmState());
             drawMainGameScene();
             sizeListener.enable();
-
-
-            //primaryStage.widthProperty().addListener(sizeListener);
-                //primaryStage.heightProperty().addListener(sizeListener);
 
             });
     }
@@ -283,7 +261,6 @@ public class GUI extends Application implements ClientUI {
 
     private StackPane bulidMainPane(double newWidth, double newHeight){
         StackPane p = new StackPane();
-        System.out.println(client.getFsmState());
         if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)){
             BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(board.getDraftedSchemas(), board.getPrivObj(), newWidth, newHeight) ;
             p.getChildren().add(draftedSchemasPane);
@@ -301,7 +278,6 @@ public class GUI extends Application implements ClientUI {
             p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight, board,turnState)));
             p.addEventHandler(SELECTED_PLAYER, e -> {
                 p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight, board)); //todo create everything at once? note that two events are executed
-                System.out.println("selected player");
             });
             p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
 
@@ -317,7 +293,6 @@ public class GUI extends Application implements ClientUI {
         double                      cellDim = sceneCreator.getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
         List <LightDie> draftPool = board.getDraftPool();
-        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
         LightSchemaCard             schemaCard = board.getPlayerById(board.getMyPlayerId()).getSchema();
         int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
         ClientFSMState              turnState = client.getFsmState();
@@ -328,7 +303,7 @@ public class GUI extends Application implements ClientUI {
 
         List<DieContainer> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
         List<DieContainer> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
-        List<DieContainer> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,turnState,latestDiceList,cellDim);
+        List<DieContainer> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,cellDim);
         sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
 
         //Top side of the border pane
@@ -358,13 +333,23 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void updateConnectionClosed() {
-
+        //It's always the client that closes the connection
     }
 
     @Override
-    public void updateConnectionBroken() {
-
+    public void updateConnectionBroken(){
+        Platform.runLater(()->{
+            sizeListener.disable(); //defensive programming
+            Stage connectionBrokStage = new Stage();
+            connectionBrokStage.initModality(Modality.APPLICATION_MODAL);
+            connectionBrokStage.setTitle(uimsg.getMessage(BROKEN_CONNECTION_TITLE));
+            connectionBrokStage.setResizable(false);
+            primaryStage.setScene(sceneCreator.buildConnecionBrokenScene());
+            connectionBrokStage.sizeToScene();
+            primaryStage.showAndWait();
+        });
     }
+
 
 
     @Override

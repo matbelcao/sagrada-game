@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -44,7 +45,6 @@ public class GUIutil {
     private static final int ROUNDTRACK_SIZE = 10;
 
     private final double SCREEN_WIDTH;
-    private final double SCREEN_HEIGHT;
     private static final String FONT = "Sans-Serif";
     private static final Color OPAQUE_FILL = Color.rgb(0,0,0,0.3);
 
@@ -81,11 +81,13 @@ public class GUIutil {
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.33333333333;
     private static final double FAVOR_TOKEN_TEXT_TO_CELL_DIM = 0.27777777;
     private static final double ROUNDTRACK_SPACING = 5;
+    //Connection Broken
+    private static final double CONN_BROKEN_FONT_TO_SCREEN = 0.018;
+
 
 
     public GUIutil(Rectangle2D visualBounds, CmdWriter cmdWrite, UIMessages uimsg) {
         SCREEN_WIDTH = visualBounds.getWidth();
-        SCREEN_HEIGHT = visualBounds.getHeight();
         this.cmdWrite = cmdWrite;
         this.uimsg = uimsg;
     }
@@ -306,7 +308,6 @@ public class GUIutil {
     }
 
     public BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board,ClientFSMState turnState){
-        System.out.println("showing multiple dice pane");
         double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
         List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
@@ -398,7 +399,7 @@ public class GUIutil {
         return selectDiePane;
     }
 
-    public List<DieContainer> getRoundTrackCells(List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList, double cellDim) {
+    public List<DieContainer> getRoundTrackCells(List<List<LightDie>> roundTrack, double cellDim) {
         ArrayList<DieContainer> roundTrackCells = new ArrayList<>();
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             DieContainer cell = new DieContainer(i, cellDim);
@@ -711,5 +712,12 @@ public class GUIutil {
         BorderPane containerPane = new BorderPane();
         containerPane.setCenter(v);
         return containerPane;
+    }
+
+    public Scene buildConnecionBrokenScene() {
+        Text connectionBrokeMessage = new Text(uimsg.getMessage(BROKEN_CONNECTION));
+        connectionBrokeMessage.setFont(new Font(FONT,SCREEN_WIDTH*CONN_BROKEN_FONT_TO_SCREEN));
+        StackPane layout = new StackPane(connectionBrokeMessage);
+        return new Scene(layout);
     }
 }
