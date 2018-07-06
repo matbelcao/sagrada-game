@@ -708,7 +708,7 @@ public class GUIutil {
 
     public BorderPane buildGameEndedPane(double newWidth, double newHeight, List<LightPlayer> players) {
         Label scoreLabel = new Label(uimsg.getMessage(GAME_END));
-        scoreLabel.setAlignment(CENTER);
+        //scoreLabel.setAlignment(CENTER);
         scoreLabel.setFont(Font.font(FONT, 60)); //TODO dynamic
 
         GridPane scoreBoard = new GridPane();
@@ -728,12 +728,18 @@ public class GUIutil {
 
         Button newGameButton = new Button(uimsg.getMessage(NEW_GAME_OPTION_2));
         newGameButton.setOnMouseClicked(e->cmdWrite.write("n"));
-        newGameButton.setId("game-button");
+        newGameButton.setId("login-button");
 
-        VBox v = new VBox(scoreLabel,scoreBoard, newGameButton);
-        v.setAlignment(TOP_CENTER);
+        VBox v2=new VBox(scoreLabel,scoreBoard,newGameButton);
+        //v2.setMinHeight(getGameSceneMinHeight()*0.5);
+        //v2.setMinWidth(getGameSceneMinWidth()*0.5);
+        v2.setAlignment(CENTER);
+        v2.setId("score-container");
+        VBox v = new VBox(v2);
+        v.setAlignment(CENTER);
         BorderPane containerPane = new BorderPane();
         containerPane.setCenter(v);
+        containerPane.setStyle("-fx-background-image: url('img/wall.png');");
         return containerPane;
     }
 }

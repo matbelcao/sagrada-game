@@ -123,3 +123,12 @@
 #roundtrack-cell{
 
 }
+
+#score-container{
+    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-background-radius: 10;
+    -fx-padding: 20px;
+    -fx-text-alignment: center;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+}
