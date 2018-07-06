@@ -307,7 +307,6 @@ public enum ClientFSMState {
             }
             toolEnabled=false;
 
-            //this should never happen
             return MAIN;
         }
 
