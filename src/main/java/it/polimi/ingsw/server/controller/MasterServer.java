@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -64,6 +66,8 @@ public class MasterServer{
     private String ipAddress;
     private int portRMI;
     private int portSocket;
+
+    private static Logger logger= Logger.getAnonymousLogger();
 
     private boolean additionalSchemas; //to be used for additional schemas FA
     public static final String XML_SOURCE = "xml/server/"; //append class name + ".xml" to obtain complete path
@@ -473,7 +477,7 @@ public class MasterServer{
             server.startSocket();
         } catch (InstantiationException e) {
             e.printStackTrace();
-            System.err.println(ERR_START_MASTER_SERVER);
+            logger.log(Level.INFO,ERR_START_MASTER_SERVER);
             return;
         }
     }

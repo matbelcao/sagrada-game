@@ -206,10 +206,9 @@ public class GUI extends Application implements ClientUI {
 
     }
 
-    @Override
     public void updateGameStart(int numUsers, int playerId) {
         this.playerId = playerId;
-    }
+    }// TODO: 06/07/2018 delete
 
     private void updateBoard(LightBoard board) {
         this.board =board;
