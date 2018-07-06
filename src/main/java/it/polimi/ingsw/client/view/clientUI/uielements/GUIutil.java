@@ -75,8 +75,8 @@ public class GUIutil {
 
     //Main game scene
     private static final double MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH = 0.8265;
-    private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.110;
-    private static final double MAIN_GAME_CELL_DIM_TO_WIDTH = 0.070;
+    private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.121;
+    private static final double MAIN_GAME_CELL_DIM_TO_WIDTH = 0.075;
     private static final double MAIN_GAME_SCENE_RATIO = MAIN_GAME_CELL_DIM_TO_HEIGHT/MAIN_GAME_CELL_DIM_TO_WIDTH;
     private static final double CARD_WIDTH_TO_CELL_DIM = 2.65;
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.6;
