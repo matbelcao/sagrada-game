@@ -113,8 +113,8 @@
         <ita>Digita qui le tue mosse</ita>
     </prompt-message>
     <quit-option>
-        <eng>q › abandon the match</eng>
-        <ita>q › abbandona partita</ita>
+        <eng>q › abandon the game</eng>
+        <ita>q › abbandona il gioco</ita>
     </quit-option>
     <discard-option>
         <eng>d › select another die</eng>

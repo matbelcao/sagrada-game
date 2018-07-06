@@ -5,6 +5,7 @@ import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.connection.SocketString;
 import it.polimi.ingsw.common.enums.Actions;
+import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
 
 import java.io.*;
@@ -125,6 +126,7 @@ public class SocketClient implements ClientConn {
                             lockPing.notifyAll();
                         }
                     }
+
                     client.disconnect();
                 }
             }
@@ -812,7 +814,6 @@ public class SocketClient implements ClientConn {
     public void quit(){
         syncedSocketWrite(SocketString.QUIT);
         outSocket.flush();
-        connectionOk = false;
         if(!socket.isClosed()){
             try {
                 socket.close();
@@ -821,11 +822,12 @@ public class SocketClient implements ClientConn {
             }
         }
         synchronized (lockPing){
+            connectionOk=false;
             if(timerActive){
                 pingTimer.cancel();
                 timerActive=false;
-                lockPing.notifyAll();
             }
+            lockPing.notifyAll();
         }
     }
 
@@ -846,7 +848,6 @@ public class SocketClient implements ClientConn {
         try{
             syncedSocketWrite(SocketString.PONG);
             outSocket.flush();
-            //System.out.println("PONG");
             synchronized (lockPing) {
                 if(connectionOk) {
                     if(pingTimer!=null){
@@ -872,7 +873,6 @@ public class SocketClient implements ClientConn {
         public void run(){
             synchronized (lockPing) {
                 if(connectionOk) {
-                    System.out.println("CONNECTION TIMEOUT!");
                     connectionOk = false;
                     timerActive = false;
                     client.disconnect();
