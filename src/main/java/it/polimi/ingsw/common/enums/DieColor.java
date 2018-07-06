@@ -11,7 +11,7 @@ public enum DieColor { //need to add png address combined with Shade's ones
     YELLOW("\u001B[93m",Color.web("#e3d107"), Color.web("#ffe100")   ),
     BLUE("\u001B[94m",  Color.web("#5faab9"), Color.web("#0086fc")  ),
     PURPLE("\u001B[95m",Color.web("#a5468c"), Color.web("#8226b7")   ),
-    NONE ("\u001B[0m",  Color.web("#9e9e9e"), Color.web("#333333")   ); //to be used (also) in shade restrictions
+    NONE ("\u001B[0m",  Color.web("#222222"), Color.web("#333333")   ); //to be used (also) in shade restrictions
 
     private final String utf;
     private final Color constraintColor;

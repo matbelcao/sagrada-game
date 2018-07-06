@@ -63,16 +63,16 @@
     -fx-padding: 20px;
     -fx-text-alignment: center;
     -fx-text-fill: black;
-    -fx-font-size: 14 vmax;
+    -fx-font-size: 20 vmax;
     -fx-font-weight: bold;
 }
 
 #login-ko{
     -fx-text-fill: #ff3922;
+    -fx-font-size: 14 vmax;
 }
 
 #drafted-message{
-    -fx-text-alignment: left;
     -fx-font-size: 24 vmax;
     -fx-background-radius: 0 0 0 0;
 }
