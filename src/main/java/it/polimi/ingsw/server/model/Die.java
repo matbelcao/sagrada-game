@@ -92,7 +92,7 @@ public class Die {
     /**
      * Rerolls a die
      */
-    public void reroll(){
+    void reroll(){
         Random randomGen = new Random();
         this.setShade(randomGen.nextInt(MAX_SHADE)+1);
     }

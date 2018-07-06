@@ -56,7 +56,7 @@ public class ToolCard extends Card {
         toolReader(super.getId());
     }
 
-    protected void toolReader(int id) {
+    private void toolReader(int id) {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         InputStream xmlFile= classLoader.getResourceAsStream(XML_LOGIC);
         String text;

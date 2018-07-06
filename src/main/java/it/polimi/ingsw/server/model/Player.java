@@ -64,7 +64,7 @@ public class  Player {
 
     /**
      * Checks if the player has to skip this turn or not, then reset the variable to false
-     * @return
+     * @return if the player skips the turn
      */
     public boolean isSkippingTurn() {
         Boolean skip=this.skipsNextTurn;
@@ -98,7 +98,7 @@ public class  Player {
         return true;
      }
 
-     public void replaceSchema(SchemaCard schema){
+     void replaceSchema(SchemaCard schema){
          this.schema=schema;
      }
 
@@ -162,7 +162,7 @@ public class  Player {
      * Sets the final position of the player
      * @param finalPosition the player's final position
      */
-    public void setFinalPosition(int finalPosition) { this.finalPosition=finalPosition; }
+    void setFinalPosition(int finalPosition) { this.finalPosition=finalPosition; }
 
     public void quitMatch(){
         quitted=true;

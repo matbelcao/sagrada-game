@@ -28,7 +28,6 @@ public class DraftPool {
     public void removeDie(int index){
         assert index>=0 && index<this.drafted.size();
         this.drafted.remove(index);
-        return;
     }
 
     /**

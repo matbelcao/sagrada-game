@@ -181,7 +181,7 @@ public class Game extends Thread implements Iterable  {
         MasterServer.getMasterServer().endGame(this);
     }
 
-    public boolean isGameEnded(){
+    boolean isGameEnded(){
         return fsm.getCurState().equals(ServerState.GAME_ENDED);
     }
 
@@ -252,7 +252,7 @@ public class Game extends Thread implements Iterable  {
      * Responds to the request by sending the user that is currently playing his turn
      * @return the user that is currently playing
      */
-    public User getNowPlayingUser(){
+    User getNowPlayingUser(){
         return nowPlayingUser;
     }
 
@@ -576,7 +576,7 @@ public class Game extends Thread implements Iterable  {
      * @param user the user who wants to reconnect
      * @return true if the request is accepted, false otherwise
      */
-    public boolean canUserReconnect(User user){
+    boolean canUserReconnect(User user){
         if(users.contains(user)){
             return !board.getPlayer(user).hasQuitted();
         }
@@ -587,7 +587,7 @@ public class Game extends Thread implements Iterable  {
      * Notifies to the active players that an user has been reconnected to the game
      * @param user the user who has reconnected
      */
-    public void reconnectUser(User user){
+    void reconnectUser(User user){
         user.setStatus(UserStatus.PLAYING);
         for(User u : users){
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)){
@@ -600,7 +600,7 @@ public class Game extends Thread implements Iterable  {
      * Notifies to the active playerss that an user has lost the connection to the game
      * @param user the user whose connection has been lost
      */
-    public void disconnectUser(User user){
+    void disconnectUser(User user){
         user.setStatus(UserStatus.DISCONNECTED);
 
         if(fsm.getCurState().equals(ServerState.INIT)){
@@ -626,7 +626,7 @@ public class Game extends Thread implements Iterable  {
      * Notifies to the active players that an user has left the game
      * @param user the user who has quitted the match
      */
-    public void quitUser(User user) {
+    void quitUser(User user) {
         user.setStatus(UserStatus.DISCONNECTED);
         board.getPlayer(user).quitMatch();
 
@@ -681,7 +681,7 @@ public class Game extends Thread implements Iterable  {
      * Returns true if the game has started
      * @return if the game has started
      */
-    public boolean gameStarted() {
+    boolean gameStarted() {
         return !fsm.getCurState().equals(ServerState.INIT);
     }
 

@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  */
 public class MasterServer{
     private static final String CONFIGURATION_FILE_NAME="ServerConf.xml";
-    public static final String SERVER_CONF_XML =
+    private static final String SERVER_CONF_XML =
             (new File(MasterServer.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParentFile().getAbsolutePath()
             +File.separator+CONFIGURATION_FILE_NAME;
     private static final String CONF = "conf";
@@ -177,7 +177,7 @@ public class MasterServer{
         return instance;
     }
 
-    public int getTurnTime() {
+    int getTurnTime() {
         return turnTime;
     }
 
@@ -191,7 +191,7 @@ public class MasterServer{
     /**
      * Updates the lobby queue and instantiate the new Games
      */
-    void updateLobby() {
+    private void updateLobby() {
 
         ArrayList<User> players = new ArrayList<>();
         boolean lobbyChanged = false;
@@ -259,7 +259,7 @@ public class MasterServer{
                         l.getServerConn().notifyLobbyUpdate(tempLobby.size());
                     }
                     if (lobby.size() == MIN_PLAYERS) {
-                        System.out.println(TIMER_STARTING + lobbyTime + SEC);
+                        printMessage(TIMER_STARTING + lobbyTime + SEC);
                         Timer timer = new Timer();
                         timer.schedule(new LobbyHandler(), lobbyTime * 1000);
                     }
@@ -278,7 +278,7 @@ public class MasterServer{
      * Checks if the user is disconnected and sends a message to the other users
      * @param user the user to check
      */
-    public void updateDisconnected(User user){
+    void updateDisconnected(User user){
         synchronized (this.lobby){
             if(this.lobby.contains(user)) {
                 lobby.remove(user);
@@ -295,7 +295,7 @@ public class MasterServer{
      * This method makes the MasterServer available for rmi connection. It publishes in the rmi registry
      * an instance of the object Authenticator
      */
-    public void startRMI(){
+    private void startRMI(){
         printMessage(SERVER_STARTING_CONNECTIONS_VIA_RMI);
         System.setProperty(JAVA_RMI_SERVER_HOSTNAME,ipAddress);
         try {
@@ -406,8 +406,7 @@ public class MasterServer{
         return null;
     }
 
-    public void endGame(Game game){
-
+    void endGame(Game game){
         synchronized (lockGames) {
             games.remove(game);
             lockGames.notifyAll();
@@ -429,27 +428,17 @@ public class MasterServer{
         return null;
     }
 
-    public User getUserByIndex(int i){ return users.get(i); }
-
     /**
      * This method checks if the user is already in the list of registered users
      * @param user the user to fing
      * @return true if present
      */
-    boolean isIn(String user){
+    private boolean isIn(String user){
         for(User u : users){
             if(u.getUsername().equals(user))
                 return true;
         }
         return false;
-    }
-
-
-    /**
-     * @return the number of users registered to the server
-     */
-    public int getUsersSize(){
-        return users.size();
     }
 
     /**
