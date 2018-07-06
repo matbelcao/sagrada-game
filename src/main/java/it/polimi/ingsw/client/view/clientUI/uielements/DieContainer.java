@@ -157,13 +157,21 @@ public class DieContainer extends StackPane{
                 break;
             case 3:
                 drawSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
-                // Fall thru to next case
+                drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                break;
+
             case 2:
                 drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
             case 5:
                 drawSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                break;
                 // Fall thru to next case
             case 4:
                 drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
@@ -195,14 +203,21 @@ public class DieContainer extends StackPane{
                 break;
             case 3:
                 drawConstraintSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
-                // Fall thru to next case
+                drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                break;
+
             case 2:
                 drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
             case 5:
                 drawConstraintSpot(gc, dieDim / 2, dieDim / 2, dieDim, xAxisDiePosition, yAxisDiePosition);
-                // Fall thru to next case
+                drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                drawConstraintSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
+                break;
             case 4:
                 drawConstraintSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 drawConstraintSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);

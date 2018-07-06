@@ -5,7 +5,7 @@
     -fx-background-radius: 10;
     -fx-padding: 12 24 12 24;
     -fx-text-fill: white;
-    -fx-font-size: 16 vmin;
+    -fx-font-size: 16 vmax;
     -fx-font-weight: bold;
 }
 
@@ -24,7 +24,7 @@
     -fx-padding: 22 10 14 10;
     -fx-background-insets: 12 4 4 4;
     -fx-text-fill: #ffffff;
-    -fx-font-size: 16 vmin;
+    -fx-font-size: 16 vmax;
     -fx-font-weight: bold;
 
 }
@@ -36,7 +36,7 @@
     -fx-background-insets: 0 2 0 0 ;
     -fx-padding: 12 ;
     -fx-text-fill: white;
-    -fx-font-size: 16 vmin;
+    -fx-font-size: 16 vmax;
     -fx-font-weight: bold;
 }
 #tab:hover,#game-button:hover{
@@ -63,17 +63,17 @@
     -fx-padding: 20px;
     -fx-text-alignment: center;
     -fx-text-fill: black;
-    -fx-font-size: 14 vmin;
+    -fx-font-size: 14 vmax;
     -fx-font-weight: bold;
 }
 
 #login-ko{
-    -fx-text-fill: red;
+    -fx-text-fill: #ff3922;
 }
 
 #drafted-message{
     -fx-text-alignment: left;
-    -fx-font-size: 24 vmin;
+    -fx-font-size: 24 vmax;
     -fx-background-radius: 0 0 0 0;
 }
 
@@ -104,23 +104,24 @@
 }
 
 #turn-indicator,#currently-playing{
-    -fx-font-size: 16 vmin;
-    -fx-padding:12;
+    -fx-font-size: 14 vmax;
+    -fx-padding:12 24 12 24;
     -fx-font-weight: bold;
 }
 
 #player-playing,#player-disconnected,#player-quitted,#player-info {
     -fx-background-radius: 10 10 0 0;
     -fx-background-insets: 0 0 0 0 ;
-    -fx-padding: 12 ;
+    -fx-padding:12 24 12 24 ;
+    -fx-min-width: 160;
     -fx-text-fill: white;
-    -fx-font-size: 16 vmin;
+    -fx-font-size: 16 vmax;
     -fx-font-weight: bold;
 }
 
 
 #player-playing{
-     -fx-background-color: #229922;
+     -fx-background-color: #139938;
  }
 #player-quitted{
     -fx-background-color: #ff4848;
@@ -135,7 +136,7 @@
 
 
 #player-playing:hover{
-    -fx-background-color: #22aa22;
+    -fx-background-color: #21aa33;
 }
 #player-quitted:hover{
     -fx-background-color: #ff6666;
@@ -151,10 +152,10 @@
 
 
 #player-playing:pressed{
-    -fx-background-color: #66dd66;
+    -fx-background-color: #2edd64;
 }
 #player-quitted:pressed{
-    -fx-background-color: #ff8888;
+    -fx-background-color: #ff857d;
 }
 #player-disconnected:pressed{
     -fx-text-fill: #444444;
@@ -171,5 +172,29 @@
 
 }
 
+#round-dice{
+    -fx-padding: 40 -20 0 20  ;
+}
+
+#favor-tokens{
+
+    -fx-text-fill: #292929;
+    -fx-background-radius: 16 16  0 0;
+    -fx-padding: 12 20 8 20;
+    -fx-font-size: 16 vmax;
+    -fx-min-width: 100;
+    -fx-font-weight: bold;
+}
+
+
+#player-schema{
+
+    -fx-padding: 0 0 80 0;
+    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-background-radius: 16;
+    -fx-background-insets: 0 0 54 0;
+
+
+}
 
 

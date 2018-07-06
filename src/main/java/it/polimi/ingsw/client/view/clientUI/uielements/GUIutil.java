@@ -76,8 +76,8 @@ public class GUIutil {
     //Main game scene
     private static final double MAIN_GAME_SCENE_RATIO = 1.72629;
     private static final double MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH = 0.8265;
-    private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.0957615;
-    private static final double MAIN_GAME_CELL_DIM_TO_WIDTH = 0.0607171;
+    private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.105;
+    private static final double MAIN_GAME_CELL_DIM_TO_WIDTH = 0.070;
     private static final double CARD_WIDTH_TO_CELL_DIM = 2.65;
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.6;
     private static final double FAVOR_TOKEN_TEXT_TO_CELL_DIM = 0.27777777;
@@ -186,6 +186,7 @@ public class GUIutil {
         for (int i = 0; i < multipleDiceListSize; i++) {
             DieContainer cell = new DieContainer(cellDim);
             cell.hideCellBorders();
+            cell.setId("round-dice");
             cell.putDie(multipleDiceList.get(i));
             multipleDiceTrack.getChildren().add(cell);
             if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
@@ -254,7 +255,7 @@ public class GUIutil {
         }
 
 
-        HBox buttonContainer = new HBox(priv, pub, tool, turnIndicator,currentlyPlaying);
+        HBox buttonContainer = new HBox(priv, pub, tool,currentlyPlaying,turnIndicator);
         buttonContainer.setId("tab-container");
 
         HBox cardContainer = new HBox();
@@ -321,7 +322,7 @@ public class GUIutil {
         HBox d1 = buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack);
         HBox d2 = buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList);
         VBox vbox =new VBox(d1,d2);
-        vbox.setSpacing(ROUNDTRACK_SPACING);
+        //vbox.setSpacing(ROUNDTRACK_SPACING);
         Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
         vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
         backPane.setTop(vbox);
@@ -484,13 +485,16 @@ public class GUIutil {
 
     //todo update
     public Group buildSchema(List<DieContainer> gridCells, int favortokens, double cellDim) {
-        Group grid = schemaToGrid(gridCells);
-        Text favorTokens = new Text(uimsg.getMessage(REMAINING_TOKENS)+" "+favortokens);
-        favorTokens.setFont(Font.font(FONT, FAVOR_TOKEN_TEXT_TO_CELL_DIM*cellDim));
-        return new Group (new VBox(favorTokens,new Group(grid)));
+        GridPane grid = schemaToGrid(gridCells);
+        Label favorTokens = new Label(uimsg.getMessage(REMAINING_TOKENS)+" "+CLIUtils.replicate(CLIUtils.FAVOR,favortokens));
+        favorTokens.setId("favor-tokens");
+        VBox schema =new VBox(favorTokens,new Group(grid));
+        schema.setId("player-schema");
+        favorTokens.prefWidthProperty().bind(grid.widthProperty());
+        return new Group (schema);
     }
 
-    private Group schemaToGrid(List<DieContainer> gridCells) {
+    private GridPane schemaToGrid(List<DieContainer> gridCells) {
         GridPane grid = new GridPane();
         for (int row = 0; row < NUM_ROWS; row++) {
             for (int col = 0; col < NUM_COLS; col++) {
@@ -499,7 +503,7 @@ public class GUIutil {
         }
         grid.setStyle("-fx-background-color: rgb(0,0,0);");
         grid.setAlignment(CENTER);
-        return new Group(grid);
+        return grid;
     }
 
     public void addActionListeners(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board, double cellDim) {
@@ -615,7 +619,7 @@ public class GUIutil {
         for(int i = 0; i < 2; i++){
             for(int j = 0; j < 2; j++){
                 int schemaIndex =i*2+j;
-                Group completeSchema = buildCompleteSchema(draftedSchemas.get(schemaIndex),cellDim);
+                Group completeSchema = buildDreftedSchema(draftedSchemas.get(schemaIndex),cellDim);
                 schemasGrid.add(completeSchema,j,i);
                 completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
             }
@@ -638,7 +642,7 @@ public class GUIutil {
         return draftedSchemasPane ;
     }
 
-    private Group buildCompleteSchema(LightSchemaCard lightSchemaCard, double cellDim) {
+    private Group buildDreftedSchema(LightSchemaCard lightSchemaCard, double cellDim) {
         double schemaWidth = cellDim*SCHEMA_W_TO_CELL;
         double schemaHeight = cellDim*SCHEMA_H_TO_CELL;
         double nameLabelSize = SCHEMA_LABEL_TO_CELL_DIM*cellDim;
@@ -658,7 +662,7 @@ public class GUIutil {
         backgroundRect.setArcHeight(arcCurvature);
         backgroundRect.setFill(Color.BLACK);
 
-        Group g = schemaToGrid(getSchemaCells(lightSchemaCard,cellDim));
+        Group g = new Group(schemaToGrid(getSchemaCells(lightSchemaCard,cellDim)));
         Rectangle spacer = new Rectangle(nameLabelSize,nameLabelSize);
         spacer.setVisible(false);
         Group cells = new Group(new VBox(g, spacer));
