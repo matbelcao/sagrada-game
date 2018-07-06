@@ -6,7 +6,7 @@
     -fx-padding: 12 24 12 24;
     -fx-text-fill: white;
     -fx-font-size: 16 vmax;
-    -fx-font-weight: bold;
+
 }
 
 #login-button:hover{
@@ -24,8 +24,8 @@
     -fx-padding: 22 10 14 10;
     -fx-background-insets: 12 4 4 4;
     -fx-text-fill: #ffffff;
-    -fx-font-size: 16 vmax;
-    -fx-font-weight: bold;
+    -fx-font-size: 14 vmax;
+
 
 }
 
@@ -36,8 +36,8 @@
     -fx-background-insets: 0 2 0 0 ;
     -fx-padding: 12 ;
     -fx-text-fill: white;
-    -fx-font-size: 16 vmax;
-    -fx-font-weight: bold;
+    -fx-font-size: 12 vmax;
+
 }
 #tab:hover,#game-button:hover{
     -fx-background-color: #66bbff;
@@ -64,7 +64,7 @@
     -fx-text-alignment: center;
     -fx-text-fill: black;
     -fx-font-size: 20 vmax;
-    -fx-font-weight: bold;
+
 }
 
 #login-ko{
@@ -97,26 +97,26 @@
 #score-container{
     -fx-background-color: rgba(255,255,255,0.9);
     -fx-background-radius: 10;
-    -fx-padding: 20px;
+    -fx-padding: 20;
     -fx-text-alignment: center;
     -fx-text-fill: black;
-    -fx-font-weight: bold;
+
 }
 
 #turn-indicator,#currently-playing{
-    -fx-font-size: 14 vmax;
+    -fx-font-size: 100%;
     -fx-padding:12 24 12 24;
-    -fx-font-weight: bold;
+
 }
 
 #player-playing,#player-disconnected,#player-quitted,#player-info {
     -fx-background-radius: 10 10 0 0;
     -fx-background-insets: 0 0 0 0 ;
-    -fx-padding:12 24 12 24 ;
-    -fx-min-width: 160;
+    -fx-padding:12 8 12 8 ;
+    -fx-max-width: 150;
     -fx-text-fill: white;
-    -fx-font-size: 16 vmax;
-    -fx-font-weight: bold;
+    -fx-font-size: 14 vmax;
+
 }
 
 
@@ -168,7 +168,10 @@
 
 #top-section{
     -fx-background-color: rgba(255,255,255,0.9);
-    -fx-padding: 20 20 30 20;
+    /*-fx-padding: 20 20 30 20;*/
+    -fx-padding: 8 20 8 20;
+
+
 
 }
 
@@ -183,7 +186,7 @@
     -fx-padding: 12 20 8 20;
     -fx-font-size: 16 vmax;
     -fx-min-width: 100;
-    -fx-font-weight: bold;
+
 }
 
 
