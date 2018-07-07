@@ -1,7 +1,7 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
-import it.polimi.ingsw.client.controller.CmdWriter;
 import it.polimi.ingsw.client.controller.ClientFSMState;
+import it.polimi.ingsw.client.controller.CmdWriter;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.enums.Actions;
@@ -232,7 +232,6 @@ public class GUIutil {
         Button pub = new Button(uimsg.getMessage(UIMsg.PUBLIC_OBJ).replaceFirst(":",""));
         Button tool = new Button(uimsg.getMessage(UIMsg.TOOLS).replaceFirst(":",""));
 
-
         priv.setId("tab");
         pub.setId("tab");
         tool.setId("tab");
@@ -252,8 +251,7 @@ public class GUIutil {
         }else{
             currentlyPlaying.setText("1234567890123 sta giocando"); // TODO: 06/07/2018 set correct player
         }
-
-
+        //the container of the button to switch view of the cards
         HBox buttonContainer = new HBox(priv, pub, tool,currentlyPlaying,turnIndicator);
         buttonContainer.setId("tab-container");
 
@@ -276,9 +274,9 @@ public class GUIutil {
             cardContainer.getChildren().setAll(cards);
         });
         tool.setOnAction(e1 -> {
-            ArrayList<Rectangle> cards = new ArrayList<>();
-            for (LightCard toolCard : board.getTools()) {
-               Rectangle toolRect = drawCard(toolCard, getCardWidth(cellDim), getCardHeight(cellDim));
+            ArrayList<Group> cards = new ArrayList<>();
+            for (LightTool toolCard : board.getTools()) {
+               Group toolRect = drawCard(toolCard, getCardWidth(cellDim), getCardHeight(cellDim),toolCard.isUsed());
                 toolRect.setOnMouseClicked(e2 -> {
                     if (turnState.equals(MAIN)) {
                         cmdWrite.write("0");
@@ -293,6 +291,25 @@ public class GUIutil {
         tool.fire();
         return primaryContainer;
 
+    }
+
+    private Group drawCard(LightCard toolCard, double cardWidth, double cardHeight, boolean used) {
+        Group tool = new Group();
+        Rectangle imgRect = drawCard(toolCard,cardWidth,cardHeight);
+        if(used){
+            Canvas favorToken = new Canvas(cardWidth,cardHeight);
+            GraphicsContext gc = favorToken.getGraphicsContext2D();
+            gc.setFill(Color.TRANSPARENT);
+            gc.fillRect(0,0,cardWidth,cardHeight);
+            gc.setFill(Color.BLUE);
+            double radius = 20;
+            gc.fillOval(cardWidth-2*radius,radius,radius,radius);
+            tool.getChildren().setAll(new StackPane(imgRect,favorToken));
+        }else{
+            tool.getChildren().addAll(imgRect);
+        }
+
+        return tool;
     }
 
     private Rectangle drawCard(LightCard card, double imageWidth, double imageHeight) {
