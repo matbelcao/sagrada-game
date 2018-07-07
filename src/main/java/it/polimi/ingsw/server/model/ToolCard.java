@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class implements the Cards named "Tools" and their calculating algorithms
@@ -29,6 +31,16 @@ public class ToolCard extends Card {
     private static final String XML_DESCRIPTION = MasterServer.XML_SOURCE + "ToolCard.xml";
     private static final String XML_LOGIC = MasterServer.XML_SOURCE + "ToolLogic.xml";
     public static final int NUM_TOOL_CARDS=12;
+    private static final String TOOL_CARD = "ToolCard";
+    private static final String ID = "id";
+    private static final String FROMM = "from";
+    private static final String TOO = "to";
+    private static final String COMMAND = "command";
+    private static final String IGNORED_CONSTRAINT = "ignored-constraint";
+    private static final String QUANTITYY = "quantity";
+
+    private static final String WHEN = "when";
+    public static final String SOMETHING_WENT_WRONG = "Something went wrong....";
 
     private boolean used;
     private Place from;
@@ -49,7 +61,7 @@ public class ToolCard extends Card {
 
     public ToolCard(int id) {
         super();
-        super.xmlReader(id, XML_DESCRIPTION, "ToolCard");
+        super.xmlReader(id, XML_DESCRIPTION, TOOL_CARD);
         this.used = false;
         actions = new ArrayList<>();
         quantity = new ArrayList<>();
@@ -68,32 +80,32 @@ public class ToolCard extends Card {
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
 
-            nodeList = doc.getElementsByTagName("ToolCard");
+            nodeList = doc.getElementsByTagName(TOOL_CARD);
 
             for (int temp = 0; temp < nodeList.getLength() && (temp - 1) != id; temp++) {
                 Element eElement = (Element) nodeList.item(temp);
-                if (Integer.parseInt(eElement.getAttribute("id")) == id) {
-                    from = Place.toPlace(eElement.getElementsByTagName("from").item(0).getTextContent());
-                    to = Place.toPlace(eElement.getElementsByTagName("to").item(0).getTextContent());
+                if (Integer.parseInt(eElement.getAttribute(ID)) == id) {
+                    from = Place.toPlace(eElement.getElementsByTagName(FROMM).item(0).getTextContent());
+                    to = Place.toPlace(eElement.getElementsByTagName(TOO).item(0).getTextContent());
 
-                    for (int temp2 = 0; temp2 < eElement.getElementsByTagName("command").getLength(); temp2++) {
-                        text = eElement.getElementsByTagName("command").item(temp2).getTextContent().toUpperCase();
+                    for (int temp2 = 0; temp2 < eElement.getElementsByTagName(COMMAND).getLength(); temp2++) {
+                        text = eElement.getElementsByTagName(COMMAND).item(temp2).getTextContent().toUpperCase();
                         actions.add(Actions.valueOf(text.toUpperCase().trim()));
                     }
 
                     if(to.equals(Place.SCHEMA)){
-                        ignoredConstraint = IgnoredConstraint.toIgnoredConstraint(eElement.getElementsByTagName("ignored-constraint").item(0).getTextContent());
+                        ignoredConstraint = IgnoredConstraint.toIgnoredConstraint(eElement.getElementsByTagName(IGNORED_CONSTRAINT).item(0).getTextContent());
                     }else{
                         ignoredConstraint = IgnoredConstraint.NONE;
                     }
 
-                    for (int temp2 = 0; temp2 < eElement.getElementsByTagName("quantity").getLength(); temp2++) {
-                        text = eElement.getElementsByTagName("quantity").item(temp2).getTextContent();
+                    for (int temp2 = 0; temp2 < eElement.getElementsByTagName(QUANTITYY).getLength(); temp2++) {
+                        text = eElement.getElementsByTagName(QUANTITYY).item(temp2).getTextContent();
                         quantity.add(DieQuantity.valueOf(text.toUpperCase().trim()));
                     }
 
                     try {
-                        turn = Turn.toTurn(eElement.getElementsByTagName("when").item(0).getTextContent());
+                        turn = Turn.toTurn(eElement.getElementsByTagName(WHEN).item(0).getTextContent());
                     } catch (NullPointerException e) {
                         turn = Turn.NONE;
                     }
@@ -112,7 +124,7 @@ public class ToolCard extends Card {
      * @param player the player who wants to use the toolcard
      * @param roundNumber the number of the match's round
      * @param turnFirstOrSecond if the turn is the first or the second in the round
-     * @param numDiePlaced the number of dice already placed by the player in the turn
+     * @param numPlacedDice the number of dice already placed by the player in the turn
      * @param schema the player's SchemaCard
      * @return true if the ToolCard has been activated successfully
      */
@@ -289,7 +301,7 @@ public class ToolCard extends Card {
      */
     public void selectDie(Die die){
         selectedDice.add(die);
-        return;
+
     }
 
     /**
@@ -316,7 +328,7 @@ public class ToolCard extends Card {
         try {
             schemaTemp.putDie(oldIndexList.get(0),selectedDice.get(0),IgnoredConstraint.FORCE);
         } catch (IllegalDieException e) {
-            System.out.println("Something went wrong....");
+            Logger.getGlobal().log(Level.INFO, SOMETHING_WENT_WRONG);
         }
         return placements;
     }
@@ -337,7 +349,7 @@ public class ToolCard extends Card {
             try {
                 schemaTemp.putDie(oldIndexList.get(0),selectedDice.get(0),IgnoredConstraint.FORCE);
             } catch (IllegalDieException e1) {
-                System.out.println("Something went wrong....");
+                Logger.getGlobal().log(Level.INFO, SOMETHING_WENT_WRONG);
             }
         }
         return true;

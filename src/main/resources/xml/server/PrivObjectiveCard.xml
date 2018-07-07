@@ -4,31 +4,26 @@
 	<!-- Private Objective cards 1 to 5 -->
 	<PrivObjectiveCard id="1">
 		<name>Sfumature Rosse</name>
-		<imgSrc>src::img::PrivObjectiveCard::1.png</imgSrc>
 		<description>Somma dei valori su tutti i dadi rossi</description>
 		<dieColor>RED</dieColor>
 	</PrivObjectiveCard>
 	<PrivObjectiveCard id="2">
 		<name>Sfumature Gialle</name>
-		<imgSrc>src::img::PrivObjectiveCard::2.png</imgSrc>
 		<description>Somma dei valori su tutti i dadi gialli</description>
 		<dieColor>YELLOW</dieColor>
 	</PrivObjectiveCard>
 	<PrivObjectiveCard id="3">
 		<name>Sfumature Verdi</name>
-		<imgSrc>src::img::PrivObjectiveCard::3.png</imgSrc>
 		<description>Somma dei valori su tutti i dadi verdi</description>
 		<dieColor>GREEN</dieColor>
 	</PrivObjectiveCard>
 	<PrivObjectiveCard id="4">
 		<name>Sfumature Blu</name>
-		<imgSrc>src::img::PrivObjectiveCard::4.png</imgSrc>
 		<description>Somma dei valori su tutti i dadi blu</description>
 		<dieColor>BLUE</dieColor>
 	</PrivObjectiveCard>
 	<PrivObjectiveCard id="5">
 		<name>Sfumature Viola</name>
-		<imgSrc>src::img::PrivObjectiveCard::5.png</imgSrc>
 		<description>Somma dei valori su tutti i dadi viola</description>
 		<dieColor>PURPLE</dieColor>
 	</PrivObjectiveCard>
