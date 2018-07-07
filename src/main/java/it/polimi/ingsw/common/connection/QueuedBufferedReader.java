@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
+
 public class QueuedBufferedReader implements QueuedReader {
     private final BufferedReader inReader;
     private final Object lockReader = new Object();
@@ -14,10 +16,18 @@ public class QueuedBufferedReader implements QueuedReader {
     private String temp;
     private List<String> queue = new ArrayList<>();
 
+    /**
+     * Instantiates a new Queued buffered reader.
+     *
+     * @param inReader the in reader
+     */
     public QueuedBufferedReader(BufferedReader inReader) {
         this.inReader= inReader;
     }
 
+    /**
+     * clears the queue of messages
+     */
     @Override
     public void clear() {
         synchronized (lockQueue){
@@ -28,6 +38,10 @@ public class QueuedBufferedReader implements QueuedReader {
 
     }
 
+    /**
+     * this adds a message to the queue if any
+     * @throws IOException
+     */
     @Override
     public void add() throws IOException {
         try {
@@ -36,18 +50,19 @@ public class QueuedBufferedReader implements QueuedReader {
                     lockReader.wait(100);
                 }
 
-                //debug
-                /*if(!temp.equals("PING"))
-                    System.out.println("\t\t\t\t\t"+temp);*/
+
             }
         } catch (InterruptedException e) {
             Logger.getGlobal().log(Level.INFO,e.getMessage());
-            //debug
+
         }
         put();
     }
 
 
+    /**
+     * puts the read message to the queue
+     */
     private void put(){
         synchronized(lockQueue) {
             queue.add(temp);
@@ -56,11 +71,18 @@ public class QueuedBufferedReader implements QueuedReader {
         temp=null;
     }
 
+    /**
+     * @return the first element of the queue
+     */
     @Override
     public String readln(){
         return queue.get(0);
     }
 
+    /**
+     * returns the first element and removes it from the queue
+     * @return the first elem of the queue
+     */
     @Override
     public String getln(){
         synchronized(lockQueue) {
@@ -71,6 +93,9 @@ public class QueuedBufferedReader implements QueuedReader {
         }
     }
 
+    /**
+     * removes the first element of the queue
+     */
     @Override
     public void pop(){
         synchronized(lockQueue) {
@@ -80,6 +105,9 @@ public class QueuedBufferedReader implements QueuedReader {
         }
     }
 
+    /**
+     * @return true if the queue is empty
+     */
     @Override
     public boolean isEmpty(){
         synchronized (lockQueue) {
@@ -87,6 +115,11 @@ public class QueuedBufferedReader implements QueuedReader {
             return queue.isEmpty();
         }
     }
+
+    /**
+     * if empty tries to add a line
+     * @throws IOException
+     */
     @Override
     public void waitForLine() throws IOException {
         if (isEmpty()){

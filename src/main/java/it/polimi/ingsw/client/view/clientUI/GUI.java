@@ -221,7 +221,7 @@ public class GUI extends Application implements ClientUI {
         Platform.runLater(()-> primaryStage.getScene().setRoot(bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight())));
     }
 
-    private StackPane bulidMainPane(double newWidth, double newHeight){
+    private synchronized StackPane bulidMainPane(double newWidth, double newHeight){
         StackPane p = new StackPane();
         if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)){
             BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(board.getDraftedSchemas(), board.getPrivObj(), newWidth, newHeight) ;

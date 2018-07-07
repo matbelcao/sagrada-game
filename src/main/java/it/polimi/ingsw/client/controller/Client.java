@@ -729,10 +729,9 @@ public class Client implements ClientInt {
         clientConn.quit();
         synchronized (lockStatus) {
             userStatus = UserStatus.DISCONNECTED;
-            lockStatus.notifyAll();
+            clientUI.updateConnectionClosed();
+            System.exit(0);
         }
-        clientUI.updateConnectionClosed();
-        System.exit(0);
     }
 
     /**
@@ -740,13 +739,12 @@ public class Client implements ClientInt {
      */
     public void disconnect(){
         synchronized (lockStatus) {
-            if(!userStatus.equals(UserStatus.DISCONNECTED)) {
+            if (!userStatus.equals(UserStatus.DISCONNECTED)) {
                 userStatus = UserStatus.DISCONNECTED;
-                lockStatus.notifyAll();
-
+                clientUI.updateConnectionBroken();
             }
+
         }
-        clientUI.updateConnectionBroken();
     }
 
     /**

@@ -5,6 +5,8 @@ import it.polimi.ingsw.common.connection.QueuedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class QueuedCmdReader implements QueuedReader,CmdWriter {
     private final Object lockQueue=new Object();
@@ -19,14 +21,15 @@ public class QueuedCmdReader implements QueuedReader,CmdWriter {
                 try {
                     lockTemp.wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Logger.getGlobal().log(Level.INFO,e.getMessage());
                     System.exit(2);
                 }
             }
-            System.out.println("+++++++++++++++++++++++++command was" + cmd);
+
             temp = cmd;
             lockTemp.notifyAll();
         }
+        System.out.println("+++++++++++++++++++++++++command was" + cmd);
     }
 
     @Override
@@ -54,7 +57,7 @@ public class QueuedCmdReader implements QueuedReader,CmdWriter {
                 try {
                     lockTemp.wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Logger.getGlobal().log(Level.INFO,e.getMessage());
                     System.exit(2);
                 }
             }
@@ -62,6 +65,7 @@ public class QueuedCmdReader implements QueuedReader,CmdWriter {
                 queue.add(temp);
                 lockQueue.notifyAll();
             }
+
             temp=null;
             lockTemp.notifyAll();
         }
@@ -69,13 +73,13 @@ public class QueuedCmdReader implements QueuedReader,CmdWriter {
 
     @Override
     public String getln() {
+        String cmd;
         synchronized (lockQueue) {
-            String cmd = queue.get(0);
+            cmd = queue.get(0);
             queue.remove(0);
-            lockQueue.notifyAll();
-
-            return cmd;
         }
+            return cmd;
+
     }
 
     @Override
@@ -86,7 +90,6 @@ public class QueuedCmdReader implements QueuedReader,CmdWriter {
     @Override
     public boolean isEmpty() {
         synchronized (lockQueue) {
-            lockQueue.notifyAll();
             return queue.isEmpty();
         }
     }
@@ -96,7 +99,6 @@ public class QueuedCmdReader implements QueuedReader,CmdWriter {
         synchronized(lockQueue) {
             assert(!queue.isEmpty());
             queue.remove(0);
-            lockQueue.notifyAll();
         }
     }
 

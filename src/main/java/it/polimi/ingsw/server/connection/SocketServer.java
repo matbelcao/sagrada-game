@@ -19,11 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class is the implementation of the SOCKET server-side connection methods
  */
 public class SocketServer extends Thread implements ServerConn  {
+    public static final String CONNECTION_TIMEOUT = "CONNECTION TIMEOUT!";
     private Socket socket;
     private QueuedBufferedReader inSocket;
     private PrintWriter outSocket;
@@ -94,7 +97,7 @@ public class SocketServer extends Thread implements ServerConn  {
         try {
             socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.INFO,e.getMessage());
         }
     }
 
@@ -532,7 +535,7 @@ public class SocketServer extends Thread implements ServerConn  {
                 if(user.getStatus()!=UserStatus.DISCONNECTED){
                     connectionOk = false;
                     lockPing.notifyAll();
-                    MasterServer.getMasterServer().printMessage("CONNECTION TIMEOUT!");
+                    MasterServer.getMasterServer().printMessage(CONNECTION_TIMEOUT);
                     user.disconnect();
                 }
             }
@@ -566,9 +569,9 @@ public class SocketServer extends Thread implements ServerConn  {
                     lockPing.notifyAll();
                 }
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(PING_TIME);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Logger.getGlobal().log(Level.INFO,e.getMessage());
                 }
             }
         }).start();

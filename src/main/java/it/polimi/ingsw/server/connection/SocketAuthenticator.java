@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.connection;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
+import it.polimi.ingsw.common.connection.SocketString;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.controller.Validator;
@@ -8,6 +9,8 @@ import it.polimi.ingsw.server.controller.User;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *This class runs as a thread launched by the MasterServer and opens a ServerSocket that keeps listening
@@ -36,12 +39,12 @@ public class SocketAuthenticator extends Thread {
             inSocket = new QueuedBufferedReader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
             outSocket = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.INFO,e.getMessage());
             return;
         }
 
         assert outSocket != null;
-        outSocket.println("Connection established!");
+        outSocket.println(SocketString.CONNECTION_ESTABLISHED);
         outSocket.flush();
         try {
             while (!logged) {
@@ -51,7 +54,7 @@ public class SocketAuthenticator extends Thread {
                 inSocket.pop();
                 if (Validator.checkLoginParams(command, params)) {
                     if (master.login(params.get(1), params.get(2).toCharArray())) {
-                        outSocket.println("LOGIN ok");
+                        outSocket.println(SocketString.LOGIN_OK);
                         outSocket.flush();
                         logged = true;
                         //Setting Socket specific parameters
@@ -60,12 +63,12 @@ public class SocketAuthenticator extends Thread {
                         user.setServerConn(new SocketServer(socket, user,inSocket,outSocket));
                         master.updateConnected(user);
                     } else {
-                        outSocket.println("LOGIN ko");
+                        outSocket.println(SocketString.LOGIN_KO);
                         outSocket.flush();
                         logged = false;
                     }
                 }else{
-                    outSocket.println("LOGIN ko");
+                    outSocket.println(SocketString.LOGIN_KO);
                 }
             }
         } catch ( Exception e) {

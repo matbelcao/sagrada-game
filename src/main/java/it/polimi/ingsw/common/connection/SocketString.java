@@ -80,4 +80,7 @@ public class SocketString {
 
     public static final String PING="PING";
     public static final String PONG="PONG";
+    public static final String CONNECTION_ESTABLISHED = "Connection established!";
+    public static final String LOGIN_OK = LOGIN+" "+OK;
+    public static final String LOGIN_KO = LOGIN + " " + KO;
 }
