@@ -80,7 +80,6 @@ public class GUIutil {
     private static final double MAIN_GAME_SCENE_RATIO = MAIN_GAME_CELL_DIM_TO_HEIGHT/MAIN_GAME_CELL_DIM_TO_WIDTH;
     private static final double CARD_WIDTH_TO_CELL_DIM = 2.65;
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.6;
-    private static final double FAVOR_TOKEN_TEXT_TO_CELL_DIM = 0.27777777;
     private static final double ROUNDTRACK_SPACING = 5;
     //Connection Broken
     private static final double CONN_BROKEN_FONT_TO_SCREEN = 0.018;
@@ -365,6 +364,8 @@ public class GUIutil {
         List<DieContainer> selectedPlayerSchema = getSchemaCells(board.getPlayerById(showingPlayerId).getSchema(), cellDim);
         Group playerSchema = buildSchema(selectedPlayerSchema,board.getPlayerById(showingPlayerId).getFavorTokens(),cellDim);
         StackPane schemaContainer = new StackPane(playerSchema);
+        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
+        schemaContainer.setOnMouseExited(e->schemaContainer.fireEvent(mouseExited));
         schemaContainer.setStyle("-fx-background-color: rgba(245,220,112,0);"); //todo hookup with css and make the same as the front pane background
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
