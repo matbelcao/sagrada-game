@@ -272,8 +272,8 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void showWaitingForGameStartScreen() {
-       Platform.runLater(() -> primaryStage.getScene().setRoot(sceneCreator.buildWaitingForGameStartScene()));
-       }
+        Platform.runLater(() -> primaryStage.getScene().setRoot(sceneCreator.buildWaitingForGameStartScene()));
+    }
 
     @Override
     public QueuedReader getCommandQueue() {

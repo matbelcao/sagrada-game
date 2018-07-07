@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static it.polimi.ingsw.common.enums.ErrMsg.*;
 
 /**
  * This class represents a client that can connect to the server and participate to a match of the game.

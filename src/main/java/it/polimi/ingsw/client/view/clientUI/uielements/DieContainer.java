@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import it.polimi.ingsw.common.enums.DieColor;
+import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.common.serializables.CellContent;
 import it.polimi.ingsw.common.serializables.LightConstraint;
@@ -46,10 +47,19 @@ public class DieContainer extends StackPane{
     DieContainer(int index, double cellDim){
         this(cellDim);
         int displayedIndex = index + 1;
-            double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL * cellDim;
-            indexText.setText(displayedIndex + "");
-            indexText.setFont(Font.font("Verdana", textSize));
-            indexText.setFill(Color.BLACK);
+        double textSize = ROUNDTRACK_TEXT_SIZE_TO_CELL * cellDim;
+        indexText.setText(displayedIndex + "");
+        indexText.setFont(Font.font("Verdana", textSize));
+        indexText.setFill(Color.BLACK);
+    }
+
+    DieContainer(double cellDim, Place place) {
+        this(cellDim);
+        switch (place){
+            case DRAFTPOOL:
+                this.hideCellBorders();
+                break;
+        }
     }
 
     DieContainer(CellContent cellContent, double cellDim) {
@@ -69,7 +79,7 @@ public class DieContainer extends StackPane{
     }
 
     public void putConstraint(LightConstraint constraintAt) {
-       drawConstraint(constraintAt,content.getGraphicsContext2D(),0,0,dieDim);
+        drawConstraint(constraintAt,content.getGraphicsContext2D(),0,0,dieDim);
     }
 
     private Canvas indexedCellToCanvas(CellContent cellContent, double dieDim) {
@@ -83,7 +93,7 @@ public class DieContainer extends StackPane{
     }
 
     private void drawConstraint(CellContent cell, GraphicsContext gc, double x, double y, double cellDim) {
-       if (!cell.isDie()) {
+        if (!cell.isDie()) {
             if (cell.hasColor()) {
                 drawColorConstraint(cell.getDieColor(), gc, x, y, cellDim);
             } else {
@@ -162,7 +172,7 @@ public class DieContainer extends StackPane{
                 drawSpot(gc, 3 * dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 drawSpot(gc, dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 break;
-                // Fall thru to next case
+            // Fall thru to next case
             case 4:
                 drawSpot(gc, dieDim / 4, dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
                 drawSpot(gc, 3 * dieDim / 4, 3 * dieDim / 4, dieDim, xAxisDiePosition, yAxisDiePosition);
@@ -249,6 +259,14 @@ public class DieContainer extends StackPane{
         gc.setFill(Color.BLACK);
         gc.fillOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
     }
+    private void drawWhiteCell(GraphicsContext gc, double x, double y, double cellDim) {
+        gc.setFill(Color.WHITE);
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(cellDim * BORDER_LINE_TO_CELL);
+        gc.fillRect(x, y, cellDim, cellDim);
+        gc.strokeRect(x, y, cellDim, cellDim);
+    }
+
     public void highlightBlue() {
         outerRect.setFill(Color.LIGHTSKYBLUE);
     }
