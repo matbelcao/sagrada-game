@@ -1,10 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI;
 
 import it.polimi.ingsw.common.connection.QueuedReader;
-import it.polimi.ingsw.common.serializables.LightPrivObj;
-import it.polimi.ingsw.common.serializables.LightSchemaCard;
-
-import java.util.List;
 import java.util.Observer;
 
 public interface ClientUI extends Observer {
@@ -45,8 +41,13 @@ public interface ClientUI extends Observer {
     void updateConnectionBroken();
 
 
+    /**
+     * this tells the user to wait for the new game
+     */
     void showWaitingForGameStartScreen();
 
-
+    /**
+     * @return the command queue of the ui
+     */
     QueuedReader getCommandQueue();
 }

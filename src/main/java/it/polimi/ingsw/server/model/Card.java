@@ -7,16 +7,22 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This abstract class is useful to the subclasses [ToolCard , ObjectiveCard and SchemaCard] to initialize common parameters
  */
 public abstract class Card {
+    private static final String IDD = "id";
+    private static final String NAMEE = "name";
+    private static final String DESCRIPTIONN = "description";
+    private static final String PRIV_OBJECTIVE_CARD = "PrivObjectiveCard";
+    private static final String DIE_COLOR = "dieColor";
     private String name;
-    private String imgSrc;
+
     private String description;
     private int id;
 
@@ -41,17 +47,17 @@ public abstract class Card {
             nodeList = doc.getElementsByTagName(type);
 
             Element eElement = (Element)nodeList.item(id-1);
-            if(Integer.parseInt(eElement.getAttribute("id"))==id){
+            if(Integer.parseInt(eElement.getAttribute(IDD))==id){
                 this.id=id;
-                this.name=eElement.getElementsByTagName("name").item(0).getTextContent();
-                this.imgSrc= eElement.getElementsByTagName("imgSrc").item(0).getTextContent().replace("::",File.separator);
-                this.description=eElement.getElementsByTagName("description").item(0).getTextContent();
+                this.name=eElement.getElementsByTagName(NAMEE).item(0).getTextContent();
 
-                return type.equals("PrivObjectiveCard")? eElement.getElementsByTagName("dieColor").item(0).getTextContent() : null;
+                this.description=eElement.getElementsByTagName(DESCRIPTIONN).item(0).getTextContent();
+
+                return type.equals(PRIV_OBJECTIVE_CARD)? eElement.getElementsByTagName(DIE_COLOR).item(0).getTextContent() : null;
             }
 
         }catch (SAXException | ParserConfigurationException | IOException e1) {
-            e1.printStackTrace();
+            Logger.getGlobal().log(Level.INFO,e1.getMessage());
         }
         return null;
     }
@@ -62,13 +68,6 @@ public abstract class Card {
      */
     public String getName(){ return this.name; }
 
-    /**
-     * Returns the directory path of the relative image
-     * @return imgSrc
-     */
-    public String getImgSrc(){
-        return this.imgSrc;
-    }
 
     /**
      * Returns the description of the card
