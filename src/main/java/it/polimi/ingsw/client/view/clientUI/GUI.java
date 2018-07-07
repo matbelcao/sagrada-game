@@ -4,7 +4,6 @@ import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.client.controller.ClientFSMState;
 import it.polimi.ingsw.client.controller.CmdWriter;
 import it.polimi.ingsw.client.controller.QueuedCmdReader;
-import it.polimi.ingsw.client.textGen;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
 import it.polimi.ingsw.client.view.clientUI.uielements.SizeListener;
@@ -105,7 +104,7 @@ public class GUI extends Application implements ClientUI {
             grid.setPadding(new Insets(sceneCreator.getLoginHeight() * 0.35, 25, 25, 25));
 
             TextField usernameField = new TextField();
-            usernameField.setText(textGen.getRandomString()); //TODO delete
+            //usernameField.setText(textGen.getRandomString()); //TODO delete
             usernameField.setPromptText("Username");
             usernameField.setMinHeight(sceneCreator.getLoginWidth() * 0.08);
             usernameField.setMinWidth(sceneCreator.getLoginWidth() * 0.75);
@@ -267,12 +266,12 @@ public class GUI extends Application implements ClientUI {
             connectionBrokenStage.sizeToScene();
             connectionBrokenStage.setAlwaysOnTop(true);
             connectionBrokenStage.showAndWait();
-        });
-    }
+});
+        }
 
 
 
-    @Override
+@Override
     public void showWaitingForGameStartScreen() {
         Platform.runLater(() -> primaryStage.getScene().setRoot(sceneCreator.buildWaitingForGameStartScene()));
     }
