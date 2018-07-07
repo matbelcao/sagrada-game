@@ -72,7 +72,6 @@ public class GUIutil {
     private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.05488;
     private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0809;
     private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
-
     //Main game scene
     private static final double MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH = 0.8265;
     private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.121;
@@ -595,18 +594,30 @@ public class GUIutil {
         IndexedCellContent latestSelectedDie = board.getLatestSelectedDie();
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<Integer> latestPlacementsList = board.getLatestPlacementsList();
+        List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         if (!latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)) {
+            //highlight all the cells where I can put a die
             for (DieContainer cell : schemaCells) {
                 if (latestPlacementsList.contains(schemaCells.indexOf(cell))) {
                     cell.highlightGreen();
                     cell.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(cell)) + ""));
                 }
             }
+
             if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
                 for (DieContainer cell : draftPoolCells) {
                     cell.setOnMouseClicked(e -> {
                         cmdWrite.write("d");
                         cmdWrite.write(draftPoolCells.indexOf(cell) + "");
+                    });
+                }
+            }else if(!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.SCHEMA)){
+                for(IndexedCellContent idexedSelectableCell : latestDiceList){
+                    DieContainer selectableCell = schemaCells.get(idexedSelectableCell.getPosition());
+                    selectableCell.highlightBlue();
+                    selectableCell.setOnMouseClicked(e->{
+                        cmdWrite.write("d");
+                        cmdWrite.write(latestDiceList.indexOf(idexedSelectableCell)+"");
                     });
                 }
             }
