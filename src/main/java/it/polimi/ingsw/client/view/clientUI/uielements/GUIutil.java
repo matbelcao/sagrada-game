@@ -44,7 +44,6 @@ public class GUIutil {
 
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
-    private static final double NUM_OF_TOOLS = 3;
     private static final int ROUNDTRACK_SIZE = 10;
     private static final String FONT = "Sans-Serif";
     private static final String IMG_WALL_PNG = "-fx-background-image: url('img/wall.png');";
@@ -84,6 +83,30 @@ public class GUIutil {
     private static final double GAME_END_TEXT_TO_CELL =0.625 ;
     //Connection Broken
     private static final double CONN_BROKEN_FONT_TO_SCREEN = 0.01;
+
+    //css Ids
+    private static final String LOBBY_MESSAGE = "lobby-message";
+    private static final String DRAFTED_MESSAGE = "drafted-message";
+    private static final String DRAFTED_SCHEMAS = "drafted-schemas";
+    private static final String GAME_BUTTON = "game-button";
+    private static final String TAB = "tab";
+    private static final String TURN_INDICATOR = "turn-indicator";
+    private static final String CURRENTLY_PLAYING = "currently-playing";
+    private static final String TAB_CONTAINER = "tab-container";
+    private static final String CARD_CONTAINER = "card-container";
+    private static final String CARD = "card";
+    private static final String OPAQUE_BACKGROUND = "opaque-background";
+    private static final String PLAYER_PLAYING = "player-playing";
+    private static final String PLAYER_DISCONNECTED = "player-disconnected";
+    private static final String PLAYER_QUITTED = "player-quitted";
+    private static final String PLAYER_INFO = "player-info";
+    private static final String ROUNDTRACK_CELL = "roundtrack-cell";
+    private static final String FAVOR_TOKENS = "favor-tokens";
+    private static final String PLAYER_SCHEMA = "player-schema";
+    private static final String LOGIN_BUTTON = "login-button";
+    private static final String SCORE_CONTAINER = "score-container";
+    private static final String ROUND_DICE = "round-dice";
+    private static final String TOP_SECTION = "top-section";
 
 
 
@@ -129,7 +152,7 @@ public class GUIutil {
         StackPane p = new StackPane();
         p.setStyle(IMG_WALL_PNG);
         Label lobbyLabel = new Label(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
-        lobbyLabel.setId("lobby-message");
+        lobbyLabel.setId(LOBBY_MESSAGE);
         p.getChildren().add(lobbyLabel);
         return new StackPane(p);
     }
@@ -147,7 +170,7 @@ public class GUIutil {
     public StackPane buildWaitingForGameStartScene() {
         String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
         Label waitingText = new Label(message);
-        waitingText.setId("lobby-message");
+        waitingText.setId(LOBBY_MESSAGE);
         StackPane stackPane = new StackPane(waitingText);
         stackPane.setStyle(IMG_WALL_PNG);
         return stackPane;
@@ -189,7 +212,7 @@ public class GUIutil {
         draftedSchemasPane.setCenter(cardsContainer);
 
         Label selectSchemaText = new Label(uimsg.getMessage(CHOOSE_SCHEMA_2));
-        selectSchemaText.setId("drafted-message");
+        selectSchemaText.setId(DRAFTED_MESSAGE);
         selectSchemaText.setAlignment(CENTER);
         selectSchemaText.setMinWidth(newWidth);
         selectSchemaText.setFont(Font.font(FONT, DRAFTED_SCHEMAS_TEXT_TO_CELL*cellDim));
@@ -223,7 +246,7 @@ public class GUIutil {
         spacer.setVisible(false);
         Group cells = new Group(new VBox(g, spacer));
         Group completeSchema = new Group(new StackPane(schemaBlackBorders,cells));
-        completeSchema.setId("drafted-schemas");
+        completeSchema.setId(DRAFTED_SCHEMAS);
 
         return new Group(new StackPane(backgroundRect,completeSchema));
     }
@@ -272,12 +295,12 @@ public class GUIutil {
         HBox.setHgrow(separator,Priority.ALWAYS);
         VBox menuButtons = buildMenuButtons(turnState);
         topSection.getChildren().addAll(separator,menuButtons);
-        topSection.setId("top-section");
+        topSection.setId(TOP_SECTION);
         frontPane.setTop(topSection);
 
         //Center side of the border pane
         Group schema = buildSchema(schemaCells,favorTokens,board.getPlayerById(board.getMyPlayerId()).getUsername());
-        HBox playersStatusBar = getPlayersStatusBar(board.getMyPlayerId(),board);
+        HBox playersStatusBar = getPlayersStatusBar(board);
         StackPane schemaContainer = new StackPane(schema);
         VBox.setVgrow(schemaContainer,Priority.ALWAYS);
         frontPane.setCenter(new VBox(schemaContainer,playersStatusBar));
@@ -320,7 +343,7 @@ public class GUIutil {
         for (int i = 0; i < multipleDiceListSize; i++) {
             DieContainer cell = new DieContainer(cellDim);
             cell.hideCellBorders();
-            cell.setId("round-dice");
+            cell.setId(ROUND_DICE);
             cell.putDie(multipleDiceList.get(i));
             multipleDiceTrack.getChildren().add(cell);
             if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
@@ -372,8 +395,8 @@ public class GUIutil {
     private VBox buildMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button("end turn");
         Button back = new Button("back");
-        endTurn.setId("game-button");
-        back.setId("game-button");
+        endTurn.setId(GAME_BUTTON);
+        back.setId(GAME_BUTTON);
 
         if (turnState.equals(ClientFSMState.NOT_MY_TURN)){
             back.setDisable(true);
@@ -394,12 +417,12 @@ public class GUIutil {
         Button pub = new Button(uimsg.getMessage(UIMsg.PUBLIC_OBJ).replaceFirst(":",""));
         Button tool = new Button(uimsg.getMessage(UIMsg.TOOLS).replaceFirst(":",""));
 
-        priv.setId("tab");
-        pub.setId("tab");
-        tool.setId("tab");
+        priv.setId(TAB);
+        pub.setId(TAB);
+        tool.setId(TAB);
 
         Label turnIndicator = new Label();
-        turnIndicator.setId("turn-indicator");
+        turnIndicator.setId(TURN_INDICATOR);
         if(board.getIsFirstTurn()) {
             turnIndicator.setText(uimsg.getMessage(FIRST_TURN));
         }else{
@@ -407,7 +430,7 @@ public class GUIutil {
         }
 
         Label currentlyPlaying = new Label();
-        currentlyPlaying.setId("currently-playing");
+        currentlyPlaying.setId(CURRENTLY_PLAYING);
         if(board.getNowPlaying() == board.getMyPlayerId()){
             currentlyPlaying.setText(uimsg.getMessage(YOUR_TURN));
         }else{
@@ -415,12 +438,12 @@ public class GUIutil {
         }
         //the container of the button to switch view of the cards
         HBox buttonContainer = new HBox(priv, pub, tool,currentlyPlaying,turnIndicator);
-        buttonContainer.setId("tab-container");
+        buttonContainer.setId(TAB_CONTAINER);
 
         HBox cardContainer = new HBox();
         VBox primaryContainer = new VBox(buttonContainer, cardContainer);
 
-        cardContainer.setId("card-container");
+        cardContainer.setId(CARD_CONTAINER);
         priv.setOnAction(e -> {
             Rectangle privObjImg = drawCard(board.getPrivObj(), getCardWidth(cellDim), getCardHeight(cellDim));
             Rectangle emptyRect1 = new Rectangle(getCardWidth(cellDim), getCardHeight(cellDim),Color.TRANSPARENT);
@@ -445,7 +468,7 @@ public class GUIutil {
                         cmdWrite.write(board.getTools().indexOf(toolCard));
                     }
                 });
-                toolRect.setId("card");
+                toolRect.setId(CARD);
                 cards.add(toolRect);
             }
             cardContainer.getChildren().setAll(cards);
@@ -484,13 +507,13 @@ public class GUIutil {
 
     public BorderPane buildSelectdPlayerPane(int showingPlayerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
-        HBox playersSelector = getPlayersStatusBar(showingPlayerId,board);
+        HBox playersSelector = getPlayersStatusBar(board);
         Region spacer = new Region();
         HBox.setHgrow(spacer,Priority.ALWAYS);
         Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
         playersSelector.setOnMouseExited(e->playersSelector.fireEvent(mouseExited));
         HBox bottomContainer = new HBox(playersSelector,spacer);
-        bottomContainer.setId("opaque-background");
+        bottomContainer.setId(OPAQUE_BACKGROUND);
         selectedPlayerPane.setBottom(bottomContainer);
 
         double cellDim = getMainSceneCellDim(width,height);
@@ -499,14 +522,14 @@ public class GUIutil {
         List<DieContainer> selectedPlayerSchema = getSchemaCells(board.getPlayerById(showingPlayerId).getSchema(), cellDim);
         Group playerSchema = buildSchema(selectedPlayerSchema,favortokens,username);
         StackPane schemaContainer = new StackPane(playerSchema);
-        schemaContainer.setId("opaque-background");
+        schemaContainer.setId(OPAQUE_BACKGROUND);
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
         return selectedPlayerPane;
     }
 
 
-    private HBox getPlayersStatusBar(int showingPlayerId, LightBoard board) {
+    private HBox getPlayersStatusBar(LightBoard board) {
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
             Button playerStatusBar = getPlayerStatusButton(playerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
@@ -527,13 +550,13 @@ public class GUIutil {
     private Button getPlayerStatusButton(int playerId, String username, LightPlayerStatus status, int nowPlaying){
         Button player = new Button(username);
         if(playerId == nowPlaying ){
-            player.setId("player-playing");
+            player.setId(PLAYER_PLAYING);
         }else if(status.equals(LightPlayerStatus.DISCONNECTED)){
-            player.setId("player-disconnected");
+            player.setId(PLAYER_DISCONNECTED);
         }else if(status.equals(LightPlayerStatus.QUITTED)){
-            player.setId("player-quitted");
+            player.setId(PLAYER_QUITTED);
         }else{
-            player.setId("player-info");
+            player.setId(PLAYER_INFO);
         }
         return player;
     }
@@ -555,7 +578,7 @@ public class GUIutil {
             optionBox.getChildren().add(c);
         }
         optionBox.setAlignment(CENTER);
-        selectDiePane.setId("opaque-background");
+        selectDiePane.setId(OPAQUE_BACKGROUND);
         selectDiePane.setCenter(new StackPane(optionBoxContainer));
         return selectDiePane;
     }
@@ -572,7 +595,7 @@ public class GUIutil {
         ArrayList<DieContainer> roundTrackCells = new ArrayList<>();
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             DieContainer cell = new DieContainer(i, cellDim);
-            cell.setId("roundtrack-cell");
+            cell.setId(ROUNDTRACK_CELL);
             if (i < roundTrack.size()) {
                 if (roundTrack.get(i).size() > 1) {
                     //draw to dice in a cell
@@ -610,12 +633,12 @@ public class GUIutil {
     private Group buildSchema(List<DieContainer> gridCells, int favortokens, String userName) {
         GridPane grid = schemaToGrid(gridCells);
         Label favorTokens = new Label(uimsg.getMessage(REMAINING_TOKENS)+" "+CLIUtils.replicate(CLIUtils.FAVOR,favortokens));
-        favorTokens.setId("favor-tokens");
+        favorTokens.setId(FAVOR_TOKENS);
         Label username = new Label(userName);
-        username.setId("favor-tokens");
+        username.setId(FAVOR_TOKENS);
         HBox nameAndFavor = new HBox(favorTokens,username);
         VBox schema =new VBox(nameAndFavor,new Group(grid));
-        schema.setId("player-schema");
+        schema.setId(PLAYER_SCHEMA);
         favorTokens.prefWidthProperty().bind(grid.widthProperty().divide(1.7));
         return new Group (schema);
     }
@@ -791,11 +814,11 @@ public class GUIutil {
 
         Button newGameButton = new Button(uimsg.getMessage(NEW_GAME_OPTION_2));
         newGameButton.setOnMouseClicked(e->cmdWrite.write(ClientFSM.NEW_GAME));
-        newGameButton.setId("login-button");
+        newGameButton.setId(LOGIN_BUTTON);
 
         VBox v2=new VBox(scoreLabel,scoreBoard,newGameButton);
         v2.setAlignment(CENTER);
-        v2.setId("score-container");
+        v2.setId(SCORE_CONTAINER);
         VBox v = new VBox(v2);
         v.setAlignment(CENTER);
         BorderPane containerPane = new BorderPane();

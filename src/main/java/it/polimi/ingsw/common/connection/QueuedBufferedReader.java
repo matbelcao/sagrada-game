@@ -18,8 +18,6 @@ public class QueuedBufferedReader implements QueuedReader {
         this.inReader= inReader;
     }
 
-
-
     @Override
     public void clear() {
         synchronized (lockQueue){
