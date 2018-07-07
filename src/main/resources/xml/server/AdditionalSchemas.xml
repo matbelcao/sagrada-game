@@ -4,7 +4,7 @@
     <!-- SchemaCards personalized, to add with progressive ID (odd -> front , even -> back) -->
     <SchemaCard id="1">
         <name>Personal - N</name>
-        <token>6</token>
+        <token>160</token>
         <constraint>
             <row>0</row>
             <col>0</col>

@@ -103,6 +103,9 @@ public class Game extends Thread implements Iterable  {
      * Restart the execution flow of Run() because the desired action has occurred
      */
     public void startFlow(){
+        if(fsm.isToolActive() && !fsm.getCurState().equals(ServerState.INIT)){
+            board.exit();
+        }
         synchronized (lockRun) {
             if(!endLock){
                 endLock = true;
