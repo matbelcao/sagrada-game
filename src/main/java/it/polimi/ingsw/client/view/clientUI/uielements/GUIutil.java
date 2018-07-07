@@ -589,7 +589,7 @@ public class GUIutil {
     private List<DieContainer> getSchemaCells(LightSchemaCard lightSchemaCard, double cellDim) {
         ArrayList<DieContainer> gridCells = new ArrayList<>();
         for (int i = 0; i < NUM_COLS * NUM_ROWS; i++) {
-            DieContainer cell = new DieContainer(cellDim,Place.SCHEMA);
+            DieContainer cell = new DieContainer(cellDim);
             if (lightSchemaCard.hasConstraintAt(i)) {
                 cell.putConstraint(lightSchemaCard.getConstraintAt(i));
             }
@@ -618,7 +618,8 @@ public class GUIutil {
     private List<DieContainer> getDraftPoolCells(List<LightDie> draftPool, double cellDim) {
          ArrayList<DieContainer> poolDice = new ArrayList<>();
         for (LightDie draftPoolDice : draftPool) {
-            DieContainer cell = new DieContainer(cellDim, Place.DRAFTPOOL);
+            DieContainer cell = new DieContainer(cellDim);
+            cell.hideCellBorders();
             cell.putDie(draftPoolDice);
             poolDice.add(cell);
         }

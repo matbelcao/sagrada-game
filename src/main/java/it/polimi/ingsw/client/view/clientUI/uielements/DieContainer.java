@@ -1,7 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import it.polimi.ingsw.common.enums.DieColor;
-import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.common.serializables.CellContent;
 import it.polimi.ingsw.common.serializables.LightConstraint;
@@ -51,15 +50,6 @@ public class DieContainer extends StackPane{
             indexText.setText(displayedIndex + "");
             indexText.setFont(Font.font("Verdana", textSize));
             indexText.setFill(Color.BLACK);
-    }
-
-    DieContainer(double cellDim, Place place) {
-        this(cellDim);
-        switch (place){
-            case DRAFTPOOL:
-                this.hideCellBorders();
-                break;
-        }
     }
 
     DieContainer(CellContent cellContent, double cellDim) {
@@ -259,14 +249,6 @@ public class DieContainer extends StackPane{
         gc.setFill(Color.BLACK);
         gc.fillOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
     }
-    private void drawWhiteCell(GraphicsContext gc, double x, double y, double cellDim) {
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(cellDim * BORDER_LINE_TO_CELL);
-        gc.fillRect(x, y, cellDim, cellDim);
-        gc.strokeRect(x, y, cellDim, cellDim);
-    }
-
     public void highlightBlue() {
         outerRect.setFill(Color.LIGHTSKYBLUE);
     }
