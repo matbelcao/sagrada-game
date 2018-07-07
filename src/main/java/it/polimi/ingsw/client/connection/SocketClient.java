@@ -27,7 +27,6 @@ public class SocketClient implements ClientConn {
     private static final int NUM_CARDS=3;
     private static final int PONG_TIME=10000;
     private static final String INVALID_MESSAGE = "INVALID message";
-    private static final String ILLEGAL_ACTION = "ILLEGAL ACTION!";
     private static final String ERR_ERROR_WHILE_CLOSING_THE_SOCKET = "ERR: error while closing the socket";
 
     private Socket socket;
@@ -112,10 +111,7 @@ public class SocketClient implements ClientConn {
 
                             } else if (ClientParser.isIllegalAction(inSocket.readln())) {
                                 inSocket.pop();
-                                //Logger.getGlobal().log(Level.INFO,ILLEGAL_ACTION);
-                                if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)){
-                                    endTurn();
-                                }
+                                manageIllegalAction();
                             }
                         }
                         lockin.notifyAll();
@@ -125,6 +121,15 @@ public class SocketClient implements ClientConn {
                 }
             }
         }).start();
+    }
+
+    /**
+     * manages the illegal action exception
+     */
+    private void manageIllegalAction() {
+        if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)){
+            endTurn();
+        }
     }
 
     /**

@@ -545,16 +545,8 @@ public class Board {
             playerScores.get(i).setFinalPosition(i+1);
             getPlayerById(playerScores.get(i).getPlayerId()).setFinalPosition(i+1);
 
-            //System.out.println(playerScores.get(i).getPlayerId()+" "+playerScores.get(i).getPoints()+" "+playerScores.get(i).getFinalPosition());
-        }
 
-        //adding disconnected or quitted users in the last position
-        /*for(Player p:players){
-            if(p.hasQuitted() || users.get(p.getGameId()).getStatus().equals(UserStatus.DISCONNECTED)){
-                int lastPos=playerScores.size();
-                playerScores.add(lastPos,new RankingEntry(p.getGameId(),0,lastPos+1));
-            }
-        }*/
+        }
 
         return playerScores;
     }
@@ -568,18 +560,28 @@ public class Board {
             Player p1=getPlayerById(r1.getPlayerId());
             Player p2=getPlayerById(r2.getPlayerId());
             if(r1.getPoints() == r2.getPoints()){
-                int privScore1=p1.getPrivObjective().getCardScore(p1.getSchema());
-                int privScore2=p2.getPrivObjective().getCardScore(p2.getSchema());
-                if(privScore1 == privScore2){
-                    if(p1.getFavorTokens() == p2.getFavorTokens()){
-                        return ((p1.getGameId()+1)%4)<((p2.getGameId()+1)%4) ? -1 : 1;
-                    }
-                    return p1.getFavorTokens()>p2.getFavorTokens() ? -1 : 1;
-                }
-                return privScore1>privScore2 ? -1 : 1;
+                return runoff(p1, p2);
             }
             return r1.getPoints()>r2.getPoints() ? -1 : 1;
         });
+    }
+
+    /**
+     * this method calculates the positions in case the two players have reached the same score
+     * @param p1 player1
+     * @param p2 player2
+     * @return the result
+     */
+    private int runoff(Player p1, Player p2) {
+        int privScore1=p1.getPrivObjective().getCardScore(p1.getSchema());
+        int privScore2=p2.getPrivObjective().getCardScore(p2.getSchema());
+        if(privScore1 == privScore2){
+            if(p1.getFavorTokens() == p2.getFavorTokens()){
+                return ((p1.getGameId()+1)%4)<((p2.getGameId()+1)%4) ? -1 : 1;
+            }
+            return p1.getFavorTokens()>p2.getFavorTokens() ? -1 : 1;
+        }
+        return privScore1>privScore2 ? -1 : 1;
     }
 
     /**
@@ -703,7 +705,7 @@ public class Board {
     }
 
     /**
-     * Returna the Player reference binded to a certain User
+     * Returns the Player reference binded to a certain User
      * @param user the User to find the relative Player
      * @return the Player's reference
      */
@@ -751,7 +753,6 @@ public class Board {
     }
 
     /**
-     * Returns the DraftPool's reference
      * @return the DraftPool's reference
      */
     public DraftPool getDraftPool(){
@@ -759,7 +760,6 @@ public class Board {
     }
 
     /**
-     * Returns the FSM reference
      * @return the FSM reference
      */
     public ServerFSM getFSM(){
