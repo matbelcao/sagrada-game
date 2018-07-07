@@ -495,7 +495,7 @@ public class GUIutil {
         StackPane schemaContainer = new StackPane(playerSchema);
         Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
         schemaContainer.setOnMouseExited(e->schemaContainer.fireEvent(mouseExited));
-        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112,0);");
+        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112,0); -fx-padding: 0 0 -16 -13");
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
         return selectedPlayerPane;
