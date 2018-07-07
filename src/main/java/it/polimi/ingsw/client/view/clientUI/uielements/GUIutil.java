@@ -47,7 +47,7 @@ public class GUIutil {
     private static final double NUM_OF_TOOLS = 3;
     private static final int ROUNDTRACK_SIZE = 10;
     private static final String FONT = "Sans-Serif";
-    public static final String IMG_WALL_PNG = "-fx-background-image: url('img/wall.png');";
+    private static final String IMG_WALL_PNG = "-fx-background-image: url('img/wall.png');";
     //-----login Stage
     private static final double LOGIN_TO_SCREEN_RATIO = 0.25;
     private static final double LOGIN_RATIO = 0.663;
@@ -114,7 +114,7 @@ public class GUIutil {
 
     private double getCardHeight(double cellDim) { return cellDim*CARD_HEIGHT_TO_CELL_DIM; }
 
-    public double getMainSceneCellDim(double newWidth, double newHeight) {
+    private double getMainSceneCellDim(double newWidth, double newHeight) {
         double cellDim;
         double sceneRatio = newWidth / newHeight;
         if (sceneRatio >= MAIN_GAME_SCENE_RATIO) {
@@ -133,6 +133,120 @@ public class GUIutil {
         p.getChildren().add(lobbyLabel);
         return new StackPane(p);
     }
+
+
+    public Scene buildConnecionBrokenScene() {
+        Text connectionBrokeMessage = new Text(uimsg.getMessage(BROKEN_CONNECTION));
+        connectionBrokeMessage.setFont(new Font(FONT, screenWidth *CONN_BROKEN_FONT_TO_SCREEN));
+        StackPane layout = new StackPane(connectionBrokeMessage);
+        return new Scene(layout);
+    }
+
+    public StackPane buildWaitingForGameStartScene() {
+        String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
+        Label waitingText = new Label(message);
+        waitingText.setId("lobby-message");
+        StackPane stackPane = new StackPane(waitingText);
+        stackPane.setStyle(IMG_WALL_PNG);
+        return stackPane;
+    }
+
+    private double getDraftedSchemasCellDim(double newWidth, double newHeight) {
+        double cellDim;
+        double sceneRatio = newWidth / newHeight;
+        if (sceneRatio >= LOBBY_SCENE_RATIO) {
+            cellDim = newHeight* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT;
+        } else {
+            cellDim = newWidth* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH;
+        }
+        return cellDim;
+    }
+
+    public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj lightPrivObj, double newWidth, double newHeight){
+        double cellDim = getDraftedSchemasCellDim(newWidth,newHeight);
+        double spacing = DRAFTED_SCHEMAS_SPACING_TO_CELL*cellDim;
+
+        BorderPane draftedSchemasPane = new BorderPane();
+        draftedSchemasPane.setStyle(IMG_WALL_PNG);
+
+        GridPane schemasGrid = new GridPane();
+        for(int i = 0; i < 2; i++){
+            for(int j = 0; j < 2; j++){
+                int schemaIndex =i*2+j;
+                Group completeSchema = buildDreftedSchema(draftedSchemas.get(schemaIndex),cellDim);
+                schemasGrid.add(completeSchema,j,i);
+                completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
+            }
+        }
+        schemasGrid.setVgap(spacing);
+        schemasGrid.setHgap(spacing);
+        StackPane privObj = new StackPane(drawCard(lightPrivObj, PRIVOBJ_W_TO_CELL_DIM*cellDim, PRIVOBJ_W_TO_CELL_DIM*cellDim/PRIVATE_OBJ_RATIO));
+        privObj.setPadding(new Insets(0,0,0,spacing));
+        StackPane cardsContainer = new StackPane(new Group(new HBox(schemasGrid, privObj)));
+        cardsContainer.setAlignment(CENTER);
+        draftedSchemasPane.setCenter(cardsContainer);
+
+        Label selectSchemaText = new Label(uimsg.getMessage(CHOOSE_SCHEMA_2));
+        selectSchemaText.setId("drafted-message");
+        selectSchemaText.setAlignment(CENTER);
+        selectSchemaText.setMinWidth(newWidth);
+        selectSchemaText.setFont(Font.font(FONT, DRAFTED_SCHEMAS_TEXT_TO_CELL*cellDim));
+        draftedSchemasPane.setTop(new StackPane(selectSchemaText));
+
+        return draftedSchemasPane ;
+    }
+
+    private Group buildDreftedSchema(LightSchemaCard lightSchemaCard, double cellDim) {
+        double schemaWidth = cellDim*SCHEMA_W_TO_CELL;
+        double schemaHeight = cellDim*SCHEMA_H_TO_CELL;
+        double nameLabelSize = SCHEMA_LABEL_TO_CELL_DIM*cellDim;
+        double arcCurvature = SCHEMA_ARC_TO_WIDTH * schemaWidth;
+
+        Canvas schemaBlackBorders = new Canvas(schemaWidth,schemaHeight);
+        GraphicsContext gc = schemaBlackBorders.getGraphicsContext2D();
+        gc.setFill(Color.BLACK);
+        gc.fillRoundRect(0, 0, schemaWidth, schemaHeight, arcCurvature, arcCurvature);
+        double x = schemaWidth / 2;
+        double y = TEXT_HEIGHT_TO_SCHEMA_H * schemaHeight;
+        drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
+        drawFavorTokens(gc, 0, y, schemaWidth, lightSchemaCard);
+
+        Rectangle backgroundRect = new Rectangle(0,0,schemaWidth,schemaHeight);
+        backgroundRect.setArcWidth(arcCurvature);
+        backgroundRect.setArcHeight(arcCurvature);
+        backgroundRect.setFill(Color.BLACK);
+
+        Group g = new Group(schemaToGrid(getSchemaCells(lightSchemaCard,cellDim)));
+        Rectangle spacer = new Rectangle(nameLabelSize,nameLabelSize);
+        spacer.setVisible(false);
+        Group cells = new Group(new VBox(g, spacer));
+        Group completeSchema = new Group(new StackPane(schemaBlackBorders,cells));
+        completeSchema.setId("drafted-schemas");
+
+        return new Group(new StackPane(backgroundRect,completeSchema));
+    }
+
+    private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
+        int favorTokens = lightSchemaCard.getFavorTokens();
+        double favTokDiameter = schemaWidth * FAVOR_DIAM_TO_SCHEMA_W;
+        x = x + FAVOR_POS_TO_SCHEMA_W * schemaWidth;
+        for (int i = 0; i < favorTokens; i++) {
+            gc.setFill(Color.WHITE);
+            gc.fillOval(x, y + favTokDiameter / 3, favTokDiameter, favTokDiameter);
+            x = x - favTokDiameter - favTokDiameter / 10;
+        }
+
+    }
+
+    private void drawSchemaText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
+        double textSize = TEXT_DIM_TO_SCHEMA_W * schemaWidth;
+        gc.setFont(Font.font(FONT, textSize));
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.TOP);
+        gc.setFill(Color.AZURE);
+        gc.fillText(lightSchemaCard.getName(), x, y);
+    }
+
 
     public BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board, ClientFSMState turnState){
         double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
@@ -176,26 +290,14 @@ public class GUIutil {
         return frontPane;
     }
 
-    private HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
-        HBox track = new HBox();
-        track.setSpacing(ROUNDTRACK_SPACING);
-        for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
-            DieContainer dummyCell = new DieContainer(cellDim);
-            dummyCell.hideCellBorders();
-            track.getChildren().add(dummyCell);
-            if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
-                if(i == selectedTrackCellIndex){
-                    //to avoid having the same event being fired continuously while the mouse is above a roundtrack cell
-                    continue;
-                }
-               Event showMultipleDice = new CustomGuiEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
-                dummyCell.setOnMouseEntered(e -> {
-                    dummyCell.fireEvent(showMultipleDice);
-                });
-            }
+    private int getMultipleDieTrackCellIndex(int index, List<List<LightDie>> roundTrack) {
+        int selectedCellindex = 0;
+        for (int j = 0; j < index; j++) {
+            selectedCellindex += roundTrack.get(j).size();
         }
-        return track;
+        return selectedCellindex;
     }
+
 
     private HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList) {
         HBox multipleDiceTrack = new HBox();
@@ -228,17 +330,43 @@ public class GUIutil {
         return multipleDiceTrack;
     }
 
-    private int getMultipleDieTrackCellIndex(int index, List<List<LightDie>> roundTrack) {
-        int selectedCellindex = 0;
-        for (int j = 0; j < index; j++) {
-            selectedCellindex += roundTrack.get(j).size();
-        }
-        return selectedCellindex;
+    public BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board,ClientFSMState turnState){
+        double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
+        List <List<LightDie>>       roundTrack = board.getRoundTrack();
+        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
+
+        BorderPane backPane = new BorderPane();
+        HBox d1 = buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack);
+        HBox d2 = buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList);
+        VBox vbox =new VBox(d1,d2);
+        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
+        vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
+        backPane.setTop(vbox);
+        vbox.setAlignment(TOP_LEFT);
+        backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);");
+        return backPane;
     }
 
+    private HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
+        HBox track = new HBox();
+        track.setSpacing(ROUNDTRACK_SPACING);
+        for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
+            DieContainer dummyCell = new DieContainer(cellDim);
+            dummyCell.hideCellBorders();
+            track.getChildren().add(dummyCell);
+            if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
+                if(i == selectedTrackCellIndex){
+                    //to avoid having the same event being fired continuously while the mouse is above a roundtrack cell
+                    continue;
+                }
+                Event showMultipleDice = new CustomGuiEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+                dummyCell.setOnMouseEntered(e -> dummyCell.fireEvent(showMultipleDice));
+            }
+        }
+        return track;
+    }
 
-
-    public VBox buildMenuButtons(ClientFSMState turnState) {
+    private VBox buildMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button("end turn");
         Button back = new Button("back");
         endTurn.setId("game-button");
@@ -258,7 +386,7 @@ public class GUIutil {
     }
 
 
-    public VBox drawCards(LightBoard board, double cellDim, ClientFSMState turnState) {
+    private VBox drawCards(LightBoard board, double cellDim, ClientFSMState turnState) {
         Button priv = new Button(uimsg.getMessage(UIMsg.PRIVATE_OBJ).replaceFirst(":",""));
         Button pub = new Button(uimsg.getMessage(UIMsg.PUBLIC_OBJ).replaceFirst(":",""));
         Button tool = new Button(uimsg.getMessage(UIMsg.TOOLS).replaceFirst(":",""));
@@ -351,51 +479,6 @@ public class GUIutil {
         return imgRect;
     }
 
-    public StackPane buildWaitingForGameStartScene() {
-        String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
-        Label waitingText = new Label(message);
-        waitingText.setId("lobby-message");
-        StackPane stackPane = new StackPane(waitingText);
-        stackPane.setStyle(IMG_WALL_PNG);
-        return stackPane;
-    }
-
-    public BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board,ClientFSMState turnState){
-        double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
-        List <List<LightDie>>       roundTrack = board.getRoundTrack();
-        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
-
-        BorderPane backPane = new BorderPane();
-        HBox d1 = buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack);
-        HBox d2 = buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList);
-        VBox vbox =new VBox(d1,d2);
-        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-        vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
-        backPane.setTop(vbox);
-        vbox.setAlignment(TOP_LEFT);
-        backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);");
-        return backPane;
-    }
-
-    public HBox getPlayersStatusBar(int showingPlayerId, LightBoard board) {
-        HBox playerSelector = new HBox();
-        for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
-            Button playerStatusBar = getPlayerStatusButton(playerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
-            playerSelector.getChildren().add(playerStatusBar);
-            if( playerId == showingPlayerId){
-                continue;
-            }else if(playerId == board.getMyPlayerId()){
-                Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseExited));
-            }else{
-                Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
-                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
-            }
-            playerSelector.setAlignment(Pos.BOTTOM_LEFT);
-        }
-        return playerSelector;
-    }
-
     public BorderPane buildSelectdPlayerPane(int showingPlayerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
         HBox playersSelector = getPlayersStatusBar(showingPlayerId,board);
@@ -417,6 +500,27 @@ public class GUIutil {
         schemaContainer.setAlignment(Pos.CENTER);
         return selectedPlayerPane;
     }
+
+
+    private HBox getPlayersStatusBar(int showingPlayerId, LightBoard board) {
+        HBox playerSelector = new HBox();
+        for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
+            Button playerStatusBar = getPlayerStatusButton(playerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
+            playerSelector.getChildren().add(playerStatusBar);
+            if( playerId == showingPlayerId){
+                continue;
+            }else if(playerId == board.getMyPlayerId()){
+                Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
+                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseExited));
+            }else{
+                Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
+                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
+            }
+            playerSelector.setAlignment(Pos.BOTTOM_LEFT);
+        }
+        return playerSelector;
+    }
+
 
     private Button getPlayerStatusButton(int playerId, String username, LightPlayerStatus status, int nowPlaying){
         Button player = new Button(username);
@@ -453,7 +557,15 @@ public class GUIutil {
         return selectDiePane;
     }
 
-    public List<DieContainer> getRoundTrackCells(List<List<LightDie>> roundTrack, double cellDim) {
+    private HBox buildRoundTrack(List<DieContainer> roundTrackCells) {
+        HBox track = new HBox();
+        track.setSpacing(ROUNDTRACK_SPACING);
+        track.getChildren().addAll(roundTrackCells);
+        track.setAlignment(TOP_LEFT);
+        return track;
+    }
+
+    private List<DieContainer> getRoundTrackCells(List<List<LightDie>> roundTrack, double cellDim) {
         ArrayList<DieContainer> roundTrackCells = new ArrayList<>();
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             DieContainer cell = new DieContainer(i, cellDim);
@@ -474,7 +586,7 @@ public class GUIutil {
         return roundTrackCells;
     }
 
-    public List<DieContainer> getSchemaCells(LightSchemaCard lightSchemaCard, double cellDim) {
+    private List<DieContainer> getSchemaCells(LightSchemaCard lightSchemaCard, double cellDim) {
         ArrayList<DieContainer> gridCells = new ArrayList<>();
         for (int i = 0; i < NUM_COLS * NUM_ROWS; i++) {
             DieContainer cell = new DieContainer(cellDim,Place.SCHEMA);
@@ -491,7 +603,19 @@ public class GUIutil {
         return gridCells;
     }
 
-    public List<DieContainer> getDraftPoolCells(List<LightDie> draftPool, double cellDim) {
+
+    //todo update
+    private Group buildSchema(List<DieContainer> gridCells, int favortokens, double cellDim) {
+        GridPane grid = schemaToGrid(gridCells);
+        Label favorTokens = new Label(uimsg.getMessage(REMAINING_TOKENS)+" "+CLIUtils.replicate(CLIUtils.FAVOR,favortokens));
+        favorTokens.setId("favor-tokens");
+        VBox schema =new VBox(favorTokens,new Group(grid));
+        schema.setId("player-schema");
+        favorTokens.prefWidthProperty().bind(grid.widthProperty());
+        return new Group (schema);
+    }
+
+    private List<DieContainer> getDraftPoolCells(List<LightDie> draftPool, double cellDim) {
          ArrayList<DieContainer> poolDice = new ArrayList<>();
         for (LightDie draftPoolDice : draftPool) {
             DieContainer cell = new DieContainer(cellDim, Place.DRAFTPOOL);
@@ -500,15 +624,9 @@ public class GUIutil {
         }
         return poolDice;
     }
-    public HBox buildRoundTrack(List<DieContainer> roundTrackCells) {
-        HBox track = new HBox();
-        track.setSpacing(ROUNDTRACK_SPACING);
-        track.getChildren().addAll(roundTrackCells);
-        track.setAlignment(TOP_LEFT);
-        return track;
-    }
 
-    public GridPane buildDraftPool(List<DieContainer> poolDice) {
+
+    private GridPane buildDraftPool(List<DieContainer> poolDice) {
         GridPane pool = new GridPane();
         int i = 0;
         int coloumnIndex = NUM_COLS;
@@ -529,16 +647,6 @@ public class GUIutil {
 
     }
 
-    //todo update
-    public Group buildSchema(List<DieContainer> gridCells, int favortokens, double cellDim) {
-        GridPane grid = schemaToGrid(gridCells);
-        Label favorTokens = new Label(uimsg.getMessage(REMAINING_TOKENS)+" "+CLIUtils.replicate(CLIUtils.FAVOR,favortokens));
-        favorTokens.setId("favor-tokens");
-        VBox schema =new VBox(favorTokens,new Group(grid));
-        schema.setId("player-schema");
-        favorTokens.prefWidthProperty().bind(grid.widthProperty());
-        return new Group (schema);
-    }
 
     private GridPane schemaToGrid(List<DieContainer> gridCells) {
         GridPane grid = new GridPane();
@@ -552,9 +660,9 @@ public class GUIutil {
         return grid;
     }
 
-    public void addActionListeners(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board) {
+    private void addActionListeners(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board) {
         switch (turnState){
-            case CHOOSE_SCHEMA: //todo remve empty declarations
+            case CHOOSE_SCHEMA:
                 break;
             case SCHEMA_CHOSEN:
                 break;
@@ -667,101 +775,6 @@ public class GUIutil {
         }
     }
 
-    private double getDraftedSchemasCellDim(double newWidth, double newHeight) {
-        double cellDim;
-        double sceneRatio = newWidth / newHeight;
-        if (sceneRatio >= LOBBY_SCENE_RATIO) {
-            cellDim = newHeight* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT;
-        } else {
-            cellDim = newWidth* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH;
-        }
-        return cellDim;
-    }
-
-    public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj lightPrivObj, double newWidth, double newHeight){
-        double cellDim = getDraftedSchemasCellDim(newWidth,newHeight);
-        double spacing = DRAFTED_SCHEMAS_SPACING_TO_CELL*cellDim;
-
-        BorderPane draftedSchemasPane = new BorderPane();
-        draftedSchemasPane.setStyle(IMG_WALL_PNG);
-
-        GridPane schemasGrid = new GridPane();
-        for(int i = 0; i < 2; i++){
-            for(int j = 0; j < 2; j++){
-                int schemaIndex =i*2+j;
-                Group completeSchema = buildDreftedSchema(draftedSchemas.get(schemaIndex),cellDim);
-                schemasGrid.add(completeSchema,j,i);
-                completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
-            }
-        }
-        schemasGrid.setVgap(spacing);
-        schemasGrid.setHgap(spacing);
-        StackPane privObj = new StackPane(drawCard(lightPrivObj, PRIVOBJ_W_TO_CELL_DIM*cellDim, PRIVOBJ_W_TO_CELL_DIM*cellDim/PRIVATE_OBJ_RATIO));
-        privObj.setPadding(new Insets(0,0,0,spacing));
-        StackPane cardsContainer = new StackPane(new Group(new HBox(schemasGrid, privObj)));
-        cardsContainer.setAlignment(CENTER);
-        draftedSchemasPane.setCenter(cardsContainer);
-
-        Label selectSchemaText = new Label(uimsg.getMessage(CHOOSE_SCHEMA_2));
-        selectSchemaText.setId("drafted-message");
-        selectSchemaText.setAlignment(CENTER);
-        selectSchemaText.setMinWidth(newWidth);
-        selectSchemaText.setFont(Font.font(FONT, DRAFTED_SCHEMAS_TEXT_TO_CELL*cellDim));
-        draftedSchemasPane.setTop(new StackPane(selectSchemaText));
-
-        return draftedSchemasPane ;
-    }
-
-    private Group buildDreftedSchema(LightSchemaCard lightSchemaCard, double cellDim) {
-        double schemaWidth = cellDim*SCHEMA_W_TO_CELL;
-        double schemaHeight = cellDim*SCHEMA_H_TO_CELL;
-        double nameLabelSize = SCHEMA_LABEL_TO_CELL_DIM*cellDim;
-        double arcCurvature = SCHEMA_ARC_TO_WIDTH * schemaWidth;
-
-        Canvas schemaBlackBorders = new Canvas(schemaWidth,schemaHeight);
-        GraphicsContext gc = schemaBlackBorders.getGraphicsContext2D();
-        gc.setFill(Color.BLACK);
-        gc.fillRoundRect(0, 0, schemaWidth, schemaHeight, arcCurvature, arcCurvature);
-        double x = schemaWidth / 2;
-        double y = TEXT_HEIGHT_TO_SCHEMA_H * schemaHeight;
-        drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
-        drawFavorTokens(gc, 0, y, schemaWidth, lightSchemaCard);
-
-        Rectangle backgroundRect = new Rectangle(0,0,schemaWidth,schemaHeight);
-        backgroundRect.setArcWidth(arcCurvature);
-        backgroundRect.setArcHeight(arcCurvature);
-        backgroundRect.setFill(Color.BLACK);
-
-        Group g = new Group(schemaToGrid(getSchemaCells(lightSchemaCard,cellDim)));
-        Rectangle spacer = new Rectangle(nameLabelSize,nameLabelSize);
-        spacer.setVisible(false);
-        Group cells = new Group(new VBox(g, spacer));
-        Group completeSchema = new Group(new StackPane(schemaBlackBorders,cells));
-        completeSchema.setId("drafted-schemas");
-
-        return new Group(new StackPane(backgroundRect,completeSchema));
-    }
-
-    private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
-        int favorTokens = lightSchemaCard.getFavorTokens();
-        double favTokDiameter = schemaWidth * FAVOR_DIAM_TO_SCHEMA_W;
-        x = x + FAVOR_POS_TO_SCHEMA_W * schemaWidth;
-        for (int i = 0; i < favorTokens; i++) {
-            gc.setFill(Color.WHITE);
-            gc.fillOval(x, y + favTokDiameter / 3, favTokDiameter, favTokDiameter);
-            x = x - favTokDiameter - favTokDiameter / 10;
-        }
-
-    }
-
-    private void drawSchemaText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
-        double textSize = TEXT_DIM_TO_SCHEMA_W * schemaWidth;
-        gc.setFont(Font.font(FONT, textSize));
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.setTextBaseline(VPos.TOP);
-        gc.setFill(Color.AZURE);
-        gc.fillText(lightSchemaCard.getName(), x, y);
-    }
 
     public BorderPane buildGameEndedPane(double newWidth, double newHeight, List<LightPlayer> players) {
         double fontDim = getMainSceneCellDim(newWidth,newHeight)*GAME_END_TEXT_TO_CELL;
@@ -796,13 +809,6 @@ public class GUIutil {
         containerPane.setCenter(v);
         containerPane.setStyle(IMG_WALL_PNG);
         return containerPane;
-    }
-
-    public Scene buildConnecionBrokenScene() {
-        Text connectionBrokeMessage = new Text(uimsg.getMessage(BROKEN_CONNECTION));
-        connectionBrokeMessage.setFont(new Font(FONT, screenWidth *CONN_BROKEN_FONT_TO_SCREEN));
-        StackPane layout = new StackPane(connectionBrokeMessage);
-        return new Scene(layout);
     }
 
 }
