@@ -142,6 +142,10 @@ public class CLIObjects {
     }
 
 
+    /**
+     * prints the screen of game end with the ranking
+     * @return the string that represents this
+     */
     public  String printGameEndScreen(){
 
         StringBuilder builder=new StringBuilder(resetScreenPosition());
@@ -153,6 +157,9 @@ public class CLIObjects {
         return latestScreen;
     }
 
+    /**
+     * @return the built game ranking
+     */
     private List<String> buildGameRanking() {
         return gameRanking;
     }
@@ -181,7 +188,10 @@ public class CLIObjects {
         }
     }
 
-
+    /**
+     * this constructs the representation for a private objective
+     * @param priv the private objective
+     */
     public  void updatePrivObj(LightPrivObj priv){
         this.privObj=buildPrivObj(priv,OBJ_LENGTH);
     }
@@ -281,16 +291,29 @@ public class CLIObjects {
                 uiMsg.getMessage(ROUND),
                 roundNumber+1);
     }
+
+    /**
+     * this updates the string that tells if it's the first turn or not
+     * @param isFirstTurn true if so
+     */
     public void updateIsFirstTurn(boolean isFirstTurn){
         this.isFirstTurn=isFirstTurn?
                 uiMsg.getMessage(FIRST_TURN):
                 uiMsg.getMessage(SECOND_TURN);
     }
 
+    /**
+     * this builds a string containing the round's info
+     * @return said string
+     */
     private String buildTurnRoundInfo(){
         return String.format(cliFormatter.getElem(ROUND_TURN),roundinfo,isFirstTurn);
     }
 
+    /**
+     * updates info about the playing user
+     * @param nowPlaying the id of the player whose turn is now
+     */
     public void updateNowPlaying(int nowPlaying) {
         List<String> updateSchema;
         updateSchema=schemas.get(nowPlaying);
@@ -314,7 +337,11 @@ public class CLIObjects {
 
     }
 
-    public  void updateGameRanking(List<LightPlayer> players){
+    /**
+     * this builds the ranking for a game
+     * @param players the list of players
+     */
+    public  void updateGameRanking(List<LightPlayer> players){ // TODO: 07/07/2018 enrich
         gameRanking.clear();
         gameRanking.add(EMPTY_STRING);
         gameRanking.add(uiMsg.getMessage(GAME_END));
@@ -353,7 +380,7 @@ public class CLIObjects {
     /**
      * this builds the prompt according to the state of the client
      * @param state the client's state
-     * @param latestDiePlace
+     * @param latestDiePlace the place in the board the latest selected die comes from
      * @return the prompt line
      */
     private String getPrompt(ClientFSMState state, Place latestDiePlace) {
@@ -458,6 +485,9 @@ public class CLIObjects {
         fillMenu();
     }
 
+    /**
+     * this cleans the menu area
+     */
     private  void clearMenu() {
         menuList.clear();
     }

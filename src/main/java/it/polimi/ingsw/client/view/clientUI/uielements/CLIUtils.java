@@ -4,12 +4,14 @@ import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.model.SchemaCard;
+
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static it.polimi.ingsw.client.view.clientUI.uielements.CLIObjects.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats.*;
-import static it.polimi.ingsw.common.enums.ErrMsg.*;
 
 /**
  * This class contains all utility methods for the cliview class. All methods here are static
@@ -33,6 +35,12 @@ public class CLIUtils {
     private static final String ESCAPE="\\u001B\\[([0-9]|([0-9][0-9]))m";
 
     private static final String GREY = "\u001b[37m";
+    private static final String CMD = "cmd";
+    private static final String C = "/c";
+    private static final String CLS = "cls";
+    private static final String IS_NULL = "is null" ;
+    private static final String INVALID_NEGATIVE_PARAM = "parameter is invalidly negative";
+    private static final String LONGER_THAN_EXPECTED = "already longer than length:";
 
     static CLIFormatter cliFormatter;
 
@@ -46,6 +54,11 @@ public class CLIUtils {
 
     private CLIUtils(){}
 
+    /**
+     * this computes the length of a string based on the number of characters that can actually be printed to screen
+     * @param line the line to calculate the length of
+     * @return the length of the line
+     */
     static int printableLength(String line){
         String[] chars=line.split(ESCAPE);
         int length=0;
@@ -55,6 +68,11 @@ public class CLIUtils {
         return length;
     }
 
+    /**
+     * this prints n bullets to represent the favor tokens
+     * @param tokens the number of tokens to print
+     * @return the string containing the favors
+     */
     static String printFavorTokens(int tokens){
         return replicate(FAVOR,tokens);
     }
@@ -62,15 +80,15 @@ public class CLIUtils {
     /**
      * this method is used to clean the screen and to make sure the lines of the page are printed starting from the top of the screen
      */
-    public synchronized static  String resetScreenPosition() {
+    public static synchronized   String resetScreenPosition() {
 
 
         if(Client.isWindows()){
             try {
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+                new ProcessBuilder(CMD, C, CLS).inheritIO().start().waitFor();
             } catch (InterruptedException | IOException e) {
-                System.err.println(ERR+CLS_COMMAND_ERR.toString());
-                System.exit(2);
+                Logger.getGlobal().log(Level.INFO,e.getMessage());
+                System.exit(1);
             }
             return "";
         }
@@ -78,7 +96,11 @@ public class CLIUtils {
         return SCREEN_CLEAR;
     }
 
-
+    /**
+     * this builds a representation for the dice list of a small die
+     * @param die the die to be represented
+     * @return the representation of the die
+     */
     static String buildSmallDie(CellContent die){
         if(die==null || !die.isDie()){
             throw new IllegalArgumentException();
@@ -367,15 +389,29 @@ public class CLIUtils {
     }
 
 
-
+    /**
+     * this changes the color of a line to grey
+     * @param line the line
+     * @return the greyed out line
+     */
     static String greyLine(String line){
         return GREY+removeColor(line)+DieColor.NONE.getUtf();
     }
 
+    /**
+     * this removes the colors from a line
+     * @param line the line
+     * @return the line without colors
+     */
     private static String removeColor(String line) {
         return line.replaceAll(ESCAPE,EMPTY_STRING);
     }
 
+    /**
+     * this greyes out a list of strings
+     * @param lines the strings
+     * @return the greyed out strings
+     */
     static List<String> greyLines(List<String> lines){
         List<String> result= new ArrayList<>();
         for(String line : lines){
@@ -406,7 +442,7 @@ public class CLIUtils {
      * @return the padded string
      */
     static String padUntil(String toPad, int finalLength, char filler){
-        if(finalLength<0){throw new IllegalArgumentException(INVALID_NEGATIVE_PARAM.toString());}
+        if(finalLength<0){throw new IllegalArgumentException(INVALID_NEGATIVE_PARAM);}
         if(toPad==null){throw new IllegalArgumentException("toPad"+ IS_NULL);}
         if(printableLength(toPad)>finalLength){throw new IllegalArgumentException(LONGER_THAN_EXPECTED+toPad);}
 
@@ -445,10 +481,16 @@ public class CLIUtils {
     }
 
 
-    static List<String> fitInWidth(List<String> lines, int length){
+    /**
+     * this fits the lines in certain width
+     * @param lines the lines
+     * @param width the width
+     * @return the fitted lines
+     */
+    static List<String> fitInWidth(List<String> lines, int width){
         List<String> result= new ArrayList<>();
         for (int line=0; line<lines.size();line++){
-            result.addAll(fitInWidth(lines.get(line),length));
+            result.addAll(fitInWidth(lines.get(line),width));
         }
         return result;
     }
@@ -474,7 +516,7 @@ public class CLIUtils {
      * @param dieColor the dieColor to apply
      * @return the colored string
      */
-    public static String addColorToLine(String line, DieColor dieColor){
+    static String addColorToLine(String line, DieColor dieColor){
         return dieColor.getUtf()+line+DieColor.NONE.getUtf();
     }
 

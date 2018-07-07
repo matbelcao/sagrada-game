@@ -42,12 +42,13 @@ public class GUIutil {
     private double screenWidth;
     private double screenHeight;
 
+    //ratio is width/height
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
     private static final double NUM_OF_TOOLS = 3;
     private static final int ROUNDTRACK_SIZE = 10;
     private static final String FONT = "Sans-Serif";
-    private static final String IMG_WALL_PNG = "-fx-background-image: url('img/wall.png');";
+
     //-----login Stage
     private static final double LOGIN_TO_SCREEN_RATIO = 0.25;
     private static final double LOGIN_RATIO = 0.663;
@@ -71,6 +72,7 @@ public class GUIutil {
     private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH = 0.05488;
     private static final double DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT = 0.0809;
     private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
+
     //Main game scene
     private static final double MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH = 0.8265;
     private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.121;
@@ -80,8 +82,7 @@ public class GUIutil {
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.6;
     private static final double ROUNDTRACK_SPACING = 5;
     private static final double FAVOR_TO_TOOL_W = 0.13;
-    //Game End
-    private static final double GAME_END_TEXT_TO_CELL =0.625 ;
+
     //Connection Broken
     private static final double CONN_BROKEN_FONT_TO_SCREEN = 0.018;
 
@@ -98,23 +99,35 @@ public class GUIutil {
 
     public double getStageY() { return (screenHeight -getGameSceneMinHeight())/2;}
 
-    public double getLoginWidth() { return screenWidth * LOGIN_TO_SCREEN_RATIO; }
+    public double getLoginWidth() {
+        return screenWidth * LOGIN_TO_SCREEN_RATIO;
+    }
 
-    public double getLoginHeight() { return getLoginWidth() / LOGIN_RATIO; }
+    public double getLoginHeight() {
+        return getLoginWidth() / LOGIN_RATIO;
+    }
 
-    public double getLobbyMinHeight() { return getLobbyMinWidth() / LOBBY_SCENE_RATIO; }
+    public double getLobbyMinHeight() {
+        return getLobbyMinWidth() / LOBBY_SCENE_RATIO;
+    }
 
-    public double getLobbyMinWidth() { return LOBBY_SCENE_W_TO_SCREEN_RATIO * screenWidth; }
+    public double getLobbyMinWidth() {
+        return LOBBY_SCENE_W_TO_SCREEN_RATIO * screenWidth;
+    }
 
-    public double getGameSceneMinWidth(){ return MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH* screenWidth; }
+    public double getGameSceneMinWidth(){
+        return MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH* screenWidth;
+    }
 
-    public double getGameSceneMinHeight(){ return (getGameSceneMinWidth()/MAIN_GAME_SCENE_RATIO); }
+    public double getGameSceneMinHeight(){
+        return (getGameSceneMinWidth()/MAIN_GAME_SCENE_RATIO);
+    }
 
     private double getCardWidth(double cellDim) { return cellDim*CARD_WIDTH_TO_CELL_DIM; }
 
     private double getCardHeight(double cellDim) { return cellDim*CARD_HEIGHT_TO_CELL_DIM; }
 
-    private double getMainSceneCellDim(double newWidth, double newHeight) {
+    public double getMainSceneCellDim(double newWidth, double newHeight) {
         double cellDim;
         double sceneRatio = newWidth / newHeight;
         if (sceneRatio >= MAIN_GAME_SCENE_RATIO) {
@@ -127,177 +140,33 @@ public class GUIutil {
 
     public StackPane buildLobbyPane(int numUsers) {
         StackPane p = new StackPane();
-        p.setStyle(IMG_WALL_PNG);
+        p.setStyle("-fx-background-image: url('img/wall.png');");
         Label lobbyLabel = new Label(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
         lobbyLabel.setId("lobby-message");
         p.getChildren().add(lobbyLabel);
         return new StackPane(p);
     }
 
-
-    public Scene buildConnecionBrokenScene() {
-        Text connectionBrokeMessage = new Text(uimsg.getMessage(BROKEN_CONNECTION));
-        connectionBrokeMessage.setFont(new Font(FONT, screenWidth *CONN_BROKEN_FONT_TO_SCREEN));
-        StackPane layout = new StackPane(connectionBrokeMessage);
-        return new Scene(layout);
-    }
-
-    public StackPane buildWaitingForGameStartScene() {
-        String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
-        Label waitingText = new Label(message);
-        waitingText.setId("lobby-message");
-        StackPane stackPane = new StackPane(waitingText);
-        stackPane.setStyle(IMG_WALL_PNG);
-        return stackPane;
-    }
-
-    private double getDraftedSchemasCellDim(double newWidth, double newHeight) {
-        double cellDim;
-        double sceneRatio = newWidth / newHeight;
-        if (sceneRatio >= LOBBY_SCENE_RATIO) {
-            cellDim = newHeight* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT;
-        } else {
-            cellDim = newWidth* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH;
-        }
-        return cellDim;
-    }
-
-    public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj lightPrivObj, double newWidth, double newHeight){
-        double cellDim = getDraftedSchemasCellDim(newWidth,newHeight);
-        double spacing = DRAFTED_SCHEMAS_SPACING_TO_CELL*cellDim;
-
-        BorderPane draftedSchemasPane = new BorderPane();
-        draftedSchemasPane.setStyle(IMG_WALL_PNG);
-
-        GridPane schemasGrid = new GridPane();
-        for(int i = 0; i < 2; i++){
-            for(int j = 0; j < 2; j++){
-                int schemaIndex =i*2+j;
-                Group completeSchema = buildDreftedSchema(draftedSchemas.get(schemaIndex),cellDim);
-                schemasGrid.add(completeSchema,j,i);
-                completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
+    private HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
+        HBox track = new HBox();
+        track.setSpacing(ROUNDTRACK_SPACING);
+        for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
+            DieContainer dummyCell = new DieContainer(cellDim);
+            dummyCell.hideCellBorders();
+            track.getChildren().add(dummyCell);
+            if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
+                if(i == selectedTrackCellIndex){
+                    //to avoid having the same event being fired continuously while the mouse is above a roundtrack cell
+                    continue;
+                }
+               Event showMultipleDice = new CustomGuiEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
+                dummyCell.setOnMouseEntered(e -> {
+                    dummyCell.fireEvent(showMultipleDice);
+                });
             }
         }
-        schemasGrid.setVgap(spacing);
-        schemasGrid.setHgap(spacing);
-        StackPane privObj = new StackPane(drawCard(lightPrivObj, PRIVOBJ_W_TO_CELL_DIM*cellDim, PRIVOBJ_W_TO_CELL_DIM*cellDim/PRIVATE_OBJ_RATIO));
-        privObj.setPadding(new Insets(0,0,0,spacing));
-        StackPane cardsContainer = new StackPane(new Group(new HBox(schemasGrid, privObj)));
-        cardsContainer.setAlignment(CENTER);
-        draftedSchemasPane.setCenter(cardsContainer);
-
-        Label selectSchemaText = new Label(uimsg.getMessage(CHOOSE_SCHEMA_2));
-        selectSchemaText.setId("drafted-message");
-        selectSchemaText.setAlignment(CENTER);
-        selectSchemaText.setMinWidth(newWidth);
-        selectSchemaText.setFont(Font.font(FONT, DRAFTED_SCHEMAS_TEXT_TO_CELL*cellDim));
-        draftedSchemasPane.setTop(new StackPane(selectSchemaText));
-
-        return draftedSchemasPane ;
+        return track;
     }
-
-    private Group buildDreftedSchema(LightSchemaCard lightSchemaCard, double cellDim) {
-        double schemaWidth = cellDim*SCHEMA_W_TO_CELL;
-        double schemaHeight = cellDim*SCHEMA_H_TO_CELL;
-        double nameLabelSize = SCHEMA_LABEL_TO_CELL_DIM*cellDim;
-        double arcCurvature = SCHEMA_ARC_TO_WIDTH * schemaWidth;
-
-        Canvas schemaBlackBorders = new Canvas(schemaWidth,schemaHeight);
-        GraphicsContext gc = schemaBlackBorders.getGraphicsContext2D();
-        gc.setFill(Color.BLACK);
-        gc.fillRoundRect(0, 0, schemaWidth, schemaHeight, arcCurvature, arcCurvature);
-        double x = schemaWidth / 2;
-        double y = TEXT_HEIGHT_TO_SCHEMA_H * schemaHeight;
-        drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
-        drawFavorTokens(gc, 0, y, schemaWidth, lightSchemaCard);
-
-        Rectangle backgroundRect = new Rectangle(0,0,schemaWidth,schemaHeight);
-        backgroundRect.setArcWidth(arcCurvature);
-        backgroundRect.setArcHeight(arcCurvature);
-        backgroundRect.setFill(Color.BLACK);
-
-        Group g = new Group(schemaToGrid(getSchemaCells(lightSchemaCard,cellDim)));
-        Rectangle spacer = new Rectangle(nameLabelSize,nameLabelSize);
-        spacer.setVisible(false);
-        Group cells = new Group(new VBox(g, spacer));
-        Group completeSchema = new Group(new StackPane(schemaBlackBorders,cells));
-        completeSchema.setId("drafted-schemas");
-
-        return new Group(new StackPane(backgroundRect,completeSchema));
-    }
-
-    private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
-        int favorTokens = lightSchemaCard.getFavorTokens();
-        double favTokDiameter = schemaWidth * FAVOR_DIAM_TO_SCHEMA_W;
-        x = x + FAVOR_POS_TO_SCHEMA_W * schemaWidth;
-        for (int i = 0; i < favorTokens; i++) {
-            gc.setFill(Color.WHITE);
-            gc.fillOval(x, y + favTokDiameter / 3, favTokDiameter, favTokDiameter);
-            x = x - favTokDiameter - favTokDiameter / 10;
-        }
-
-    }
-
-    private void drawSchemaText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
-        double textSize = TEXT_DIM_TO_SCHEMA_W * schemaWidth;
-        gc.setFont(Font.font(FONT, textSize));
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.setTextBaseline(VPos.TOP);
-        gc.setFill(Color.AZURE);
-        gc.fillText(lightSchemaCard.getName(), x, y);
-    }
-
-
-    public BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board, ClientFSMState turnState){
-        double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
-        List <List<LightDie>>       roundTrackList = board.getRoundTrack();
-        List <LightDie> draftPool = board.getDraftPool();
-        LightSchemaCard             schemaCard = board.getPlayerById(board.getMyPlayerId()).getSchema();
-        int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
-
-        BorderPane frontPane = new BorderPane();
-
-        frontPane.setStyle("-fx-background-image: url('img/blue-wall.png')");
-
-        List<DieContainer> draftPoolCells = getDraftPoolCells(draftPool,cellDim);
-        List<DieContainer> schemaCells = getSchemaCells(schemaCard,cellDim);
-        List<DieContainer> roundTrackCells = getRoundTrackCells(roundTrackList,cellDim);
-        addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board);
-
-        //Top side of the border pane
-        HBox topSection = buildRoundTrack(roundTrackCells);
-        Region separator = new Region();
-        HBox.setHgrow(separator,Priority.ALWAYS);
-        VBox menuButtons = buildMenuButtons(turnState);
-        topSection.getChildren().addAll(separator,menuButtons);
-        topSection.setId("top-section");
-        frontPane.setTop(topSection);
-
-        //Center side of the border pane
-        Group schema = buildSchema(schemaCells,favorTokens,cellDim);
-        HBox playersStatusBar = getPlayersStatusBar(board.getMyPlayerId(),board);
-        StackPane schemaContainer = new StackPane(schema);
-        VBox.setVgrow(schemaContainer,Priority.ALWAYS);
-        frontPane.setCenter(new VBox(schemaContainer,playersStatusBar));
-
-        //Right side of the border pane
-        VBox cards = drawCards(board,cellDim,turnState);
-        StackPane cardsContainer = new StackPane(cards);
-        cards.setAlignment(CENTER);
-        GridPane draftpool = buildDraftPool(draftPoolCells);
-        VBox.setVgrow(cardsContainer,Priority.ALWAYS);
-        frontPane.setRight(new VBox(cardsContainer,draftpool));
-        return frontPane;
-    }
-
-    private int getMultipleDieTrackCellIndex(int index, List<List<LightDie>> roundTrack) {
-        int selectedCellindex = 0;
-        for (int j = 0; j < index; j++) {
-            selectedCellindex += roundTrack.get(j).size();
-        }
-        return selectedCellindex;
-    }
-
 
     private HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList) {
         HBox multipleDiceTrack = new HBox();
@@ -330,43 +199,17 @@ public class GUIutil {
         return multipleDiceTrack;
     }
 
-    public BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board,ClientFSMState turnState){
-        double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
-        List <List<LightDie>>       roundTrack = board.getRoundTrack();
-        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
-
-        BorderPane backPane = new BorderPane();
-        HBox d1 = buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack);
-        HBox d2 = buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList);
-        VBox vbox =new VBox(d1,d2);
-        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-        vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
-        backPane.setTop(vbox);
-        vbox.setAlignment(TOP_LEFT);
-        backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);");
-        return backPane;
-    }
-
-    private HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
-        HBox track = new HBox();
-        track.setSpacing(ROUNDTRACK_SPACING);
-        for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
-            DieContainer dummyCell = new DieContainer(cellDim);
-            dummyCell.hideCellBorders();
-            track.getChildren().add(dummyCell);
-            if (i < roundTrack.size() && roundTrack.get(i).size() > 1) {
-                if(i == selectedTrackCellIndex){
-                    //to avoid having the same event being fired continuously while the mouse is above a roundtrack cell
-                    continue;
-                }
-                Event showMultipleDice = new CustomGuiEvent(MOUSE_ENTERED_MULTIPLE_DICE_CELL, i);
-                dummyCell.setOnMouseEntered(e -> dummyCell.fireEvent(showMultipleDice));
-            }
+    private int getMultipleDieTrackCellIndex(int index, List<List<LightDie>> roundTrack) {
+        int selectedCellindex = 0;
+        for (int j = 0; j < index; j++) {
+            selectedCellindex += roundTrack.get(j).size();
         }
-        return track;
+        return selectedCellindex;
     }
 
-    private VBox buildMenuButtons(ClientFSMState turnState) {
+
+
+    public VBox buildMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button("end turn");
         Button back = new Button("back");
         endTurn.setId("game-button");
@@ -386,7 +229,7 @@ public class GUIutil {
     }
 
 
-    private VBox drawCards(LightBoard board, double cellDim, ClientFSMState turnState) {
+    public VBox drawCards(LightBoard board, double cellDim, ClientFSMState turnState) {
         Button priv = new Button(uimsg.getMessage(UIMsg.PRIVATE_OBJ).replaceFirst(":",""));
         Button pub = new Button(uimsg.getMessage(UIMsg.PUBLIC_OBJ).replaceFirst(":",""));
         Button tool = new Button(uimsg.getMessage(UIMsg.TOOLS).replaceFirst(":",""));
@@ -479,6 +322,53 @@ public class GUIutil {
         return imgRect;
     }
 
+    public StackPane buildWaitingForGameStartScene(double width, double height) { //todo make dynamic
+        String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
+        Label waitingText = new Label(message);
+        waitingText.setId("lobby-message");
+        StackPane stackPane = new StackPane(waitingText);
+        stackPane.setStyle("-fx-background-image: url('img/wall.png');");
+        return stackPane;
+    }
+
+    public BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board,ClientFSMState turnState){
+        double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
+        List <List<LightDie>>       roundTrack = board.getRoundTrack();
+        List <IndexedCellContent>   latestDiceList = board.getLatestDiceList();
+
+        BorderPane backPane = new BorderPane();
+        HBox d1 = buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack);
+        HBox d2 = buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList);
+        VBox vbox =new VBox(d1,d2);
+        //vbox.setSpacing(ROUNDTRACK_SPACING);
+        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
+        vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
+        backPane.setTop(vbox);
+        vbox.setAlignment(TOP_LEFT);
+        backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
+        return backPane;
+    }
+
+    public HBox getPlayersStatusBar(int showingPlayerId, LightBoard board) { //todo remove my player id
+        HBox playerSelector = new HBox();
+        for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
+            Button playerStatusBar = getPlayerStatusButton(playerId,showingPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
+            playerSelector.getChildren().add(playerStatusBar);
+            if( playerId == showingPlayerId){
+                continue;
+            }else if(playerId == board.getMyPlayerId()){
+                Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
+                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseExited));
+            }else{
+                Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
+                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
+            }
+            playerSelector.setAlignment(Pos.BOTTOM_LEFT);
+        }
+        return playerSelector;
+    }
+
+    //todo update
     public BorderPane buildSelectdPlayerPane(int showingPlayerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
         HBox playersSelector = getPlayersStatusBar(showingPlayerId,board);
@@ -495,36 +385,17 @@ public class GUIutil {
         StackPane schemaContainer = new StackPane(playerSchema);
         Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
         schemaContainer.setOnMouseExited(e->schemaContainer.fireEvent(mouseExited));
-        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112,0);");
+        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112,0);"); //todo hookup with css and make the same as the front pane background
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
         return selectedPlayerPane;
     }
 
-
-    private HBox getPlayersStatusBar(int showingPlayerId, LightBoard board) {
-        HBox playerSelector = new HBox();
-        for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
-            Button playerStatusBar = getPlayerStatusButton(playerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
-            playerSelector.getChildren().add(playerStatusBar);
-            if( playerId == showingPlayerId){
-                continue;
-            }else if(playerId == board.getMyPlayerId()){
-                Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseExited));
-            }else{
-                Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
-                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
-            }
-            playerSelector.setAlignment(Pos.BOTTOM_LEFT);
-        }
-        return playerSelector;
-    }
-
-
-    private Button getPlayerStatusButton(int playerId, String username, LightPlayerStatus status, int nowPlaying){
+    private Button getPlayerStatusButton(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
         Button player = new Button(username);
+        System.out.println(playerId +"   "+ nowPlaying);
         if(playerId == nowPlaying ){
+            System.out.println(playerId +"   "+ nowPlaying);
             player.setId("player-playing");
         }else if(status.equals(LightPlayerStatus.DISCONNECTED)){
             player.setId("player-disconnected");
@@ -536,6 +407,7 @@ public class GUIutil {
         return player;
     }
 
+    //todo add Text
     public BorderPane bulidSelectDiePane(double width, double height, LightBoard board) {
         BorderPane selectDiePane = new BorderPane();
         HBox optionBox = new HBox();
@@ -552,20 +424,12 @@ public class GUIutil {
             optionBox.getChildren().add(c);
         }
         optionBox.setAlignment(CENTER);
-        selectDiePane.setStyle("-fx-background-color: rgb(255,255,255,0.4);");
+        selectDiePane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
         selectDiePane.setCenter(new StackPane(optionBox));
         return selectDiePane;
     }
 
-    private HBox buildRoundTrack(List<DieContainer> roundTrackCells) {
-        HBox track = new HBox();
-        track.setSpacing(ROUNDTRACK_SPACING);
-        track.getChildren().addAll(roundTrackCells);
-        track.setAlignment(TOP_LEFT);
-        return track;
-    }
-
-    private List<DieContainer> getRoundTrackCells(List<List<LightDie>> roundTrack, double cellDim) {
+    public List<DieContainer> getRoundTrackCells(List<List<LightDie>> roundTrack, double cellDim) {
         ArrayList<DieContainer> roundTrackCells = new ArrayList<>();
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
             DieContainer cell = new DieContainer(i, cellDim);
@@ -586,7 +450,7 @@ public class GUIutil {
         return roundTrackCells;
     }
 
-    private List<DieContainer> getSchemaCells(LightSchemaCard lightSchemaCard, double cellDim) {
+    public List<DieContainer> getSchemaCells(LightSchemaCard lightSchemaCard, double cellDim) {
         ArrayList<DieContainer> gridCells = new ArrayList<>();
         for (int i = 0; i < NUM_COLS * NUM_ROWS; i++) {
             DieContainer cell = new DieContainer(cellDim);
@@ -603,19 +467,7 @@ public class GUIutil {
         return gridCells;
     }
 
-
-    //todo update
-    private Group buildSchema(List<DieContainer> gridCells, int favortokens, double cellDim) {
-        GridPane grid = schemaToGrid(gridCells);
-        Label favorTokens = new Label(uimsg.getMessage(REMAINING_TOKENS)+" "+CLIUtils.replicate(CLIUtils.FAVOR,favortokens));
-        favorTokens.setId("favor-tokens");
-        VBox schema =new VBox(favorTokens,new Group(grid));
-        schema.setId("player-schema");
-        favorTokens.prefWidthProperty().bind(grid.widthProperty());
-        return new Group (schema);
-    }
-
-    private List<DieContainer> getDraftPoolCells(List<LightDie> draftPool, double cellDim) {
+    public List<DieContainer> getDraftPoolCells(List<LightDie> draftPool, double cellDim) {
          ArrayList<DieContainer> poolDice = new ArrayList<>();
         for (LightDie draftPoolDice : draftPool) {
             DieContainer cell = new DieContainer(cellDim);
@@ -625,9 +477,15 @@ public class GUIutil {
         }
         return poolDice;
     }
+    public HBox buildRoundTrack(List<DieContainer> roundTrackCells) {
+        HBox track = new HBox();
+        track.setSpacing(ROUNDTRACK_SPACING);
+        track.getChildren().addAll(roundTrackCells);
+        track.setAlignment(TOP_LEFT);
+        return track;
+    }
 
-
-    private GridPane buildDraftPool(List<DieContainer> poolDice) {
+    public GridPane buildDraftPool(List<DieContainer> poolDice) {
         GridPane pool = new GridPane();
         int i = 0;
         int coloumnIndex = NUM_COLS;
@@ -648,6 +506,16 @@ public class GUIutil {
 
     }
 
+    //todo update
+    public Group buildSchema(List<DieContainer> gridCells, int favortokens, double cellDim) {
+        GridPane grid = schemaToGrid(gridCells);
+        Label favorTokens = new Label(uimsg.getMessage(REMAINING_TOKENS)+" "+CLIUtils.printFavorTokens(favortokens));
+        favorTokens.setId("favor-tokens");
+        VBox schema =new VBox(favorTokens,new Group(grid));
+        schema.setId("player-schema");
+        favorTokens.prefWidthProperty().bind(grid.widthProperty());
+        return new Group (schema);
+    }
 
     private GridPane schemaToGrid(List<DieContainer> gridCells) {
         GridPane grid = new GridPane();
@@ -661,9 +529,9 @@ public class GUIutil {
         return grid;
     }
 
-    private void addActionListeners(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board) {
+    public void addActionListeners(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board, double cellDim) {
         switch (turnState){
-            case CHOOSE_SCHEMA:
+            case CHOOSE_SCHEMA: //todo remve empty declarations
                 break;
             case SCHEMA_CHOSEN:
                 break;
@@ -699,7 +567,11 @@ public class GUIutil {
         }
         //latest dice list has dice
         if (latestDiceList.get(0).getPlace().equals(Place.SCHEMA)) {
-            addSelectDieInSchemaAction(schemaCells, latestDiceList);
+            for (IndexedCellContent activeCell : latestDiceList) {
+                DieContainer cell = schemaCells.get(activeCell.getPosition());
+                cell.highlightBlue();
+                cell.setOnMouseClicked(e -> cmdWrite.write(latestDiceList.indexOf(activeCell) + ""));
+            }
         } else if (latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)) {
             if (latestOptionsList.isEmpty() || (!latestOptionsList.get(0).equals(Actions.SET_SHADE) && !latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
                 for (IndexedCellContent activeCell : latestDiceList) {
@@ -709,26 +581,14 @@ public class GUIutil {
                 }
             }
         }else if (latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
-            addSelectDieInRoudTrackAction(roundTrackCells, roundTrack);
-        }
-    }
-
-    private void addSelectDieInRoudTrackAction(List<DieContainer> roundTrackCells, List<List<LightDie>> roundTrack) {
-        for (int i = 0; i < roundTrack.size(); i++) {
-            roundTrackCells.get(i).highlightBlue();
-            if (roundTrack.get(i).size() < 2) {
-                roundTrackCells.get(i).highlightOrange();
-                int finalI = i;
-                roundTrackCells.get(i).setOnMouseClicked(e -> cmdWrite.write(getMultipleDieTrackCellIndex(finalI, roundTrack) + ""));
+            for (int i = 0; i < roundTrack.size(); i++) {
+                roundTrackCells.get(i).highlightBlue();
+                if (roundTrack.get(i).size() < 2) {
+                    roundTrackCells.get(i).highlightOrange();
+                    int finalI = i;
+                    roundTrackCells.get(i).setOnMouseClicked(e -> cmdWrite.write(getMultipleDieTrackCellIndex(finalI, roundTrack) + ""));
+                }
             }
-        }
-    }
-
-    private void addSelectDieInSchemaAction(List<DieContainer> schemaCells, List<IndexedCellContent> latestDiceList) {
-        for (IndexedCellContent activeCell : latestDiceList) {
-            DieContainer cell = schemaCells.get(activeCell.getPosition());
-            cell.highlightBlue();
-            cell.setOnMouseClicked(e -> cmdWrite.write(latestDiceList.indexOf(activeCell) + ""));
         }
     }
 
@@ -736,11 +596,13 @@ public class GUIutil {
         IndexedCellContent latestSelectedDie = board.getLatestSelectedDie();
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<Integer> latestPlacementsList = board.getLatestPlacementsList();
-        List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         if (!latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)) {
-            //highlight all the cells where I can put a die and add listener on selection
-            activateChoosePlacemetCells(schemaCells, latestPlacementsList);
-
+            for (DieContainer cell : schemaCells) {
+                if (latestPlacementsList.contains(schemaCells.indexOf(cell))) {
+                    cell.highlightGreen();
+                    cell.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(cell)) + ""));
+                }
+            }
             if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
                 for (DieContainer cell : draftPoolCells) {
                     cell.setOnMouseClicked(e -> {
@@ -748,24 +610,6 @@ public class GUIutil {
                         cmdWrite.write(draftPoolCells.indexOf(cell) + "");
                     });
                 }
-            }else if(!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.SCHEMA)){
-                for(IndexedCellContent idexedSelectableCell : latestDiceList){
-                    DieContainer selectableCell = schemaCells.get(idexedSelectableCell.getPosition());
-                    selectableCell.highlightBlue();
-                    selectableCell.setOnMouseClicked(e->{
-                        cmdWrite.write("d");
-                        cmdWrite.write(latestDiceList.indexOf(idexedSelectableCell)+"");
-                    });
-                }
-            }
-        }
-    }
-
-    private void activateChoosePlacemetCells(List<DieContainer> schemaCells, List<Integer> latestPlacementsList) {
-        for (DieContainer cell : schemaCells) {
-            if (latestPlacementsList.contains(schemaCells.indexOf(cell))) {
-                cell.highlightGreen();
-                cell.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(cell)) + ""));
             }
         }
     }
@@ -776,11 +620,106 @@ public class GUIutil {
         }
     }
 
+    private double getDraftedSchemasCellDim(double newWidth, double newHeight) {
+        double cellDim;
+        double sceneRatio = newWidth / newHeight;
+        if (sceneRatio >= LOBBY_SCENE_RATIO) {
+            cellDim = newHeight* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_HEIGHT;
+        } else {
+            cellDim = newWidth* DRAFTED_SCHEMAS_CELL_DIM_TO_SCENE_WIDTH;
+        }
+        return cellDim;
+    }
+
+    public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj lightPrivObj, double newWidth, double newHeight){
+        double cellDim = getDraftedSchemasCellDim(newWidth,newHeight);
+        double spacing = DRAFTED_SCHEMAS_SPACING_TO_CELL*cellDim;
+
+        BorderPane draftedSchemasPane = new BorderPane();
+        draftedSchemasPane.setStyle("-fx-background-image: url('img/wall.png');");
+
+        GridPane schemasGrid = new GridPane();
+        for(int i = 0; i < 2; i++){
+            for(int j = 0; j < 2; j++){
+                int schemaIndex =i*2+j;
+                Group completeSchema = buildDreftedSchema(draftedSchemas.get(schemaIndex),cellDim);
+                schemasGrid.add(completeSchema,j,i);
+                completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
+            }
+        }
+        schemasGrid.setVgap(spacing);
+        schemasGrid.setHgap(spacing);
+        StackPane privObj = new StackPane(drawCard(lightPrivObj, PRIVOBJ_W_TO_CELL_DIM*cellDim, PRIVOBJ_W_TO_CELL_DIM*cellDim/PRIVATE_OBJ_RATIO));
+        privObj.setPadding(new Insets(0,0,0,spacing));
+        StackPane cardsContainer = new StackPane(new Group(new HBox(schemasGrid, privObj)));
+        cardsContainer.setAlignment(CENTER);
+        draftedSchemasPane.setCenter(cardsContainer);
+
+        Label selectSchemaText = new Label(uimsg.getMessage(CHOOSE_SCHEMA_2));
+        selectSchemaText.setId("drafted-message");
+        selectSchemaText.setAlignment(CENTER);
+        selectSchemaText.setMinWidth(newWidth);
+        selectSchemaText.setFont(Font.font(FONT, DRAFTED_SCHEMAS_TEXT_TO_CELL*cellDim));
+        draftedSchemasPane.setTop(new StackPane(selectSchemaText));
+
+        return draftedSchemasPane ;
+    }
+
+    private Group buildDreftedSchema(LightSchemaCard lightSchemaCard, double cellDim) {
+        double schemaWidth = cellDim*SCHEMA_W_TO_CELL;
+        double schemaHeight = cellDim*SCHEMA_H_TO_CELL;
+        double nameLabelSize = SCHEMA_LABEL_TO_CELL_DIM*cellDim;
+        double arcCurvature = SCHEMA_ARC_TO_WIDTH * schemaWidth;
+
+        Canvas schemaBlackBorders = new Canvas(schemaWidth,schemaHeight);
+        GraphicsContext gc = schemaBlackBorders.getGraphicsContext2D();
+        gc.setFill(Color.BLACK);
+        gc.fillRoundRect(0, 0, schemaWidth, schemaHeight, arcCurvature, arcCurvature);
+        double x = schemaWidth / 2;
+        double y = TEXT_HEIGHT_TO_SCHEMA_H * schemaHeight;
+        drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
+        drawFavorTokens(gc, 0, y, schemaWidth, lightSchemaCard);
+
+        Rectangle backgroundRect = new Rectangle(0,0,schemaWidth,schemaHeight);
+        backgroundRect.setArcWidth(arcCurvature);
+        backgroundRect.setArcHeight(arcCurvature);
+        backgroundRect.setFill(Color.BLACK);
+
+        Group g = new Group(schemaToGrid(getSchemaCells(lightSchemaCard,cellDim)));
+        Rectangle spacer = new Rectangle(nameLabelSize,nameLabelSize);
+        spacer.setVisible(false);
+        Group cells = new Group(new VBox(g, spacer));
+        Group completeSchema = new Group(new StackPane(schemaBlackBorders,cells));
+        completeSchema.setId("drafted-schemas");
+
+        return new Group(new StackPane(backgroundRect,completeSchema));
+    }
+
+    private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
+        int favorTokens = lightSchemaCard.getFavorTokens();
+        double favTokDiameter = schemaWidth * FAVOR_DIAM_TO_SCHEMA_W;
+        x = x + FAVOR_POS_TO_SCHEMA_W * schemaWidth;
+        for (int i = 0; i < favorTokens; i++) {
+            gc.setFill(Color.WHITE);
+            gc.fillOval(x, y + favTokDiameter / 3, favTokDiameter, favTokDiameter);
+            x = x - favTokDiameter - favTokDiameter / 10;
+        }
+
+    }
+
+    private void drawSchemaText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
+        double textSize = TEXT_DIM_TO_SCHEMA_W * schemaWidth;
+        gc.setFont(Font.font(FONT, textSize));
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.TOP);
+        gc.setFill(Color.AZURE);
+        gc.fillText(lightSchemaCard.getName(), x, y);
+    }
 
     public BorderPane buildGameEndedPane(double newWidth, double newHeight, List<LightPlayer> players) {
-        double fontDim = getMainSceneCellDim(newWidth,newHeight)*GAME_END_TEXT_TO_CELL;
         Label scoreLabel = new Label(uimsg.getMessage(GAME_END));
-        scoreLabel.setFont(Font.font(FONT, fontDim*1.1));
+        //scoreLabel.setAlignment(CENTER);
+        scoreLabel.setFont(Font.font(FONT, 60)); //TODO dynamic
 
         GridPane scoreBoard = new GridPane();
         scoreBoard.setHgap(10);
@@ -790,8 +729,8 @@ public class GUIutil {
         for(int i = 0; i < players.size();i++){
             Label name = new Label(players.get(i).getUsername());
             Label points = new Label(players.get(i).getPoints()+"");
-            name.setFont(Font.font(FONT, fontDim));
-            points.setFont(Font.font(FONT, fontDim));
+            name.setFont(Font.font(FONT, 50)); //TODO dynamic
+            points.setFont(Font.font(FONT, 50)); //TODO dynamic
             scoreBoard.add(name,0,i);
             scoreBoard.add(points,1,i);
 
@@ -802,14 +741,23 @@ public class GUIutil {
         newGameButton.setId("login-button");
 
         VBox v2=new VBox(scoreLabel,scoreBoard,newGameButton);
+        //v2.setMinHeight(getGameSceneMinHeight()*0.5);
+        //v2.setMinWidth(getGameSceneMinWidth()*0.5);
         v2.setAlignment(CENTER);
         v2.setId("score-container");
         VBox v = new VBox(v2);
         v.setAlignment(CENTER);
         BorderPane containerPane = new BorderPane();
         containerPane.setCenter(v);
-        containerPane.setStyle(IMG_WALL_PNG);
+        containerPane.setStyle("-fx-background-image: url('img/wall.png');");
         return containerPane;
+    }
+
+    public Scene buildConnecionBrokenScene() {
+        Text connectionBrokeMessage = new Text(uimsg.getMessage(BROKEN_CONNECTION));
+        connectionBrokeMessage.setFont(new Font(FONT, screenWidth *CONN_BROKEN_FONT_TO_SCREEN));
+        StackPane layout = new StackPane(connectionBrokeMessage);
+        return new Scene(layout);
     }
 
 }
