@@ -116,13 +116,13 @@ public class ToolCard extends Card {
      * @param schema the player's SchemaCard
      * @return true if the ToolCard has been activated successfully
      */
-    public boolean enableToolCard(Player player,int roundNumber,Turn turnFirstOrSecond, int numDiePlaced , SchemaCard schema) {
+    public boolean enableToolCard(Player player,int roundNumber,Turn turnFirstOrSecond, int numPlacedDice , SchemaCard schema) {
         try {
             if((actions.contains(Actions.SWAP) || actions.contains(Actions.SET_COLOR)) && roundNumber==0){return false;}
             if (!turn.equals(Turn.NONE) && !turn.equals(turnFirstOrSecond)) {return false;}
-            if(turn.equals(Turn.SECOND_TURN) && numDiePlaced>=1){return false;}
-            if(turn.equals(Turn.FIRST_TURN) && numDiePlaced!=1){return false;}
-            if (checkPlacementConditions(numDiePlaced, schema)) {return false;}
+            if(turn.equals(Turn.SECOND_TURN) && numPlacedDice>=1){return false;}
+            if(turn.equals(Turn.FIRST_TURN) && numPlacedDice!=1){return false;}
+            if (checkPlacementConditions(numPlacedDice, schema)) {return false;}
 
             if (!used) {
                 player.decreaseFavorTokens(1);
@@ -140,7 +140,7 @@ public class ToolCard extends Card {
             constraint=DieColor.NONE;
             actionIndex=0;
             schemaTemp=schema.cloneSchema();
-            numDiePlaced=0;
+            this.numDiePlaced=0;
         } catch (NegativeTokensException e) {
             return false;
         }
@@ -330,7 +330,6 @@ public class ToolCard extends Card {
     public boolean internalDiePlacement(int index){
         List<Integer> placerments= internalListPlacements();
         try {
-            //System.out.println("Internal_placement: "+selectedDice.get(0).toString()+" "+ignoredConstraint+" "+oldIndexList.get(0)); //TODO delete
             schemaTemp.removeDie(oldIndexList.get(0));
             schemaTemp.putDie(placerments.get(index),selectedDice.get(0),ignoredConstraint);
             numDiePlaced++;
@@ -352,7 +351,6 @@ public class ToolCard extends Card {
      * @return if the execution flow is not finished yet, false elsewhere
      */
     public boolean toolCanContinue(Player player){
-        //System.out.println(selectedDice+"  "+oldIndexList); //TODO delete
         if(actions.get(actionIndex)!=Actions.SWAP && actions.get(actionIndex)!=Actions.INCREASE_DECREASE && !selectedDice.isEmpty()){//DA RIVEDERE, SI MANGIA I DADI
             selectedDice.remove(0);
         }
