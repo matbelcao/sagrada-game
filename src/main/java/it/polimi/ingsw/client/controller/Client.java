@@ -748,7 +748,7 @@ public class Client implements ClientInt {
                 lockStatus.notifyAll();
             }
         }
-        System.exit(0);
+
     }
 
     /**

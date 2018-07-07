@@ -275,7 +275,7 @@ public class CLI implements ClientUI {
     @Override
     public void updateConnectionBroken() {
         printToScreen(uimsg.getMessage(UIMsg.BROKEN_CONNECTION));
-
+        System.exit(1);
     }
 
 
