@@ -13,11 +13,11 @@ import static it.polimi.ingsw.client.controller.ClientFSMState.*;
 
 public class ClientFSM {
 
-    static final char QUIT = 'q';
-    static final char END_TURN = 'e';
-    static final char BACK = 'b';
-    static final char DISCARD = 'd';
-    static final char NEW_GAME = 'n';
+    public static final char QUIT = 'q';
+    public static final char END_TURN = 'e';
+    public static final char BACK = 'b';
+    public static final char DISCARD = 'd';
+    public static final char NEW_GAME = 'n';
 
     private final Object lockState=new Object();
     private ClientFSMState state;

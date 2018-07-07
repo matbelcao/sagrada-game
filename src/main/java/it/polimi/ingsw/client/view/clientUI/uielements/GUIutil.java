@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
+import it.polimi.ingsw.client.controller.ClientFSM;
 import it.polimi.ingsw.client.controller.ClientFSMState;
 import it.polimi.ingsw.client.controller.CmdWriter;
 import it.polimi.ingsw.client.view.LightBoard;
@@ -37,7 +38,6 @@ import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;
 
 public class GUIutil {
-    private static final String BACK = "b";
     private final CmdWriter cmdWrite;
     private final UIMessages uimsg;
     private double screenWidth;
@@ -176,7 +176,7 @@ public class GUIutil {
                 int schemaIndex =i*2+j;
                 Group completeSchema = buildDraftedSchema(draftedSchemas.get(schemaIndex),cellDim);
                 schemasGrid.add(completeSchema,j,i);
-                completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
+                completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex));
             }
         }
         schemasGrid.setVgap(spacing);
@@ -325,7 +325,7 @@ public class GUIutil {
             if (turnState.equals(SELECT_DIE) && !latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
                 cell.highlightOrange();
                 int multipleDieIndex = getMultipleDieTrackCellIndex(selectedTrackCellIndex, roundTrack) + i;
-                cell.setOnMouseClicked(e -> cmdWrite.write(multipleDieIndex + ""));
+                cell.setOnMouseClicked(e -> cmdWrite.write(multipleDieIndex));
             }
         }
         return multipleDiceTrack;
@@ -380,8 +380,8 @@ public class GUIutil {
         }else if(turnState.equals(MAIN)){ //can't go back when in main
             back.setDisable(true);
         }
-        endTurn.setOnAction(e -> cmdWrite.write("e"));
-        back.setOnAction(e -> cmdWrite.write(BACK));
+        endTurn.setOnAction(e -> cmdWrite.write(ClientFSM.END_TURN));
+        back.setOnAction(e -> cmdWrite.write(ClientFSM.BACK));
         VBox buttonContainer = new VBox();
         buttonContainer.getChildren().addAll(back, endTurn);
         return buttonContainer;
@@ -441,7 +441,7 @@ public class GUIutil {
                 toolRect.setOnMouseClicked(e2 -> {
                     if (turnState.equals(MAIN)) {
                         cmdWrite.write("0");
-                        cmdWrite.write(board.getTools().indexOf(toolCard) + "");
+                        cmdWrite.write(board.getTools().indexOf(toolCard));
                     }
                 });
                 toolRect.setId("card");
@@ -539,7 +539,7 @@ public class GUIutil {
         return player;
     }
 
-    public BorderPane bulidSelectDiePane(double width, double height, LightBoard board) {
+    public BorderPane bulidDieOptionPane(double width, double height, LightBoard board) {
         BorderPane selectDiePane = new BorderPane();
         HBox optionBox = new HBox();
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
@@ -547,7 +547,7 @@ public class GUIutil {
         for (IndexedCellContent selectableDie : latestDiceList) {
             DieContainer c = new DieContainer(selectableDie.getContent(), cellDim);
             c.setOnMouseClicked(e -> {
-                cmdWrite.write(latestDiceList.indexOf(selectableDie) + "");
+                cmdWrite.write(latestDiceList.indexOf(selectableDie));
                 Event exitBackPane = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
                 c.fireEvent(exitBackPane);
             });
@@ -555,7 +555,8 @@ public class GUIutil {
             optionBox.getChildren().add(c);
         }
         optionBox.setAlignment(CENTER);
-        selectDiePane.setStyle("-fx-background-color: rgb(255,255,255,0.4);");
+        //selectDiePane.setStyle("-fx-background-color: rgb(255,255,255,0.4);");
+        selectDiePane.setId("opaque-background");
         selectDiePane.setCenter(new StackPane(optionBox));
         return selectDiePane;
     }
@@ -697,7 +698,7 @@ public class GUIutil {
                 for (IndexedCellContent activeCell : latestDiceList) {
                     DieContainer cell = draftPoolCells.get(activeCell.getPosition());
                     cell.highlightBlue();
-                    cell.setOnMouseClicked(e -> cmdWrite.write(draftPoolCells.indexOf(cell) + ""));
+                    cell.setOnMouseClicked(e -> cmdWrite.write(draftPoolCells.indexOf(cell)));
                 }
             }
         }else if (latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
@@ -711,7 +712,7 @@ public class GUIutil {
             if (roundTrack.get(i).size() < 2) {
                 roundTrackCells.get(i).highlightOrange();
                 int finalI = i;
-                roundTrackCells.get(i).setOnMouseClicked(e -> cmdWrite.write(getMultipleDieTrackCellIndex(finalI, roundTrack) + ""));
+                roundTrackCells.get(i).setOnMouseClicked(e -> cmdWrite.write(getMultipleDieTrackCellIndex(finalI, roundTrack)));
             }
         }
     }
@@ -720,7 +721,7 @@ public class GUIutil {
         for (IndexedCellContent activeCell : latestDiceList) {
             DieContainer cell = schemaCells.get(activeCell.getPosition());
             cell.highlightBlue();
-            cell.setOnMouseClicked(e -> cmdWrite.write(latestDiceList.indexOf(activeCell) + ""));
+            cell.setOnMouseClicked(e -> cmdWrite.write(latestDiceList.indexOf(activeCell)));
         }
     }
 
@@ -736,8 +737,8 @@ public class GUIutil {
             if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
                 for (DieContainer cell : draftPoolCells) {
                     cell.setOnMouseClicked(e -> {
-                        cmdWrite.write("d");
-                        cmdWrite.write(draftPoolCells.indexOf(cell) + "");
+                        cmdWrite.write(ClientFSM.DISCARD);
+                        cmdWrite.write(draftPoolCells.indexOf(cell));
                     });
                 }
             }else if(!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.SCHEMA)){
@@ -745,8 +746,8 @@ public class GUIutil {
                     DieContainer selectableCell = schemaCells.get(idexedSelectableCell.getPosition());
                     selectableCell.highlightBlue();
                     selectableCell.setOnMouseClicked(e->{
-                        cmdWrite.write("d");
-                        cmdWrite.write(latestDiceList.indexOf(idexedSelectableCell)+"");
+                        cmdWrite.write(ClientFSM.DISCARD);
+                        cmdWrite.write(latestDiceList.indexOf(idexedSelectableCell));
                     });
                 }
             }
@@ -757,7 +758,7 @@ public class GUIutil {
         for (DieContainer cell : schemaCells) {
             if (latestPlacementsList.contains(schemaCells.indexOf(cell))) {
                 cell.highlightGreen();
-                cell.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(cell)) + ""));
+                cell.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(cell))));
             }
         }
     }
@@ -790,7 +791,7 @@ public class GUIutil {
         }
 
         Button newGameButton = new Button(uimsg.getMessage(NEW_GAME_OPTION_2));
-        newGameButton.setOnMouseClicked(e->cmdWrite.write("n"));
+        newGameButton.setOnMouseClicked(e->cmdWrite.write(ClientFSM.NEW_GAME));
         newGameButton.setId("login-button");
 
         VBox v2=new VBox(scoreLabel,scoreBoard,newGameButton);

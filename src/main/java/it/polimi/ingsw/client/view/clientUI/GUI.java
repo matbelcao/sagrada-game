@@ -242,7 +242,7 @@ public class GUI extends Application implements ClientUI {
             p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
 
             if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
-                BorderPane backPane = sceneCreator.bulidSelectDiePane(newWidth,newHeight, board);
+                BorderPane backPane = sceneCreator.bulidDieOptionPane(newWidth,newHeight, board);
                 p.getChildren().add(backPane);
             }
         }
@@ -257,7 +257,7 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void updateConnectionBroken(){
         Platform.runLater(()->{
-            sizeListener.disable(); //defensive programming
+            sizeListener.disable();
             Stage connectionBrokStage = new Stage();
             connectionBrokStage.initModality(Modality.APPLICATION_MODAL);
             connectionBrokStage.setTitle(uimsg.getMessage(BROKEN_CONNECTION_TITLE));
