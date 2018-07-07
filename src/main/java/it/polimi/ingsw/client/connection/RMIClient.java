@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.controller.Client;
+import it.polimi.ingsw.client.controller.ClientFSMState;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.common.exceptions.IllegalActionException;
@@ -45,8 +46,12 @@ public class RMIClient implements ClientConn{
         List <LightSchemaCard>result = new ArrayList<>();
         try {
             result = remoteObj.getSchemaDraft();
-        } catch (RemoteException | IllegalActionException e) {
+        } catch (RemoteException e) {
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
         return result;
     }
@@ -62,8 +67,12 @@ public class RMIClient implements ClientConn{
         LightSchemaCard schema=null;
         try {
             schema = remoteObj.getSchema(playerId);
-        } catch (RemoteException | IllegalActionException e) {
+        } catch (RemoteException e) {
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
         return schema;
     }
@@ -122,8 +131,12 @@ public class RMIClient implements ClientConn{
         List<LightDie> draftPool =new ArrayList<>();
         try {
             draftPool = remoteObj.getDraftPool();
-        } catch (RemoteException | IllegalActionException e) {
+        } catch (RemoteException e) {
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
         return draftPool;
     }
@@ -137,8 +150,12 @@ public class RMIClient implements ClientConn{
         List<List<LightDie>> roundTrack=new ArrayList<>();
         try {
             roundTrack = remoteObj.getRoundTrack();
-        } catch (RemoteException | IllegalActionException e) {
+        } catch (RemoteException e) {
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
         return roundTrack;
 
@@ -201,8 +218,12 @@ public class RMIClient implements ClientConn{
         List<IndexedCellContent> diceList=new ArrayList<>();
         try{
             diceList = remoteObj.getDiceList();
-        }catch(RemoteException | IllegalActionException e){
+        }catch(RemoteException  e){
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
         return diceList;
     }
@@ -218,8 +239,12 @@ public class RMIClient implements ClientConn{
         List<Actions> options=new ArrayList<>();
         try{
             options = remoteObj.select(dieIndex);
-        }catch(RemoteException | IllegalActionException e){
+        }catch(RemoteException  e){
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
         return options;
     }
@@ -234,8 +259,12 @@ public class RMIClient implements ClientConn{
         List<Integer> placements=new ArrayList<>();
         try{
             placements = remoteObj.getPlacementsList();
-        }catch(RemoteException | IllegalActionException e){
+        }catch(RemoteException  e){
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
         return placements;
     }
@@ -250,8 +279,12 @@ public class RMIClient implements ClientConn{
     public boolean choose(int optionIndex) {
         try{
             return remoteObj.choose(optionIndex);
-        }catch(RemoteException | IllegalActionException e){
+        }catch(RemoteException e){
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
         return false;
     }
@@ -266,8 +299,12 @@ public class RMIClient implements ClientConn{
     public boolean enableTool(int toolIndex) {
         try{
             return remoteObj.enableTool(toolIndex);
-        }catch(RemoteException | IllegalActionException e){
+        }catch(RemoteException  e){
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
         return false;
     }
@@ -280,8 +317,12 @@ public class RMIClient implements ClientConn{
     public boolean toolCanContinue() {
         try{
             return remoteObj.toolCanContinue();
-        }catch(RemoteException | IllegalActionException e){
+        }catch(RemoteException  e){
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
         return false;
     }
@@ -293,8 +334,12 @@ public class RMIClient implements ClientConn{
     public void endTurn() {
         try {
             remoteObj.endTurn();
-        } catch (RemoteException | IllegalActionException e) {
+        } catch (RemoteException e) {
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
     }
 
@@ -306,8 +351,12 @@ public class RMIClient implements ClientConn{
     public void discard() {
         try {
             remoteObj.discard();
-        } catch (RemoteException | IllegalActionException e) {
+        } catch (RemoteException e) {
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
     }
 
@@ -318,8 +367,12 @@ public class RMIClient implements ClientConn{
     public void back() {
         try {
             remoteObj.back();
-        } catch (RemoteException | IllegalActionException e) {
+        } catch (RemoteException e) {
             closeConn();
+        }catch (IllegalActionException e){
+            if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
+                endTurn();
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.connection;
 
 import it.polimi.ingsw.client.controller.Client;
+import it.polimi.ingsw.client.controller.ClientFSMState;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.connection.SocketString;
@@ -111,7 +112,10 @@ public class SocketClient implements ClientConn {
 
                             } else if (ClientParser.isIllegalAction(inSocket.readln())) {
                                 inSocket.pop();
-                                Logger.getGlobal().log(Level.INFO,ILLEGAL_ACTION);
+                                //Logger.getGlobal().log(Level.INFO,ILLEGAL_ACTION);
+                                if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)){
+                                    endTurn();
+                                }
                             }
                         }
                         lockin.notifyAll();
@@ -600,7 +604,7 @@ public class SocketClient implements ClientConn {
         String[] args;
 
         syncedSocketWrite(SocketString.GET_DICE_LIST);
-        outSocket.flush();
+
         synchronized (lockin) {
             waitForLine();
 
@@ -635,7 +639,7 @@ public class SocketClient implements ClientConn {
         List<Actions> options=new ArrayList<>();
 
         syncedSocketWrite(SocketString.SELECT+" "+dieIndex);
-        outSocket.flush();
+
         synchronized (lockin) {
             waitForLine();
 
@@ -665,7 +669,7 @@ public class SocketClient implements ClientConn {
         ArrayList<Integer> positions=new ArrayList<>();
 
         syncedSocketWrite(SocketString.GET_PLACEMENTS_LIST);
-        outSocket.flush();
+
         synchronized (lockin) {
             waitForLine();
 
@@ -693,7 +697,7 @@ public class SocketClient implements ClientConn {
         ArrayList<String> result=new ArrayList<>();
 
         syncedSocketWrite(SocketString.CHOOSE+" "+optionIndex);
-        outSocket.flush();
+
 
         synchronized (lockin) {
             waitForLine();
@@ -718,7 +722,7 @@ public class SocketClient implements ClientConn {
         ArrayList<String> result=new ArrayList<>();
 
         syncedSocketWrite(SocketString.TOOL_ENABLE+toolIndex);
-        outSocket.flush();
+
         synchronized (lockin) {
             waitForLine();
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isTool(inSocket.readln()))) {
@@ -739,7 +743,7 @@ public class SocketClient implements ClientConn {
         ArrayList<String> result = new ArrayList<>();
 
         syncedSocketWrite(SocketString.TOOL_CONTINUE);
-        outSocket.flush();
+
         synchronized (lockin) {
             waitForLine();
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isTool(inSocket.readln()))) {
@@ -757,7 +761,7 @@ public class SocketClient implements ClientConn {
     @Override
     public void endTurn(){
         syncedSocketWrite(SocketString.GAME_END_TURN);
-        outSocket.flush();
+
     }
 
     /**
@@ -767,7 +771,7 @@ public class SocketClient implements ClientConn {
     @Override
     public void discard(){
         syncedSocketWrite(SocketString.DISCARD);
-        outSocket.flush();
+
     }
 
 
@@ -777,7 +781,7 @@ public class SocketClient implements ClientConn {
     @Override
     public void back(){
         syncedSocketWrite(SocketString.BACK);
-        outSocket.flush();
+
     }
 
     /**
@@ -786,7 +790,7 @@ public class SocketClient implements ClientConn {
     @Override
     public void quit(){
         syncedSocketWrite(SocketString.QUIT);
-        outSocket.flush();
+
         if(!socket.isClosed()){
             try {
                 socket.close();
@@ -810,7 +814,7 @@ public class SocketClient implements ClientConn {
     @Override
     public void newMatch() {
         syncedSocketWrite(SocketString.GAME_NEW_MATCH);
-        outSocket.flush();
+
     }
 
     /**
@@ -820,7 +824,7 @@ public class SocketClient implements ClientConn {
     public void pong() {
         try{
             syncedSocketWrite(SocketString.PONG);
-            outSocket.flush();
+
             synchronized (lockPing) {
                 if(connectionOk) {
                     if(pingTimer!=null){
