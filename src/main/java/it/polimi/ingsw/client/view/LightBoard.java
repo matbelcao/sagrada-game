@@ -62,6 +62,10 @@ public class LightBoard extends Observable {
     }
 
 
+    /**
+     * this adds a new change to the list
+     * @param event the new change event
+     */
     private void addToChanges(int event) {
         synchronized (lockChanges) {
             changes.add(event);
@@ -226,6 +230,10 @@ public class LightBoard extends Observable {
         setChanged();
     }
 
+    /**
+     * this sets the new round number
+     * @param roundNumber the new round number
+     */
     public void setRoundNumber(int roundNumber) {
 
         this.roundNumber = roundNumber;
@@ -297,6 +305,9 @@ public class LightBoard extends Observable {
     }
 
 
+    /**
+     * this tells the lightboard that the fsm state has changed
+     */
     public void stateChanged(){
         addToChanges(LightBoardEvents.STATE_CHANGED);
         setChanged();
@@ -369,6 +380,9 @@ public class LightBoard extends Observable {
         setChanged();
     }
 
+    /**
+     * @return a copy of the changes and clears it
+     */
     public  List<Integer> getChanges() {
         List<Integer> copy;
         synchronized (lockChanges) {
@@ -388,6 +402,9 @@ public class LightBoard extends Observable {
         return latestSelectedDie;
     }
 
+    /**
+     * @return the list of players sorted by final position
+     */
     public List<LightPlayer> sortFinalPositions(){
         List<LightPlayer> players= new ArrayList<>();
         for(int i=0;i<this.players.size();i++){
