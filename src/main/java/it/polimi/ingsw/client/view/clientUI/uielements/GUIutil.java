@@ -98,29 +98,17 @@ public class GUIutil {
 
     public double getStageY() { return (screenHeight -getGameSceneMinHeight())/2;}
 
-    public double getLoginWidth() {
-        return screenWidth * LOGIN_TO_SCREEN_RATIO;
-    }
+    public double getLoginWidth() { return screenWidth * LOGIN_TO_SCREEN_RATIO; }
 
-    public double getLoginHeight() {
-        return getLoginWidth() / LOGIN_RATIO;
-    }
+    public double getLoginHeight() { return getLoginWidth() / LOGIN_RATIO; }
 
-    public double getLobbyMinHeight() {
-        return getLobbyMinWidth() / LOBBY_SCENE_RATIO;
-    }
+    public double getLobbyMinHeight() { return getLobbyMinWidth() / LOBBY_SCENE_RATIO; }
 
-    public double getLobbyMinWidth() {
-        return LOBBY_SCENE_W_TO_SCREEN_RATIO * screenWidth;
-    }
+    public double getLobbyMinWidth() { return LOBBY_SCENE_W_TO_SCREEN_RATIO * screenWidth; }
 
-    public double getGameSceneMinWidth(){
-        return MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH* screenWidth;
-    }
+    public double getGameSceneMinWidth(){ return MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH* screenWidth; }
 
-    public double getGameSceneMinHeight(){
-        return (getGameSceneMinWidth()/MAIN_GAME_SCENE_RATIO);
-    }
+    public double getGameSceneMinHeight(){ return (getGameSceneMinWidth()/MAIN_GAME_SCENE_RATIO); }
 
     private double getCardWidth(double cellDim) { return cellDim*CARD_WIDTH_TO_CELL_DIM; }
 
@@ -321,7 +309,7 @@ public class GUIutil {
         return imgRect;
     }
 
-    public StackPane buildWaitingForGameStartScene(double width, double height) { //todo make dynamic
+    public StackPane buildWaitingForGameStartScene() {
         String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
         Label waitingText = new Label(message);
         waitingText.setId("lobby-message");
@@ -339,16 +327,15 @@ public class GUIutil {
         HBox d1 = buildDummyTrack(cellDim,selectedTrackCellIndex,roundTrack);
         HBox d2 = buildMultipleDiceBar(cellDim,selectedTrackCellIndex,roundTrack,turnState,latestDiceList);
         VBox vbox =new VBox(d1,d2);
-        //vbox.setSpacing(ROUNDTRACK_SPACING);
         Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
         vbox.setOnMouseExited(e->vbox.fireEvent(mouseExited));
         backPane.setTop(vbox);
         vbox.setAlignment(TOP_LEFT);
-        backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
+        backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);");
         return backPane;
     }
 
-    public HBox getPlayersStatusBar(int showingPlayerId, LightBoard board) { //todo remove my player id
+    public HBox getPlayersStatusBar(int showingPlayerId, LightBoard board) {
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
             Button playerStatusBar = getPlayerStatusButton(playerId,showingPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
@@ -367,7 +354,6 @@ public class GUIutil {
         return playerSelector;
     }
 
-    //todo update
     public BorderPane buildSelectdPlayerPane(int showingPlayerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
         HBox playersSelector = getPlayersStatusBar(showingPlayerId,board);
@@ -384,7 +370,7 @@ public class GUIutil {
         StackPane schemaContainer = new StackPane(playerSchema);
         Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
         schemaContainer.setOnMouseExited(e->schemaContainer.fireEvent(mouseExited));
-        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112,0);"); //todo hookup with css and make the same as the front pane background
+        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112,0);");
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
         return selectedPlayerPane;
@@ -392,9 +378,7 @@ public class GUIutil {
 
     private Button getPlayerStatusButton(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
         Button player = new Button(username);
-        System.out.println(playerId +"   "+ nowPlaying);
         if(playerId == nowPlaying ){
-            System.out.println(playerId +"   "+ nowPlaying);
             player.setId("player-playing");
         }else if(status.equals(LightPlayerStatus.DISCONNECTED)){
             player.setId("player-disconnected");
@@ -406,7 +390,6 @@ public class GUIutil {
         return player;
     }
 
-    //todo add Text
     public BorderPane bulidSelectDiePane(double width, double height, LightBoard board) {
         BorderPane selectDiePane = new BorderPane();
         HBox optionBox = new HBox();
@@ -423,7 +406,7 @@ public class GUIutil {
             optionBox.getChildren().add(c);
         }
         optionBox.setAlignment(CENTER);
-        selectDiePane.setStyle("-fx-background-color: rgb(255,255,255,0.4);"); //todo hookup with css
+        selectDiePane.setStyle("-fx-background-color: rgb(255,255,255,0.4);");
         selectDiePane.setCenter(new StackPane(optionBox));
         return selectDiePane;
     }
@@ -527,7 +510,7 @@ public class GUIutil {
         return grid;
     }
 
-    public void addActionListeners(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board, double cellDim) {
+    public void addActionListeners(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board) {
         switch (turnState){
             case CHOOSE_SCHEMA: //todo remve empty declarations
                 break;
@@ -565,11 +548,7 @@ public class GUIutil {
         }
         //latest dice list has dice
         if (latestDiceList.get(0).getPlace().equals(Place.SCHEMA)) {
-            for (IndexedCellContent activeCell : latestDiceList) {
-                DieContainer cell = schemaCells.get(activeCell.getPosition());
-                cell.highlightBlue();
-                cell.setOnMouseClicked(e -> cmdWrite.write(latestDiceList.indexOf(activeCell) + ""));
-            }
+            addSelectDieInSchemaAction(schemaCells, latestDiceList);
         } else if (latestDiceList.get(0).getPlace().equals(Place.DRAFTPOOL)) {
             if (latestOptionsList.isEmpty() || (!latestOptionsList.get(0).equals(Actions.SET_SHADE) && !latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
                 for (IndexedCellContent activeCell : latestDiceList) {
@@ -579,14 +558,26 @@ public class GUIutil {
                 }
             }
         }else if (latestDiceList.get(0).getPlace().equals(Place.ROUNDTRACK)) {
-            for (int i = 0; i < roundTrack.size(); i++) {
-                roundTrackCells.get(i).highlightBlue();
-                if (roundTrack.get(i).size() < 2) {
-                    roundTrackCells.get(i).highlightOrange();
-                    int finalI = i;
-                    roundTrackCells.get(i).setOnMouseClicked(e -> cmdWrite.write(getMultipleDieTrackCellIndex(finalI, roundTrack) + ""));
-                }
+            addSelectDieInRoudTrackAction(roundTrackCells, roundTrack);
+        }
+    }
+
+    private void addSelectDieInRoudTrackAction(List<DieContainer> roundTrackCells, List<List<LightDie>> roundTrack) {
+        for (int i = 0; i < roundTrack.size(); i++) {
+            roundTrackCells.get(i).highlightBlue();
+            if (roundTrack.get(i).size() < 2) {
+                roundTrackCells.get(i).highlightOrange();
+                int finalI = i;
+                roundTrackCells.get(i).setOnMouseClicked(e -> cmdWrite.write(getMultipleDieTrackCellIndex(finalI, roundTrack) + ""));
             }
+        }
+    }
+
+    private void addSelectDieInSchemaAction(List<DieContainer> schemaCells, List<IndexedCellContent> latestDiceList) {
+        for (IndexedCellContent activeCell : latestDiceList) {
+            DieContainer cell = schemaCells.get(activeCell.getPosition());
+            cell.highlightBlue();
+            cell.setOnMouseClicked(e -> cmdWrite.write(latestDiceList.indexOf(activeCell) + ""));
         }
     }
 
@@ -596,13 +587,8 @@ public class GUIutil {
         List<Integer> latestPlacementsList = board.getLatestPlacementsList();
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         if (!latestOptionsList.isEmpty() && latestOptionsList.get(0).equals(Actions.PLACE_DIE)) {
-            //highlight all the cells where I can put a die
-            for (DieContainer cell : schemaCells) {
-                if (latestPlacementsList.contains(schemaCells.indexOf(cell))) {
-                    cell.highlightGreen();
-                    cell.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(cell)) + ""));
-                }
-            }
+            //highlight all the cells where I can put a die and add listener on selection
+            activateChoosePlacemetCells(schemaCells, latestPlacementsList);
 
             if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
                 for (DieContainer cell : draftPoolCells) {
@@ -620,6 +606,15 @@ public class GUIutil {
                         cmdWrite.write(latestDiceList.indexOf(idexedSelectableCell)+"");
                     });
                 }
+            }
+        }
+    }
+
+    private void activateChoosePlacemetCells(List<DieContainer> schemaCells, List<Integer> latestPlacementsList) {
+        for (DieContainer cell : schemaCells) {
+            if (latestPlacementsList.contains(schemaCells.indexOf(cell))) {
+                cell.highlightGreen();
+                cell.setOnMouseClicked(e -> cmdWrite.write(latestPlacementsList.indexOf(schemaCells.indexOf(cell)) + ""));
             }
         }
     }
@@ -728,7 +723,6 @@ public class GUIutil {
 
     public BorderPane buildGameEndedPane(double newWidth, double newHeight, List<LightPlayer> players) {
         Label scoreLabel = new Label(uimsg.getMessage(GAME_END));
-        //scoreLabel.setAlignment(CENTER);
         scoreLabel.setFont(Font.font(FONT, 60)); //TODO dynamic
 
         GridPane scoreBoard = new GridPane();
