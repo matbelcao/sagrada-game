@@ -283,7 +283,7 @@ public class GUI extends Application implements ClientUI {
         return (QueuedReader) cmdWrite;
     }
 
-    public CmdWriter getCmdWrite(){
+    private CmdWriter getCmdWrite(){
         if (cmdWrite == null) {
             cmdWrite = new QueuedCmdReader();
         }
