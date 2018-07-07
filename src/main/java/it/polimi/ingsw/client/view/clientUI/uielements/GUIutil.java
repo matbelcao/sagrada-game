@@ -81,6 +81,9 @@ public class GUIutil {
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.6;
     private static final double ROUNDTRACK_SPACING = 5;
     private static final double FAVOR_TO_TOOL_W = 0.13;
+    //Game End
+    private static final double GAME_END_TEXT_TO_CELL =0.625 ;
+
 
     //Connection Broken
     private static final double CONN_BROKEN_FONT_TO_SCREEN = 0.018;
@@ -722,8 +725,9 @@ public class GUIutil {
     }
 
     public BorderPane buildGameEndedPane(double newWidth, double newHeight, List<LightPlayer> players) {
+        double fontDim = getMainSceneCellDim(newWidth,newHeight)*GAME_END_TEXT_TO_CELL;
         Label scoreLabel = new Label(uimsg.getMessage(GAME_END));
-        scoreLabel.setFont(Font.font(FONT, 60)); //TODO dynamic
+        scoreLabel.setFont(Font.font(FONT, fontDim*1.1));
 
         GridPane scoreBoard = new GridPane();
         scoreBoard.setHgap(10);
@@ -733,8 +737,8 @@ public class GUIutil {
         for(int i = 0; i < players.size();i++){
             Label name = new Label(players.get(i).getUsername());
             Label points = new Label(players.get(i).getPoints()+"");
-            name.setFont(Font.font(FONT, 50)); //TODO dynamic
-            points.setFont(Font.font(FONT, 50)); //TODO dynamic
+            name.setFont(Font.font(FONT, fontDim));
+            points.setFont(Font.font(FONT, fontDim));
             scoreBoard.add(name,0,i);
             scoreBoard.add(points,1,i);
 
@@ -745,8 +749,6 @@ public class GUIutil {
         newGameButton.setId("login-button");
 
         VBox v2=new VBox(scoreLabel,scoreBoard,newGameButton);
-        //v2.setMinHeight(getGameSceneMinHeight()*0.5);
-        //v2.setMinWidth(getGameSceneMinWidth()*0.5);
         v2.setAlignment(CENTER);
         v2.setId("score-container");
         VBox v = new VBox(v2);

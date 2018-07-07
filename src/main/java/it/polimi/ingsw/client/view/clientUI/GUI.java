@@ -247,7 +247,7 @@ public class GUI extends Application implements ClientUI {
                     break;
             }
             primaryStage.setMinWidth(sceneCreator.getGameSceneMinWidth());
-            primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight()); //todo decide if I want to keep it
+            primaryStage.setMinHeight(sceneCreator.getGameSceneMinHeight());
             sizeListener.purgeTimer();
             drawMainGameScene();
             sizeListener.enable();
@@ -265,7 +265,7 @@ public class GUI extends Application implements ClientUI {
             BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(board.getDraftedSchemas(), board.getPrivObj(), newWidth, newHeight) ;
             p.getChildren().add(draftedSchemasPane);
         }else if(client.getFsmState().equals(ClientFSMState.SCHEMA_CHOSEN)){
-            p.getChildren().add(sceneCreator.buildWaitingForGameStartScene(newWidth, newHeight));
+            p.getChildren().add(sceneCreator.buildWaitingForGameStartScene());
         }else if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
             BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(newWidth,newHeight, board.sortFinalPositions());
             p.getChildren().add(gameEndedPane);
@@ -302,7 +302,7 @@ public class GUI extends Application implements ClientUI {
         List<DieContainer> draftPoolCells = sceneCreator.getDraftPoolCells(draftPool,cellDim);
         List<DieContainer> schemaCells = sceneCreator.getSchemaCells(schemaCard,cellDim);
         List<DieContainer> roundTrackCells = sceneCreator.getRoundTrackCells(roundTrackList,cellDim);
-        sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board,cellDim);
+        sceneCreator.addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board);
 
         //Top side of the border pane
         HBox topSection = sceneCreator.buildRoundTrack(roundTrackCells);
@@ -353,7 +353,7 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void showWaitingForGameStartScreen() {
-       Platform.runLater(() -> primaryStage.getScene().setRoot(sceneCreator.buildWaitingForGameStartScene(primaryStage.getWidth(), primaryStage.getHeight())));
+       Platform.runLater(() -> primaryStage.getScene().setRoot(sceneCreator.buildWaitingForGameStartScene()));
        }
 
     @Override
