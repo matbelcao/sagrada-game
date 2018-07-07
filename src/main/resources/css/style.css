@@ -57,7 +57,7 @@
     -fx-opacity: 0.8;
 }
 
-#login-ko,#lobby-message,#login-ok,#drafted-message{
+#login-ko,#lobby-message,#login-ok,#drafted-message,#connection-error{
     -fx-background-color: rgba(255,255,255,0.9);
     -fx-background-radius: 10;
     -fx-padding: 20px;

@@ -21,8 +21,8 @@
         <ita>Impossibile effettuare il login, per favore riprova ...</ita>
     </login-ko>
     <broken-connection>
-        <eng>Something went wrong with your connection to the server...%n</eng>
-        <ita>Si sono verificati dei problemi alla connessione verso il server...%n</ita>
+        <eng>Something went wrong with your connection to the server...</eng>
+        <ita>Si sono verificati dei problemi alla connessione verso il server...</ita>
     </broken-connection>
     <broken-connection-title>
         <eng>Connection Broken</eng>

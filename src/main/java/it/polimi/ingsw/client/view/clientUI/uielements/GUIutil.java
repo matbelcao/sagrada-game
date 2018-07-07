@@ -161,8 +161,10 @@ public class GUIutil {
     public Scene buildConnecionBrokenScene() {
         Label connectionBrokeMessage = new Label(String.format(uimsg.getMessage(BROKEN_CONNECTION)));
         connectionBrokeMessage.setFont(new Font(FONT, screenWidth *CONN_BROKEN_FONT_TO_SCREEN));
+        connectionBrokeMessage.setId("connection-error");
         StackPane layout = new StackPane(connectionBrokeMessage);
-        Scene connectionBrokeScene = new Scene(layout);
+        layout.setStyle("-fx-background-image: url('img/wall.png')");
+        Scene connectionBrokeScene = new Scene(layout,screenWidth*0.32,screenWidth*0.16);
         connectionBrokeScene.getStylesheets().add("css/style.css");
         return connectionBrokeScene;
     }
