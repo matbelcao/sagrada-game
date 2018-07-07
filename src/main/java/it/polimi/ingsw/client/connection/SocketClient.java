@@ -63,8 +63,12 @@ public class SocketClient implements ClientConn {
     private void syncedSocketWrite(String message){
         synchronized (lockOutSocket){
 
-            outSocket.println(message);
-            outSocket.flush();
+            try {
+                outSocket.println(message);
+                outSocket.flush();
+            }catch (Exception e){
+                client.disconnect();
+            }
             lockOutSocket.notifyAll();
         }
     }
