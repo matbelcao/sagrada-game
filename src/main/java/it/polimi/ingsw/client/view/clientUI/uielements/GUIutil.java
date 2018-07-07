@@ -236,7 +236,7 @@ public class GUIutil {
         double x = schemaWidth / 2;
         double y = TEXT_HEIGHT_TO_SCHEMA_H * schemaHeight;
         drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
-        drawFavorTokens(gc, schemaWidth, lightSchemaCard);
+        drawFavorTokens(gc, y, schemaWidth, lightSchemaCard);
 
         Rectangle backgroundRect = new Rectangle(0,0,schemaWidth,schemaHeight);
         backgroundRect.setArcWidth(arcCurvature);
@@ -253,9 +253,8 @@ public class GUIutil {
         return new Group(new StackPane(backgroundRect,completeSchema));
     }
 
-    private void drawFavorTokens(GraphicsContext gc, double schemaWidth, LightSchemaCard lightSchemaCard) {
+    private void drawFavorTokens(GraphicsContext gc, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
         double x = 0;
-        double y = 0;
         int favorTokens = lightSchemaCard.getFavorTokens();
         double favTokDiameter = schemaWidth * FAVOR_DIAM_TO_SCHEMA_W;
         x = x + FAVOR_POS_TO_SCHEMA_W * schemaWidth;
