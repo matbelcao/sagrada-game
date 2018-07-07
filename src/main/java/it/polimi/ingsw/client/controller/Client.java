@@ -369,9 +369,10 @@ public class Client implements ClientInt {
      * @return true iff it succeeded
      */
     private boolean login()  {
-        if(this.username.equals(EMPTY_STRING)){return false;}
         boolean logged=false;
         try {
+            if(this.username.equals(EMPTY_STRING)){return false;}
+
             if (connMode.equals(ConnectionMode.RMI)) {
                 logged = loginRMI();
             } else {
