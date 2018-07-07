@@ -251,7 +251,6 @@ public class Board {
             status=fsm.nextState(selectedCommand);
         }
         status=fsm.nextState(selectedCommand);
-        System.out.println(diceList.get(0).getContent().getDieColor().toString());
         return diceList;
     }
 

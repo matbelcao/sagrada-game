@@ -396,6 +396,7 @@ public class ClientFSM {
             lockState.notifyAll();
         }
         client.getBoard().stateChanged();
+        client.getBoard().resetLatests();
     }
 
     /**

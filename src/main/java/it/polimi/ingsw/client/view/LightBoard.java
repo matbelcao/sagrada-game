@@ -402,6 +402,13 @@ public class LightBoard extends Observable {
         return latestSelectedDie;
     }
 
+    public void resetLatests() {
+        latestDiceList=new ArrayList<>();
+        latestOptionsList=new ArrayList<>();
+        latestPlacementsList=new ArrayList<>();
+    }
+
+
     /**
      * @return the list of players sorted by final position
      */
