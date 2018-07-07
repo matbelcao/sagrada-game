@@ -42,13 +42,12 @@ public class GUIutil {
     private double screenWidth;
     private double screenHeight;
 
-    //ratio is width/height
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
     private static final double NUM_OF_TOOLS = 3;
     private static final int ROUNDTRACK_SIZE = 10;
     private static final String FONT = "Sans-Serif";
-
+    public static final String IMG_WALL_PNG = "-fx-background-image: url('img/wall.png');";
     //-----login Stage
     private static final double LOGIN_TO_SCREEN_RATIO = 0.25;
     private static final double LOGIN_RATIO = 0.663;
@@ -83,8 +82,6 @@ public class GUIutil {
     private static final double FAVOR_TO_TOOL_W = 0.13;
     //Game End
     private static final double GAME_END_TEXT_TO_CELL =0.625 ;
-
-
     //Connection Broken
     private static final double CONN_BROKEN_FONT_TO_SCREEN = 0.018;
 
@@ -130,11 +127,53 @@ public class GUIutil {
 
     public StackPane buildLobbyPane(int numUsers) {
         StackPane p = new StackPane();
-        p.setStyle("-fx-background-image: url('img/wall.png');");
+        p.setStyle(IMG_WALL_PNG);
         Label lobbyLabel = new Label(String.format(uimsg.getMessage(LOBBY_UPDATE),numUsers));
         lobbyLabel.setId("lobby-message");
         p.getChildren().add(lobbyLabel);
         return new StackPane(p);
+    }
+
+    public BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board, ClientFSMState turnState){
+        double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
+        List <List<LightDie>>       roundTrackList = board.getRoundTrack();
+        List <LightDie> draftPool = board.getDraftPool();
+        LightSchemaCard             schemaCard = board.getPlayerById(board.getMyPlayerId()).getSchema();
+        int favorTokens =           board.getPlayerById(board.getMyPlayerId()).getFavorTokens();
+
+        BorderPane frontPane = new BorderPane();
+
+        frontPane.setStyle("-fx-background-image: url('img/blue-wall.png')");
+
+        List<DieContainer> draftPoolCells = getDraftPoolCells(draftPool,cellDim);
+        List<DieContainer> schemaCells = getSchemaCells(schemaCard,cellDim);
+        List<DieContainer> roundTrackCells = getRoundTrackCells(roundTrackList,cellDim);
+        addActionListeners(draftPoolCells,schemaCells,roundTrackCells,turnState,board);
+
+        //Top side of the border pane
+        HBox topSection = buildRoundTrack(roundTrackCells);
+        Region separator = new Region();
+        HBox.setHgrow(separator,Priority.ALWAYS);
+        VBox menuButtons = buildMenuButtons(turnState);
+        topSection.getChildren().addAll(separator,menuButtons);
+        topSection.setId("top-section");
+        frontPane.setTop(topSection);
+
+        //Center side of the border pane
+        Group schema = buildSchema(schemaCells,favorTokens,cellDim);
+        HBox playersStatusBar = getPlayersStatusBar(board.getMyPlayerId(),board);
+        StackPane schemaContainer = new StackPane(schema);
+        VBox.setVgrow(schemaContainer,Priority.ALWAYS);
+        frontPane.setCenter(new VBox(schemaContainer,playersStatusBar));
+
+        //Right side of the border pane
+        VBox cards = drawCards(board,cellDim,turnState);
+        StackPane cardsContainer = new StackPane(cards);
+        cards.setAlignment(CENTER);
+        GridPane draftpool = buildDraftPool(draftPoolCells);
+        VBox.setVgrow(cardsContainer,Priority.ALWAYS);
+        frontPane.setRight(new VBox(cardsContainer,draftpool));
+        return frontPane;
     }
 
     private HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
@@ -317,7 +356,7 @@ public class GUIutil {
         Label waitingText = new Label(message);
         waitingText.setId("lobby-message");
         StackPane stackPane = new StackPane(waitingText);
-        stackPane.setStyle("-fx-background-image: url('img/wall.png');");
+        stackPane.setStyle(IMG_WALL_PNG);
         return stackPane;
     }
 
@@ -341,7 +380,7 @@ public class GUIutil {
     public HBox getPlayersStatusBar(int showingPlayerId, LightBoard board) {
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
-            Button playerStatusBar = getPlayerStatusButton(playerId,showingPlayerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
+            Button playerStatusBar = getPlayerStatusButton(playerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
             playerSelector.getChildren().add(playerStatusBar);
             if( playerId == showingPlayerId){
                 continue;
@@ -379,7 +418,7 @@ public class GUIutil {
         return selectedPlayerPane;
     }
 
-    private Button getPlayerStatusButton(int playerId, int hilighlightedPlayerId, String username, LightPlayerStatus status, int nowPlaying){
+    private Button getPlayerStatusButton(int playerId, String username, LightPlayerStatus status, int nowPlaying){
         Button player = new Button(username);
         if(playerId == nowPlaying ){
             player.setId("player-playing");
@@ -644,7 +683,7 @@ public class GUIutil {
         double spacing = DRAFTED_SCHEMAS_SPACING_TO_CELL*cellDim;
 
         BorderPane draftedSchemasPane = new BorderPane();
-        draftedSchemasPane.setStyle("-fx-background-image: url('img/wall.png');");
+        draftedSchemasPane.setStyle(IMG_WALL_PNG);
 
         GridPane schemasGrid = new GridPane();
         for(int i = 0; i < 2; i++){
@@ -755,7 +794,7 @@ public class GUIutil {
         v.setAlignment(CENTER);
         BorderPane containerPane = new BorderPane();
         containerPane.setCenter(v);
-        containerPane.setStyle("-fx-background-image: url('img/wall.png');");
+        containerPane.setStyle(IMG_WALL_PNG);
         return containerPane;
     }
 
