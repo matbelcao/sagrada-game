@@ -495,8 +495,6 @@ public class GUIutil {
         double cellDim = getMainSceneCellDim(width,height);
         int favortokens = board.getPlayerById(showingPlayerId).getFavorTokens();
         String username = board.getPlayerById(showingPlayerId).getUsername();
-        //selectedPlayerPane.setRight(new Rectangle(getCardWidth(cellDim)*NUM_OF_TOOLS,getCardHeight(cellDim),Color.TRANSPARENT)); //the space occupied by cards
-       // selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT)); //the space occupied by roundtrack
         List<DieContainer> selectedPlayerSchema = getSchemaCells(board.getPlayerById(showingPlayerId).getSchema(), cellDim);
         Group playerSchema = buildSchema(selectedPlayerSchema,favortokens,username);
         StackPane schemaContainer = new StackPane(playerSchema);
@@ -542,6 +540,8 @@ public class GUIutil {
     public BorderPane bulidDieOptionPane(double width, double height, LightBoard board) {
         BorderPane selectDiePane = new BorderPane();
         HBox optionBox = new HBox();
+        Group optionBoxContainer = new Group(optionBox);
+        optionBox.setStyle( "-fx-background-color: rgba(255,67,72,0.9);");
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         double cellDim = getMainSceneCellDim(width, height);
         for (IndexedCellContent selectableDie : latestDiceList) {
@@ -555,9 +555,8 @@ public class GUIutil {
             optionBox.getChildren().add(c);
         }
         optionBox.setAlignment(CENTER);
-        //selectDiePane.setStyle("-fx-background-color: rgb(255,255,255,0.4);");
         selectDiePane.setId("opaque-background");
-        selectDiePane.setCenter(new StackPane(optionBox));
+        selectDiePane.setCenter(new StackPane(optionBoxContainer));
         return selectDiePane;
     }
 
