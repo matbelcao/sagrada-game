@@ -23,7 +23,6 @@ import java.net.Socket;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
@@ -67,7 +66,7 @@ public class MasterServer{
     private int portRMI;
     private int portSocket;
 
-    private static Logger logger= Logger.getAnonymousLogger();
+    private static Logger logger= Logger.getGlobal();
 
     private boolean additionalSchemas; //to be used for additional schemas FA
     public static final String XML_SOURCE = "xml/server/"; //append class name + ".xml" to obtain complete path
@@ -76,8 +75,8 @@ public class MasterServer{
     private final ArrayList <User> users;
     private final ArrayList <User> lobby;
     private final ArrayList <Game> games;
-    public static final int MIN_PLAYERS=2;
-    public static final int MAX_PLAYERS=4;
+    private static final int MIN_PLAYERS=2;
+    private static final int MAX_PLAYERS=4;
     private final Object lockGames= new Object();
 
     /**
@@ -99,6 +98,10 @@ public class MasterServer{
         new LobbyHandler();
     }
 
+    /**
+     * parses the xml configuration file
+     * @return a new masterserver instance with the parsed configurations
+     */
     private static MasterServer parser(){
         MasterServer master;
         try (InputStream xmlFile= new FileInputStream(SERVER_CONF_XML)){
@@ -115,6 +118,11 @@ public class MasterServer{
         return readConfFile(xmlFile);
     }
 
+    /**
+     * this reads the xml file
+     * @param xmlFile the xml file to be read
+     * @return the new master server instance (could be null if the configuration file was corrupted or non existent)
+     */
     @Nullable
     private static MasterServer readConfFile(InputStream xmlFile) {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -133,7 +141,7 @@ public class MasterServer{
             boolean setadditionalSchemas=Boolean.parseBoolean(eElement.getElementsByTagName(ADDITIONAL_SCHEMAS).item(0).getTextContent());
             return new MasterServer(setipAddress,setportSocket,setportRMI,setadditionalSchemas,setlobbyTime,setturnTime);
         }catch (SAXException | ParserConfigurationException | IOException e1) {
-            e1.printStackTrace();
+            logger.log(Level.INFO,e1.getMessage());
             return null;
         }
     }
@@ -152,18 +160,34 @@ public class MasterServer{
         return portSocket;
     }
 
+    /**
+     * sets the ip address to be listening on
+     * @param ipAddress the ipv4 address
+     */
     public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
     }
 
+    /**
+     * sets whether or not to show the additional schemas
+     * @param additionalSchemas true iff they are to be used
+     */
     public void setAdditionalSchemas(boolean additionalSchemas) {
         this.additionalSchemas = additionalSchemas;
     }
 
+    /**
+     * this sets the desired time for the lobby timer
+     * @param lobbyTime the desired time in seconds
+     */
     public void setLobbyTime(int lobbyTime) {
         this.lobbyTime = lobbyTime;
     }
 
+    /**
+     * this sets the desired time for the turn timer
+     * @param turnTime the desired time in seconds
+     */
     public void setTurnTime(int turnTime ) {
         this.turnTime = turnTime;
     }
@@ -177,14 +201,23 @@ public class MasterServer{
         return instance;
     }
 
+    /**
+     * @return the max time a player has to play his turn
+     */
     int getTurnTime() {
         return turnTime;
     }
 
+    /**
+     * this handles the timer for the lobby
+     */
     private static class LobbyHandler extends TimerTask {
         @Override
         public void run(){
-            getMasterServer().updateLobby();
+            MasterServer masterServer=getMasterServer();
+            if(masterServer!=null) {
+                masterServer.updateLobby();
+            }
         }
     }
 
@@ -235,6 +268,10 @@ public class MasterServer{
         }
     }
 
+    /**
+     * this starts the master server with preferences loaded from the xml file
+     * @throws InstantiationException
+     */
     private static void startMasterServer() throws InstantiationException {
         instance= parser();
         if(instance==null){
@@ -261,7 +298,7 @@ public class MasterServer{
                     if (lobby.size() == MIN_PLAYERS) {
                         printMessage(TIMER_STARTING + lobbyTime + SEC);
                         Timer timer = new Timer();
-                        timer.schedule(new LobbyHandler(), lobbyTime * 1000);
+                        timer.schedule(new LobbyHandler(), (long)lobbyTime * 1000);
                     }
                     if (lobby.size() >= MAX_PLAYERS) {
                         this.updateLobby();
@@ -300,7 +337,7 @@ public class MasterServer{
         System.setProperty(JAVA_RMI_SERVER_HOSTNAME,ipAddress);
         try {
             AuthenticationInt authenticator = new RMIAuthenticator();
-            Registry registry = LocateRegistry.createRegistry(portRMI);
+            LocateRegistry.createRegistry(portRMI);
             Naming.rebind(RMI_SLASHSLASH +ipAddress+":"+portRMI+ AUTH, authenticator);
         }catch (RemoteException | MalformedURLException e){
             printMessage(ERR_STARTING_RMI);
@@ -406,6 +443,10 @@ public class MasterServer{
         return null;
     }
 
+    /**
+     * this removes the ended game from the list of games active on the server
+     * @param game the game to be deleted
+     */
     void endGame(Game game){
         synchronized (lockGames) {
             games.remove(game);
@@ -462,12 +503,14 @@ public class MasterServer{
                     ServerOptions.setServerPreferences(options, server);
                 }
             }
-            server.startRMI();
-            server.startSocket();
+            if(server!=null) {
+                server.startRMI();
+                server.startSocket();
+            }
         } catch (InstantiationException e) {
-            e.printStackTrace();
+            logger.log(Level.INFO,e.getMessage());
             logger.log(Level.INFO,ERR_START_MASTER_SERVER);
-            return;
+
         }
     }
 
