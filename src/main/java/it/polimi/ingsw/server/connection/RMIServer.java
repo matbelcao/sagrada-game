@@ -9,9 +9,12 @@ import it.polimi.ingsw.server.controller.User;
 
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class RMIServer implements ServerConn {
-        private RMIClientInt remoteObj; //client
+    public static final String CONNECTION_TIMEOUT = "CONNECTION TIMEOUT!";
+    private RMIClientInt remoteObj; //client
         private User user;
         private boolean connectionOk;
         private final Object lockPing =new Object();
@@ -108,6 +111,7 @@ public class RMIServer implements ServerConn {
      * Notifies to all connected users that the status of a certain player has been changed
      * @param gameEvent the new status of the player (reconnect|disconnect|quit)
      * @param id the id of the interested player
+     * @param userName the username
      */
     @Override
     public void notifyStatusUpdate(GameEvent gameEvent, int id, String userName) {
@@ -165,12 +169,12 @@ public class RMIServer implements ServerConn {
                     try {
                         Thread.sleep(PING_TIME);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Logger.getGlobal().log(Level.INFO,e.getMessage());
                     }
                 } catch (RemoteException e) {
                     synchronized (lockPing) {
                         if (user.getStatus() != UserStatus.DISCONNECTED) {
-                            MasterServer.getMasterServer().printMessage("CONNECTION TIMEOUT!");
+                            MasterServer.getMasterServer().printMessage(CONNECTION_TIMEOUT);
                             user.disconnect();
                             connectionOk = false;
                         }

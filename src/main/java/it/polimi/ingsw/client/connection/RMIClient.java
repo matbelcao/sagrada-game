@@ -9,6 +9,8 @@ import it.polimi.ingsw.common.connection.rmi_interfaces.RMIServerInt;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class is the implementation of the RMI client-side connection methods
@@ -21,6 +23,11 @@ public class RMIClient implements ClientConn{
 
     private static final int PONG_TIME=5000;
 
+    /**
+     * instantiates the object
+     * @param remoteObj the objet on the server
+     * @param client the client object
+     */
     public RMIClient(RMIServerInt remoteObj, Client client) {
         this.remoteObj = remoteObj;
         this.client = client;
@@ -195,7 +202,6 @@ public class RMIClient implements ClientConn{
         try{
             diceList = remoteObj.getDiceList();
         }catch(RemoteException | IllegalActionException e){
-            e.printStackTrace();
             closeConn();
         }
         return diceList;
@@ -367,7 +373,7 @@ public class RMIClient implements ClientConn{
                     try {
                         Thread.sleep(PONG_TIME);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Logger.getGlobal().log(Level.INFO,e.getMessage());
                     }
                 } catch (RemoteException e) {
                     synchronized (lockPing) {
@@ -375,7 +381,6 @@ public class RMIClient implements ClientConn{
                             client.disconnect();
                             connectionOk = false;
                             ping = false;
-                            System.out.println("CONNECTION TIMEOUT!");
                             lockPing.notifyAll();
                         }
                     }
