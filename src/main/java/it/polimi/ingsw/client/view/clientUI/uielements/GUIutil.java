@@ -508,7 +508,7 @@ public class GUIutil {
     //todo update
     public Group buildSchema(List<DieContainer> gridCells, int favortokens, double cellDim) {
         GridPane grid = schemaToGrid(gridCells);
-        Label favorTokens = new Label(uimsg.getMessage(REMAINING_TOKENS)+" "+CLIUtils.replicate(CLIUtils.FAVOR,favortokens));
+        Label favorTokens = new Label(uimsg.getMessage(REMAINING_TOKENS)+" "+CLIUtils.printFavorTokens(favortokens));
         favorTokens.setId("favor-tokens");
         VBox schema =new VBox(favorTokens,new Group(grid));
         schema.setId("player-schema");

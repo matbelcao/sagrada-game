@@ -19,14 +19,13 @@ import java.util.List;
 import java.util.Observable;
 
 import static it.polimi.ingsw.client.controller.ClientFSMState.*;
-import static it.polimi.ingsw.common.enums.ErrMsg.ERR;
-import static it.polimi.ingsw.common.enums.ErrMsg.ERROR_RETRIEVING_CONSOLE;
 
 /**
  * This is the class that implements the UI for the client as a command line interface
  */
 public class CLI implements ClientUI {
     private static final String STRING_NEWLINE="%s%n";
+    private static final String ERR_RETRIEVING_CONSOLE="ERR: error while retrieving console";
     private final CLIObjects view;
     private Console console;
 
@@ -44,7 +43,7 @@ public class CLI implements ClientUI {
         this.console=System.console();
 
         if (console == null) {
-            System.err.println(ERR.toString()+ERROR_RETRIEVING_CONSOLE);
+            System.err.println(ERR_RETRIEVING_CONSOLE);
             System.exit(1);
         }
 

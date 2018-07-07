@@ -65,76 +65,141 @@ public class ClientParser {
     }
 
 
-
+    /**
+     * this method tells if the message received through socket was a login message
+     * @param message the unparsed message received from the server
+     * @return true iff it's a login message
+     */
     public static boolean isLogin(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.LOGIN);
 
     }
 
+    /**
+     * this method tells if the message received through socket was a lobby message
+     * @param message the unparsed message received from the server
+     * @return true iff it's a lobby message
+     */
     public static boolean isLobby(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.LOBBY);
 
     }
 
+    /**
+     * this method tells if the message received through socket was a game message
+     * @param message the unparsed message received from the server
+     * @return true iff it's a game message
+     */
     public static boolean isGame(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.GAME);
 
     }
 
+    /**
+     * this method tells if the message received through socket was a send message of some object from the board
+     * @param message the unparsed message received from the server
+     * @return true iff it's a send message
+     */
     public static boolean isSend(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.SEND);
 
     }
 
+    /**
+     * this method tells if the message received through socket was a list of dice
+     * @param message the unparsed message received from the server
+     * @return true iff it's a message containing a list of dice
+     */
     public static boolean isDiceList(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.LIST_DICE);
 
     }
 
+    /**
+     * this method tells if the message received through socket was an  list of options
+     * @param message the unparsed message received from the server
+     * @return true iff it's a list of options
+     */
     public static boolean isOptionList(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.LIST_OPTIONS);
 
     }
 
+    /**
+     * this method tells if the message received through socket was a list of placements
+     * @param message the unparsed message received from the server
+     * @return true iff it's a list of placements
+     */
     public static boolean isPlacementList(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.LIST_PLACEMENTS);
 
     }
 
+    /**
+     * this method tells if the message received through socket was a choice response message
+     * @param message the unparsed message received from the server
+     * @return true iff it's a choice response message
+     */
     public static boolean isChoice(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.CHOICE);
 
     }
 
+    /**
+     * this method tells if the message received through socket was a message regarding tools
+     * @param message the unparsed message received from the server
+     * @return true iff it's a message regarding tools
+     */
     public static boolean isTool(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.TOOL);
     }
 
+    /**
+     * this method tells if the message received through socket was a status message
+     * @param message the unparsed message received from the server
+     * @return true iff it's a status message
+     */
     public static boolean isStatus(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.STATUS);
 
     }
 
+    /**
+     * this method tells if the message received through socket was a message saying the last command we sent was malformed
+     * @param message the unparsed message received from the server
+     * @return true iff it's a message saying the last command we sent was malformed
+     */
     public static boolean isInvalid(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.INVALID);
     }
 
+    /**
+     * this method tells if the message received through socket was a ping
+     * @param message the unparsed message received from the server
+     * @return true iff it's a ping
+     */
     public static boolean isPing(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.PING);
     }
 
+    /**
+     * this method tells if the message received through socket was a message saying the last command we sent was
+     * an illegal move at that time
+     * @param message the unparsed message received from the server
+     * @return true iff it's a message saying the last command we sent was an illegal move at that time
+     */
     public static boolean isIllegalAction(String message){
         if (message == null) throw new IllegalArgumentException();
         return message.trim().split("\\s+",2)[0].equals(SocketString.ILLEGAL);
@@ -287,6 +352,11 @@ public class ClientParser {
         return parsedResult.get(1).equals(SocketString.OK) || parsedResult.get(1).equals(SocketString.KO);
     }
 
+    /**
+     * This method checks if the STATUS parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * @param parsedResult the parsed parameters of the command
+     * @return true iff the parameters are valid
+     */
     private static boolean checkStatus(List<String> parsedResult) {
         return parsedResult.size()>=2;
     }

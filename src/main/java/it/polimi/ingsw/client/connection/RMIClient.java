@@ -10,6 +10,9 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is the implementation of the RMI client-side connection methods
+ */
 public class RMIClient implements ClientConn{
     private RMIServerInt remoteObj; //user
     private Client client;
@@ -382,7 +385,7 @@ public class RMIClient implements ClientConn{
     }
 
     /*
-     *  Disabled for RMI_SLASHSLASH
+     *  Disabled for rmi
      */
     @Override
     public boolean login(String username, char[] password) {

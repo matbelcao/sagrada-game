@@ -5,7 +5,6 @@ import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.connection.SocketString;
 import it.polimi.ingsw.common.enums.Actions;
-import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.*;
 
 import java.io.*;
@@ -14,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class is the implementation of the SOCKET client-side connection methods
@@ -24,6 +25,9 @@ public class SocketClient implements ClientConn {
     private static final int LIST_START=1;
     private static final int NUM_CARDS=3;
     private static final int PONG_TIME=10000;
+    private static final String INVALID_MESSAGE = "INVALID message";
+    private static final String ILLEGAL_ACTION = "ILLEGAL ACTION!";
+    private static final String ERR_ERROR_WHILE_CLOSING_THE_SOCKET = "ERR: error while closing the socket";
 
     private Socket socket;
     private QueuedBufferedReader inSocket;
@@ -82,55 +86,71 @@ public class SocketClient implements ClientConn {
                         if (ClientParser.parse(inSocket.readln(), result) && connectionOk) {
                             if (ClientParser.isStatus(inSocket.readln())) {
                                 inSocket.pop();
-                                client.addUpdateTask(new Thread(()->
-                                        client.updatePlayerStatus(
-                                                Integer.parseInt(result.get(2)),
-                                                GameEvent.valueOf(result.get(1).toUpperCase()),
-                                                result.get(3))
-                                ));
+                                updatePlayerStatus(result);
 
                             } else if (ClientParser.isLobby(inSocket.readln())) {
                                 inSocket.pop();
                                 updateLobby(result.get(1));
+
                             } else if (ClientParser.isGame(inSocket.readln())) {
                                 inSocket.pop();
-
                                 updateMessages( result);
 
                             } else if (ClientParser.isPing(inSocket.readln())) {
                                 inSocket.pop();
                                 pong();
+
                             } else if (ClientParser.isInvalid(inSocket.readln())) {
                                 inSocket.pop();
-                                System.out.println("INVALID message");
+                                Logger.getGlobal().log(Level.INFO,INVALID_MESSAGE);
+
                             } else if (ClientParser.isIllegalAction(inSocket.readln())) {
                                 inSocket.pop();
-                                System.out.println("ILLEGAL ACTION!");
+                                Logger.getGlobal().log(Level.INFO,ILLEGAL_ACTION);
                             }
                         }
                         lockin.notifyAll();
                     }
                 } catch (IOException e) {
-                    if(!socket.isClosed()) {
-                        try {
-                            socket.close();
-                        } catch (IOException e1) {
-                            System.err.println("ERR: error while closing the socket");
-                        }
-                        System.out.println("QUITTED(1)");
-                    }
-                    synchronized (lockPing){
-                        if(timerActive && pingTimer!=null){
-                            pingTimer.cancel();
-                            timerActive=false;
-                            lockPing.notifyAll();
-                        }
-                    }
-
-                    client.disconnect();
+                    manageSocketError();
                 }
             }
         }).start();
+    }
+
+    /**
+     * manages an error in the connection via socket
+     */
+    private void manageSocketError() {
+        if(!socket.isClosed()) {
+            try {
+                socket.close();
+            } catch (IOException e1) {
+                Logger.getGlobal().log(Level.INFO, ERR_ERROR_WHILE_CLOSING_THE_SOCKET);
+            }
+        }
+        synchronized (lockPing){
+            if(timerActive && pingTimer!=null){
+                pingTimer.cancel();
+                timerActive=false;
+                lockPing.notifyAll();
+            }
+        }
+
+        client.disconnect();
+    }
+
+    /**
+     * updates the client with the changes in status of a player
+     * @param result the message
+     */
+    private void updatePlayerStatus(ArrayList<String> result) {
+        client.addUpdateTask(new Thread(()->
+                client.updatePlayerStatus(
+                        Integer.parseInt(result.get(2)),
+                        GameEvent.valueOf(result.get(1).toUpperCase()),
+                        result.get(3))
+        ));
     }
 
     /**
@@ -183,7 +203,7 @@ public class SocketClient implements ClientConn {
         switch(outcomes.get(1)){
             case SocketString.START:
                 client.addUpdateTask(new Thread(()->
-                client.updateGameStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)))
+                    client.updateGameStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3)))
                 ));
                 break;
             case SocketString.END:
@@ -193,13 +213,13 @@ public class SocketClient implements ClientConn {
                     ranking.add(new RankingEntry(Integer.parseInt(param[0]),Integer.parseInt(param[1]),Integer.parseInt(param[2])));
                 }
                 client.addUpdateTask(new Thread(()->
-                client.updateGameEnd(ranking)
+                    client.updateGameEnd(ranking)
                 ));
 
                 break;
             case SocketString.ROUND_START:
                 client.addUpdateTask(new Thread(()->
-                client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)))
+                    client.updateGameRoundStart(Integer.parseInt(outcomes.get(2)))
                 ));
                 break;
             case SocketString.ROUND_END:
@@ -209,20 +229,32 @@ public class SocketClient implements ClientConn {
                 break;
             case SocketString.TURN_START:
                 client.addUpdateTask(new Thread(()->
-                client.updateGameTurnStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3))==0)
+                    client.updateGameTurnStart(Integer.parseInt(outcomes.get(2)),Integer.parseInt(outcomes.get(3))==0)
                 ));
                 break;
             case SocketString.TURN_END:
                 client.addUpdateTask(new Thread(()->
-                client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)))
+                    client.updateGameTurnEnd(Integer.parseInt(outcomes.get(2)))
                 ));
                 break;
             case SocketString.BOARD_CHANGED:
                 client.addUpdateTask(new Thread(()->
-                client.getBoardUpdates()
+                    client.getBoardUpdates()
                 ));
                 break;
             default:
+        }
+    }
+
+    /**
+     * this waits for the next message coming in via socket
+     */
+    private void waitForLine() {
+        try {
+            inSocket.waitForLine();
+        } catch (IOException e) {
+            Logger.getGlobal().log(Level.INFO,e.getMessage());
+            System.exit(1);
         }
     }
 
@@ -244,12 +276,7 @@ public class SocketClient implements ClientConn {
         int i=0;
         while(i<NUM_DRAFTED_SCHEMAS){
             synchronized (lockin) {
-                try {
-                    inSocket.waitForLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                waitForLine();
                 while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals(SocketString.SCHEMA))) {
                     waitForTheRightOne();
                 }
@@ -265,18 +292,19 @@ public class SocketClient implements ClientConn {
         return lightSchemaCards;
     }
 
+    /**
+     * this waits for a new message that could possibly be the expected one
+     */
     private void waitForTheRightOne() {
         synchronized (lockin) {
             lockin.notifyAll();
             try {
                 lockin.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            try {
+
                 inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException |InterruptedException e) {
+                Logger.getGlobal().log(Level.INFO,e.getMessage());
+                System.exit(1);
             }
         }
 
@@ -296,11 +324,7 @@ public class SocketClient implements ClientConn {
         syncedSocketWrite(SocketString.GET_SCHEMA+playerId);
 
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
 
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals(SocketString.SCHEMA))) {
                 waitForTheRightOne();
@@ -325,16 +349,11 @@ public class SocketClient implements ClientConn {
         syncedSocketWrite(SocketString.GET_PRIVATE);
 
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
 
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals(SocketString.PRIVATE))) {
                 waitForTheRightOne();
             }
-
 
             lightObjCard = LightPrivObj.toLightPrivObj(inSocket.readln());
             inSocket.pop();
@@ -359,11 +378,7 @@ public class SocketClient implements ClientConn {
             int i=0;
             while(i<NUM_CARDS){
                 synchronized (lockin) {
-                    try {
-                        inSocket.waitForLine();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    waitForLine();
                     while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals(SocketString.PUBLIC))) {
                         waitForTheRightOne();
                     }
@@ -391,16 +406,11 @@ public class SocketClient implements ClientConn {
 
         syncedSocketWrite(SocketString.GET_TOOLCARD);
 
-
         int i=0;
         while(i<NUM_CARDS){
 
             synchronized (lockin) {
-                try {
-                    inSocket.waitForLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                waitForLine();
 
                 while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals(SocketString.TOOLCARD))) {
                     waitForTheRightOne();
@@ -412,9 +422,10 @@ public class SocketClient implements ClientConn {
             }
             i++;
         }
-        System.out.println("QUI");
         return toolCards;
     }
+
+
 
     /**
      * This function can be invoked to request the dice in the draftpool
@@ -425,16 +436,12 @@ public class SocketClient implements ClientConn {
         ArrayList<String> result= new ArrayList<>();
         List<LightDie> draftPool=new ArrayList<>();
         LightDie die;
-        String args[];
+        String [] args;
 
         syncedSocketWrite(SocketString.GET_DRAFTPOOL);
 
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
 
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals(SocketString.DRAFTPOOL))) {
                 waitForTheRightOne();
@@ -462,16 +469,12 @@ public class SocketClient implements ClientConn {
         List<LightDie> container;
         LightDie die;
         int index=-1;
-        String args[];
+        String [] args;
 
         syncedSocketWrite(SocketString.GET_ROUNDTRACK);
 
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
 
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals(SocketString.ROUNDTRACK))) {
                 waitForTheRightOne();
@@ -507,11 +510,7 @@ public class SocketClient implements ClientConn {
         syncedSocketWrite(SocketString.GET_PLAYERS);
 
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
 
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals(SocketString.PLAYERS))) {
                 waitForTheRightOne();
@@ -542,11 +541,7 @@ public class SocketClient implements ClientConn {
         syncedSocketWrite(SocketString.GET_GAME_STATUS);
 
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
 
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals(SocketString.GAME_STATUS))) {
                 waitForTheRightOne();
@@ -575,11 +570,7 @@ public class SocketClient implements ClientConn {
         syncedSocketWrite(SocketString.GET_TOKENS+playerId);
 
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
 
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isSend(inSocket.readln()) && result.get(1).equals(SocketString.TOKENS))) {
                 waitForTheRightOne();
@@ -606,11 +597,7 @@ public class SocketClient implements ClientConn {
         syncedSocketWrite(SocketString.GET_DICE_LIST);
         outSocket.flush();
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
 
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isDiceList(inSocket.readln()))) {
                 waitForTheRightOne();
@@ -629,6 +616,8 @@ public class SocketClient implements ClientConn {
         return diceList;
     }
 
+
+
     /**
      * This function can be invoked to select one die of a previously GET_DICE_LIST command and obtain
      * a list of to options to manipulate it
@@ -643,11 +632,7 @@ public class SocketClient implements ClientConn {
         syncedSocketWrite(SocketString.SELECT+" "+dieIndex);
         outSocket.flush();
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
 
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isOptionList(inSocket.readln()))) {
                 waitForTheRightOne();
@@ -677,11 +662,7 @@ public class SocketClient implements ClientConn {
         syncedSocketWrite(SocketString.GET_PLACEMENTS_LIST);
         outSocket.flush();
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
 
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isPlacementList(inSocket.readln()) && result.get(0).equals(SocketString.LIST_PLACEMENTS))) {
                 waitForTheRightOne();
@@ -710,11 +691,7 @@ public class SocketClient implements ClientConn {
         outSocket.flush();
 
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
 
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isChoice(inSocket.readln()))) {
                 waitForTheRightOne();
@@ -738,12 +715,7 @@ public class SocketClient implements ClientConn {
         syncedSocketWrite(SocketString.TOOL_ENABLE+toolIndex);
         outSocket.flush();
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            waitForLine();
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isTool(inSocket.readln()))) {
                 waitForTheRightOne();
             }
@@ -764,11 +736,7 @@ public class SocketClient implements ClientConn {
         syncedSocketWrite(SocketString.TOOL_CONTINUE);
         outSocket.flush();
         synchronized (lockin) {
-            try {
-                inSocket.waitForLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            waitForLine();
             while (!(ClientParser.parse(inSocket.readln(), result) && ClientParser.isTool(inSocket.readln()))) {
                 waitForTheRightOne();
             }
@@ -818,7 +786,7 @@ public class SocketClient implements ClientConn {
             try {
                 socket.close();
             } catch (IOException e) {
-
+                Logger.getGlobal().log(Level.INFO,e.getMessage());
             }
         }
         synchronized (lockPing){
@@ -854,13 +822,13 @@ public class SocketClient implements ClientConn {
                         pingTimer.cancel();
                     }
                     pingTimer = new Timer();
-                    pingTimer.schedule(new connectionTimeout(), PONG_TIME);
+                    pingTimer.schedule(new ConnectionTimeout(), PONG_TIME);
                     timerActive = true;
                     lockPing.notifyAll();
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.INFO,e.getMessage());
             return;
         }
     }
@@ -868,7 +836,7 @@ public class SocketClient implements ClientConn {
     /**
      * If triggered, it means that the connection has broken
      */
-    private class connectionTimeout extends TimerTask {
+    private class ConnectionTimeout extends TimerTask {
         @Override
         public void run(){
             synchronized (lockPing) {

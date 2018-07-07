@@ -33,6 +33,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static it.polimi.ingsw.common.enums.ErrMsg.*;
 
@@ -579,9 +581,8 @@ public class Client implements ClientInt {
                 try {
                     lockReady.wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    System.err.println(ERR.toString()+INTERRUPTED_READY_WAIT);
-                    System.exit(2);
+                    Logger.getGlobal().log(Level.INFO,e.getMessage());
+                    System.exit(1);
                 }
             }
         }
@@ -772,8 +773,8 @@ public class Client implements ClientInt {
         try {
             client.connectAndLogin();
         } catch (InterruptedException e) {
-            System.err.println(ERR.toString() + INTERRUPTED_LOGIN_PROCEDURE.toString());
-            System.exit(2);
+            Logger.getGlobal().log(Level.INFO,e.getMessage());
+            System.exit(1);
         }
 
     }
