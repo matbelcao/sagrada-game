@@ -766,6 +766,9 @@ public class GUIutil {
 
             if (latestSelectedDie.getPlace().equals(Place.DRAFTPOOL)) {
                 for (DieContainer cell : draftPoolCells) {
+                    if(draftPoolCells.indexOf(cell)==latestSelectedDie.getPosition()){
+                        continue;
+                    }
                     cell.setOnMouseClicked(e -> {
                         synchronized (lockWrite) {
                             cmdWrite.write(ClientFSM.DISCARD);
