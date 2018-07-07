@@ -81,6 +81,8 @@ public class GUIutil {
     private static final double CARD_WIDTH_TO_CELL_DIM = 2.65;
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.6;
     private static final double ROUNDTRACK_SPACING = 5;
+    private static final double FAVOR_TO_TOOL_W = 0.13;
+
     //Connection Broken
     private static final double CONN_BROKEN_FONT_TO_SCREEN = 0.018;
 
@@ -247,9 +249,9 @@ public class GUIutil {
         Label currentlyPlaying = new Label();
         currentlyPlaying.setId("currently-playing");
         if(board.getNowPlaying() == board.getMyPlayerId()){
-            currentlyPlaying.setText("E' il tuo turno");
+            currentlyPlaying.setText(uimsg.getMessage(YOUR_TURN));
         }else{
-            currentlyPlaying.setText("1234567890123 sta giocando"); // TODO: 06/07/2018 set correct player
+            currentlyPlaying.setText(board.getPlayerById(board.getNowPlaying()).getUsername()+uimsg.getMessage(IS_PLAYING));
         }
         //the container of the button to switch view of the cards
         HBox buttonContainer = new HBox(priv, pub, tool,currentlyPlaying,turnIndicator);
@@ -302,7 +304,7 @@ public class GUIutil {
             gc.setFill(Color.TRANSPARENT);
             gc.fillRect(0,0,cardWidth,cardHeight);
             gc.setFill(Color.BLUE);
-            double radius = 20;
+            double radius = FAVOR_TO_TOOL_W*cardWidth;
             gc.fillOval(cardWidth-2*radius,radius,radius,radius);
             tool.getChildren().setAll(new StackPane(imgRect,favorToken));
         }else{

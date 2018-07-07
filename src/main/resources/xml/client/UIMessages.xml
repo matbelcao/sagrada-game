@@ -176,6 +176,10 @@
         <eng>%s is playing at the moment... Please, wait for your turn!</eng>
         <ita>%s sta giocando al momento... Attendi il tuo turno!</ita>
     </not-my-turn>
+    <is-playing>
+        <eng>is playing </eng>
+        <ita>sta giocando</ita>
+    </is-playing>
     <first-turn>
         <eng>first turn</eng>
         <ita>primo turno</ita>

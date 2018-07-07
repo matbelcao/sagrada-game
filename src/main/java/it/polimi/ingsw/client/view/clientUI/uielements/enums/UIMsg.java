@@ -19,6 +19,7 @@ public enum UIMsg {
     ROUND("round"),
     ROUND_NUMBER("round-number"),
     TURN_OF("turn-of"),
+    IS_PLAYING("is-playing"),
     YOUR_TURN("your-turn"),
     DRAFTPOOL("draftpool"),
     ROUNDTRACK("roundtrack"),
