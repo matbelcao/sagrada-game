@@ -12,6 +12,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UIMessages {
     private Element msgFile;
@@ -22,6 +24,13 @@ public class UIMessages {
 
     public UIMessages(UILanguage lang) {
         this.lang = lang;
+        createXmlParser();
+   }
+
+    /**
+     * this sets the xml reader ready to gather the needed messages
+     */
+    private void createXmlParser() {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         InputStream xmlFile= classLoader.getResourceAsStream(Client.XML_SOURCE+UIMESSAGES_FILE_NAME);
 
@@ -35,11 +44,16 @@ public class UIMessages {
            msgFile = (Element)doc.getElementsByTagName(MSG).item(FIRST);
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
-           e.printStackTrace();
+            Logger.getGlobal().log(Level.INFO,e.getMessage());
 
         }
-   }
-   public  String getMessage(UIMsg msgName){
+    }
+
+    /**
+     * @param msgName the desired message
+     * @return the string containing the messages
+     */
+    public  String getMessage(UIMsg msgName){
         Element msg= (Element) msgFile.getElementsByTagName(msgName.toString().toLowerCase()).item(FIRST);
         return msg.getElementsByTagName(lang.toString().toLowerCase()).item(FIRST).getTextContent();
    }

@@ -26,6 +26,9 @@ public class CLIFormatter {
         }
     }
 
+    /**
+     * @return a reader for the xml file
+     */
     private static Element parser(){
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         InputStream xmlFile= classLoader.getResourceAsStream(Client.XML_SOURCE+FORMATS_FILE_NAME);

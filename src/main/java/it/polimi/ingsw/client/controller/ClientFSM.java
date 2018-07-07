@@ -379,10 +379,16 @@ public class ClientFSM {
         }
     }
 
+    /**
+     * @return the state of the fsm
+     */
     public ClientFSMState getState(){
         return state;
     }
 
+    /**
+     * sets the state to NOT_MY_TURN
+     */
     void setNotMyTurn() {
         synchronized (lockState) {
             state = NOT_MY_TURN;
@@ -392,6 +398,10 @@ public class ClientFSM {
         client.getBoard().stateChanged();
     }
 
+    /**
+     * sets the state to MAIN or NOT_MY_TURN according to the param
+     * @param isMyTurn true if it is so
+     */
     void setMyTurn(boolean isMyTurn) {
         synchronized (lockState) {
             assert (state.equals(NOT_MY_TURN));
@@ -401,6 +411,9 @@ public class ClientFSM {
         client.getBoard().stateChanged();
     }
 
+    /**
+     * sets the state to GAME_ENDED
+     */
     void endGame() {
         synchronized (lockState) {
             state = GAME_ENDED;
@@ -408,6 +421,10 @@ public class ClientFSM {
         }
     }
 
+    /**
+     * sets the state to either CHOOSE_SCHEMA or NOT_MY_TURN according to the phase of the game
+     * @param isInit true if the schemas still have to be chosen by the players
+     */
     void resetState(boolean isInit) {
         if(isInit){
             synchronized (lockState) {

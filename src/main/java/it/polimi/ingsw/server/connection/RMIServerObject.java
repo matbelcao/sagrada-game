@@ -33,7 +33,7 @@ public class RMIServerObject extends UnicastRemoteObject implements RMIServerInt
     }
 
     @Override
-    public List<LightCard> getPublicObjects() {
+    public List<LightCard> getPublicObjectives() {
         return user.getGame().getPubCards();
     }
 

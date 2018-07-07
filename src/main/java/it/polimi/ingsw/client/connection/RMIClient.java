@@ -91,7 +91,7 @@ public class RMIClient implements ClientConn{
     public List<LightCard> getPublicObjectives() {
         List<LightCard> result = new ArrayList<>();
         try {
-            result = remoteObj.getPublicObjects();
+            result = remoteObj.getPublicObjectives();
         } catch (RemoteException e) {
             closeConn();
         }
