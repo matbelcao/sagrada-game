@@ -62,6 +62,7 @@ public class SocketClient implements ClientConn {
 
     private void syncedSocketWrite(String message){
         synchronized (lockOutSocket){
+
             outSocket.println(message);
             outSocket.flush();
             lockOutSocket.notifyAll();

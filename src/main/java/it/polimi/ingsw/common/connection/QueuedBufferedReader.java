@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class QueuedBufferedReader implements QueuedReader {
     private final BufferedReader inReader;
@@ -41,9 +43,8 @@ public class QueuedBufferedReader implements QueuedReader {
                     System.out.println("\t\t\t\t\t"+temp);*/
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.INFO,e.getMessage());
             //debug
-            System.err.println("ERR interrupt");
         }
         put();
     }

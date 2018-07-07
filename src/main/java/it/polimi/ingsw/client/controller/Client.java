@@ -1,7 +1,10 @@
 package it.polimi.ingsw.client.controller;
 
 import it.polimi.ingsw.client.ClientOptions;
-import it.polimi.ingsw.client.connection.*;
+import it.polimi.ingsw.client.connection.ClientConn;
+import it.polimi.ingsw.client.connection.RMIClient;
+import it.polimi.ingsw.client.connection.RMIClientObject;
+import it.polimi.ingsw.client.connection.SocketClient;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.clientUI.CLI;
 import it.polimi.ingsw.client.view.clientUI.ClientUI;
@@ -119,7 +122,7 @@ public class Client implements ClientInt {
                 return client;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.INFO,e.getMessage());
             client=null;
         }
 
@@ -149,7 +152,7 @@ public class Client implements ClientInt {
 
             return new Client(uiMode,connMode,serverIP,port,lang);
         } catch (ParserConfigurationException | IOException | SAXException e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.INFO,e.getMessage());
             System.exit(1);
             return null;
         }
@@ -208,12 +211,8 @@ public class Client implements ClientInt {
                 doc.getDocumentElement().normalize();
                 Element eElement = (Element) doc.getElementsByTagName(CONFIGURATIONS).item(0);
                 this.port=Integer.parseInt(eElement.getElementsByTagName(RMI_PORT).item(0).getTextContent());
-            }catch (ParserConfigurationException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
+            }catch (ParserConfigurationException | SAXException | IOException e) {
+                Logger.getGlobal().log(Level.INFO,e.getMessage());
             }
         }
     }
@@ -283,7 +282,8 @@ public class Client implements ClientInt {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Logger.getGlobal().log(Level.INFO,e.getMessage());
+                    System.exit(1);
                 }
             }
             clientUI = GUI.getGUI();
@@ -360,11 +360,6 @@ public class Client implements ClientInt {
             clientConn.pong();
 
         } catch (IOException | NotBoundException e) {
-            e.printStackTrace();
-            synchronized (lockStatus) {
-                userStatus = UserStatus.DISCONNECTED;
-                lockStatus.notifyAll();
-            }
             disconnect();
         }
     }
@@ -372,17 +367,19 @@ public class Client implements ClientInt {
     /**
      * this logs tries to log the user in
      * @return true iff it succeeded
-     * @throws RemoteException
-     * @throws MalformedURLException
-     * @throws NotBoundException
      */
-    private boolean login() throws RemoteException, MalformedURLException, NotBoundException {
+    private boolean login()  {
         if(this.username.equals(EMPTY_STRING)){return false;}
-        boolean logged;
-        if (connMode.equals(ConnectionMode.RMI)) {
-            logged = loginRMI();
-        } else {
-            logged = clientConn.login(username, password);
+        boolean logged=false;
+        try {
+            if (connMode.equals(ConnectionMode.RMI)) {
+                logged = loginRMI();
+            } else {
+
+                logged = clientConn.login(username, password);
+            }
+        }catch (Exception e){
+            disconnect();
         }
         return logged;
     }
@@ -445,7 +442,7 @@ public class Client implements ClientInt {
                         try {
                             updatesQueue.wait();
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            Logger.getGlobal().log(Level.INFO,e.getMessage());
                             System.exit(2);
                         }
                     }
@@ -455,7 +452,7 @@ public class Client implements ClientInt {
                     try {
                         updatesQueue.get(0).join();
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Logger.getGlobal().log(Level.INFO,e.getMessage());
                         System.exit(2);
                     }
                     updatesQueue.remove(0);
@@ -743,12 +740,12 @@ public class Client implements ClientInt {
     public void disconnect(){
         synchronized (lockStatus) {
             if(!userStatus.equals(UserStatus.DISCONNECTED)) {
-                clientUI.updateConnectionBroken();
                 userStatus = UserStatus.DISCONNECTED;
                 lockStatus.notifyAll();
+
             }
         }
-
+        clientUI.updateConnectionBroken();
     }
 
     /**
