@@ -30,6 +30,16 @@ public class QueuedCmdReader implements QueuedReader,CmdWriter {
     }
 
     @Override
+    public void write(char cmd) {
+        write(cmd + "");
+    }
+
+    @Override
+    public void write(int cmd) {
+        write(cmd + "");
+    }
+
+    @Override
     public void clear() {
         synchronized (lockQueue){
             queue.clear();

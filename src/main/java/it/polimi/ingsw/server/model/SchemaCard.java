@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class represents a schema card of the game
@@ -30,6 +32,16 @@ public class SchemaCard implements Iterable<Cell>  {
     private static final String EXTERNAL_ADDITIONAL_SCHEMAS_XML =
             (new File(MasterServer.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParentFile().getAbsolutePath()
                     +File.separator+"AdditionalSchemas.xml";
+    private static final String SCHEMA_CARD = "SchemaCard";
+    private static final String NAMEE = "name";
+    private static final String TOKEN = "token";
+    private static final String DATA = "data";
+    private static final String ROW = "row";
+    private static final String COL = "col";
+    private static final String ERR_COULDN_T_LOAD_SCHEMA_CARD = "ERR: couldn't load schema card";
+    private static final String ERR_OPENING_ADD_SCHEMAS_FILE = "ERR: couldn't open the additional schemas file correctly: ";
+    private static final String YOU_CAN_T_PLACE_THIS_DIE_HERE = "You can't place this die here!";
+    private static final String THERE_S_NO_DIE_TO_REMOVE_IN_THIS_CELL_INDEX = "there's no die to remove in this cell(index:";
     private String name;
     private int id;
     private int favorTokens;
@@ -102,6 +114,12 @@ public class SchemaCard implements Iterable<Cell>  {
     }
 
 
+    /**
+     *
+     * @param id
+     * @param xmlFile
+     * @return
+     */
     @Nullable
     private static SchemaCard readSchema(int id, InputStream xmlFile) {
         String name;
@@ -114,17 +132,17 @@ public class SchemaCard implements Iterable<Cell>  {
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
 
-            NodeList nodeList = doc.getElementsByTagName("SchemaCard");
+            NodeList nodeList = doc.getElementsByTagName(SCHEMA_CARD);
             Element eElement = (Element)nodeList.item(id-1);
 
-            name=eElement.getElementsByTagName("name").item(0).getTextContent();
+            name=eElement.getElementsByTagName(NAMEE).item(0).getTextContent();
 
-            favorTokens = Integer.parseInt(eElement.getElementsByTagName("token").item(0).getTextContent());
+            favorTokens = Integer.parseInt(eElement.getElementsByTagName(TOKEN).item(0).getTextContent());
 
-            for (int temp2 = 0; temp2 < eElement.getElementsByTagName("data").getLength(); temp2++) {
-                int row = Integer.parseInt(eElement.getElementsByTagName("row").item(temp2).getTextContent());
-                int column = Integer.parseInt(eElement.getElementsByTagName("col").item(temp2).getTextContent());
-                cells[row][column]=new Cell(eElement.getElementsByTagName("data").item(temp2).getTextContent());
+            for (int temp2 = 0; temp2 < eElement.getElementsByTagName(DATA).getLength(); temp2++) {
+                int row = Integer.parseInt(eElement.getElementsByTagName(ROW).item(temp2).getTextContent());
+                int column = Integer.parseInt(eElement.getElementsByTagName(COL).item(temp2).getTextContent());
+                cells[row][column]=new Cell(eElement.getElementsByTagName(DATA).item(temp2).getTextContent());
             }
 
             for (int i=0; i<NUM_ROWS ; i++){
@@ -137,7 +155,7 @@ public class SchemaCard implements Iterable<Cell>  {
 
             return new SchemaCard(cells,id,name,favorTokens);
         }catch (SAXException | ParserConfigurationException | IOException e1) {
-            System.err.println("ERR: couldn't load schema card");
+            Logger.getGlobal().log(Level.INFO, ERR_COULDN_T_LOAD_SCHEMA_CARD);
         }
         return null;
     }
@@ -167,12 +185,12 @@ public class SchemaCard implements Iterable<Cell>  {
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
 
-            NodeList nodeList = doc.getElementsByTagName("SchemaCard");
+            NodeList nodeList = doc.getElementsByTagName(SCHEMA_CARD);
             return nodeList.getLength();
 
         }catch (SAXException | ParserConfigurationException | IOException e1) {
-            e1.printStackTrace();
-            System.err.println("ERR: couldn't open the file correctly");
+            Logger.getGlobal().log(Level.INFO,e1.getMessage());
+            Logger.getGlobal().log(Level.INFO, ERR_OPENING_ADD_SCHEMAS_FILE);
             return 0;
         }
     }
@@ -374,7 +392,7 @@ public class SchemaCard implements Iterable<Cell>  {
         if(!ignoreConstraint.equals(IgnoredConstraint.FORCE)) {
 
             if (!this.listPossiblePlacements(die, ignoreConstraint).contains(index))
-                throw new IllegalDieException("You can't place this die here!");
+                throw new IllegalDieException(YOU_CAN_T_PLACE_THIS_DIE_HERE);
         }
         this.cell[index/NUM_COLS][index%NUM_COLS].setDie(die,ignoreConstraint);
         this.isFirstDie=false;
@@ -393,7 +411,7 @@ public class SchemaCard implements Iterable<Cell>  {
             }
             return;
         }
-        throw new NoSuchElementException("there's no die to remove in this cell(index:"+index+")");
+        throw new NoSuchElementException(THERE_S_NO_DIE_TO_REMOVE_IN_THIS_CELL_INDEX +index+")");
     }
 
     /**

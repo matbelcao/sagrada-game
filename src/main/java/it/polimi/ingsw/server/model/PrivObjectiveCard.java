@@ -8,6 +8,7 @@ import it.polimi.ingsw.server.model.iterators.FullCellIterator;
  * This class implements the Cards named "Private Objective" and their score calculating algorithms
  */
 public class PrivObjectiveCard extends Card{
+    private final String PRIV_OBJECTIVE_CARD = "PrivObjectiveCard";
     private DieColor dieColor;
     static final int NUM_PRIV_OBJ=5;
     private static String xmlSource=MasterServer.XML_SOURCE+"PrivObjectiveCard.xml";
@@ -18,7 +19,7 @@ public class PrivObjectiveCard extends Card{
      */
     public PrivObjectiveCard(int id){
         super();
-        this.dieColor =DieColor.valueOf(super.xmlReader(id,xmlSource,"PrivObjectiveCard"));
+        this.dieColor =DieColor.valueOf(super.xmlReader(id,xmlSource, PRIV_OBJECTIVE_CARD));
     }
 
     /**

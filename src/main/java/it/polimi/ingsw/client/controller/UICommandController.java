@@ -3,6 +3,9 @@ package it.polimi.ingsw.client.controller;
 import it.polimi.ingsw.common.connection.QueuedReader;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static it.polimi.ingsw.client.controller.ClientFSM.*;
 
 /**
@@ -10,6 +13,7 @@ import static it.polimi.ingsw.client.controller.ClientFSM.*;
  * status and view
  */
 public class UICommandController extends Thread {
+    private static final String ERR_COULDN_T_READ_FROM_CONSOLE = "ERR: couldn't read from console";
     private final ClientFSM clientFSM;
     private final QueuedReader commandQueue;
     private static final String INDEX = "([0-9]|([1-9][0-9]))";
@@ -37,7 +41,7 @@ public class UICommandController extends Thread {
             try {
                 commandQueue.waitForLine();
             } catch (IOException e) {
-                System.err.println("ERR: couldn't read from console");
+                Logger.getGlobal().log(Level.INFO, ERR_COULDN_T_READ_FROM_CONSOLE);
                 System.exit(2);
             }
 
