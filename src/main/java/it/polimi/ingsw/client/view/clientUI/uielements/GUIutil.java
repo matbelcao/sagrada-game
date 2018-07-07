@@ -37,6 +37,7 @@ import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;
 
 public class GUIutil {
+    private static final String BACK = "b";
     private final CmdWriter cmdWrite;
     private final UIMessages uimsg;
     private double screenWidth;
@@ -173,7 +174,7 @@ public class GUIutil {
         for(int i = 0; i < 2; i++){
             for(int j = 0; j < 2; j++){
                 int schemaIndex =i*2+j;
-                Group completeSchema = buildDreftedSchema(draftedSchemas.get(schemaIndex),cellDim);
+                Group completeSchema = buildDraftedSchema(draftedSchemas.get(schemaIndex),cellDim);
                 schemasGrid.add(completeSchema,j,i);
                 completeSchema.setOnMouseClicked(e-> cmdWrite.write(schemaIndex+""));
             }
@@ -196,7 +197,7 @@ public class GUIutil {
         return draftedSchemasPane ;
     }
 
-    private Group buildDreftedSchema(LightSchemaCard lightSchemaCard, double cellDim) {
+    private Group buildDraftedSchema(LightSchemaCard lightSchemaCard, double cellDim) {
         double schemaWidth = cellDim*SCHEMA_W_TO_CELL;
         double schemaHeight = cellDim*SCHEMA_H_TO_CELL;
         double nameLabelSize = SCHEMA_LABEL_TO_CELL_DIM*cellDim;
@@ -274,7 +275,7 @@ public class GUIutil {
         frontPane.setTop(topSection);
 
         //Center side of the border pane
-        Group schema = buildSchema(schemaCells,favorTokens,cellDim);
+        Group schema = buildSchema(schemaCells,favorTokens,board.getPlayerById(board.getMyPlayerId()).getUsername());
         HBox playersStatusBar = getPlayersStatusBar(board.getMyPlayerId(),board);
         StackPane schemaContainer = new StackPane(schema);
         VBox.setVgrow(schemaContainer,Priority.ALWAYS);
@@ -344,6 +345,7 @@ public class GUIutil {
         backPane.setTop(vbox);
         vbox.setAlignment(TOP_LEFT);
         backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);");
+        //todo add background
         return backPane;
     }
 
@@ -379,7 +381,7 @@ public class GUIutil {
             back.setDisable(true);
         }
         endTurn.setOnAction(e -> cmdWrite.write("e"));
-        back.setOnAction(e -> cmdWrite.write("b"));
+        back.setOnAction(e -> cmdWrite.write(BACK));
         VBox buttonContainer = new VBox();
         buttonContainer.getChildren().addAll(back, endTurn);
         return buttonContainer;
@@ -484,18 +486,21 @@ public class GUIutil {
         HBox playersSelector = getPlayersStatusBar(showingPlayerId,board);
         Region spacer = new Region();
         HBox.setHgrow(spacer,Priority.ALWAYS);
+        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
+        playersSelector.setOnMouseExited(e->playersSelector.fireEvent(mouseExited));
         HBox bottomContainer = new HBox(playersSelector,spacer);
+        bottomContainer.setId("opaque-background");
         selectedPlayerPane.setBottom(bottomContainer);
 
         double cellDim = getMainSceneCellDim(width,height);
-        selectedPlayerPane.setRight(new Rectangle(getCardWidth(cellDim)*NUM_OF_TOOLS,getCardHeight(cellDim),Color.TRANSPARENT)); //the space occupied by cards
-        selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT)); //the space occupied by roundtrack
+        int favortokens = board.getPlayerById(showingPlayerId).getFavorTokens();
+        String username = board.getPlayerById(showingPlayerId).getUsername();
+        //selectedPlayerPane.setRight(new Rectangle(getCardWidth(cellDim)*NUM_OF_TOOLS,getCardHeight(cellDim),Color.TRANSPARENT)); //the space occupied by cards
+       // selectedPlayerPane.setTop(new Rectangle(cellDim,cellDim,Color.TRANSPARENT)); //the space occupied by roundtrack
         List<DieContainer> selectedPlayerSchema = getSchemaCells(board.getPlayerById(showingPlayerId).getSchema(), cellDim);
-        Group playerSchema = buildSchema(selectedPlayerSchema,board.getPlayerById(showingPlayerId).getFavorTokens(),cellDim);
+        Group playerSchema = buildSchema(selectedPlayerSchema,favortokens,username);
         StackPane schemaContainer = new StackPane(playerSchema);
-        Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-        schemaContainer.setOnMouseExited(e->schemaContainer.fireEvent(mouseExited));
-        schemaContainer.setStyle("-fx-background-color: rgba(245,220,112,0); -fx-padding: 0 0 -16 -13");
+        schemaContainer.setId("opaque-background");
         selectedPlayerPane.setCenter(schemaContainer);
         schemaContainer.setAlignment(Pos.CENTER);
         return selectedPlayerPane;
@@ -506,18 +511,16 @@ public class GUIutil {
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
             Button playerStatusBar = getPlayerStatusButton(playerId,board.getPlayerById(playerId).getUsername(),board.getPlayerById(playerId).getStatus(),board.getNowPlaying());
-            playerSelector.getChildren().add(playerStatusBar);
-            if( playerId == showingPlayerId){
+
+            if(playerId == board.getMyPlayerId()){
                 continue;
-            }else if(playerId == board.getMyPlayerId()){
-                Event mouseExited = new CustomGuiEvent(MOUSE_EXITED_BACK_PANE);
-                playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseExited));
             }else{
                 Event mouseEnteredPlayerStatusBar = new CustomGuiEvent(SELECTED_PLAYER, playerId);
                 playerStatusBar.setOnAction(e ->playerStatusBar.fireEvent(mouseEnteredPlayerStatusBar));
             }
-            playerSelector.setAlignment(Pos.BOTTOM_LEFT);
+            playerSelector.getChildren().add(playerStatusBar);
         }
+        playerSelector.setAlignment(Pos.BOTTOM_LEFT);
         return playerSelector;
     }
 
@@ -604,14 +607,16 @@ public class GUIutil {
     }
 
 
-    //todo update
-    private Group buildSchema(List<DieContainer> gridCells, int favortokens, double cellDim) {
+    private Group buildSchema(List<DieContainer> gridCells, int favortokens, String userName) {
         GridPane grid = schemaToGrid(gridCells);
         Label favorTokens = new Label(uimsg.getMessage(REMAINING_TOKENS)+" "+CLIUtils.replicate(CLIUtils.FAVOR,favortokens));
         favorTokens.setId("favor-tokens");
-        VBox schema =new VBox(favorTokens,new Group(grid));
+        Label username = new Label(userName);
+        username.setId("favor-tokens");
+        HBox nameAndFavor = new HBox(favorTokens,username);
+        VBox schema =new VBox(nameAndFavor,new Group(grid));
         schema.setId("player-schema");
-        favorTokens.prefWidthProperty().bind(grid.widthProperty());
+        favorTokens.prefWidthProperty().bind(grid.widthProperty().divide(1.7));
         return new Group (schema);
     }
 
@@ -662,28 +667,16 @@ public class GUIutil {
 
     private void addActionListeners(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board) {
         switch (turnState){
-            case CHOOSE_SCHEMA:
-                break;
-            case SCHEMA_CHOSEN:
-                break;
-            case NOT_MY_TURN:
-                break;
             case MAIN:
                 addMainStateActionListeners(draftPoolCells);
                 break;
             case SELECT_DIE:
                 addSelectDieStateActionListener(draftPoolCells,schemaCells,roundTrackCells,board);
                 break;
-            case CHOOSE_OPTION:
-                break;
-            case CHOOSE_TOOL:
-                break;
             case CHOOSE_PLACEMENT:
                 addChoosePlacementActionListener(draftPoolCells,schemaCells,board);
                 break;
-            case TOOL_CAN_CONTINUE:
-                break;
-            case GAME_ENDED:
+            default:
                 break;
         }
 
