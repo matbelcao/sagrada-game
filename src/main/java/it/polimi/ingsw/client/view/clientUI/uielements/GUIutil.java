@@ -25,7 +25,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
@@ -84,7 +83,7 @@ public class GUIutil {
     //Game End
     private static final double GAME_END_TEXT_TO_CELL =0.625 ;
     //Connection Broken
-    private static final double CONN_BROKEN_FONT_TO_SCREEN = 0.018;
+    private static final double CONN_BROKEN_FONT_TO_SCREEN = 0.01;
 
 
 
@@ -137,10 +136,12 @@ public class GUIutil {
 
 
     public Scene buildConnecionBrokenScene() {
-        Text connectionBrokeMessage = new Text(uimsg.getMessage(BROKEN_CONNECTION));
+        Label connectionBrokeMessage = new Label(String.format(uimsg.getMessage(BROKEN_CONNECTION)));
         connectionBrokeMessage.setFont(new Font(FONT, screenWidth *CONN_BROKEN_FONT_TO_SCREEN));
         StackPane layout = new StackPane(connectionBrokeMessage);
-        return new Scene(layout);
+        Scene connectionBrokeScene = new Scene(layout);
+        connectionBrokeScene.getStylesheets().add("css/style.css");
+        return connectionBrokeScene;
     }
 
     public StackPane buildWaitingForGameStartScene() {
@@ -541,7 +542,6 @@ public class GUIutil {
         BorderPane selectDiePane = new BorderPane();
         HBox optionBox = new HBox();
         Group optionBoxContainer = new Group(optionBox);
-        optionBox.setStyle( "-fx-background-color: rgba(255,67,72,0.9);");
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
         double cellDim = getMainSceneCellDim(width, height);
         for (IndexedCellContent selectableDie : latestDiceList) {

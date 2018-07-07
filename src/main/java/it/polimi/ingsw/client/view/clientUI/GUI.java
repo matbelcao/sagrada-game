@@ -83,7 +83,7 @@ public class GUI extends Application implements ClientUI {
 
 
     @Override
-    public void updateConnectionOk() { Platform.runLater(()->messageToUser.setText(uimsg.getMessage(UIMsg.CONNECTION_OK))); }
+    public void updateConnectionOk() { Platform.runLater(()->messageToUser.setText(uimsg.getMessage(UIMsg.CONNECTION_OK))); } //to do remove
 
     @Override
     public void showLoginScreen() {
@@ -258,13 +258,15 @@ public class GUI extends Application implements ClientUI {
     public void updateConnectionBroken(){
         Platform.runLater(()->{
             sizeListener.disable();
-            Stage connectionBrokStage = new Stage();
-            connectionBrokStage.initModality(Modality.APPLICATION_MODAL);
-            connectionBrokStage.setTitle(uimsg.getMessage(BROKEN_CONNECTION_TITLE));
-            connectionBrokStage.setResizable(false);
-            primaryStage.setScene(sceneCreator.buildConnecionBrokenScene());
-            connectionBrokStage.sizeToScene();
-            primaryStage.showAndWait();
+            Stage connectionBrokenStage = new Stage();
+            connectionBrokenStage.initModality(Modality.APPLICATION_MODAL);
+            connectionBrokenStage.setTitle(uimsg.getMessage(BROKEN_CONNECTION_TITLE));
+            connectionBrokenStage.setResizable(false);
+            connectionBrokenStage.setScene(sceneCreator.buildConnecionBrokenScene());
+            connectionBrokenStage.setOnCloseRequest(e->System.exit(1));
+            connectionBrokenStage.sizeToScene();
+            connectionBrokenStage.setAlwaysOnTop(true);
+            connectionBrokenStage.showAndWait();
         });
     }
 
