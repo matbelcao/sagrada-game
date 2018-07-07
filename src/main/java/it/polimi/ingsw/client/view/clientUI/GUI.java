@@ -256,6 +256,7 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void updateConnectionBroken(){
         Platform.runLater(()->{
+            primaryStage.close();
             sizeListener.disable();
             Stage connectionBrokenStage = new Stage();
             connectionBrokenStage.initModality(Modality.APPLICATION_MODAL);

@@ -107,6 +107,8 @@ public class GUIutil {
     private static final String SCORE_CONTAINER = "score-container";
     private static final String ROUND_DICE = "round-dice";
     private static final String TOP_SECTION = "top-section";
+    private static final String CONNECTION_ERROR = "connection-error";
+
 
     private final Object lockWrite= new Object();
 
@@ -163,7 +165,7 @@ public class GUIutil {
     public Scene buildConnecionBrokenScene() {
         Label connectionBrokeMessage = new Label(uimsg.getMessage(BROKEN_CONNECTION));
         connectionBrokeMessage.setFont(new Font(FONT, screenWidth *CONN_BROKEN_FONT_TO_SCREEN));
-        connectionBrokeMessage.setId("connection-error");
+        connectionBrokeMessage.setId(CONNECTION_ERROR);
         StackPane layout = new StackPane(connectionBrokeMessage);
         layout.setStyle("-fx-background-image: url('img/wall.png')");
         Scene connectionBrokeScene = new Scene(layout,screenWidth*0.32,screenWidth*0.16);
