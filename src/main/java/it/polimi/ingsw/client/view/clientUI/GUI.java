@@ -160,7 +160,7 @@ public class GUI extends Application implements ClientUI {
                 if (client.isLogged())
                     client.quit();
                 else {
-                    client.disconnect();
+                    System.exit(1);
                 }
             });
             //disable the size listener because login is non resizable
