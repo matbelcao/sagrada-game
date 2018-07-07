@@ -159,7 +159,7 @@ public class GUIutil {
 
 
     public Scene buildConnecionBrokenScene() {
-        Label connectionBrokeMessage = new Label(String.format(uimsg.getMessage(BROKEN_CONNECTION)));
+        Label connectionBrokeMessage = new Label(uimsg.getMessage(BROKEN_CONNECTION));
         connectionBrokeMessage.setFont(new Font(FONT, screenWidth *CONN_BROKEN_FONT_TO_SCREEN));
         connectionBrokeMessage.setId("connection-error");
         StackPane layout = new StackPane(connectionBrokeMessage);
@@ -236,7 +236,7 @@ public class GUIutil {
         double x = schemaWidth / 2;
         double y = TEXT_HEIGHT_TO_SCHEMA_H * schemaHeight;
         drawSchemaText(gc, x, y, schemaWidth, lightSchemaCard);
-        drawFavorTokens(gc, 0, y, schemaWidth, lightSchemaCard);
+        drawFavorTokens(gc, schemaWidth, lightSchemaCard);
 
         Rectangle backgroundRect = new Rectangle(0,0,schemaWidth,schemaHeight);
         backgroundRect.setArcWidth(arcCurvature);
@@ -253,7 +253,9 @@ public class GUIutil {
         return new Group(new StackPane(backgroundRect,completeSchema));
     }
 
-    private void drawFavorTokens(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
+    private void drawFavorTokens(GraphicsContext gc, double schemaWidth, LightSchemaCard lightSchemaCard) {
+        double x = 0;
+        double y = 0;
         int favorTokens = lightSchemaCard.getFavorTokens();
         double favTokDiameter = schemaWidth * FAVOR_DIAM_TO_SCHEMA_W;
         x = x + FAVOR_POS_TO_SCHEMA_W * schemaWidth;
@@ -371,7 +373,6 @@ public class GUIutil {
         backPane.setTop(vbox);
         vbox.setAlignment(TOP_LEFT);
         backPane.setStyle("-fx-background-color: rgb(255,255,255,0.4);");
-        //todo add background
         return backPane;
     }
 
