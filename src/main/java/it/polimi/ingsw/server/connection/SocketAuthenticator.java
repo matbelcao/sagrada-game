@@ -59,7 +59,6 @@ public class SocketAuthenticator extends Thread {
                         logged = true;
                         //Setting Socket specific parameters
                         User user = master.getUser(params.get(1));
-                        user.setConnectionMode(ConnectionMode.SOCKET);
                         user.setServerConn(new SocketServer(socket, user,inSocket,outSocket));
                         master.updateConnected(user);
                     } else {

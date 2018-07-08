@@ -30,7 +30,6 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
         boolean logged = master.login(username,password);
         if(logged){
             User user = master.getUser(username);
-            user.setConnectionMode(ConnectionMode.RMI);
             try {
                 LocateRegistry.getRegistry(master.getIpAddress(),MasterServer.getMasterServer().getRMIPort()) ;
                 RMIServerObject serverObj=new RMIServerObject(user);

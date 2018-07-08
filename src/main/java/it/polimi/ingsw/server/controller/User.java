@@ -14,7 +14,6 @@ public class User{
     private char [] password;
     private final Object lockStatus;
     private UserStatus status;
-    private ConnectionMode connectionMode;
     private ServerConn serverConn;
     private Game game;
 
@@ -84,22 +83,6 @@ public class User{
         synchronized (lockStatus) {
             return status;
         }
-    }
-
-    /**
-     * Sets the user connection mode ( RMI_SLASHSLASH or SOCKET )
-     * @param connectionMode the connection mode to be set
-     */
-    public void setConnectionMode(ConnectionMode connectionMode){
-        this.connectionMode=connectionMode;
-    }
-
-    /**
-     * Returns the user's connection mode ( RMI_SLASHSLASH or SOCKET )
-     * @return the user's connection mode
-     */
-    public ConnectionMode getConnectionMode() {
-        return connectionMode;
     }
 
     /**

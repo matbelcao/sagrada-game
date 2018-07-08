@@ -26,7 +26,5 @@ class UserTest {
         user.setStatus(UserStatus.DISCONNECTED);
         assertEquals(UserStatus.DISCONNECTED,user.getStatus());
 
-        user.setConnectionMode(ConnectionMode.RMI);
-        assertEquals(ConnectionMode.RMI,user.getConnectionMode());
     }
 }
