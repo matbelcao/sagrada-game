@@ -608,6 +608,7 @@ public class Client implements ClientInt {
         board.setNowPlaying(playerId);
         board.setIsFirstTurn(isFirstTurn);
 
+
         fsm.setNotMyTurn();
         fsm.setMyTurn(playerId==board.getMyPlayerId());
         board.stateChanged();
@@ -621,9 +622,11 @@ public class Client implements ClientInt {
      * @param playerId the id of the player
      */
     public void updateGameTurnEnd(int playerId){
+        board.setTools(clientConn.getTools());
         board.updateSchema(playerId,clientConn.getSchema(playerId));
-        board.notifyObservers();
+        board.updateFavorTokens(playerId,clientConn.getFavorTokens(playerId));
 
+        board.notifyObservers();
     }
 
     /**

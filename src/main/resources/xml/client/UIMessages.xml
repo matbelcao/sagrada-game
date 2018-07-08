@@ -173,12 +173,12 @@
         <ita>Scegli la tua prossima mossa:</ita>
     </main-choice>
     <not-my-turn>
-        <eng>%s is playing at the moment... Please, wait for your turn!</eng>
-        <ita>%s sta giocando al momento... Attendi il tuo turno!</ita>
+        <eng>%s is playing at the moment...   Please, wait for your turn!</eng>
+        <ita>%s sta giocando al momento...   Attendi il tuo turno!</ita>
     </not-my-turn>
     <is-playing>
-        <eng>is playing </eng>
-        <ita>sta giocando</ita>
+        <eng> is playing </eng>
+        <ita> sta giocando </ita>
     </is-playing>
     <first-turn>
         <eng>first turn</eng>
@@ -208,10 +208,6 @@
         <eng>Here are the final scores:</eng>
         <ita>Ecco i punteggi finali:</ita>
     </score>
-    <player-score>
-        <eng> score</eng>
-        <ita> punti</ita>
-    </player-score>
     <player-score>
         <eng> score</eng>
         <ita> punti</ita>
