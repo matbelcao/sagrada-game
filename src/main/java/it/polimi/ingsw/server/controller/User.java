@@ -50,18 +50,18 @@ public class User{
         if(previousStatus==UserStatus.PLAYING){
             this.getGame().disconnectUser(this);
         }
-        MasterServer.getMasterServer().printMessage("Connection lost : "+this.getUsername());
+        MasterServer.printMessage("Connection lost : "+this.getUsername());
     }
 
     public void quit(){
         UserStatus previousStatus=this.getStatus();
         if(previousStatus==UserStatus.LOBBY){
             MasterServer.getMasterServer().updateDisconnected(this);
-            MasterServer.getMasterServer().printMessage("Quitted lobby : "+this.getUsername());
+            MasterServer.printMessage("Quitted lobby : "+this.getUsername());
         }
         if(previousStatus==UserStatus.PLAYING){
             this.getGame().quitUser(this);
-            MasterServer.getMasterServer().printMessage("Quitted match : "+this.getUsername());
+            MasterServer.printMessage("Quitted match : "+this.getUsername());
         }
     }
 
@@ -114,7 +114,7 @@ public class User{
      * Returns the user's connection class used for the communication
      * @return the user's connection
      */
-    public ServerConn getServerConn() {
+    ServerConn getServerConn() {
         return serverConn;
     }
 
@@ -147,7 +147,7 @@ public class User{
         if(game.isGameEnded()){
             status=UserStatus.CONNECTED;
             MasterServer.getMasterServer().updateConnected(this);
-            MasterServer.getMasterServer().printMessage("New match for: "+username);
+            MasterServer.printMessage("New match for: "+username);
         }
     }
     
