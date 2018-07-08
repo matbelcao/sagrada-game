@@ -292,7 +292,7 @@ public class GUI extends Application implements ClientUI {
     }
 
     /**
-     * this notifies an error in the connection towards the server, the primary stage gets closed and an alert box gets opened
+     *This method gets invoked when the connection to the server is lost, it closes the window currently showing and shows an alert box informing the user that the connection is broken
      */
     @Override
     public void updateConnectionBroken(){

@@ -47,6 +47,8 @@ public class GUIutil {
     private static final int ROUNDTRACK_SIZE = 10;
     private static final String FONT = "Sans-Serif";
     private static final String IMG_WALL_PNG = "-fx-background-image: url('img/wall.png');";
+    private final Object lockWrite= new Object();
+
     //-----login Stage
     private static final double LOGIN_TO_SCREEN_RATIO = 0.25;
     private static final double LOGIN_RATIO = 0.663;
@@ -110,10 +112,12 @@ public class GUIutil {
     private static final String CONNECTION_ERROR = "connection-error";
 
 
-    private final Object lockWrite= new Object();
-
-
-
+    /**
+     * Constructor of the class
+     * @param visualBounds a rectangle with the dimension of the screen
+     * @param cmdWrite an instance of the CmdWriter that is set and then it's used to write the commands in the QuequedReader
+     * @param uimsg a reference to  UImessages used to get the messages to show to the user
+     */
     public GUIutil(Rectangle2D visualBounds, CmdWriter cmdWrite, UIMessages uimsg) {
         screenWidth = visualBounds.getWidth();
         screenHeight = visualBounds.getHeight();
@@ -141,6 +145,14 @@ public class GUIutil {
 
     private double getCardHeight(double cellDim) { return cellDim*CARD_HEIGHT_TO_CELL_DIM; }
 
+    /**
+     * This method computes the dimensions of the cell in a scene based on the dimensions of the stage containing the scene
+     * and a predifined aspect ratio. The cell dimensions are then used as an unit of mesure for drawing every other component in the scene. The ratio
+     * ensures that all the components in the scene are drawn to fit the stage
+     * @param newWidth the width of the stage in witch the all the components are going to be drawn
+     * @param newHeight the height of the stage in witch the all the components are going to be drawn
+     * @return the dimension of the cell in the new stage
+     */
     private double getMainSceneCellDim(double newWidth, double newHeight) {
         double cellDim;
         double sceneRatio = newWidth / newHeight;
@@ -152,6 +164,11 @@ public class GUIutil {
         return cellDim;
     }
 
+    /**
+     * This method builds the parent to be set as a root in the lobby scene
+     * @param numUsers the number of users currently in the lobby
+     * @return the root of the scene
+     */
     public StackPane buildLobbyPane(int numUsers) {
         StackPane p = new StackPane();
         p.setStyle(IMG_WALL_PNG);
@@ -161,7 +178,10 @@ public class GUIutil {
         return new StackPane(p);
     }
 
-
+    /**
+     * This method builds the scene shown when the connection is broken
+     * @return the scene already with its nodes
+     */
     public Scene buildConnecionBrokenScene() {
         Label connectionBrokeMessage = new Label(uimsg.getMessage(BROKEN_CONNECTION));
         connectionBrokeMessage.setFont(new Font(FONT, screenWidth *CONN_BROKEN_FONT_TO_SCREEN));
@@ -173,6 +193,10 @@ public class GUIutil {
         return connectionBrokeScene;
     }
 
+    /**
+     * This method builds the parent to be set as a root in the waiting for game start scene
+     * @return a stack pane already populated with nodes
+     */
     public StackPane buildWaitingForGameStartScene() {
         String message = String.format("%s%n", uimsg.getMessage(WAIT_FOR_GAME_START));
         Label waitingText = new Label(message);
@@ -182,6 +206,14 @@ public class GUIutil {
         return stackPane;
     }
 
+    /**
+     * This method computes the dimensions of the cell in the drafted Schemas Scene based on the dimensions of the stage containing the scene
+     * and a predefined aspect ratio. The cell dimensions are then used as an unit of mesure for drawing every other component in the scene. The ratio
+     * ensures that all the components in the scene are drawn to fit the stage
+     * @param newWidth the width of the stage in witch the all the components are going to be drawn
+     * @param newHeight the height of the stage in witch the all the components are going to be drawn
+     * @return the dimension of the cell in the new stage
+     */
     private double getDraftedSchemasCellDim(double newWidth, double newHeight) {
         double cellDim;
         double sceneRatio = newWidth / newHeight;
@@ -193,6 +225,14 @@ public class GUIutil {
         return cellDim;
     }
 
+    /**
+     * creates a border pane with the four drafted schemas set in the center
+     * @param draftedSchemas the four drafted schemas from witch the  player as to choose
+     * @param lightPrivObj the light private objective also shown to help the player chose the best schema to achieve it
+     * @param newWidth the width of the stage canting the pane
+     * @param newHeight the width of the height containing the pane
+     * @return the populated pane
+     */
     public BorderPane buildDraftedSchemasPane(List<LightSchemaCard> draftedSchemas, LightPrivObj lightPrivObj, double newWidth, double newHeight){
         double cellDim = getDraftedSchemasCellDim(newWidth,newHeight);
         double spacing = DRAFTED_SCHEMAS_SPACING_TO_CELL*cellDim;
@@ -227,6 +267,12 @@ public class GUIutil {
         return draftedSchemasPane ;
     }
 
+    /**
+     * This method creates a new schema to be shown in the drafted schemas pane. Said schema other than the cells contains also the name of the schema and the favortokens
+     * @param lightSchemaCard the schema to be drawn
+     * @param cellDim the dimension of the cells in the schema
+     * @return a group containing the complete schema
+     */
     private Group buildDraftedSchema(LightSchemaCard lightSchemaCard, double cellDim) {
         double schemaWidth = cellDim*SCHEMA_W_TO_CELL;
         double schemaHeight = cellDim*SCHEMA_H_TO_CELL;
@@ -257,6 +303,13 @@ public class GUIutil {
         return new Group(new StackPane(backgroundRect,completeSchema));
     }
 
+    /**
+     * draws the favor tokens as dots on a Canvas that then will be the frame of a schema
+     * @param gc the graphics context of the canvas where the dots are drawn
+     * @param y the coordinate of where the dot is drawn
+     * @param schemaWidth the width of the schema to be drawn
+     * @param lightSchemaCard the light schema that gets drawn
+     */
     private void drawFavorTokens(GraphicsContext gc, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
         double x = 0;
         int favorTokens = lightSchemaCard.getFavorTokens();
@@ -270,6 +323,14 @@ public class GUIutil {
 
     }
 
+    /**
+     * draws the name of the schema on a Canvas that then will be the frame of a schema
+     * @param gc the graphics context of the canvas where the the text is drawn
+     * @param x coordinate of where the text is drawn
+     * @param y coordinate of where the text is drawn
+     * @param schemaWidth the width of the schema  to be drawn
+     * @param lightSchemaCard the light schema that gets drawn
+     */
     private void drawSchemaText(GraphicsContext gc, double x, double y, double schemaWidth, LightSchemaCard lightSchemaCard) {
         double textSize = TEXT_DIM_TO_SCHEMA_W * schemaWidth;
         gc.setFont(Font.font(FONT, textSize));
@@ -279,7 +340,14 @@ public class GUIutil {
         gc.fillText(lightSchemaCard.getName(), x, y);
     }
 
-
+    /**
+     * This class builds a border pane used in the main game scene, it contais the schema, draftpool, rondtrack, and cards
+     * @param newWidth the width of the stage canting the pane
+     * @param newHeight the width of the height containing the pane
+     * @param board the lightboard
+     * @param turnState the stte of the client Fsm
+     * @return the populated BorderPane
+     */
     public BorderPane buildFrontPane(double newWidth, double newHeight, LightBoard board, ClientFSMState turnState){
         double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrackList = board.getRoundTrack();
@@ -322,6 +390,12 @@ public class GUIutil {
         return frontPane;
     }
 
+    /**
+     * Calculates the index of a die in a cell of the roundtrack that has multiple dice compared to all the dice in the roundtrack
+     * @param index the index of the die in a multiple dice cell compared to the list of dice in that cell
+     * @param roundTrack a list of lists that contains all the dice in the roundtrack
+     * @return the index of a die compared to all the dice in the roundtrack list
+     */
     private int getMultipleDieTrackCellIndex(int index, List<List<LightDie>> roundTrack) {
         int selectedCellindex = 0;
         for (int j = 0; j < index; j++) {
@@ -330,7 +404,15 @@ public class GUIutil {
         return selectedCellindex;
     }
 
-
+    /**
+     * It creates a HBox container that is shown under the roundtrack and shows the dice in a cell of the roundtrack tha has multiple dice
+     * @param cellDim the dimension of the cells inside tehe HBox
+     * @param selectedTrackCellIndex the index of the cell in the roundtrack whose multiple dice are showing
+     * @param roundTrack all the dice in the roundtrack
+     * @param turnState the state of the ClientFSM
+     * @param latestDiceList the latest dice list sent by the server
+     * @return the HBox container with all the multiple dices inside
+     */
     private HBox buildMultipleDiceBar(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack, ClientFSMState turnState, List<IndexedCellContent> latestDiceList) {
         HBox multipleDiceTrack = new HBox();
         multipleDiceTrack.setSpacing(ROUNDTRACK_SPACING);
@@ -362,6 +444,16 @@ public class GUIutil {
         return multipleDiceTrack;
     }
 
+    /**
+     * This method builds a BorderPane that shows the multiple dice contained in a cell
+     * @param selectedTrackCellIndex
+     * @param newWidth
+     * @param newHeight
+     * @param board
+     * @param turnState
+     * @return
+     */
+//todo continue from here
     public BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board,ClientFSMState turnState){
         double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
