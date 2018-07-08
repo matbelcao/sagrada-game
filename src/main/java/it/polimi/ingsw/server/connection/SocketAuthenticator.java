@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * newly created socket
  */
 public class SocketAuthenticator extends Thread {
-    Socket socket;
+    private Socket socket;
 
     public SocketAuthenticator(Socket socket){
         this.socket=socket;

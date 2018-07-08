@@ -112,10 +112,10 @@ public class SchemaCard implements Iterable<Cell>  {
 
 
     /**
-     *
-     * @param id
-     * @param xmlFile
-     * @return
+     * Builds the schema card readed from the xml file
+     * @param id the id of the built schema card
+     * @param xmlFile the xml file path
+     * @return the built schemas
      */
     @Nullable
     private static SchemaCard readSchema(int id, InputStream xmlFile,boolean additionalSchema) {
@@ -175,6 +175,11 @@ public class SchemaCard implements Iterable<Cell>  {
         return countAdditionalSchemas(xmlFile);
     }
 
+    /**
+     * Returns the numbero of additonal schemas on the xmlFile
+     * @param xmlFile the xml file path
+     * @return the numbero of schemas
+     */
     private static int countAdditionalSchemas(InputStream xmlFile) {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;

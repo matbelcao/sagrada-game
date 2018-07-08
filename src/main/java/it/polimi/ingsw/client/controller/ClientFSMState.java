@@ -361,12 +361,20 @@ public enum ClientFSMState {
      */
     private static boolean placedDie;
 
+
     public abstract ClientFSMState nextState(boolean stateSpecific, boolean back, boolean endTurn, boolean discard);
     public abstract ClientFSMState nextState(boolean stateSpecific);
 
+    /**
+     * @return true iff a die has already been placed in the turn
+     */
     public static synchronized boolean isPlacedDie() {
         return placedDie;
     }
+
+    /**
+     * @return true iff a toolcard has already been used in the turn
+     */
     public static synchronized boolean isToolEnabled() {
         return toolEnabled;
     }
