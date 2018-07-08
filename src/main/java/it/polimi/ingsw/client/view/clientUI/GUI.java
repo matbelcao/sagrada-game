@@ -34,7 +34,9 @@ import java.util.Observable;
 import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.CENTER;
-
+/**
+ * This is the class that implements the UI for the client as a graphic interface
+ */
 public class GUI extends Application implements ClientUI {
     public static final int NUM_COLS = 5;
     public static final int NUM_ROWS = 4;
@@ -50,7 +52,13 @@ public class GUI extends Application implements ClientUI {
     private static final Object lock = new Object();
     private Label messageToUser = new Label();
 
+    /**
+     * Getter of the instance of the gui
+     * @return an instance of the gui
+     */
     public static GUI getGUI() {
+        //Since the GUI object is instantiated by the javaFx thread client needs a static getter to get an instance
+        //of the UI
         if(instance == null){
             return null;
         }else{
@@ -58,8 +66,14 @@ public class GUI extends Application implements ClientUI {
         }
     }
 
-
+    /**
+     * Launches the JavaFx thread after setting the static parameters.
+     * @param client a reference of the client launching the GUI
+     * @param lang the language chose by the client
+     */
     public static void launch(Client client, UILanguage lang) {
+        //since the GUI is instantiated by the javafx thread the only way for the client to get a reference of the GUI is
+        //for the GUI to pass itself to the client after it has been created
         GUI.client = client;
         GUI.uimsg = new UIMessages(lang);
         Application.launch(GUI.class);
@@ -82,8 +96,11 @@ public class GUI extends Application implements ClientUI {
 
 
     @Override
-    public void updateConnectionOk() { Platform.runLater(()->messageToUser.setText(uimsg.getMessage(UIMsg.CONNECTION_OK))); } //to do remove
+    public void updateConnectionOk() { Platform.runLater(()->messageToUser.setText(uimsg.getMessage(UIMsg.CONNECTION_OK))); }
 
+    /**
+     * this method asks via the ui to insert username and password and sets them in the client
+     */
     @Override
     public void showLoginScreen() {
         Platform.runLater(() -> {
@@ -171,6 +188,10 @@ public class GUI extends Application implements ClientUI {
         });
     }
 
+    /**
+     * this method notifies the user whether the login was successful or not
+     * @param logged the outcome of the login (true iff it went fine)
+     */
     @Override
     public void updateLogin(boolean logged) {
         if (logged) {
@@ -189,6 +210,10 @@ public class GUI extends Application implements ClientUI {
     @Override
     public void showLatestScreen() {/*this method is useful only to CLI*/}
 
+    /**
+     * this method sends to the client an update regarding the number of players connected and waiting to begin a match
+     * @param numUsers the number of connected players at the moment
+     */
     @Override
     public void updateLobby(int numUsers) {
         Platform.runLater(() -> {
@@ -202,6 +227,11 @@ public class GUI extends Application implements ClientUI {
 
     }
 
+    /**
+     * This method gets called everytime the lightBoard gets updated and creates the GUI's scenes accordingly to the info
+     * taken by it
+     * @param board the updated board
+     */
     private void updateBoard(LightBoard board) {
         if (board == null) {
             throw new IllegalArgumentException();
@@ -215,33 +245,41 @@ public class GUI extends Application implements ClientUI {
             sizeListener.enable();
         });
     }
-
+    /**
+     * This method gets called every time the board gets updated or the scene resizes chenging the root of the scene of the stage
+     */
     public void drawMainGameScene(){
         Platform.runLater(()-> primaryStage.getScene().setRoot(bulidMainPane(primaryStage.getWidth(), primaryStage.getHeight())));
     }
 
-    private synchronized StackPane bulidMainPane(double newWidth, double newHeight){
+    /**
+     * This method constructs the root for scenes that get info from the board
+     * @param width the width that the newly created root must have
+     * @param height the width that the newly created root must have
+     * @return a StackPane that gets set as a root of the newly created scene
+     */
+    private synchronized StackPane bulidMainPane(double width, double height){
         StackPane p = new StackPane();
         if(client.getFsmState().equals(ClientFSMState.CHOOSE_SCHEMA)){
-            BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(board.getDraftedSchemas(), board.getPrivObj(), newWidth, newHeight) ;
+            BorderPane draftedSchemasPane = sceneCreator.buildDraftedSchemasPane(board.getDraftedSchemas(), board.getPrivObj(), width, height) ;
             p.getChildren().add(draftedSchemasPane);
         }else if(client.getFsmState().equals(ClientFSMState.SCHEMA_CHOSEN)){
             p.getChildren().add(sceneCreator.buildWaitingForGameStartScene());
         }else if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
-            BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(newWidth,newHeight, board.sortFinalPositions());
+            BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(width,height, board.sortFinalPositions());
             p.getChildren().add(gameEndedPane);
         }else{
-            BorderPane frontPane = sceneCreator.buildFrontPane(newWidth,newHeight, board,client.getFsmState());
+            BorderPane frontPane = sceneCreator.buildFrontPane(width,height, board,client.getFsmState());
             List <Actions> latestOptionsList = board.getLatestOptionsList();
             ClientFSMState turnState = client.getFsmState();
             p.getChildren().add(frontPane);
             //the pane listens for custom events to know when it has to which layer
-            p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),newWidth,newHeight, board,turnState)));
-            p.addEventHandler(SELECTED_PLAYER, e -> p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),newWidth, newHeight, board)));
+            p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),width,height, board,turnState)));
+            p.addEventHandler(SELECTED_PLAYER, e -> p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),width, height, board)));
             p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
 
             if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
-                BorderPane backPane = sceneCreator.bulidDieOptionPane(newWidth,newHeight, board);
+                BorderPane backPane = sceneCreator.bulidDieOptionPane(width,height, board);
                 p.getChildren().add(backPane);
             }
         }
@@ -250,9 +288,12 @@ public class GUI extends Application implements ClientUI {
 
     @Override
     public void updateConnectionClosed() {
-        //It's always the client that closes the connection
+        //when the user closes the window he knows the program has stopped so he doesn't need to be updated
     }
 
+    /**
+     * this notifies an error in the connection towards the server, the primary stage gets closed and an alert box gets opened
+     */
     @Override
     public void updateConnectionBroken(){
         Platform.runLater(()->{
@@ -270,13 +311,16 @@ public class GUI extends Application implements ClientUI {
 });
         }
 
-
-
-@Override
+    /**
+     * this tells the user to wait for the new game
+     */
+    @Override
     public void showWaitingForGameStartScreen() {
         Platform.runLater(() -> primaryStage.getScene().setRoot(sceneCreator.buildWaitingForGameStartScene()));
     }
-
+    /**
+     * @return the command queue of the ui
+     */
     @Override
     public QueuedReader getCommandQueue() {
         if (cmdWrite == null) {
@@ -285,12 +329,17 @@ public class GUI extends Application implements ClientUI {
         return (QueuedReader) cmdWrite;
     }
 
+    /**
+     * This is a getter for the CmdWrite, if it hasn't been initialized it instantiates a new one
+     * @return an instance of CmdWriter
+     */
     private CmdWriter getCmdWrite(){
         if (cmdWrite == null) {
             cmdWrite = new QueuedCmdReader();
         }
         return cmdWrite;
     }
+
 
     @Override
     public void update(Observable o, Object arg) {
