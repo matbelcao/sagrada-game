@@ -1,6 +1,6 @@
 #  Sagrada board-game
 
-<img src="/src/img/sagrada-box.jpg" height="400px" ></img>
+<img src="/src/main/resources/img/sagrada-box.jpg" height="400px" ></img>
 
 ### Group number: 7
 * __10503336__ - *Belcao Matteo*
@@ -13,11 +13,11 @@
 
 This project aims to replicate the experience of playing Sagrada, a board game that obviously gets its name from Gaudi's Sagrada Familia, in which the players become master glassmakers and compete to create the most beautiful window (or the one that just gets them more points!). 
 
-### The boring stuff
+### A little background 
 
-The project is built around a simple client-server infrastructure, so that you can play with others without having to share a computer among four people. What you need to do is just setting up a server (one of your computers, you can still play the game on that too, of course), then connect all of you to the same server (more on that later on) by launching a client for each participants with the correct IP set (this should be the one of the machine used as a server). You will have to login with a username and a password (Notice: those will be deleted once you kill the server), then you'll be able to join a lobby of users that are waiting to begin to play. Once some time has passed or four people get in the lobby a new match can start. From now on you'll be playing Sagrada, with all it's rules written in pure code (and other magical stuff you don't really need to care about) so none of you can try to give new interpretations to the rules to cheat at it (😉😌).
+The project is built around a simple client-server infrastructure, so that you can play with others without having to share a computer among four people. What you need to do is just setting up a server (one of your computers, you can still play the game on that too, of course), then connect all of you to the same server (more on that later on) by launching a client for each participants with the correct IP set (this should be the one of the machine used as a server). You will have to login with a username and a password (Notice: those will be deleted once you kill the server), then you'll be able to join a lobby of users that are waiting to begin to play. Once some time has passed or four people get in the lobby a new match can start. From now on you'll be playing Sagrada, with all it's rules written in pure code (and other magical stuff you don't really need to care about) so none of you can try to give new interpretations to the rules to cheat at it.
 
-### The even more boring stuff
+### technical stuff
 
 Here's a copy of the help messages you wuold get in while launching both client and server with invalid options:
 ##### Client
@@ -59,7 +59,7 @@ Welcome to Sagrada!
         
 ```
 
-They're pretty much self-explanatory but let me give you more details on theese.
+They're pretty much self-explanatory but let me give you more details on these.
 
 +   You can play this game in either a CLI or GUI interface (you can set this in the client), the default is CLI because we hate you and just want you to have nightmares about this game.
 +   More importantly, let's talk about __IP addresses__: the default is the simple _loopback_ (that will only work if you play on the same machine you start the server from). This setting is crucial, because if you mess with this you won't be able to play (not on different machines, at least). It's simple though: 
@@ -78,10 +78,15 @@ We genuinely hope you'll have fun with this.
 And now ... 
  
 
-### the ... technical and extremely boring stuff
+### other technical stuff for windows
 
 If ((you're using Windows) AND (you wish to use the CLI) AND (you really wish to se colored dice and not some strange characters)) then we have this simple solution:
 
-1.   open a CMD.exe (press start and type cmd)
-2.   type in `Chcp 10 `, press enter
-3.   
+1. unzip the LM_7_Client.zip file
+2. run the bat file UTF8-windows.bat
+3. set your cmd font to __consolas__ or __curier new__
+4. run the LM_7_Client.jar with the option `-Dfile.encoding=UTF8` (ex: `java -jar -Dfile.encoding=UTF8 LM_7_Client.jar` assuming you are in the parent folder)
+
+### other technical stuff for some linux distros (like Ubuntu)
+
+If you're trying to run the client with a GUI on linux with java installed and all and you can't start it, the problem may be that your distribution of jre doesn't contain the needed javafx implementation. Please make sure to install it before running the application
