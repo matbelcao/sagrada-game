@@ -1,5 +1,8 @@
 package it.polimi.ingsw.common.enums;
 
+/**
+ * This class contains the possible actions tha can be done during the game
+ */
 public enum Actions {
     INCREASE_DECREASE,
     SWAP,

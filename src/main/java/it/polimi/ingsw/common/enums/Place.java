@@ -1,12 +1,14 @@
 package it.polimi.ingsw.common.enums;
 
+/**
+ * Enuums of the possible places of the game
+ */
 public enum Place {
     DRAFTPOOL,
     SCHEMA,
     ROUNDTRACK,
     DICEBAG,
     NONE;
-
 
     public static Place toPlace(String place){
         switch(place){

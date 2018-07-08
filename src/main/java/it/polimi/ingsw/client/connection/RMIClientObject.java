@@ -11,6 +11,9 @@ import java.util.List;
 
 import static it.polimi.ingsw.common.serializables.GameEvent.*;
 
+/**
+ * This class implements the remote object of the client to share with the server
+ */
 public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt {
     private ClientInt client;
     public RMIClientObject(ClientInt client) throws RemoteException {

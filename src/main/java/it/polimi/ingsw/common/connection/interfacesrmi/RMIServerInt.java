@@ -8,6 +8,9 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+/**
+ * This interface offers the server's set of remote methods to the client
+ */
 public interface RMIServerInt extends Remote {
 
     /**

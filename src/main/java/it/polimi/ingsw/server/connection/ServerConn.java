@@ -6,7 +6,7 @@ import it.polimi.ingsw.common.serializables.RankingEntry;
 import java.util.List;
 
 /**
- * This class is an interfaces that declares the common methods between SOCKET/RMI_SLASHSLASH server-side connections
+ * This class is an interface that declares the common methods between SOCKET/RMI server-side connections
  */
 public interface ServerConn {
 

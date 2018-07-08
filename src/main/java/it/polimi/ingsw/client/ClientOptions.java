@@ -16,26 +16,29 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Option class used for setting the options passed from the command line
+ */
 public class ClientOptions {
     public static final String SHORT_HELP ="h";
-    public static final String SHORT_GUI ="g";
-    public static final String SHORT_CLI ="c";
-    public static final String SHORT_RMI ="r";
-    public static final String SHORT_SOCKET ="s";
-    public static final String SHORT_ADDRESS ="a";
-    public static final String SHORT_ITA ="i";
-    public static final String SHORT_ENG ="e";
-    public static final String ALL_SHORTS = "[hgcarsie]";
-    public static final String SHORTS_NO_PARAMS = "[hgcrsie]";
-    public static final String LONG_GUI = "--gui";
-    public static final String LONG_CLI = "--cli";
-    public static final String LONG_RMI = "--rmi";
-    public static final String LONG_SOCKET = "--socket";
-    public static final String LONG_ITA = "--italian";
-    public static final String LONG_ENG = "--english";
-    public static final String LONG_ADDRESS = "--server-address";
-    public static final String LONG_HELP = "--help";
-    public static final String HELP_MESSAGE = "help-message";
+    private static final String SHORT_GUI ="g";
+    private static final String SHORT_CLI ="c";
+    private static final String SHORT_RMI ="r";
+    private static final String SHORT_SOCKET ="s";
+    private static final String SHORT_ADDRESS ="a";
+    private static final String SHORT_ITA ="i";
+    private static final String SHORT_ENG ="e";
+    private static final String ALL_SHORTS = "[hgcarsie]";
+    private static final String SHORTS_NO_PARAMS = "[hgcrsie]";
+    private static final String LONG_GUI = "--gui";
+    private static final String LONG_CLI = "--cli";
+    private static final String LONG_RMI = "--rmi";
+    private static final String LONG_SOCKET = "--socket";
+    private static final String LONG_ITA = "--italian";
+    private static final String LONG_ENG = "--english";
+    private static final String LONG_ADDRESS = "--server-address";
+    private static final String LONG_HELP = "--help";
+    private static final String HELP_MESSAGE = "help-message";
 
     private ClientOptions(){}
 

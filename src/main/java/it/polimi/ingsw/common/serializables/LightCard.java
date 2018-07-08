@@ -2,6 +2,9 @@ package it.polimi.ingsw.common.serializables;
 
 import java.io.Serializable;
 
+/**
+ * This class is a lighter, serializable representation of a Public Objective Card
+ */
 public class LightCard implements Serializable {
     private String name;
     private String description;

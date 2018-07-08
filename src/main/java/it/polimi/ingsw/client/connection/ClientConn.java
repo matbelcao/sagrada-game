@@ -5,6 +5,9 @@ import it.polimi.ingsw.common.serializables.*;
 
 import java.util.List;
 
+/**
+ * This class is an interface that declares the common methods between SOCKET/RMI client-side connections
+ */
 public interface ClientConn {
 
     /**

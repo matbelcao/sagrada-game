@@ -15,6 +15,9 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This class contains some special messages used only by the GUI
+ */
 public class UIMessages {
     private Element msgFile;
     private static final String MSG="messages";

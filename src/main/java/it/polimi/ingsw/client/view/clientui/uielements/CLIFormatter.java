@@ -15,6 +15,9 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * this class contains the string formats used for the CLI wiew
+ */
 public class CLIFormatter {
     private Element elemFile;
     private static final String FORMATS_FILE_NAME="CLIFormats.xml";

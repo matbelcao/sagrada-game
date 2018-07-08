@@ -2,6 +2,9 @@ package it.polimi.ingsw.common.connection;
 
 import java.io.IOException;
 
+/**
+ * Reads commands from an input source and adds them to a FIFO queue
+ */
 public interface QueuedReader {
     /**
      * clears the queue of messages

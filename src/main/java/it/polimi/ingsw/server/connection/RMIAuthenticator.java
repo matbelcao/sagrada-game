@@ -13,6 +13,9 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This class is the implementation of the RMI server-side methods used during the authentication
+ */
 public class RMIAuthenticator extends UnicastRemoteObject implements AuthenticationInt {
 
     private static final String RMI_SLASHSLASH = "rmi://";
