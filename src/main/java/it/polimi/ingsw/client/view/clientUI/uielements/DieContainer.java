@@ -13,7 +13,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-
+/**
+ * This class represents a cell where both dice and constraints and borders can be placed, removed or hidden
+ * */
 public class DieContainer extends StackPane{
     private static final double ROUNDTRACK_TEXT_SIZE_TO_CELL = 0.7;
     private static final double BORDER_LINE_TO_CELL = 0.12;
@@ -29,6 +31,10 @@ public class DieContainer extends StackPane{
     private Text indexText;
     private Canvas content;
 
+    /**
+     * Constructor of the class
+     * @param cellDim the dimension of the outer border of the die container
+     */
     DieContainer(double cellDim){
         this.dieDim = cellDim*DIE_DIM_TO_CELL_DIM;
         this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
@@ -41,6 +47,12 @@ public class DieContainer extends StackPane{
         innerRect.setFill(Color.WHITE);
         this.getChildren().addAll(outerRect,innerRect,indexText,content);
     }
+
+    /**
+     * Overloaded constructor that allows to draw an index at the bottom of the container, this method is used only bty roundtrack cells
+     * @param index the index to be drawn
+     * @param cellDim the dimension of the outer border of the die container
+     */
     DieContainer(int index, double cellDim){
         this(cellDim);
         int displayedIndex = index + 1;
@@ -50,26 +62,49 @@ public class DieContainer extends StackPane{
         indexText.setFill(Color.BLACK);
     }
 
+    /**
+     * Overloaded constructor that allows to build the cell with the dice or constarint already drawn inside
+     * @param cellDim the dimension of the outer border of the die container
+     */
     DieContainer(CellContent cellContent, double cellDim) {
         this(cellDim);
         this.content = indexedCellToCanvas(cellContent,dieDim);
         this.getChildren().add(content);
     }
 
+    /**
+     * This method allows to draw two halves of respectively two dices in the cell
+     * @param die1 the die where the first half will be taken
+     * @param die2 the die where the second half will be taken
+     */
     public void putDoubleDice(LightDie die1, LightDie die2) {
         GraphicsContext gc = content.getGraphicsContext2D();
         drawDie(die1, gc,0,0, dieDim);
         drawDie(die2, gc, dieDim / 2, 0, dieDim);
     }
 
+    /**
+     * This method allows to draw a dice in the cell
+     * @param lightDie the dice to be drawn
+     */
     public void putDie(LightDie lightDie) {
         drawDie(lightDie,content.getGraphicsContext2D(),0,0,dieDim);
     }
 
+    /**
+     * This method allows to draw a constraint in the cell
+     * @param constraintAt the constraint to be drawn
+     */
     public void putConstraint(LightConstraint constraintAt) {
         drawConstraint(constraintAt,content.getGraphicsContext2D(),0,0,dieDim);
     }
 
+    /**
+     * This method draws the CellContent of an IndexCellContent in a Canvas
+     * @param cellContent the CellContent to be drawn
+     * @param dieDim the dimension of the cell
+     * @return the drawn Canvas
+     */
     private Canvas indexedCellToCanvas(CellContent cellContent, double dieDim) {
         Canvas canvas = new Canvas(dieDim, dieDim);
         if (cellContent.isDie()) {
@@ -88,10 +123,6 @@ public class DieContainer extends StackPane{
                 drawShadeConstraint(cell.getShade(), gc, x, y, cellDim);
             }
         }
-    }
-
-    private void drawDie(LightDie lightDie, GraphicsContext graphicsContext2D, double dieDim) {
-        drawDie(lightDie, graphicsContext2D, 0, 0, dieDim);
     }
 
     private void drawDie(LightDie lightDie, GraphicsContext gc, double x, double y, double dieDim) {
@@ -121,6 +152,14 @@ public class DieContainer extends StackPane{
         }
     }
 
+    /**
+     * This method draws a shade constraint in a graphic context
+     * @param shade the shade to be drawn
+     * @param gc the graphic context in witch draw
+     * @param x x_axis of the beginning of the drawing in canvas
+     * @param y y_axis of the beginning of the drawing in canvas
+     * @param cellDim the dimension of the Canvas whose Graphic Context gets drawn
+     */
     private void drawShadeConstraint(Shade shade, GraphicsContext gc, double x, double y, double cellDim) {
         gc.setFill(Color.LIGHTGRAY);
         gc.fillRect(x, y, cellDim, cellDim);
@@ -128,16 +167,28 @@ public class DieContainer extends StackPane{
         gc.setStroke(Color.BLACK);
     }
 
+    /**
+     * This method draws a color constraint in a graphic context
+     * @param dieColor the color to be drawn
+     * @param gc  the graphic context in witch draw
+     * @param x x_axis of the beginning of the drawing in canvas
+     * @param y y_axis of the beginning of the drawing in canvas
+     * @param cellDim the dimension of the Canvas whose Graphic Context gets drawn
+     */
     private void drawColorConstraint(DieColor dieColor, GraphicsContext gc, double x, double y, double cellDim) {
         gc.setFill(Color.web(dieColor.getFXConstraintColor()));
         gc.fillRect(x, y, cellDim, cellDim);
         gc.setStroke(Color.BLACK);
     }
 
-    private void drawSpots(GraphicsContext gc, double dieDim, int count) {
-        drawSpots(gc, 0, 0, dieDim, count);
-    }
-
+    /**
+     * This method draws the spots of dice
+     * @param gc the graphic context in witch draw
+     * @param xAxisDiePosition x_axis of the beginning of the drawing in canvas
+     * @param yAxisDiePosition y_axis of the beginning of the drawing in canvas
+     * @param dieDim the dimension of the die in the Canvas whose Graphic Context gets drawn
+     * @param count the number of spots to be drawn
+     */
     private void drawSpots(GraphicsContext gc, double xAxisDiePosition, double yAxisDiePosition, double dieDim, int count) {
         switch (count) {
             case 1:
@@ -180,10 +231,14 @@ public class DieContainer extends StackPane{
         }
     }
 
-    private void drawConstraintSpots(GraphicsContext gc, double dieDim, int count) {
-        drawConstraintSpots(gc, 0, 0, dieDim, count);
-    }
-
+    /**
+     * This method draws the spots of the shade constraint
+     * @param gc the graphic context in witch draw
+     * @param xAxisDiePosition x_axis of the beginning of the drawing in the Canvas
+     * @param yAxisDiePosition y_axis of the beginning of the drawing in the Canvas
+     * @param dieDim the dimension of the die in the Canvas whose Graphic Context gets drawn
+     * @param count the number of spots to be drawn
+     */
     private void drawConstraintSpots(GraphicsContext gc, double xAxisDiePosition, double yAxisDiePosition, double dieDim, int count) {
         switch (count) {
             case 1:
@@ -225,10 +280,15 @@ public class DieContainer extends StackPane{
         }
     }
 
-    private void drawConstraintSpot(GraphicsContext gc, double x, double y, double dieDim) {
-        drawConstraintSpot(gc, x, y, dieDim, 0, 0);
-    }
-
+    /**
+     * This method draws a single spot of a constraint
+     * @param gc the graphic context in witch draw
+     * @param x x_axis of the beginning of the drawing in the Canvas
+     * @param y y_axis of the beginning of the drawing in the Canvas
+     * @param dieDim the dimension of the die in the Canvas whose Graphic Context gets drawn
+     * @param xAxisDiePosition the x-axis position of the die whose spot is being drawn respect to the Canvas where it's being drawn
+     * @param yAxisDiePosition the y-axis position of the die whose spot is being drawn respect to the Canvas where it's being drawn
+     */
     private void drawConstraintSpot(GraphicsContext gc, double x, double y, double dieDim, double xAxisDiePosition, double yAxisDiePosition) {
         double spotDiameter = dieDim / SPOT_RATIO;
         gc.setFill(Color.WHITE);
@@ -237,27 +297,39 @@ public class DieContainer extends StackPane{
         gc.fillOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
         gc.strokeOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
     }
-
-    private void drawSpot(GraphicsContext gc, double x, double y, double dieDim) {
-        drawSpot(gc, x, y, dieDim, 0, 0);
-    }
-
+    /**
+     * This method draws a single spot of a die
+     * @param gc the graphic context in witch draw
+     * @param x x_axis of the beginning of the drawing in the Canvas
+     * @param y y_axis of the beginning of the drawing in the Canvas
+     * @param dieDim the dimension of the die in the Canvas whose Graphic Context gets drawn
+     * @param xAxisDiePosition the x-axis position of the die whose spot is being drawn respect to the Canvas where it's being drawn
+     * @param yAxisDiePosition the y-axis position of the die whose spot is being drawn respect to the Canvas where it's being drawn
+     */
     private void drawSpot(GraphicsContext gc, double x, double y, double dieDim, double xAxisDiePosition, double yAxisDiePosition) {
         double spotDiameter = dieDim / SPOT_RATIO;
         gc.setFill(Color.BLACK);
         gc.fillOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
     }
 
-    public void highlightBlue() {
-        outerRect.setFill(Color.LIGHTSKYBLUE);
-    }
+    /**
+     * This method highlights the borders of a DieContainer in blue
+     */
+    public void highlightBlue() { outerRect.setFill(Color.LIGHTSKYBLUE); }
 
+    /**
+     * This method highlights the borders of a DieContainer in green
+     */
     public void highlightGreen() { outerRect.setFill(Color.LIGHTGREEN); }
 
-    public void highlightOrange() {
-        outerRect.setFill(Color.ORANGE);
-    }
+    /**
+     * This method highlights the borders of a DieContainer in orange
+     */
+    public void highlightOrange() { outerRect.setFill(Color.ORANGE); }
 
+    /**
+     * This method hides the borders of cell leaving only the die showing
+     */
     public void hideCellBorders() {
         outerRect.setFill(Color.TRANSPARENT);
         innerRect.setFill(Color.TRANSPARENT);
