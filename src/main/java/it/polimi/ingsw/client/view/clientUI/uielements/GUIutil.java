@@ -715,8 +715,8 @@ public class GUIutil {
 
     /**
      *
-     * @param width the width of the scne containg the pane
-     * @param height the height of the scne containg the pane
+     * @param width the width of the scene containing the pane
+     * @param height the height of the scene containing the pane
      * @param board a copy of the lightboard of the user
      * @return a pane containing a list of dice in the center that the user as to select
      */
@@ -828,6 +828,12 @@ public class GUIutil {
         return new Group (schema);
     }
 
+    /**
+     * Creates a list of cells containing all the cells of the drafpool
+     * @param draftPool a list of dice in the draftpool
+     * @param cellDim the dimensions of the cell in the game scene, from witch is based the dimension of dice
+     * @return al list of DieContainer containing the dices of the draftpool
+     */
     private List<DieContainer> getDraftPoolCells(List<LightDie> draftPool, double cellDim) {
         ArrayList<DieContainer> poolDice = new ArrayList<>();
         for (LightDie draftPoolDice : draftPool) {
@@ -838,7 +844,11 @@ public class GUIutil {
         return poolDice;
     }
 
-
+    /**
+     * Places all the dice of the draftpool in a grid
+     * @param poolDice a list of dieContainer containing the dice of the draftpool
+     * @return a grid containing the dice in the draftpool
+     */
     private GridPane buildDraftPool(List<DieContainer> poolDice) {
         GridPane pool = new GridPane();
         int i = 0;
@@ -860,7 +870,11 @@ public class GUIutil {
 
     }
 
-
+    /**
+     * Groups a list of die container containing the dice of the draftpool in a grid
+     * @param gridCells a list of DieContainer containing the dice of the drafpool
+     * @return a GridPane containing the dice of the draftpool
+     */
     private GridPane schemaToGrid(List<DieContainer> gridCells) {
         GridPane grid = new GridPane();
         for (int row = 0; row < NUM_ROWS; row++) {
@@ -873,6 +887,14 @@ public class GUIutil {
         return grid;
     }
 
+    /**
+     * Adds mouse action listeners to all the DieContainers based on the ClientFsm turn state
+     * @param draftPoolCells a list containing theDieContainer of the draftpool
+     * @param schemaCells draftPoolCells a list containing theDieContainer of the schema card
+     * @param roundTrackCells draftPoolCells a list containing theDieContainer of the roundtrack
+     * @param turnState the ClientFSM state
+     * @param board a copy of the lightboard
+     */
     private void addActionListeners(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, ClientFSMState turnState, LightBoard board) {
         switch (turnState){
             case MAIN:
@@ -889,6 +911,14 @@ public class GUIutil {
         }
 
     }
+
+    /**
+     * Adds mouse action listeners to all the DieContainers when the ClientFSM state is SELECT_DIE
+     * @param draftPoolCells the DieContainers containing the dice of draftpool
+     * @param schemaCells the DieContainers containing the dice of SchemaCard
+     * @param roundTrackCells the DieContainers containing the dice of roundtrack
+     * @param board a copy of the client's LightBoard
+     */
     private void addSelectDieStateActionListener(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, List<DieContainer> roundTrackCells, LightBoard board) {
         List<Actions> latestOptionsList = board.getLatestOptionsList();
         List<IndexedCellContent> latestDiceList = board.getLatestDiceList();
@@ -913,6 +943,11 @@ public class GUIutil {
         }
     }
 
+    /**
+     * Adds mouse action listeners to all the DieContainers of roundtrack when the ClientFSM state is SELECT_DIE
+     * @param roundTrackCells the DieContainers containing the dice of roundtrack
+     * @param roundTrack all the light dices in the roundtrack
+     */
     private void addSelectDieInRoudTrackAction(List<DieContainer> roundTrackCells, List<List<LightDie>> roundTrack) {
         for (int i = 0; i < roundTrack.size(); i++) {
             roundTrackCells.get(i).highlightBlue();
@@ -924,6 +959,11 @@ public class GUIutil {
         }
     }
 
+    /**
+     * Adds mouse action listeners to all the DieContainers of SchemaCard when the ClientFSM state is SELECT_DIE
+     * @param schemaCells the DieContainers containing the dice of SchemaCard
+     * @param latestDiceList the last list of IndexedCellContent sent by the server
+     */
     private void addSelectDieInSchemaAction(List<DieContainer> schemaCells, List<IndexedCellContent> latestDiceList) {
         for (IndexedCellContent activeCell : latestDiceList) {
             DieContainer cell = schemaCells.get(activeCell.getPosition());
@@ -932,6 +972,12 @@ public class GUIutil {
         }
     }
 
+    /**
+     * Adds mouse action listeners to all the DieContainers when the ClientFSM state is CHOOSE_PLACEMENT
+     * @param draftPoolCells the DieContainers containing the dice of draftpool
+     * @param schemaCells the DieContainers containing the dice of SchemaCard
+     * @param board a copy of the client's LightBoard
+     */
     private void addChoosePlacementActionListener(List<DieContainer> draftPoolCells, List<DieContainer> schemaCells, LightBoard board) {
         IndexedCellContent latestSelectedDie = board.getLatestSelectedDie();
         List<Actions> latestOptionsList = board.getLatestOptionsList();
@@ -954,20 +1000,34 @@ public class GUIutil {
                     });
                 }
             }else if(!latestDiceList.isEmpty() && latestDiceList.get(0).getPlace().equals(Place.SCHEMA)){
-                for(IndexedCellContent idexedSelectableCell : latestDiceList){
-                    DieContainer selectableCell = schemaCells.get(idexedSelectableCell.getPosition());
-                    selectableCell.highlightBlue();
-                    selectableCell.setOnMouseClicked(e->{
-                        synchronized (lockWrite) {
-                            cmdWrite.write(ClientFSM.DISCARD);
-                            cmdWrite.write(latestDiceList.indexOf(idexedSelectableCell));
-                        }
-                    });
-                }
+                addChosePlacementInSchemaActionListener(schemaCells, latestDiceList);
             }
         }
     }
 
+    /**
+     * Adds mouse action listeners to all the DieContainers of SchemaCard when the ClientFSM state is CHOOSE_PLACEMENT
+     * @param schemaCells the DieContainers containing the dice of SchemaCard
+     * @param latestDiceList the last list of IndexedCellContent sent by the server
+     */
+    private void addChosePlacementInSchemaActionListener(List<DieContainer> schemaCells, List<IndexedCellContent> latestDiceList) {
+        for(IndexedCellContent idexedSelectableCell : latestDiceList){
+            DieContainer selectableCell = schemaCells.get(idexedSelectableCell.getPosition());
+            selectableCell.highlightBlue();
+            selectableCell.setOnMouseClicked(e->{
+                synchronized (lockWrite) {
+                    cmdWrite.write(ClientFSM.DISCARD);
+                    cmdWrite.write(latestDiceList.indexOf(idexedSelectableCell));
+                }
+            });
+        }
+    }
+
+    /**
+     * Adds mouse action listeners to all the DieContainers of SchemaCard when the ClientFSM state is CHOOSE_PLACEMENT and latestOption list has PLACE DIE
+     * @param schemaCells the DieContainers containing the dice of SchemaCard
+     * @param latestPlacementsList the last list of IndexedCellContent of placements sent by the server
+     */
     private void activateChoosePlacemetCells(List<DieContainer> schemaCells, List<Integer> latestPlacementsList) {
         for (DieContainer cell : schemaCells) {
             if (latestPlacementsList.contains(schemaCells.indexOf(cell))) {
@@ -977,13 +1037,23 @@ public class GUIutil {
         }
     }
 
+    /**
+     * Adds mouse action listeners to all the DieContainers when the ClientFSM state is MAIN
+     * @param draftPoolCells the DieContainers containing the dice of draftpool
+     */
     private void addMainStateActionListeners(List<DieContainer> draftPoolCells) {
         for (DieContainer cell : draftPoolCells) {
             cell.setOnMouseClicked(e -> {synchronized (lockWrite) {cmdWrite.write("1");}});
         }
     }
 
-
+    /**
+     * Builds the pane to be set as root for the scene shown whe the game has ended
+     * @param newWidth the width of the scne containg the pane
+     * @param newHeight the height of the scne containg the pane
+     * @param players a list of all the players playing the game
+     * @return the built pane with the ranking of the game
+     */
     public BorderPane buildGameEndedPane(double newWidth, double newHeight, List<LightPlayer> players) {
         double fontDim = getMainSceneCellDim(newWidth,newHeight)*GAME_END_TEXT_TO_CELL;
         Label scoreLabel = new Label(uimsg.getMessage(GAME_END));
