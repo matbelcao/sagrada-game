@@ -75,7 +75,7 @@ public class SocketAuthenticator extends Thread {
             try {
                 socket.close();
             } catch (IOException e1) {
-                e1.printStackTrace();
+                Logger.getGlobal().log(Level.INFO,e.getMessage());
             }
         }
     }

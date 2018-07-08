@@ -10,6 +10,10 @@ import java.util.List;
 
 public class SerializableServerUtil {
 
+    private SerializableServerUtil(){
+        //not implemented
+    }
+
     public static LightPlayer toLightPlayer(Player player){
         String username = player.getUsername();
         int playerId = player.getGameId();

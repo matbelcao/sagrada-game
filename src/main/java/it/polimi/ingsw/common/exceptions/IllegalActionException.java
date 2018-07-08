@@ -1,5 +1,11 @@
 package it.polimi.ingsw.common.exceptions;
 
 public class IllegalActionException extends Exception{
-    public IllegalActionException(){}
+
+    /**
+     * Constructs  an IllegalActionException
+     */
+    public IllegalActionException(){
+        super();
+    }
 }

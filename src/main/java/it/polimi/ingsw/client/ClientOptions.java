@@ -13,6 +13,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClientOptions {
     public static final String SHORT_HELP ="h";
@@ -56,7 +58,7 @@ public class ClientOptions {
 
             message = doc.getElementsByTagName(HELP_MESSAGE).item(0).getTextContent();
         }catch (SAXException | ParserConfigurationException | IOException e1) {
-            e1.printStackTrace();
+            Logger.getGlobal().log(Level.INFO, e1.getMessage());
         }
         System.out.print(message);
     }

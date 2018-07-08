@@ -11,14 +11,18 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class RMIAuthenticator extends UnicastRemoteObject implements AuthenticationInt {
 
-    public static final String RMI_SLASHSLASH = "rmi://";
-    public static final String RMI_SERVICE_FOR_CLIENT = "rmi service for client ";
-    public static final String PUBLISHED = " published";
+    private static final String RMI_SLASHSLASH = "rmi://";
+    private static final String RMI_SERVICE_FOR_CLIENT = "rmi service for client ";
+    private static final String PUBLISHED = " published";
 
-    public RMIAuthenticator() throws RemoteException {}
+    public RMIAuthenticator() throws RemoteException {
+        //Not implemented
+    }
 
     @Override
     public boolean authenticate(String username, char [] password) {
@@ -32,13 +36,12 @@ public class RMIAuthenticator extends UnicastRemoteObject implements Authenticat
                 RMIServerObject serverObj=new RMIServerObject(user);
                 Naming.rebind(RMI_SLASHSLASH +master.getIpAddress()+":"+master.getRMIPort()+"/"+username, serverObj);
 
-                master.printMessage(RMI_SERVICE_FOR_CLIENT +username+ PUBLISHED); //delete
+                MasterServer.printMessage(RMI_SERVICE_FOR_CLIENT +username+ PUBLISHED); //delete
             }catch (RemoteException |MalformedURLException e){
-                e.printStackTrace();
+                Logger.getGlobal().log(Level.INFO,e.getMessage());
                 logged = false;
                 user.quit();
             }
-            //master.updateConnected(user); todo
 
         }
         return logged;
