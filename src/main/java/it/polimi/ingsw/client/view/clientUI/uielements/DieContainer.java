@@ -1,7 +1,6 @@
 package it.polimi.ingsw.client.view.clientUI.uielements;
 
 import it.polimi.ingsw.common.enums.DieColor;
-import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.enums.Shade;
 import it.polimi.ingsw.common.serializables.CellContent;
 import it.polimi.ingsw.common.serializables.LightConstraint;
@@ -24,7 +23,6 @@ public class DieContainer extends StackPane{
     private static final int SPOT_RATIO = 6;
 
 
-    private double cellDim;
     private double dieDim;
     private Rectangle outerRect;
     private Rectangle innerRect;
@@ -32,7 +30,6 @@ public class DieContainer extends StackPane{
     private Canvas content;
 
     DieContainer(double cellDim){
-        this.cellDim = cellDim;
         this.dieDim = cellDim*DIE_DIM_TO_CELL_DIM;
         this.outerRect = new Rectangle(0, 0, cellDim, cellDim);
         this.indexText = new Text();
@@ -51,15 +48,6 @@ public class DieContainer extends StackPane{
         indexText.setText(displayedIndex + "");
         indexText.setFont(Font.font("Verdana", textSize));
         indexText.setFill(Color.BLACK);
-    }
-
-    DieContainer(double cellDim, Place place) {
-        this(cellDim);
-        switch (place){
-            case DRAFTPOOL:
-                this.hideCellBorders();
-                break;
-        }
     }
 
     DieContainer(CellContent cellContent, double cellDim) {
@@ -258,13 +246,6 @@ public class DieContainer extends StackPane{
         double spotDiameter = dieDim / SPOT_RATIO;
         gc.setFill(Color.BLACK);
         gc.fillOval(xAxisDiePosition + (x - spotDiameter / 2), yAxisDiePosition + (y - spotDiameter / 2), spotDiameter, spotDiameter);
-    }
-    private void drawWhiteCell(GraphicsContext gc, double x, double y, double cellDim) {
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(cellDim * BORDER_LINE_TO_CELL);
-        gc.fillRect(x, y, cellDim, cellDim);
-        gc.strokeRect(x, y, cellDim, cellDim);
     }
 
     public void highlightBlue() {
