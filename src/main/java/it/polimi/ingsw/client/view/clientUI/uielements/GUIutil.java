@@ -48,6 +48,8 @@ public class GUIutil {
     private static final String FONT = "Sans-Serif";
     private static final String IMG_WALL_PNG = "-fx-background-image: url('img/wall.png');";
     private final Object lockWrite= new Object();
+    private static final String END_TURN = "end turn";
+    private static final String BACK = "back";
 
     //-----login Stage
     private static final double LOGIN_TO_SCREEN_RATIO = 0.25;
@@ -74,8 +76,8 @@ public class GUIutil {
     private static final double DRAFTED_SCHEMAS_SPACING_TO_CELL = 0.34;
     //Main game scene
     private static final double MAIN_SCENE_WIDTH_TO_SCREEN_WIDTH = 0.8265;
-    private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.121;
-    private static final double MAIN_GAME_CELL_DIM_TO_WIDTH = 0.075;
+    private static final double MAIN_GAME_CELL_DIM_TO_HEIGHT = 0.107;
+    private static final double MAIN_GAME_CELL_DIM_TO_WIDTH = 0.066;
     private static final double MAIN_GAME_SCENE_RATIO = MAIN_GAME_CELL_DIM_TO_HEIGHT/MAIN_GAME_CELL_DIM_TO_WIDTH;
     private static final double CARD_WIDTH_TO_CELL_DIM = 2.65;
     private static final double CARD_HEIGHT_TO_CELL_DIM = 3.6;
@@ -445,15 +447,14 @@ public class GUIutil {
     }
 
     /**
-     * This method builds a BorderPane that shows the multiple dice contained in a cell
-     * @param selectedTrackCellIndex
-     * @param newWidth
-     * @param newHeight
-     * @param board
-     * @param turnState
-     * @return
+     * This method builds a BorderPane that that gets shown every time the mouse hovers on a cell of the rountrack that contains more than one die
+     * @param selectedTrackCellIndex the cell in the roundtrack that has more than one die
+     * @param newWidth the width of the new scene
+     * @param newHeight the height of the new scene
+     * @param board the lighttboard of the player
+     * @param turnState the ClientFSm state
+     * @return a BorderPane containing a container showing  a row o dice
      */
-//todo continue from here
     public BorderPane showMultipleDiceRoundTrack(int selectedTrackCellIndex, double newWidth, double newHeight, LightBoard board,ClientFSMState turnState){
         double                      cellDim = getMainSceneCellDim(newWidth,newHeight);
         List <List<LightDie>>       roundTrack = board.getRoundTrack();
@@ -471,6 +472,13 @@ public class GUIutil {
         return backPane;
     }
 
+    /**
+     * This method creates an invisible track without dice that has to bu put over the real roundtrack that listens for mouse hovering and acts as a spacer for the multiple dice track
+     * @param cellDim the dimension of the cell in the dummy truck
+     * @param selectedTrackCellIndex the currently selected cell in the real roundtrack, the listener on mouse hover gets disabled for it
+     * @param roundTrack a list of lists of all the dice in the roundtrack
+     * @return a container containing invisible cells that act as roundtrack cell for mouse MouseEntererd events
+     */
     private HBox buildDummyTrack(double cellDim, int selectedTrackCellIndex, List<List<LightDie>> roundTrack) {
         HBox track = new HBox();
         track.setSpacing(ROUNDTRACK_SPACING);
@@ -490,9 +498,14 @@ public class GUIutil {
         return track;
     }
 
+    /**
+     * Creates the buttons to end the turn and
+     * @param turnState //todo continue from here
+     * @return
+     */
     private VBox buildMenuButtons(ClientFSMState turnState) {
-        Button endTurn = new Button("end turn");
-        Button back = new Button("back");
+        Button endTurn = new Button(END_TURN);
+        Button back = new Button(BACK);
         endTurn.setId(GAME_BUTTON);
         back.setId(GAME_BUTTON);
 
