@@ -177,8 +177,10 @@ public class CLI implements ClientUI {
                 printToScreen(cliObjs.printMainView(MAIN));
                 break;
             case SELECT_DIE:
-                if (board.getLatestDiceList().get(0).getPlace().equals(Place.ROUNDTRACK) &&
-                        board.getLatestOptionsList().get(0).equals(Actions.SWAP)) {
+                if (!board.getLatestDiceList().isEmpty()
+                        && board.getLatestDiceList().get(0).getPlace().equals(Place.ROUNDTRACK)
+                        && !board.getLatestOptionsList().isEmpty()
+                        && board.getLatestOptionsList().get(0).equals(Actions.SWAP)) {
                     board.getLatestDiceList().add(0, board.getLatestSelectedDie());
                 }
                 cliObjs.updateMenuDiceList(board.getLatestDiceList());
