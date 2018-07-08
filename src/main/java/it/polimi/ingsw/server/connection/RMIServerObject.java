@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.common.connection.rmi_interfaces.RMIServerInt;
+import it.polimi.ingsw.common.connection.interfacesrmi.RMIServerInt;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;
 import it.polimi.ingsw.server.controller.User;

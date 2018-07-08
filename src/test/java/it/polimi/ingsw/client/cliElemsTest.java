@@ -1,10 +1,10 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.controller.ClientFSMState;
-import it.polimi.ingsw.client.view.clientUI.uielements.CLIFormatter;
-import it.polimi.ingsw.client.view.clientUI.uielements.CLIObjects;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.clientui.uielements.CLIFormatter;
+import it.polimi.ingsw.client.view.clientui.uielements.CLIObjects;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.CLIFormats;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UILanguage;
 import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.serializables.*;
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats.FILLED;
+import static it.polimi.ingsw.client.view.clientui.uielements.enums.CLIFormats.FILLED;
 import static it.polimi.ingsw.common.enums.Shade.*;
 
 /**

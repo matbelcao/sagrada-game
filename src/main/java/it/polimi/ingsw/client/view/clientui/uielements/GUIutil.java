@@ -1,10 +1,10 @@
-package it.polimi.ingsw.client.view.clientUI.uielements;
+package it.polimi.ingsw.client.view.clientui.uielements;
 
 import it.polimi.ingsw.client.controller.ClientFSM;
 import it.polimi.ingsw.client.controller.ClientFSMState;
 import it.polimi.ingsw.client.controller.CmdWriter;
 import it.polimi.ingsw.client.view.LightBoard;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.enums.Place;
 import it.polimi.ingsw.common.serializables.*;
@@ -32,8 +32,8 @@ import java.util.List;
 
 import static it.polimi.ingsw.client.controller.ClientFSMState.MAIN;
 import static it.polimi.ingsw.client.controller.ClientFSMState.SELECT_DIE;
-import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
+import static it.polimi.ingsw.client.view.clientui.uielements.CustomGuiEvent.*;
+import static it.polimi.ingsw.client.view.clientui.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;
 
 /**

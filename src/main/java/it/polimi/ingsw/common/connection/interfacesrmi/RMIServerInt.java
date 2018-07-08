@@ -1,4 +1,4 @@
-package it.polimi.ingsw.common.connection.rmi_interfaces;
+package it.polimi.ingsw.common.connection.interfacesrmi;
 
 import it.polimi.ingsw.common.enums.Actions;
 import it.polimi.ingsw.common.serializables.*;

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.common.connection.rmi_interfaces.RMIClientInt;
+import it.polimi.ingsw.common.connection.interfacesrmi.RMIClientInt;
 import it.polimi.ingsw.common.serializables.GameEvent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 import it.polimi.ingsw.server.controller.User;

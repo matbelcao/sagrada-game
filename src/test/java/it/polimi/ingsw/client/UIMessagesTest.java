@@ -1,8 +1,8 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
-import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.clientui.uielements.UIMessages;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UIMsg;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.view.clientUI;
+package it.polimi.ingsw.client.view.clientui;
 
 import it.polimi.ingsw.common.connection.QueuedReader;
 import java.util.Observer;

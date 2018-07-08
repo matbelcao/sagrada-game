@@ -1,8 +1,8 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.client.controller.Client;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMode;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UIMode;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;

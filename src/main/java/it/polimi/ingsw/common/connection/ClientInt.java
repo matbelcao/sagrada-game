@@ -1,6 +1,6 @@
 package it.polimi.ingsw.common.connection;
 
-import it.polimi.ingsw.client.view.clientUI.ClientUI;
+import it.polimi.ingsw.client.view.clientui.ClientUI;
 import it.polimi.ingsw.common.serializables.GameEvent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
 

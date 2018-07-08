@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.view.clientUI.uielements;
+package it.polimi.ingsw.client.view.clientui.uielements;
 
 import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.Shade;

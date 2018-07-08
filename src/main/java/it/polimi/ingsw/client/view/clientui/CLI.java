@@ -1,13 +1,13 @@
-package it.polimi.ingsw.client.view.clientUI;
+package it.polimi.ingsw.client.view.clientui;
 
 import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.client.view.LightBoard;
 import it.polimi.ingsw.client.view.LightBoardEvents;
-import it.polimi.ingsw.client.view.clientUI.uielements.CLIObjects;
-import it.polimi.ingsw.client.view.clientUI.uielements.CLIUtils;
-import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
+import it.polimi.ingsw.client.view.clientui.uielements.CLIObjects;
+import it.polimi.ingsw.client.view.clientui.uielements.CLIUtils;
+import it.polimi.ingsw.client.view.clientui.uielements.UIMessages;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedBufferedReader;
 import it.polimi.ingsw.common.enums.Actions;

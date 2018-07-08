@@ -1,9 +1,9 @@
-package it.polimi.ingsw.client.view.clientUI.uielements;
+package it.polimi.ingsw.client.view.clientui.uielements;
 
 import it.polimi.ingsw.client.controller.ClientFSMState;
 import it.polimi.ingsw.client.view.LightBoard;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.enums.DieColor;
 import it.polimi.ingsw.common.enums.ConnectionMode;
 import it.polimi.ingsw.common.enums.Place;
@@ -13,9 +13,9 @@ import it.polimi.ingsw.server.model.SchemaCard;
 
 import java.util.*;
 
-import static it.polimi.ingsw.client.view.clientUI.uielements.CLIUtils.*;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats.*;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
+import static it.polimi.ingsw.client.view.clientui.uielements.CLIUtils.*;
+import static it.polimi.ingsw.client.view.clientui.uielements.enums.CLIFormats.*;
+import static it.polimi.ingsw.client.view.clientui.uielements.enums.UIMsg.*;
 
 /**
  * this class contains the objects used by the cli to show the board components to the user

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.view.clientUI.uielements;
+package it.polimi.ingsw.client.view.clientui.uielements;
 
 import javafx.event.Event;
 import javafx.event.EventType;

@@ -543,7 +543,6 @@ public class Board {
 
         sortScores(playerScores);
 
-        System.out.println(playerScores.size() );
         for(int i=0; i<playerScores.size();i++){
 
             playerScores.get(i).setFinalPosition(i+1);

@@ -1,6 +1,6 @@
-package it.polimi.ingsw.client.view.clientUI.uielements;
+package it.polimi.ingsw.client.view.clientui.uielements;
 
-import it.polimi.ingsw.client.view.clientUI.GUI;
+import it.polimi.ingsw.client.view.clientui.GUI;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 

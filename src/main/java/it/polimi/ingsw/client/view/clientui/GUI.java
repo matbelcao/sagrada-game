@@ -1,15 +1,15 @@
-package it.polimi.ingsw.client.view.clientUI;
+package it.polimi.ingsw.client.view.clientui;
 
 import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.client.controller.ClientFSMState;
 import it.polimi.ingsw.client.controller.CmdWriter;
 import it.polimi.ingsw.client.controller.QueuedCmdReader;
 import it.polimi.ingsw.client.view.LightBoard;
-import it.polimi.ingsw.client.view.clientUI.uielements.GUIutil;
-import it.polimi.ingsw.client.view.clientUI.uielements.SizeListener;
-import it.polimi.ingsw.client.view.clientUI.uielements.UIMessages;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UILanguage;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg;
+import it.polimi.ingsw.client.view.clientui.uielements.GUIutil;
+import it.polimi.ingsw.client.view.clientui.uielements.SizeListener;
+import it.polimi.ingsw.client.view.clientui.uielements.UIMessages;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UILanguage;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.UIMsg;
 import it.polimi.ingsw.common.connection.Credentials;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import it.polimi.ingsw.common.enums.Actions;
@@ -31,8 +31,8 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.Observable;
 
-import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
+import static it.polimi.ingsw.client.view.clientui.uielements.CustomGuiEvent.*;
+import static it.polimi.ingsw.client.view.clientui.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.CENTER;
 /**
  * This is the class that implements the UI for the client as a graphic interface

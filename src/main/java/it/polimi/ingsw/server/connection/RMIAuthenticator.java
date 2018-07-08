@@ -1,8 +1,7 @@
 package it.polimi.ingsw.server.connection;
 
-import it.polimi.ingsw.common.connection.rmi_interfaces.AuthenticationInt;
-import it.polimi.ingsw.common.connection.rmi_interfaces.RMIClientInt;
-import it.polimi.ingsw.common.enums.ConnectionMode;
+import it.polimi.ingsw.common.connection.interfacesrmi.AuthenticationInt;
+import it.polimi.ingsw.common.connection.interfacesrmi.RMIClientInt;
 import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.controller.User;
 

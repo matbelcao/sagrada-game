@@ -1,7 +1,7 @@
-package it.polimi.ingsw.client.view.clientUI.uielements;
+package it.polimi.ingsw.client.view.clientui.uielements;
 
 import it.polimi.ingsw.client.controller.Client;
-import it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats;
+import it.polimi.ingsw.client.view.clientui.uielements.enums.CLIFormats;
 import it.polimi.ingsw.common.enums.Shade;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.view.clientUI.uielements;
+package it.polimi.ingsw.client.view.clientui.uielements;
 
 import it.polimi.ingsw.client.controller.Client;
 import it.polimi.ingsw.common.enums.DieColor;
@@ -10,8 +10,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static it.polimi.ingsw.client.view.clientUI.uielements.CLIObjects.*;
-import static it.polimi.ingsw.client.view.clientUI.uielements.enums.CLIFormats.*;
+import static it.polimi.ingsw.client.view.clientui.uielements.CLIObjects.*;
+import static it.polimi.ingsw.client.view.clientui.uielements.enums.CLIFormats.*;
 
 /**
  * This class contains all utility methods for the cliview class. All methods here are static

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.view.clientUI.uielements.enums;
+package it.polimi.ingsw.client.view.clientui.uielements.enums;
 
 public enum UIMsg {
     CONNECTION_OK("connection-ok"),

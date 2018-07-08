@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.controller;
 
-import it.polimi.ingsw.common.connection.rmi_interfaces.AuthenticationInt;
+import it.polimi.ingsw.common.connection.interfacesrmi.AuthenticationInt;
 import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.server.ServerOptions;
 import it.polimi.ingsw.server.connection.RMIAuthenticator;
@@ -441,7 +441,7 @@ public class MasterServer{
                 }
             }
         }
-        throw new IllegalArgumentException(); //todo  //return null;
+        throw new IllegalArgumentException();
     }
 
     /**
