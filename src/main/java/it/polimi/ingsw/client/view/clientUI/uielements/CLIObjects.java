@@ -41,7 +41,7 @@ public class CLIObjects {
     private List<String> draftPool = new ArrayList<>();
     private List<String> menuList = new ArrayList<>();
 
-    private static UIMessages uiMsg;
+    private UIMessages uiMsg;
     private int numPlayers;
     private int playerId;
     private String latestScreen =EMPTY_STRING;
@@ -341,15 +341,15 @@ public class CLIObjects {
      * this builds the ranking for a game
      * @param players the list of players
      */
-    public  void updateGameRanking(List<LightPlayer> players){ // TODO: 07/07/2018 enrich
+    public  void updateGameRanking(List<LightPlayer> players){
         gameRanking.clear();
         gameRanking.add(EMPTY_STRING);
         gameRanking.add(uiMsg.getMessage(GAME_END));
         gameRanking.add(EMPTY_STRING);
-        for(int position=1; position<=players.size(); position++){
+        for(LightPlayer player:players){
             gameRanking.add(
-                    String.format(cliFormatter.getElem(LIST_ELEMENT),position,players.get(position-1).getUsername())+
-                            String.format(cliFormatter.getElem(POINTS),uiMsg.getMessage(PLAYER_SCORE),players.get(position-1).getPoints())
+                    String.format(cliFormatter.getElem(LIST_ELEMENT),player.getFinalPosition(),player.getUsername())+
+                            String.format(cliFormatter.getElem(POINTS),uiMsg.getMessage(PLAYER_SCORE),player.getPoints())
             );
         }
     }
@@ -723,7 +723,7 @@ public class CLIObjects {
      * @param index the index (0-19) of a cell in the schema
      * @return a string containing the coordinates
      */
-    private static String rowColmumn(int index){
+    private  String rowColmumn(int index){
         int row= index/SchemaCard.NUM_COLS;
         int column= index%SchemaCard.NUM_COLS;
         return String.format(cliFormatter.getElem(ROW_COL),uiMsg.getMessage(ROW),row,uiMsg.getMessage(COL),column);
