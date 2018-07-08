@@ -559,10 +559,13 @@ public class Board {
         playerScores.sort((r1, r2) -> {
             Player p1=getPlayerById(r1.getPlayerId());
             Player p2=getPlayerById(r2.getPlayerId());
-            if(r1.getPoints() == r2.getPoints()){
-                return runoff(p1, p2);
+            if(r1.getFinalPosition()== r2.getFinalPosition()) {
+                if (r1.getPoints() == r2.getPoints()) {
+                    return runoff(p1, p2);
+                }
+                return r1.getPoints() > r2.getPoints() ? -1 : 1;
             }
-            return r1.getPoints()>r2.getPoints() ? -1 : 1;
+            return r1.getFinalPosition() < r2.getFinalPosition() ? -1 : 1;
         });
     }
 
