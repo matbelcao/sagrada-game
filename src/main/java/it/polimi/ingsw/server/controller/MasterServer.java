@@ -237,7 +237,7 @@ public class MasterServer{
                     players.add(u);
                 }
                 game = new Game(players, additionalSchemas);
-                MasterServer.getMasterServer().printMessage("New match started with "+players.size()+" players");
+                printMessage("New match started with "+players.size()+" players");
                 synchronized (lockGames) {
                     games.add(game);
                     lockGames.notifyAll();
@@ -253,7 +253,7 @@ public class MasterServer{
             if (lobby.size() >= MIN_PLAYERS) {
                 players.addAll(lobby);
                 game = new Game(players, additionalSchemas);
-                MasterServer.getMasterServer().printMessage("New match started with "+players.size()+" players");
+                printMessage("New match started with "+players.size()+" players");
                 synchronized (lockGames) {
                     games.add(game);
                     lockGames.notifyAll();
@@ -376,7 +376,7 @@ public class MasterServer{
      * prints a message to the server's CLI
      * @param message the message to be printed
      */
-    public void printMessage(String message) {
+    public static void printMessage(String message) {
         System.out.println(message);
     }
 
@@ -393,18 +393,18 @@ public class MasterServer{
                 user = getUser(username);
                 if (Arrays.equals(password, user.getPassword()) && (user.getStatus() == UserStatus.DISCONNECTED)) {
                     user.setStatus(UserStatus.CONNECTED);
-                    this.printMessage(LOGGED +username);
+                    printMessage(LOGGED +username);
                     return true;
                 }
                 if(!Arrays.equals(password, user.getPassword())){
-                    this.printMessage(WRONG_PASS +username);
+                    printMessage(WRONG_PASS +username);
                 }else{
-                    this.printMessage(USER_ALREADY_LOGGED_IN +username);
+                    printMessage(USER_ALREADY_LOGGED_IN +username);
                 }
             } else {
                 user = new User(username, password);
                 users.add(user);
-                this.printMessage(LOGGED+username);
+                printMessage(LOGGED+username);
                 return true;
             }
         }
