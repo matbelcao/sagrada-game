@@ -46,7 +46,6 @@ public class Game extends Thread implements Iterable  {
             u.setStatus(UserStatus.PLAYING);
             u.setGame(this);
         }
-        MasterServer.getMasterServer().printMessage("New match started with "+users.size()+" players");
     }
 
 

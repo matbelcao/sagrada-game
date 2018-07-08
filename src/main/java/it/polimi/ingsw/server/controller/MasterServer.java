@@ -237,6 +237,7 @@ public class MasterServer{
                     players.add(u);
                 }
                 game = new Game(players, additionalSchemas);
+                MasterServer.getMasterServer().printMessage("New match started with "+players.size()+" players");
                 synchronized (lockGames) {
                     games.add(game);
                     lockGames.notifyAll();
@@ -252,6 +253,7 @@ public class MasterServer{
             if (lobby.size() >= MIN_PLAYERS) {
                 players.addAll(lobby);
                 game = new Game(players, additionalSchemas);
+                MasterServer.getMasterServer().printMessage("New match started with "+players.size()+" players");
                 synchronized (lockGames) {
                     games.add(game);
                     lockGames.notifyAll();
