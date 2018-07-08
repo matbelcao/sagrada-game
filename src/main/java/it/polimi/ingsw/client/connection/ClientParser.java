@@ -47,9 +47,9 @@ public class ClientParser {
             case SocketString.LIST_PLACEMENTS:
                 return true;
             case SocketString.CHOICE:
-                return checkChoice(parsedResult);
+                return checkToolChoice(parsedResult);
             case SocketString.TOOL:
-                return checkTool(parsedResult);
+                return checkToolChoice(parsedResult);
             case SocketString.STATUS:
                 return checkStatus(parsedResult);
             case SocketString.PING:
@@ -290,9 +290,6 @@ public class ClientParser {
      */
     private static boolean checkSendSchema(List<String> parsedResult) {
         for (int i = 4; i < parsedResult.size(); i++) {
-            if(parsedResult.get(i).matches("[0-9]")){
-                i++;
-            }
             String[] args = parsedResult.get(i).split(",");
             if (args[0].equals(SocketString.DIE) && args.length != 4) {
                 return false;
@@ -333,21 +330,11 @@ public class ClientParser {
     }
 
     /**
-     * This method checks if the TOOL parameters have a correct number of arguments (nothing has been lost during the communication) and format
+     * This method checks if the TOOL|CHOICE parameters have a correct number of arguments (nothing has been lost during the communication) and format
      * @param parsedResult the parsed parameters of the command
      * @return true iff the parameters are valid
      */
-    private static boolean checkTool(List<String> parsedResult){
-        if(parsedResult.size()!=2){return false;}
-        return parsedResult.get(1).equals(SocketString.OK) || parsedResult.get(1).equals(SocketString.KO);
-    }
-
-    /**
-     * This method checks if the CHOICE parameters have a correct number of arguments (nothing has been lost during the communication) and format
-     * @param parsedResult the parsed parameters of the command
-     * @return true iff the parameters are valid
-     */
-    private static boolean checkChoice(List<String> parsedResult){
+    private static boolean checkToolChoice(List<String> parsedResult){
         if(parsedResult.size()!=2){return false;}
         return parsedResult.get(1).equals(SocketString.OK) || parsedResult.get(1).equals(SocketString.KO);
     }

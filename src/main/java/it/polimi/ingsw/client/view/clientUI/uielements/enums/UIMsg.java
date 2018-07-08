@@ -58,15 +58,15 @@ public enum UIMsg {
 
 
 
-    private String uiMsg;
+    private String uiMessage;
     UIMsg(String uiMsg){
-        this.uiMsg=uiMsg;
+        this.uiMessage=uiMsg;
 
     }
 
     @Override
     public String toString() {
-        return uiMsg;
+        return uiMessage;
     }
 
 

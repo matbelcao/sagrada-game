@@ -29,7 +29,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * The constant CONNECTION_TIMEOUT.
      */
-    public static final String CONNECTION_TIMEOUT = "CONNECTION TIMEOUT!";
+    private static final String CONNECTION_TIMEOUT = "CONNECTION TIMEOUT!";
     private Socket socket;
     private QueuedBufferedReader inSocket;
     private PrintWriter outSocket;
@@ -91,7 +91,7 @@ public class SocketServer extends Thread implements ServerConn  {
                 if(!inSocket.isEmpty()){
                     command=inSocket.getln();
                     if (Validator.isValid(command, parsedResult)) {
-                        playing = execute(command,parsedResult);
+                        playing = execute(parsedResult);
                     }else{
                         syncedSocketWrite(SocketString.INVALID_MESSAGE);
                     }
@@ -110,10 +110,9 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * This method provides the socket messages interpretation logic
-     * @param command the socket's message received
      * @return true if the connection has to be closed
      */
-    private boolean execute(String command,ArrayList<String> parsedResult) {
+    private boolean execute(ArrayList<String> parsedResult) {
         try {
             switch (parsedResult.get(0)) {
                 case SocketString.GAME:
@@ -167,7 +166,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * manages a GAME command
      * @param command  the command to be managed
-     * @throws IllegalActionException
+     * @throws IllegalActionException if the action is not permitted
      */
     private void gameCommand(String command) throws IllegalActionException {
         if(command.equals(SocketString.NEW_MATCH)){
@@ -183,7 +182,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * this manages tool related commands
      * @param parsedResult the parsed commands
-     * @throws IllegalActionException
+     * @throws IllegalActionException if the action is not permitted
      */
     private void toolCommand(ArrayList<String> parsedResult) throws IllegalActionException {
         if(!user.isMyTurn()){throw new IllegalActionException();}
@@ -197,7 +196,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * this method manages the GET commands
      * @param parsedResult the parsed command
-     * @throws IllegalActionException
+     * @throws IllegalActionException if the action is not permitted
      */
     private void getCommands(ArrayList<String> parsedResult) throws IllegalActionException {
         switch (parsedResult.get(1)) {
@@ -231,6 +230,8 @@ public class SocketServer extends Thread implements ServerConn  {
                 break;
             case SocketString.GAME_STATUS:
                 sendGameStatus();
+                break;
+            default:
                 break;
         }
     }
@@ -430,7 +431,6 @@ public class SocketServer extends Thread implements ServerConn  {
     }
 
     /**
-     *
      * Sends the client a text description of the users that are currently playing in the match
      */
     private void sendPlayers(){
@@ -462,11 +462,11 @@ public class SocketServer extends Thread implements ServerConn  {
         StringBuilder builder= new StringBuilder();
 
         builder.append(SocketString.LIST_DICE);
-        if(dice.size()>0){
+        if(!dice.isEmpty()){
             builder.append(" "+dice.get(0).getPlace().toString().toLowerCase());
-            for(int index=0;index<dice.size();index++){
-                builder.append(" "+dice.get(index).getPosition()+","+dice.get(index).getContent().getShade().toString()
-                        +"," +dice.get(index).getContent().getDieColor().toString());
+            for (IndexedCellContent aDice : dice) {
+                builder.append(" " + aDice.getPosition() + "," + aDice.getContent().getShade().toString()
+                        + "," + aDice.getContent().getDieColor().toString());
             }
         }
         syncedSocketWrite(builder.toString());
@@ -479,8 +479,8 @@ public class SocketServer extends Thread implements ServerConn  {
         List<Integer> placements=user.getGame().getPlacements();
 
         StringBuilder builder=new StringBuilder(SocketString.LIST_PLACEMENTS);
-        for(int i=0;i<placements.size();i++){
-            builder.append(" "+placements.get(i));
+        for (Integer placement : placements) {
+            builder.append(" " + placement);
         }
         syncedSocketWrite(builder.toString());
     }
@@ -518,7 +518,7 @@ public class SocketServer extends Thread implements ServerConn  {
     /**
      * Notifies the server that the user wants to enable a ToolCard and sends the result to the client
      * @param toolIndex the index of the tool to enable
-     * @throws IllegalActionException
+     * @throws IllegalActionException if the action is not permitted
      */
     private void toolEnable(int toolIndex) throws IllegalActionException {
         Boolean used;
@@ -533,7 +533,7 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * Recalls to the controller if the execution of the toolcard is terminated and sends the response to the client
-     * @throws IllegalActionException
+     * @throws IllegalActionException if the action is not permitted
      */
     private void toolCanContinue() throws IllegalActionException {
         Boolean isActive=null;
@@ -565,7 +565,7 @@ public class SocketServer extends Thread implements ServerConn  {
             if(!user.getStatus().equals(UserStatus.DISCONNECTED)){
                 connectionOk = false;
                 lockPing.notifyAll();
-                MasterServer.getMasterServer().printMessage(CONNECTION_TIMEOUT);
+                MasterServer.printMessage(CONNECTION_TIMEOUT);
                 user.disconnect();
             }
         }

@@ -413,14 +413,14 @@ public class LightBoard extends Observable {
      * @return the list of players sorted by final position
      */
     public List<LightPlayer> sortFinalPositions(){
-        List<LightPlayer> players= new ArrayList<>();
+        List<LightPlayer> players2= new ArrayList<>();
         for(int i=0;i<this.players.size();i++){
-            players.add(this.players.get(i));
+            players2.add(this.players.get(i));
         }
 
-        players.sort(Comparator.comparing(LightPlayer::getFinalPosition).reversed());
+        players2.sort(Comparator.comparing(LightPlayer::getFinalPosition).reversed());
 
-        return players;
+        return players2;
     }
 
 

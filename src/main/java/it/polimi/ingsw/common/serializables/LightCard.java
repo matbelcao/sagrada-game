@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class LightCard implements Serializable {
     private String name;
     private String description;
-    private static final String imgSrc="img/PubObjectiveCard/";
+    private static final String IMG_SRC ="img/PubObjectiveCard/";
     private int id;
 
     public LightCard(String name, String description, int id){
@@ -27,8 +27,8 @@ public class LightCard implements Serializable {
         return description;
     }
 
-    public  String getImgSrc() {
-        return imgSrc+id;
+    public  String getImgSrc(){
+        return IMG_SRC +id;
     }
 
     public int getId() {

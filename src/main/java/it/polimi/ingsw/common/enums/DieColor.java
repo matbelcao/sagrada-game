@@ -15,18 +15,18 @@ public enum DieColor { //need to add png address combined with Shade's ones
 
     private final String utf;
     private final Color constraintColor;
-    private final Color dieColor;
+    private final Color colorDie;
 
     /**
      * Constructs the elements of the enum setting the corresponding ansi color code
      * @param utf the DieColor utf code for CLI
      * @param constraintColor the java fx color for a constraint
-     * @param dieColor the javafx color for a die
+     * @param colorDie the javafx color for a die
      */
-    DieColor(String utf, Color constraintColor, Color dieColor){
+    DieColor(String utf, Color constraintColor, Color colorDie){
         this.utf=utf;
         this.constraintColor = constraintColor;
-        this.dieColor = dieColor;
+        this.colorDie = colorDie;
     }
 
     /**
@@ -58,6 +58,6 @@ public enum DieColor { //need to add png address combined with Shade's ones
     }
 
     public Color getFXColor(){
-        return dieColor;
+        return colorDie;
     }
 }

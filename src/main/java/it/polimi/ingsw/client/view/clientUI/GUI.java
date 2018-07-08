@@ -123,7 +123,6 @@ public class GUI extends Application implements ClientUI {
             grid.setPadding(new Insets(sceneCreator.getLoginHeight() * 0.35, 25, 25, 25));
 
             TextField usernameField = new TextField();
-            //usernameField.setText(textGen.getRandomString()); //TODO delete
             usernameField.setPromptText("Username");
             usernameField.setMinHeight(sceneCreator.getLoginWidth() * 0.08);
             usernameField.setMinWidth(sceneCreator.getLoginWidth() * 0.75);

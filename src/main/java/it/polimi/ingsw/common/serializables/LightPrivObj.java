@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class LightPrivObj extends LightCard implements Serializable {
     private DieColor dieColor;
-    private static String imgSrc="img/PrivObjectiveCard/";
+    private static final String IMG_SRC="img/PrivObjectiveCard/";
 
     public LightPrivObj(String name, String description, int id, DieColor dieColor) {
         super(name, description, id);
@@ -18,8 +18,9 @@ public class LightPrivObj extends LightCard implements Serializable {
         return new LightPrivObj (param[3].replaceAll("_", " "),param[4].replaceAll("_", " "),Integer.parseInt(param[2]),DieColor.valueOf(param[5]));
     }
 
+    @Override
     public String getImgSrc() {
-        return imgSrc+getId();
+        return IMG_SRC+getId();
     }
 
     public DieColor getDieColor() {
