@@ -26,6 +26,9 @@ import java.util.logging.Logger;
  * This class is the implementation of the SOCKET server-side connection methods
  */
 public class SocketServer extends Thread implements ServerConn  {
+    /**
+     * The constant CONNECTION_TIMEOUT.
+     */
     public static final String CONNECTION_TIMEOUT = "CONNECTION TIMEOUT!";
     private Socket socket;
     private QueuedBufferedReader inSocket;
@@ -39,7 +42,11 @@ public class SocketServer extends Thread implements ServerConn  {
 
     /**
      * This is the constructor of the class, it starts a thread linked to an open socket
-     * @param socket the socket already open used to communicate with the client
+     *
+     * @param socket    the socket already open used to communicate with the client
+     * @param user      the user
+     * @param inSocket  the in socket
+     * @param outSocket the out socket
      */
     SocketServer(Socket socket, User user, QueuedBufferedReader inSocket, PrintWriter outSocket){
         this.inSocket=inSocket;
@@ -77,7 +84,7 @@ public class SocketServer extends Thread implements ServerConn  {
                 try {
                     inSocket.add();
                 } catch (Exception e) {
-                    user.disconnect();
+                    disconnect();
                     return;
                 }
 
@@ -90,7 +97,7 @@ public class SocketServer extends Thread implements ServerConn  {
                     }
                 }
             } catch (IllegalArgumentException e) {
-                user.disconnect();
+                disconnect();
                 playing=false;
             }
         }
@@ -157,6 +164,11 @@ public class SocketServer extends Thread implements ServerConn  {
         return true;
     }
 
+    /**
+     * manages a GAME command
+     * @param command  the command to be managed
+     * @throws IllegalActionException
+     */
     private void gameCommand(String command) throws IllegalActionException {
         if(command.equals(SocketString.NEW_MATCH)){
             user.newMatch();
@@ -168,6 +180,11 @@ public class SocketServer extends Thread implements ServerConn  {
         }
     }
 
+    /**
+     * this manages tool related commands
+     * @param parsedResult the parsed commands
+     * @throws IllegalActionException
+     */
     private void toolCommand(ArrayList<String> parsedResult) throws IllegalActionException {
         if(!user.isMyTurn()){throw new IllegalActionException();}
         if (SocketString.ENABLE.equals(parsedResult.get(1))) {
@@ -177,6 +194,11 @@ public class SocketServer extends Thread implements ServerConn  {
         }
     }
 
+    /**
+     * this method manages the GET commands
+     * @param parsedResult the parsed command
+     * @throws IllegalActionException
+     */
     private void getCommands(ArrayList<String> parsedResult) throws IllegalActionException {
         switch (parsedResult.get(1)) {
             case SocketString.SCHEMA:
@@ -531,17 +553,27 @@ public class SocketServer extends Thread implements ServerConn  {
     private class ConnectionTimeout extends TimerTask {
         @Override
         public void run(){
-            synchronized (lockPing) {
-                if(user.getStatus()!=UserStatus.DISCONNECTED){
-                    connectionOk = false;
-                    lockPing.notifyAll();
-                    MasterServer.getMasterServer().printMessage(CONNECTION_TIMEOUT);
-                    user.disconnect();
-                }
+            disconnect();
+        }
+    }
+
+    /**
+     * Disconnects the user
+     */
+    private void disconnect() {
+        synchronized (lockPing) {
+            if(!user.getStatus().equals(UserStatus.DISCONNECTED)){
+                connectionOk = false;
+                lockPing.notifyAll();
+                MasterServer.getMasterServer().printMessage(CONNECTION_TIMEOUT);
+                user.disconnect();
             }
         }
     }
 
+    /**
+     * cancels the timer for connection error detection
+     */
     private void pong(){
         synchronized (lockPing) {
             if(pingTimer!=null){
