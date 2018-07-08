@@ -51,7 +51,7 @@ public class RMIClient implements ClientConn{
         try {
             result = remoteObj.getSchemaDraft();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -72,7 +72,7 @@ public class RMIClient implements ClientConn{
         try {
             schema = remoteObj.getSchema(playerId);
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -91,7 +91,7 @@ public class RMIClient implements ClientConn{
         try {
             card = remoteObj.getPrivateObject();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
         return card;
     }
@@ -106,7 +106,7 @@ public class RMIClient implements ClientConn{
         try {
             result = remoteObj.getPublicObjectives();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
         return result;
     }
@@ -121,7 +121,7 @@ public class RMIClient implements ClientConn{
         try {
             result = remoteObj.getTools();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
         return result;
     }
@@ -136,7 +136,7 @@ public class RMIClient implements ClientConn{
         try {
             draftPool = remoteObj.getDraftPool();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -155,7 +155,7 @@ public class RMIClient implements ClientConn{
         try {
             roundTrack = remoteObj.getRoundTrack();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -175,7 +175,7 @@ public class RMIClient implements ClientConn{
         try {
             players = remoteObj.getPlayers();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
         return players;
     }
@@ -191,7 +191,7 @@ public class RMIClient implements ClientConn{
         try {
             status = remoteObj.getGameStatus();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
         return status;
     }
@@ -207,7 +207,7 @@ public class RMIClient implements ClientConn{
         try{
             favorTokens = remoteObj.getFavorTokens(playerId);
         }catch(RemoteException e){
-            closeConn();
+            disconnect();
         }
         return favorTokens;
     }
@@ -223,7 +223,7 @@ public class RMIClient implements ClientConn{
         try{
             diceList = remoteObj.getDiceList();
         }catch(RemoteException  e){
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -244,7 +244,7 @@ public class RMIClient implements ClientConn{
         try{
             options = remoteObj.select(dieIndex);
         }catch(RemoteException  e){
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -264,7 +264,7 @@ public class RMIClient implements ClientConn{
         try{
             placements = remoteObj.getPlacementsList();
         }catch(RemoteException  e){
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -284,7 +284,7 @@ public class RMIClient implements ClientConn{
         try{
             return remoteObj.choose(optionIndex);
         }catch(RemoteException e){
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -304,7 +304,7 @@ public class RMIClient implements ClientConn{
         try{
             return remoteObj.enableTool(toolIndex);
         }catch(RemoteException  e){
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -322,7 +322,7 @@ public class RMIClient implements ClientConn{
         try{
             return remoteObj.toolCanContinue();
         }catch(RemoteException  e){
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -339,7 +339,7 @@ public class RMIClient implements ClientConn{
         try {
             remoteObj.endTurn();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -356,7 +356,7 @@ public class RMIClient implements ClientConn{
         try {
             remoteObj.discard();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -372,7 +372,7 @@ public class RMIClient implements ClientConn{
         try {
             remoteObj.back();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }catch (IllegalActionException e){
             if(client.isPlayingTurns()&&!client.getFsmState().equals(ClientFSMState.NOT_MY_TURN)) {
                 endTurn();
@@ -388,7 +388,7 @@ public class RMIClient implements ClientConn{
         try {
             remoteObj.quit();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
     }
 
@@ -400,20 +400,7 @@ public class RMIClient implements ClientConn{
         try {
             remoteObj.newMatch();
         } catch (RemoteException e) {
-            closeConn();
-        }
-    }
-
-    /**
-     * Closes the connection if broken
-     */
-    private void closeConn(){
-        synchronized (lockPing){
-            if (connectionOk){
-                client.disconnect();
-                connectionOk=false;
-            }
-            lockPing.notifyAll();
+            disconnect();
         }
     }
 
@@ -428,13 +415,12 @@ public class RMIClient implements ClientConn{
     }
 
     /**
-     * If triggered, it means that the connection has broken
+     * Closes the connection if broken
      */
     private void disconnect(){
         synchronized (lockPing) {
             if (connectionOk) {
                 connectionOk = false;
-                lockPing.notifyAll();
                 System.out.println(CONNECTION_TIMEOUT);
                 client.disconnect();
             }
@@ -450,10 +436,10 @@ public class RMIClient implements ClientConn{
         new Thread(() -> {
             while(connectionOk) {
                 try {
-                        pingTimer = new Timer();
-                        pingTimer.schedule(new ConnectionTimeout(), PONG_TIME);
-                        remoteObj.pong();
-                        pingTimer.cancel();
+                    pingTimer = new Timer();
+                    pingTimer.schedule(new ConnectionTimeout(), PONG_TIME);
+                    remoteObj.pong();
+                    pingTimer.cancel();
                     try {
                         Thread.sleep(PONG_TIME);
                     } catch (InterruptedException e) {

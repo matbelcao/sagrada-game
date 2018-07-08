@@ -40,7 +40,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyLobbyUpdate(n);
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
 
     }
@@ -56,7 +56,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyGameStart(n, id);
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
 
     }
@@ -71,7 +71,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyGameEnd(ranking);
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
     }
 
@@ -86,7 +86,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyRoundEvent(gameEvent, roundNumber);
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
     }
 
@@ -102,7 +102,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyTurnEvent(gameEvent, playerId, turnNumber);
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
 
 
@@ -120,7 +120,7 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyStatusUpdate(gameEvent, id, userName);
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
 
     }
@@ -134,23 +134,10 @@ public class RMIServer implements ServerConn {
         try {
             remoteObj.notifyBoardChanged();
         } catch (RemoteException e) {
-            closeConn();
+            disconnect();
         }
 
 
-    }
-
-    /**
-     * Closes the connection if broken
-     */
-    private void closeConn(){
-        synchronized (lockPing){
-            if (connectionOk){
-                user.disconnect();
-                connectionOk=false;
-            }
-            lockPing.notifyAll();
-        }
     }
 
     /**
@@ -164,13 +151,12 @@ public class RMIServer implements ServerConn {
     }
 
     /**
-     * If triggered, it means that the connection has broken
+     * Closes the connection if broken
      */
     private void disconnect(){
         synchronized (lockPing) {
             if (connectionOk) {
                 connectionOk = false;
-                lockPing.notifyAll();
                 System.out.println(CONNECTION_TIMEOUT);
                 user.disconnect();
             }
