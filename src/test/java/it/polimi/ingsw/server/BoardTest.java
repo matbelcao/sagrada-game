@@ -190,7 +190,7 @@ class BoardTest {
     }
 
     /**
-     * Checks the classification algorithm
+     * Checks the ranking algorithm
      */
     @Test
     void testFinalScore(){
@@ -210,11 +210,11 @@ class BoardTest {
 
         board.getPlayer(users2.get(1)).quitMatch();
         playerScores=board.gameRunningEnd(users2);
-        assertEquals(1,playerScores.size());
+        assertEquals(2,playerScores.size());
         assertEquals(0,playerScores.get(0).getPlayerId());
 
         users2.get(0).setStatus(UserStatus.DISCONNECTED);
         playerScores=board.gameRunningEnd(users2);
-        assertEquals(0,playerScores.size());
+        assertEquals(2,playerScores.size());
     }
 }

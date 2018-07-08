@@ -442,6 +442,9 @@ public class Client implements ClientInt {
         return userStatus.equals(UserStatus.LOBBY)||userStatus.equals(UserStatus.PLAYING);
     }
 
+    /**
+     * this method prepares the client for a new game
+     */
     void prepareForNewGame() {
 
         synchronized (lockStatus) {

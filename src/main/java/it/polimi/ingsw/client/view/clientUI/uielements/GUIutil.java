@@ -1052,10 +1052,10 @@ public class GUIutil {
      * Builds the pane to be set as root for the scene shown whe the game has ended
      * @param newWidth the width of the scne containg the pane
      * @param newHeight the height of the scne containg the pane
-     * @param players a list of all the players playing the game
+     * @param board the board
      * @return the built pane with the ranking of the game
      */
-    public BorderPane buildGameEndedPane(double newWidth, double newHeight, List<LightPlayer> players) {
+    public BorderPane buildGameEndedPane(double newWidth, double newHeight, LightBoard board) {
         double fontDim = getMainSceneCellDim(newWidth,newHeight)*GAME_END_TEXT_TO_CELL;
         Label scoreLabel = new Label(uimsg.getMessage(GAME_END));
         scoreLabel.setFont(Font.font(FONT, fontDim*1.1));
@@ -1065,13 +1065,13 @@ public class GUIutil {
         scoreBoard.setVgap(10);
         scoreBoard.setPadding(new Insets(50,50,50,50));
         scoreBoard.setAlignment(CENTER);
-        for(int i = 0; i < players.size();i++){
-            Label name = new Label(players.get(i).getUsername());
-            Label points = new Label(players.get(i).getPoints()+"");
+        for(int pos = 1; pos <= board.getNumPlayers(); pos++){
+            Label name = new Label(board.getByFinalPosition(pos).getUsername());
+            Label points = new Label(board.getByFinalPosition(pos).getPoints()+"");
             name.setFont(Font.font(FONT, fontDim));
             points.setFont(Font.font(FONT, fontDim));
-            scoreBoard.add(name,0,i);
-            scoreBoard.add(points,1,i);
+            scoreBoard.add(name,0,pos);
+            scoreBoard.add(points,1,pos);
 
         }
 

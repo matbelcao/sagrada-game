@@ -339,16 +339,17 @@ public class CLIObjects {
 
     /**
      * this builds the ranking for a game
-     * @param players the list of players
+     * @param board the board
      */
-    public  void updateGameRanking(List<LightPlayer> players){
+    public  void updateGameRanking(LightBoard board){
         gameRanking.clear();
         gameRanking.add(EMPTY_STRING);
         gameRanking.add(uiMsg.getMessage(GAME_END));
         gameRanking.add(EMPTY_STRING);
-        for(LightPlayer player:players){
+        for(int pos=1;pos<=board.getNumPlayers();pos++){
+            LightPlayer player=board.getByFinalPosition(pos);
             gameRanking.add(
-                    String.format(cliFormatter.getElem(LIST_ELEMENT),player.getFinalPosition(),player.getUsername())+
+                    String.format(cliFormatter.getElem(LIST_ELEMENT),pos,player.getUsername())+
                             String.format(cliFormatter.getElem(POINTS),uiMsg.getMessage(PLAYER_SCORE),player.getPoints())
             );
         }

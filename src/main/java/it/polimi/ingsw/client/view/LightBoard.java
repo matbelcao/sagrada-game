@@ -408,19 +408,22 @@ public class LightBoard extends Observable {
         latestPlacementsList=new ArrayList<>();
     }
 
-
     /**
-     * @return the list of players sorted by final position
+     * returns the player in the passed position
+     * @param pos the position
+     * @return the player in this position
      */
-    public List<LightPlayer> sortFinalPositions(){
-        List<LightPlayer> players2= new ArrayList<>();
-        for(int i=0;i<this.players.size();i++){
-            players2.add(this.players.get(i));
+    public LightPlayer getByFinalPosition(int pos){
+        if (pos<=0 || pos>numPlayers){
+            throw new IllegalArgumentException();
         }
 
-        players2.sort(Comparator.comparing(LightPlayer::getFinalPosition));
-
-        return players2;
+        for(int id=0;id<numPlayers;id++){
+            if(getPlayerById(id).getFinalPosition()==pos){
+                return getPlayerById(id);
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
 }

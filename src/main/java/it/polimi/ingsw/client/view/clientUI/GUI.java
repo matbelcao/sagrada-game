@@ -270,7 +270,7 @@ public class GUI extends Application implements ClientUI {
         }else if(client.getFsmState().equals(ClientFSMState.SCHEMA_CHOSEN)){
             p.getChildren().add(sceneCreator.buildWaitingForGameStartScene());
         }else if(client.getFsmState().equals(ClientFSMState.GAME_ENDED)){
-            BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(width,height, board.sortFinalPositions());
+            BorderPane gameEndedPane = sceneCreator.buildGameEndedPane(width,height, board);
             p.getChildren().add(gameEndedPane);
         }else{
             BorderPane frontPane = sceneCreator.buildFrontPane(width,height, board,client.getFsmState());

@@ -199,7 +199,7 @@ public class CLI implements ClientUI {
             case TOOL_CAN_CONTINUE:
                 break;
             case GAME_ENDED:
-                cliObjs.updateGameRanking(board.sortFinalPositions());
+                cliObjs.updateGameRanking(board);
                 printToScreen(cliObjs.printGameEndScreen());
                 break;
             default:

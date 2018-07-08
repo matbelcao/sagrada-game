@@ -535,18 +535,22 @@ public class Board {
                 p.calculateScore();
                 playerScores.add(new RankingEntry(p.getGameId(),p.getScore(),0));
             }else{
+                playerScores.add(new RankingEntry(p.getGameId(),p.getScore(),players.size()));
                 p.setFinalPosition(players.size());
             }
         }
 
         sortScores(playerScores);
 
+        System.out.println(playerScores.size() );
         for(int i=0; i<playerScores.size();i++){
+
             playerScores.get(i).setFinalPosition(i+1);
             getPlayerById(playerScores.get(i).getPlayerId()).setFinalPosition(i+1);
 
 
         }
+
 
         return playerScores;
     }
