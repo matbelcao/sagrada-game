@@ -36,6 +36,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,6 +66,7 @@ public class Client implements ClientInt {
     private static final String AUTH = "auth" ;
     public static final String CLIENT_CONF_XML = (new File(Client.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParentFile().getAbsolutePath()
             +File.separator+CONFIGURATION_FILE_NAME;
+    public static final int LOGIN_DELAY = 3000;
 
     private UserStatus userStatus;
     private final Object lockStatus=new Object();
@@ -87,7 +90,7 @@ public class Client implements ClientInt {
     private boolean readyWithBasicBoardElems;
     private final Object lockReady = new Object();
     private final List<Thread> updatesQueue;
-
+    private Timer loginTimer;
 
 
     /**
@@ -329,7 +332,7 @@ public class Client implements ClientInt {
                     }
                 }
 
-                logged = login();
+                    logged = login();
 
                 if(!logged) {
                     synchronized (lockCredentials) {
@@ -398,7 +401,19 @@ public class Client implements ClientInt {
      * @return true iff the login had a positive result
      */
     private boolean loginRMI() throws RemoteException, MalformedURLException, NotBoundException {
+        if(loginTimer==null) {
+            loginTimer = new Timer();
 
+            loginTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (lockStatus) {
+                        userStatus = UserStatus.CONNECTED;
+                    }
+                    disconnect();
+                }
+            }, LOGIN_DELAY);
+        }
         AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+":"+port+SLASH+AUTH);
         if(authenticator.authenticate(username,password)){
             //get the stub of the remote object
@@ -407,9 +422,14 @@ public class Client implements ClientInt {
             authenticator.setRemoteReference(new RMIClientObject(this),username);
             clientUI.updateConnectionOk();
             clientUI.updateLogin(true);
+
+            loginTimer.cancel();
+            loginTimer=null;
             return true;
         }
         clientUI.updateLogin(false);
+        loginTimer.cancel();
+        loginTimer=null;
         return false;
     }
 
