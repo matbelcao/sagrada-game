@@ -187,7 +187,6 @@ public class ServerFSM {
     }
 
     /**
-     * Returns true if it's the player's first turn
      * @return true if it's the player's first turn
      */
     public boolean isFirstTurn(){
@@ -218,11 +217,17 @@ public class ServerFSM {
         placeFrom=place;
     }
 
+    /**
+     * @return the current state
+     */
     public ServerState getCurState(){
         return curState;
     }
 
-    public int getUserPlayingId() {
+    /**
+     * @return the id of the user that is playing his turn now
+     */
+    int getUserPlayingId() {
         return userPlayingId;
     }
 }

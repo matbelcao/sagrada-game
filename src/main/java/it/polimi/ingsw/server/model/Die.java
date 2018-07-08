@@ -97,6 +97,10 @@ public class Die {
         this.setShade(randomGen.nextInt(MAX_SHADE)+1);
     }
 
+    /**
+     * this method swaps the die with the passed one
+     * @param die the die to swap this with
+     */
     public void swap(Die die){
         String tmpColor = this.getColor().toString();
         int tmpFace = this.getShade().toInt();
@@ -113,6 +117,10 @@ public class Die {
         this.lightDie = new LightDie(Shade.valueOf(shade),this.lightDie.getDieColor());
     }
 
+    /**
+     * sets a new color
+     * @param color the new color
+     */
     public void setColor(String color){this.lightDie=new LightDie(this.lightDie.getShade(),DieColor.valueOf(color));}
 
     /**
