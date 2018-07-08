@@ -61,10 +61,10 @@ class cliElemsTest {
             AnsiConsole.systemInstall();
         }
 
-        LightSchemaCard schema0 = SerializableServerUtil.toLightSchema(new SchemaCard(1, false));
-        LightSchemaCard schema1 = SerializableServerUtil.toLightSchema(new SchemaCard(2, false));
-        LightSchemaCard schema2 = SerializableServerUtil.toLightSchema(new SchemaCard(3, false));
-        LightSchemaCard schema3 = SerializableServerUtil.toLightSchema(new SchemaCard(4, false));
+        LightSchemaCard schema0 = SerializableServerUtil.toLightSchema(SchemaCard.getNewSchema(1, false));
+        LightSchemaCard schema1 = SerializableServerUtil.toLightSchema(SchemaCard.getNewSchema(2, false));
+        LightSchemaCard schema2 = SerializableServerUtil.toLightSchema(SchemaCard.getNewSchema(3, false));
+        LightSchemaCard schema3 = SerializableServerUtil.toLightSchema(SchemaCard.getNewSchema(4, false));
 
         List<LightDie> draftpool = new ArrayList<>();
 

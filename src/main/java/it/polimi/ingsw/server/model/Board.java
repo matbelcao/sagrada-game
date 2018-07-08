@@ -160,7 +160,7 @@ public class Board {
                 } while (draftedIndex.contains(id));
 
                 draftedIndex.add(id);
-                schemaDrafted[(p*NUM_PLAYER_SCHEMAS)+i+offset] = new SchemaCard(id, false);
+                schemaDrafted[(p*NUM_PLAYER_SCHEMAS)+i+offset] = SchemaCard.getNewSchema(id, false);
             }
         }
 
@@ -184,7 +184,7 @@ public class Board {
                     id=randomGen.nextInt(quantity*players.size()) + 1;
                 } while(draftedIndex.contains(id));
                 draftedIndex.add(id);
-                additionalSchemas.add(i,new SchemaCard(id,true));
+                additionalSchemas.add(i,SchemaCard.getNewSchema(id,true));
             }
 
             for(int p=0;p<players.size();p++){

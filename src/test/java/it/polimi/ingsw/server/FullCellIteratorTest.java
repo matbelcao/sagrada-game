@@ -27,7 +27,7 @@ class FullCellIteratorTest {
     @BeforeAll
     static void setUp(){
         //Aurorae Magnificus schema
-        schema = new SchemaCard(11,false);
+        schema = SchemaCard.getNewSchema(11,false);
         iter= (FullCellIterator) schema.iterator();
         int num=0;
         //SchemaCard's dice

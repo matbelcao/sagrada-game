@@ -31,7 +31,7 @@ class PlayerTest {
 
         board = new Board(users, additionalSchemas);
 
-        schema = new SchemaCard(1,false);
+        schema = SchemaCard.getNewSchema(1,false);
     }
 
     /**

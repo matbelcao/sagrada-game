@@ -94,7 +94,7 @@ class BoardTest {
     @Test
     void testInternalPlacement(){
         Board board=new Board(users1, additionalSchemas);
-        SchemaCard schema= new SchemaCard(1,false);
+        SchemaCard schema= SchemaCard.getNewSchema(1,false);
         Die die1=new Die("FOUR","RED");
         Die die2=new Die("ONE","YELLOW");
 
@@ -158,7 +158,7 @@ class BoardTest {
         assertTrue(board.chooseSchemaCard(users1.get(1),1));
 
         Player player1 = board.getPlayer(users1.get(1));
-        SchemaCard schema=new SchemaCard(1,false);
+        SchemaCard schema=SchemaCard.getNewSchema(1,false);
         player1.setSchema(schema);
         assertEquals(schema,board.getUserSchemaCard(player1.getGameId()));
     }
@@ -197,8 +197,8 @@ class BoardTest {
         //It's not possible to test the final score != 0 because the public objectives are random
         Board board=new Board(users2, additionalSchemas);
 
-        board.getPlayer(users2.get(0)).setSchema(new SchemaCard(1,false));
-        board.getPlayer(users2.get(1)).setSchema(new SchemaCard(5,false));
+        board.getPlayer(users2.get(0)).setSchema(SchemaCard.getNewSchema(1,false));
+        board.getPlayer(users2.get(1)).setSchema(SchemaCard.getNewSchema(5,false));
         List<RankingEntry> playerScores=board.gameRunningEnd(users2);
 
         assertEquals(4,board.getPlayer(users2.get(0)).getFavorTokens());

@@ -38,7 +38,7 @@ class PubObjectiveCardTest {
     @Test
     void testGetCardScore1() {
         //Aurorae Magnificus schema
-        SchemaCard schema = new SchemaCard(11,false);
+        SchemaCard schema = SchemaCard.getNewSchema(11,false);
 
         //PublicObjective cards
         PubObjectiveCard pub1 = new PubObjectiveCard(1,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");
@@ -103,7 +103,7 @@ class PubObjectiveCardTest {
     @Test
     void testGetCardScore2() {
         //Aurorae Magnificus schema
-        SchemaCard schema = new SchemaCard(11,false);
+        SchemaCard schema = SchemaCard.getNewSchema(11,false);
 
         //PublicObjective cards
         PubObjectiveCard pub1 = new PubObjectiveCard(1,MasterServer.XML_SOURCE+"PubObjectiveCard.xml");

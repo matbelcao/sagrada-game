@@ -58,11 +58,12 @@ public class SchemaCard implements Iterable<Cell>  {
      * Retrieves the SchemaCard(id) data from the xml file and instantiates it
      * @param id ToolCard id
      */
-    public SchemaCard(Cell [] [] cells,int id, String name,int favorTokens){
+    public SchemaCard(Cell [] [] cells,int id, String name,int favorTokens,boolean additionalSchema){
         cell = cells;
         this.id=id;
         this.name=name;
         this.favorTokens=favorTokens;
+        this.additionalSchema = additionalSchema;
         isFirstDie=true;
 
     }
@@ -72,15 +73,9 @@ public class SchemaCard implements Iterable<Cell>  {
      * @param additionalSchema true to enable a personalized SchemaCard instantiation
      * @param id the ID of the schema card to instantiate
      */
-    public SchemaCard(int id,boolean additionalSchema){
-        SchemaCard temp= parser(id,additionalSchema);
-        this.additionalSchema=additionalSchema;
-        assert temp != null;
-        cell = temp.cell;
-        this.id=id;
-        this.name=temp.name;
-        this.favorTokens=temp.favorTokens;
-        isFirstDie=true;
+    public static SchemaCard getNewSchema(int id,boolean additionalSchema){
+        return parser(id,additionalSchema);
+
     }
 
     /**
@@ -94,7 +89,7 @@ public class SchemaCard implements Iterable<Cell>  {
         SchemaCard schema;
         if(additionalSchema){
             try (InputStream xmlFile= new FileInputStream(EXTERNAL_ADDITIONAL_SCHEMAS_XML)){
-                schema=readSchema(id,xmlFile);
+                schema=readSchema(id,xmlFile,additionalSchema);
                 if(schema!=null){
                     return schema;
                 }
@@ -105,12 +100,12 @@ public class SchemaCard implements Iterable<Cell>  {
             ClassLoader classLoader = ClassLoader.getSystemClassLoader();
             InputStream xmlFile=classLoader.getResourceAsStream(XML_ADDITIONAL_SCHEMAS);
 
-            return readSchema(id,xmlFile);
+            return readSchema(id,xmlFile,additionalSchema);
 
         }else{
             ClassLoader classLoader = ClassLoader.getSystemClassLoader();
             InputStream xmlFile=classLoader.getResourceAsStream(XML_SCHEMAS);
-            return readSchema(id, xmlFile);
+            return readSchema(id, xmlFile,additionalSchema);
         }
 
     }
@@ -123,7 +118,7 @@ public class SchemaCard implements Iterable<Cell>  {
      * @return
      */
     @Nullable
-    private static SchemaCard readSchema(int id, InputStream xmlFile) {
+    private static SchemaCard readSchema(int id, InputStream xmlFile,boolean additionalSchema) {
         String name;
         int favorTokens;
         Cell[][] cells= new Cell[NUM_ROWS][NUM_COLS];
@@ -155,7 +150,7 @@ public class SchemaCard implements Iterable<Cell>  {
                 }
             }
 
-            return new SchemaCard(cells,id,name,favorTokens);
+            return new SchemaCard(cells,id,name,favorTokens,additionalSchema);
         }catch (SAXException | ParserConfigurationException | IOException e1) {
             Logger.getGlobal().log(Level.INFO, ERR_COULDN_T_LOAD_SCHEMA_CARD);
         }
@@ -440,7 +435,7 @@ public class SchemaCard implements Iterable<Cell>  {
      * @return the copy reference
      */
     SchemaCard cloneSchema(){
-        SchemaCard temp= new SchemaCard(this.id,additionalSchema);
+        SchemaCard temp= getNewSchema(this.id,additionalSchema);
         FullCellIterator iter= (FullCellIterator) iterator();
         Cell tempCell;
         while(iter.hasNext()){

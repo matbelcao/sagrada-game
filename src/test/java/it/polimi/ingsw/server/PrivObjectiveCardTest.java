@@ -38,7 +38,7 @@ class PrivObjectiveCardTest {
      */
     @Test
     void testGetCardScore(){
-        SchemaCard schema1 = new SchemaCard(1,false);
+        SchemaCard schema1 = SchemaCard.getNewSchema(1,false);
 
         //PrivateObjective cards
         PrivObjectiveCard priv1 = new PrivObjectiveCard(1);
