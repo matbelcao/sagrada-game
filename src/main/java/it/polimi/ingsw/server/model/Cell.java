@@ -51,7 +51,6 @@ public class Cell {
             return true;
         }
 
-        if(die==null){return false;}
         if(ignoreConstraint.equals(IgnoredConstraint.NONE)){
             if( this.constraint.isColorConstraint() && die.getColor().toString().equals(this.constraint.getColor().toString())){
                 return true;

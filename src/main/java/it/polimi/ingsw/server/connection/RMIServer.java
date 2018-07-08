@@ -180,6 +180,8 @@ public class RMIServer implements ServerConn {
                         Thread.sleep(PING_TIME);
                     } catch (InterruptedException e) {
                         Logger.getGlobal().log(Level.INFO,e.getMessage());
+                        // Restore interrupted state...
+                        Thread.currentThread().interrupt();
                     }
                 } catch (RemoteException e) {
                     disconnect();

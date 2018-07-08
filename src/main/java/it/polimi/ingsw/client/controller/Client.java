@@ -287,6 +287,8 @@ public class Client implements ClientInt {
                 } catch (InterruptedException e) {
                     Logger.getGlobal().log(Level.INFO,e.getMessage());
                     System.exit(1);
+                    // Restore interrupted state...
+                    Thread.currentThread().interrupt();
                 }
             }
             clientUI = GUI.getGUI();
@@ -465,6 +467,8 @@ public class Client implements ClientInt {
                         } catch (InterruptedException e) {
                             Logger.getGlobal().log(Level.INFO,e.getMessage());
                             System.exit(2);
+                            // Restore interrupted state...
+                            Thread.currentThread().interrupt();
                         }
                     }
                     updatesQueue.notifyAll();
@@ -475,6 +479,8 @@ public class Client implements ClientInt {
                     } catch (InterruptedException e) {
                         Logger.getGlobal().log(Level.INFO,e.getMessage());
                         System.exit(2);
+                        // Restore interrupted state...
+                        Thread.currentThread().interrupt();
                     }
                     updatesQueue.remove(0);
 
@@ -600,6 +606,8 @@ public class Client implements ClientInt {
                 } catch (InterruptedException e) {
                     Logger.getGlobal().log(Level.INFO,e.getMessage());
                     System.exit(1);
+                    // Restore interrupted state...
+                    Thread.currentThread().interrupt();
                 }
             }
         }
@@ -795,6 +803,8 @@ public class Client implements ClientInt {
         } catch (InterruptedException e) {
             Logger.getGlobal().log(Level.INFO,e.getMessage());
             System.exit(1);
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
         }
 
     }

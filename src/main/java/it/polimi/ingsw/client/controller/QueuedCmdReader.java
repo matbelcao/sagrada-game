@@ -23,6 +23,8 @@ public class QueuedCmdReader implements QueuedReader,CmdWriter {
                 } catch (InterruptedException e) {
                     Logger.getGlobal().log(Level.INFO,e.getMessage());
                     System.exit(2);
+                    // Restore interrupted state...
+                    Thread.currentThread().interrupt();
                 }
             }
 
@@ -59,6 +61,8 @@ public class QueuedCmdReader implements QueuedReader,CmdWriter {
                 } catch (InterruptedException e) {
                     Logger.getGlobal().log(Level.INFO,e.getMessage());
                     System.exit(2);
+                    // Restore interrupted state...
+                    Thread.currentThread().interrupt();
                 }
             }
             synchronized (lockQueue){

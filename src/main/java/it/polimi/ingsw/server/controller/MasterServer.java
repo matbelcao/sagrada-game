@@ -441,7 +441,7 @@ public class MasterServer{
                 }
             }
         }
-        return null;
+        throw new IllegalArgumentException(); //todo  //return null;
     }
 
     /**

@@ -604,6 +604,8 @@ public class SocketServer extends Thread implements ServerConn  {
                     Thread.sleep(PING_TIME);
                 } catch (InterruptedException e) {
                     Logger.getGlobal().log(Level.INFO,e.getMessage());
+                    // Restore interrupted state...
+                    Thread.currentThread().interrupt();
                 }
             }
         }).start();

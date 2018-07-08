@@ -442,6 +442,8 @@ public class RMIClient implements ClientConn{
                         Thread.sleep(PONG_TIME);
                     } catch (InterruptedException e) {
                         Logger.getGlobal().log(Level.INFO,e.getMessage());
+                        // Restore interrupted state...
+                        Thread.currentThread().interrupt();
                     }
                 } catch (RemoteException e) {
                     disconnect();

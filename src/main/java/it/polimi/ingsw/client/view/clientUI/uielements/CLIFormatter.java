@@ -12,6 +12,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CLIFormatter {
     private Element elemFile;
@@ -42,7 +44,7 @@ public class CLIFormatter {
             return (Element)doc.getElementsByTagName(CLI_COMP).item(0);
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.INFO,e.getMessage());
             return null;
         }
     }

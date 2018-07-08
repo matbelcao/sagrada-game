@@ -54,7 +54,8 @@ public class QueuedBufferedReader implements QueuedReader {
             }
         } catch (InterruptedException e) {
             Logger.getGlobal().log(Level.INFO,e.getMessage());
-
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
         }
         put();
     }
