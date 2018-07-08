@@ -1,5 +1,8 @@
 package it.polimi.ingsw.common.enums;
 
+/**
+ * This enum contains some information about the resources requested to the server. The elements are immutable.
+ */
 public enum GameStatus {
     INITIALIZING,
     TURN_RUN,

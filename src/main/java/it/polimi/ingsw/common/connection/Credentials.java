@@ -1,6 +1,9 @@
 package it.polimi.ingsw.common.connection;
 import java.util.Base64;
 
+/**
+ * Utility class used for hashing password and/or converting it into strings
+ */
 public class Credentials {
     private Credentials(){}
     private static final int HASH_SIZE=32;

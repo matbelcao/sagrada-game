@@ -1,5 +1,8 @@
 package it.polimi.ingsw.common.connection;
 
+/**
+ * Utility class containing the strings used during the Socket session
+ */
 public class SocketString {
     public static final String LOGIN="LOGIN";
     public static final String LOBBY="LOBBY";

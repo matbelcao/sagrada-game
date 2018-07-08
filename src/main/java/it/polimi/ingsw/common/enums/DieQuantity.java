@@ -1,5 +1,8 @@
 package it.polimi.ingsw.common.enums;
 
+/**
+ * Enum class tha represents the die quantity (for toolcard usage)
+ */
 public enum DieQuantity {
     ONE,
     TWO,

@@ -5,6 +5,9 @@ import it.polimi.ingsw.common.enums.Shade;
 
 import java.io.Serializable;
 
+/**
+ * This class is a lighter, serializable and immutable representation of a Constraint contained in a Cell
+ */
 public class LightConstraint implements CellContent,Serializable {
     private DieColor dieColor;
     private Shade shade;

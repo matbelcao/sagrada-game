@@ -3,6 +3,9 @@ package it.polimi.ingsw.client.view.clientui;
 import it.polimi.ingsw.common.connection.QueuedReader;
 import java.util.Observer;
 
+/**
+ * This interface offers the common methods (between CLI and GUI) used to send graphical updates to the View
+ */
 public interface ClientUI extends Observer {
 
     /**

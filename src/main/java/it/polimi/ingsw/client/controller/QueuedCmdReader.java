@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Reads commands from an input source and adds them to a FIFO queue
+ */
 public class QueuedCmdReader implements QueuedReader,CmdWriter {
     private final Object lockQueue=new Object();
     private final List<String> queue= new ArrayList<>();

@@ -2,6 +2,9 @@ package it.polimi.ingsw.common.serializables;
 
 import java.io.Serializable;
 
+/**
+ * This class is a lighter, serializable representation of a Player
+ */
 public class LightPlayer implements Serializable {
     private String username;
     private Integer playerId;
@@ -11,6 +14,11 @@ public class LightPlayer implements Serializable {
     private int favorTokens;
     private LightPlayerStatus status;
 
+    /**
+     * The LightPlayer constructor
+     * @param username the player's username
+     * @param playerId the player's ID
+     */
     public LightPlayer(String username, int playerId) {
         this.username = username;
         assert (playerId < 4 && playerId >= 0);

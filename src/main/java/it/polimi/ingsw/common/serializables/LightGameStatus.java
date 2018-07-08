@@ -2,6 +2,10 @@ package it.polimi.ingsw.common.serializables;
 
 import java.io.Serializable;
 
+/**
+ * This class is a lighter, serializable and immutable representation of the status of a match
+ * It contains data useful for correctly managing the user's reconnection to the server
+ */
 public class LightGameStatus implements Serializable {
     private int numPlayers;
     private int numRound;

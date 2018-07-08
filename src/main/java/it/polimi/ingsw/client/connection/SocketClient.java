@@ -60,6 +60,10 @@ public class SocketClient implements ClientConn {
         client.getClientUI().updateConnectionOk();
     }
 
+    /**
+     * Adds a string into the Socket buffer, the flushes it
+     * @param message the message to add in the buffer
+     */
     private void syncedSocketWrite(String message){
         synchronized (lockOutSocket){
 

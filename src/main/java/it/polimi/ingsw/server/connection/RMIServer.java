@@ -12,6 +12,9 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This class is the implementation of the RMI server-side connection methods
+ */
 public class RMIServer implements ServerConn {
     private RMIClientInt remoteObj; //client
     private User user;

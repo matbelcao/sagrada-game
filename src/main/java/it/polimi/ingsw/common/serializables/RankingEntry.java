@@ -2,6 +2,9 @@ package it.polimi.ingsw.common.serializables;
 
 import java.io.Serializable;
 
+/**
+ * This class is a lighter, serializable representation of final ranking
+ */
 public class RankingEntry implements Serializable {
     private int playerId;
     private int points;

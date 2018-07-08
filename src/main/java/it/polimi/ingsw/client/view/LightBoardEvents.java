@@ -1,5 +1,8 @@
 package it.polimi.ingsw.client.view;
 
+/**
+ * Thi utility class is used to identify changes in the lightboard objects
+ */
 public class LightBoardEvents {
 
     private LightBoardEvents(){}

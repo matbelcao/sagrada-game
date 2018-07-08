@@ -10,6 +10,9 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
+/**
+ * This class implements the remote object of the server to share with the client
+ */
 public class RMIServerObject extends UnicastRemoteObject implements RMIServerInt {
     private User user;
 

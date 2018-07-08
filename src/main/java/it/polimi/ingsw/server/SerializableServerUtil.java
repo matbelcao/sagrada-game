@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Utility class used to convert objects to lightObjects
+ */
 public class SerializableServerUtil {
 
     private SerializableServerUtil(){

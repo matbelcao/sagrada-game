@@ -1,5 +1,8 @@
 package it.polimi.ingsw.common.enums;
 
+/**
+ * This enum represents the turns during the match. The elements are immutable.
+ */
 public enum Turn {
     FIRST_TURN,
     SECOND_TURN,

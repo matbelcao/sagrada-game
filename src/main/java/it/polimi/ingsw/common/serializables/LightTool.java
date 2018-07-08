@@ -2,9 +2,13 @@ package it.polimi.ingsw.common.serializables;
 
 import java.io.Serializable;
 
+/**
+ * This class is a lighter, serializable representation of a ToolCard
+ */
 public class LightTool extends LightCard implements Serializable {
     private static final String IMG_SRC = "img/ToolCard/";
     private boolean used;
+
     public LightTool(String name, String description, int id, boolean used) {
         super(name, description, id);
         this.used=used;

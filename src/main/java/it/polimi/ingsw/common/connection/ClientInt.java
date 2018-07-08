@@ -7,6 +7,9 @@ import it.polimi.ingsw.common.serializables.RankingEntry;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * This interface offers a limited selection of client's methods to the server
+ */
 public interface ClientInt extends Serializable {
     ClientUI getClientUI();
     void addUpdateTask(Thread newUpdate);

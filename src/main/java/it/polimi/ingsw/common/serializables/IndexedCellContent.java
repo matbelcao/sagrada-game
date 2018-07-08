@@ -6,6 +6,9 @@ import it.polimi.ingsw.common.enums.Place;
 
 import java.io.Serializable;
 
+/**
+ * This class is a lighter, serializable and immutable representation of an Indexed Cell
+ */
 public class IndexedCellContent implements Serializable {
     private Place place;
     private int position;

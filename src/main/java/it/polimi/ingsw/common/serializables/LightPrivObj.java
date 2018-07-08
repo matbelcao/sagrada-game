@@ -4,6 +4,9 @@ import it.polimi.ingsw.common.enums.DieColor;
 
 import java.io.Serializable;
 
+/**
+ * This class is a lighter, serializable and immutable representation of a Private Object Card
+ */
 public class LightPrivObj extends LightCard implements Serializable {
     private DieColor dieColor;
     private static final String IMG_SRC="img/PrivObjectiveCard/";
