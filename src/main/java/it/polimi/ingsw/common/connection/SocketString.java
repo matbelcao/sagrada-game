@@ -83,4 +83,8 @@ public class SocketString {
     public static final String CONNECTION_ESTABLISHED = "Connection established!";
     public static final String LOGIN_OK = LOGIN+" "+OK;
     public static final String LOGIN_KO = LOGIN + " " + KO;
+
+    private SocketString(){
+        //Not implemented
+    }
 }

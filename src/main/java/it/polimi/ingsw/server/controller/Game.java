@@ -9,6 +9,8 @@ import it.polimi.ingsw.common.exceptions.IllegalActionException;
 import it.polimi.ingsw.server.model.iterators.RoundIterator;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class represents the controller of the game. It manages the rounds and the operations that the players make on the board
@@ -177,7 +179,7 @@ public class Game extends Thread implements Iterable  {
             board.getPlayer(u).quitMatch();
             if(u.getStatus().equals(UserStatus.PLAYING) && u.getGame().equals(this)) {
                 u.getServerConn().notifyGameEnd(ranking);
-                MasterServer.getMasterServer().printMessage("End match: "+u.getUsername());
+                MasterServer.printMessage("End match: "+u.getUsername());
             }
         }
         MasterServer.getMasterServer().endGame(this);
@@ -609,7 +611,7 @@ public class Game extends Thread implements Iterable  {
             try {
                 choose(user,0);
             } catch (IllegalActionException e) {
-                e.printStackTrace();
+                Logger.getGlobal().log(Level.INFO,e.getMessage());
             }
         }
 
@@ -636,7 +638,7 @@ public class Game extends Thread implements Iterable  {
             try {
                 choose(user, 0);
             } catch (IllegalActionException e) {
-                e.printStackTrace();
+                Logger.getGlobal().log(Level.INFO,e.getMessage());
             }
         }
 

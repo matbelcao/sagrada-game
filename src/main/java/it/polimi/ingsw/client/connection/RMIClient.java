@@ -421,7 +421,6 @@ public class RMIClient implements ClientConn{
         synchronized (lockPing) {
             if (connectionOk) {
                 connectionOk = false;
-                System.out.println(CONNECTION_TIMEOUT);
                 client.disconnect();
             }
             lockPing.notifyAll();

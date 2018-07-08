@@ -11,19 +11,18 @@ public enum Shade { // need to add address for png of the face
     FOUR(4,"\u2683"),
     FIVE(5,"\u2684"),
     SIX(6,"\u2685");
-    //NONE(-1,"\u25a0");
 
-    private final int shade;
+    private final int shadeDie;
     private final String utf;
     public static final String EMPTY = "\u25a0"; //to be used in color restrictions
 
     /**
      * Constructs the elements of the enum
-     * @param shade the shade of the die
+     * @param shadeDie the shade of the die
      * @param utf the utf code that renders the corresponding die face
      */
-    Shade(final int shade, final String utf){
-        this.shade=shade;
+    Shade(final int shadeDie, final String utf){
+        this.shadeDie=shadeDie;
         this.utf=utf;
     }
 
@@ -49,7 +48,7 @@ public enum Shade { // need to add address for png of the face
      */
 
     public int toInt(){
-        return this.shade;
+        return this.shadeDie;
     }
 
     /**
