@@ -110,7 +110,7 @@ public class DieContainer extends StackPane{
         double lineWidth = BORDER_LINE_TO_DIE * dieDim;
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        gc.setFill(lightDie.getDieColor().getFXColor());
+        gc.setFill(Color.web(lightDie.getDieColor().getFXColor()));
         gc.fillRoundRect(x+lineWidth, y+lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         drawSpots(gc, x, y, dieDim, lightDie.getShade().toInt());
     }
@@ -119,7 +119,7 @@ public class DieContainer extends StackPane{
         double lineWidth = BORDER_LINE_TO_DIE * dieDim;
         gc.setFill(Color.BLACK);
         gc.fillRoundRect(x, y, dieDim, dieDim, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
-        gc.setFill(dieColor.getFXColor());
+        gc.setFill(Color.web(dieColor.getFXColor()));
         gc.fillRoundRect(x + lineWidth, y + lineWidth, dieDim - 2 * lineWidth, dieDim - 2 * lineWidth, DIE_ARC_TO_DIM * dieDim, DIE_ARC_TO_DIM * dieDim);
         drawSpots(gc, x, y, dieDim, shade.toInt());
     }
@@ -141,7 +141,7 @@ public class DieContainer extends StackPane{
     }
 
     private void drawColorConstraint(DieColor dieColor, GraphicsContext gc, double x, double y, double cellDim) {
-        gc.setFill(dieColor.getFXConstraintColor());
+        gc.setFill(Color.web(dieColor.getFXConstraintColor()));
         gc.fillRect(x, y, cellDim, cellDim);
         gc.setStroke(Color.BLACK);
     }

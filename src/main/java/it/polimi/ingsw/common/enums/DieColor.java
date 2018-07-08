@@ -1,21 +1,19 @@
 package it.polimi.ingsw.common.enums;
-import javafx.scene.paint.Color;
-
 /**
  * This enum offers the set of colors (RED, GREEN, YELLOW, BLUE, PURPLE) needed to build the dice,
  * it also contains the ansi code to apply color to text in the CLI
  */
 public enum DieColor { //need to add png address combined with Shade's ones
-    RED("\u001B[91m",   Color.web("#bb331a"), Color.web("#ff433f")   ),
-    GREEN("\u001B[92m", Color.web("#579b55"), Color.web("#08ad3f")   ),
-    YELLOW("\u001B[93m",Color.web("#e3d107"), Color.web("#ffe100")   ),
-    BLUE("\u001B[94m",  Color.web("#5faab9"), Color.web("#0086fc")  ),
-    PURPLE("\u001B[95m",Color.web("#a5468c"), Color.web("#8226b7")   ),
-    NONE ("\u001B[0m",  Color.web("#222222"), Color.web("#222222")   ); //to be used (also) in shade restrictions
+    RED("\u001B[91m",   "#bb331a", "#ff433f"   ),
+    GREEN("\u001B[92m", "#579b55", "#08ad3f"   ),
+    YELLOW("\u001B[93m","#e3d107", "#ffe100"   ),
+    BLUE("\u001B[94m",  "#5faab9", "#0086fc"  ),
+    PURPLE("\u001B[95m","#a5468c", "#8226b7"   ),
+    NONE ("\u001B[0m",  "#222222", "#222222"   ); //to be used (also) in shade restrictions
 
     private final String utf;
-    private final Color constraintColor;
-    private final Color colorDie;
+    private final String constraintColor;
+    private final String colorDie;
 
     /**
      * Constructs the elements of the enum setting the corresponding ansi color code
@@ -23,7 +21,7 @@ public enum DieColor { //need to add png address combined with Shade's ones
      * @param constraintColor the java fx color for a constraint
      * @param colorDie the javafx color for a die
      */
-    DieColor(String utf, Color constraintColor, Color colorDie){
+    DieColor(String utf, String constraintColor, String colorDie){
         this.utf=utf;
         this.constraintColor = constraintColor;
         this.colorDie = colorDie;
@@ -53,11 +51,11 @@ public enum DieColor { //need to add png address combined with Shade's ones
         return false;
     }
 
-    public Color getFXConstraintColor(){
+    public String getFXConstraintColor(){
         return constraintColor;
     }
 
-    public Color getFXColor(){
+    public String getFXColor(){
         return colorDie;
     }
 }
