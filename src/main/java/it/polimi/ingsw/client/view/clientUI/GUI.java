@@ -51,6 +51,8 @@ public class GUI extends Application implements ClientUI {
     private SizeListener sizeListener;
     private static final Object lock = new Object();
     private Label messageToUser = new Label();
+    private boolean loginIsActive = true;
+
 
     /**
      * Getter of the instance of the gui
@@ -162,10 +164,12 @@ public class GUI extends Application implements ClientUI {
             });
 
             loginScene.getStylesheets().add("css/style.css");
-
             button.setOnAction(e -> {
-                client.setUsername(usernameField.getText());
-                client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
+                if(loginIsActive) {
+                        client.setUsername(usernameField.getText());
+                        client.setPassword(Credentials.hash(client.getUsername(), passwordField.getText().toCharArray()));
+                        loginIsActive = false;
+                    }
             });
 
             primaryStage.setTitle("Login");
@@ -203,6 +207,7 @@ public class GUI extends Application implements ClientUI {
             Platform.runLater(() -> {
                 messageToUser.setId("login-ko");
                 messageToUser.setText(" "+uimsg.getMessage(LOGIN_KO)+" ");
+                loginIsActive = true;
             });
         }
     }
