@@ -1,25 +1,26 @@
 package it.polimi.ingsw.server.connection;
 
 import it.polimi.ingsw.common.connection.rmi_interfaces.RMIClientInt;
-import it.polimi.ingsw.common.enums.UserStatus;
 import it.polimi.ingsw.common.serializables.GameEvent;
 import it.polimi.ingsw.common.serializables.RankingEntry;
-import it.polimi.ingsw.server.controller.MasterServer;
 import it.polimi.ingsw.server.controller.User;
 
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RMIServer implements ServerConn {
-    public static final String CONNECTION_TIMEOUT = "CONNECTION TIMEOUT!";
     private RMIClientInt remoteObj; //client
-        private User user;
-        private boolean connectionOk;
-        private final Object lockPing =new Object();
+    private User user;
+    private boolean connectionOk;
+    private final Object lockPing =new Object();
+    private Timer pingTimer;
 
-        private static final int PING_TIME=5000;
+    private static final int PING_TIME=2000;
+    private static final String CONNECTION_TIMEOUT = "CONNECTION TIMEOUT!";
 
 
     RMIServer(RMIClientInt remoteObj, User user){
@@ -153,34 +154,49 @@ public class RMIServer implements ServerConn {
     }
 
     /**
-     * Tests if the client is still connected
+     * If triggered, it means that the connection has broken
+     */
+    private class ConnectionTimeout extends TimerTask {
+        @Override
+        public void run(){
+            disconnect();
+        }
+    }
+
+    /**
+     * If triggered, it means that the connection has broken
+     */
+    private void disconnect(){
+        synchronized (lockPing) {
+            if (connectionOk) {
+                connectionOk = false;
+                lockPing.notifyAll();
+                System.out.println(CONNECTION_TIMEOUT);
+                user.disconnect();
+            }
+            lockPing.notifyAll();
+        }
+    }
+
+    /**
+     * This method provides the ping functionality for checking if the connection is still active
      */
     @Override
     public void ping(){
         new Thread(() -> {
-            boolean ping=true;
-            synchronized (lockPing) {
-                connectionOk = true;
-                lockPing.notifyAll();
-            }
-            while(ping && connectionOk) {
+            while(connectionOk) {
                 try {
-                    ping = remoteObj.ping();
+                    pingTimer = new Timer();
+                    pingTimer.schedule(new ConnectionTimeout(), PING_TIME);
+                    remoteObj.ping();
+                    pingTimer.cancel();
                     try {
                         Thread.sleep(PING_TIME);
                     } catch (InterruptedException e) {
                         Logger.getGlobal().log(Level.INFO,e.getMessage());
                     }
                 } catch (RemoteException e) {
-                    synchronized (lockPing) {
-                        if (user.getStatus() != UserStatus.DISCONNECTED) {
-                            MasterServer.getMasterServer().printMessage(CONNECTION_TIMEOUT);
-                            user.disconnect();
-                            connectionOk = false;
-                        }
-                        ping = false;
-                        lockPing.notifyAll();
-                    }
+                    disconnect();
                 }
             }
         }).start();

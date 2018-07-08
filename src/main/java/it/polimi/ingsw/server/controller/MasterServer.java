@@ -84,7 +84,6 @@ public class MasterServer{
      * it's made private as MasterServer is a Singleton
      */
     private MasterServer(String ipAddress, int portSocket,int portRMI, boolean additionalSchemas, int lobbyTime, int turnTime) {
-
         this.ipAddress = ipAddress;
         this.portSocket = portSocket;
         this.portRMI = portRMI;

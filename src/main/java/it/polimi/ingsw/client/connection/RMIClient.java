@@ -10,6 +10,8 @@ import it.polimi.ingsw.common.connection.rmi_interfaces.RMIServerInt;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,8 +23,10 @@ public class RMIClient implements ClientConn{
     private Client client;
     private boolean connectionOk;
     private final Object lockPing =new Object();
+    private Timer pingTimer;
 
-    private static final int PONG_TIME=5000;
+    private static final int PONG_TIME=2000;
+    private static final String CONNECTION_TIMEOUT = "CONNECTION TIMEOUT!";
 
     /**
      * instantiates the object
@@ -32,7 +36,7 @@ public class RMIClient implements ClientConn{
     public RMIClient(RMIServerInt remoteObj, Client client) {
         this.remoteObj = remoteObj;
         this.client = client;
-        connectionOk=false;
+        connectionOk=true;
     }
 
     /**
@@ -414,29 +418,49 @@ public class RMIClient implements ClientConn{
     }
 
     /**
+     * If triggered, it means that the connection has broken
+     */
+    private class ConnectionTimeout extends TimerTask {
+        @Override
+        public void run(){
+            disconnect();
+        }
+    }
+
+    /**
+     * If triggered, it means that the connection has broken
+     */
+    private void disconnect(){
+        synchronized (lockPing) {
+            if (connectionOk) {
+                connectionOk = false;
+                lockPing.notifyAll();
+                System.out.println(CONNECTION_TIMEOUT);
+                client.disconnect();
+            }
+            lockPing.notifyAll();
+        }
+    }
+
+    /**
      * This method provides the ping functionality for checking if the connection is still active
      */
     @Override
     public void pong(){
         new Thread(() -> {
-            boolean ping=true;
-            while(ping && client.isLogged()) {
+            while(connectionOk) {
                 try {
-                    ping = remoteObj.pong();
+                        pingTimer = new Timer();
+                        pingTimer.schedule(new ConnectionTimeout(), PONG_TIME);
+                        remoteObj.pong();
+                        pingTimer.cancel();
                     try {
                         Thread.sleep(PONG_TIME);
                     } catch (InterruptedException e) {
                         Logger.getGlobal().log(Level.INFO,e.getMessage());
                     }
                 } catch (RemoteException e) {
-                    synchronized (lockPing) {
-                        if (client.isLogged()) {
-                            client.disconnect();
-                            connectionOk = false;
-                            ping = false;
-                            lockPing.notifyAll();
-                        }
-                    }
+                    disconnect();
                 }
             }
         }).start();
