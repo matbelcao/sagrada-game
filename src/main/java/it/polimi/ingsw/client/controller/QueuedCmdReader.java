@@ -31,7 +31,7 @@ public class QueuedCmdReader implements QueuedReader,CmdWriter {
             temp = cmd;
             lockTemp.notifyAll();
         }
-        System.out.println("+++++++++++++++++++++++++command was" + cmd);
+        System.out.println("+++++++++++++++++++++++++command was" + cmd); // TODO: 08/07/2018  
     }
 
     @Override
