@@ -67,6 +67,10 @@
 
 }
 
+#connection-error{
+    -fx-font-size: 14 vmax;
+}
+
 #login-ko{
     -fx-text-fill: #ff3922;
     -fx-font-size: 14 vmax;

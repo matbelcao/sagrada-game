@@ -6,6 +6,9 @@ import it.polimi.ingsw.server.model.exceptions.NegativeTokensException;
 
 import java.util.List;
 
+/**
+ * this class represent the player in a game
+ */
 public class  Player {
     private final String username;
     private final int gameId;
@@ -19,6 +22,14 @@ public class  Player {
     private boolean quitted;
 
 
+    /**
+     * Instantiates a new Player.
+     *
+     * @param username      the username
+     * @param gameId        the game id
+     * @param board         the board
+     * @param privObjective the private objective
+     */
     public Player(String username,int gameId, Board board, PrivObjectiveCard privObjective){
         this.username = username;
         this.gameId=gameId;
@@ -164,10 +175,16 @@ public class  Player {
      */
     void setFinalPosition(int finalPosition) { this.finalPosition=finalPosition; }
 
+    /**
+     * Quit match
+     */
     public void quitMatch(){
         quitted=true;
     }
 
+    /**
+     * @return true if the player has quitted
+     */
     public boolean hasQuitted(){
         return quitted;
     }

@@ -356,7 +356,7 @@ public class Client implements ClientInt {
 
             startUICommandController();
             updateMessagesManager();
-            //ENABLE PONG
+
             clientConn.pong();
 
         } catch (IOException | NotBoundException e) {
@@ -398,7 +398,7 @@ public class Client implements ClientInt {
      * @return true iff the login had a positive result
      */
     private boolean loginRMI() throws RemoteException, MalformedURLException, NotBoundException {
-        //System.setProperty(RMI_HOSTNAME_PROPERTY,serverIP);
+
         AuthenticationInt authenticator=(AuthenticationInt) Naming.lookup(RMI_SLASHSLASH+serverIP+":"+port+SLASH+AUTH);
         if(authenticator.authenticate(username,password)){
             //get the stub of the remote object
@@ -726,7 +726,9 @@ public class Client implements ClientInt {
      * this method quits the player from the game, he/she will not be able to resume the game
      */
     public void quit(){
-        clientConn.quit();
+        if(!userStatus.equals(UserStatus.DISCONNECTED)) {
+            clientConn.quit();
+        }
         synchronized (lockStatus) {
             userStatus = UserStatus.DISCONNECTED;
             clientUI.updateConnectionClosed();
