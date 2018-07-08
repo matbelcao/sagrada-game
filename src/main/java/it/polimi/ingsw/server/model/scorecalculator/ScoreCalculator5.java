@@ -15,7 +15,8 @@ public class ScoreCalculator5 implements ScoreCalculator{
      */
     @Override
     public int calculateScore(SchemaCard schema){
-        int ones=0,twos=0;
+        int ones=0;
+        int twos=0;
         Die die;
         FullCellIterator diceIterator=(FullCellIterator)schema.iterator();
 

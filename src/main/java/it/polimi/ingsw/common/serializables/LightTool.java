@@ -3,15 +3,16 @@ package it.polimi.ingsw.common.serializables;
 import java.io.Serializable;
 
 public class LightTool extends LightCard implements Serializable {
-    private static  String imgSrc = "img/ToolCard/";
+    private static final String IMG_SRC = "img/ToolCard/";
     private boolean used;
     public LightTool(String name, String description, int id, boolean used) {
         super(name, description, id);
         this.used=used;
     }
 
+    @Override
     public String getImgSrc() {
-        return imgSrc+getId();
+        return IMG_SRC+getId();
     }
 
     public boolean isUsed() {

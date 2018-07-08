@@ -12,7 +12,7 @@ import java.util.List;
 import static it.polimi.ingsw.common.serializables.GameEvent.*;
 
 public class RMIClientObject extends UnicastRemoteObject implements RMIClientInt {
-    ClientInt client;
+    private ClientInt client;
     public RMIClientObject(ClientInt client) throws RemoteException {
         this.client = client;
     }

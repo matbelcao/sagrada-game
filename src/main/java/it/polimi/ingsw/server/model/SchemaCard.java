@@ -98,7 +98,9 @@ public class SchemaCard implements Iterable<Cell>  {
                 if(schema!=null){
                     return schema;
                 }
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {
+                //Not necessary
+            }
 
             ClassLoader classLoader = ClassLoader.getSystemClassLoader();
             InputStream xmlFile=classLoader.getResourceAsStream(XML_ADDITIONAL_SCHEMAS);
@@ -168,7 +170,9 @@ public class SchemaCard implements Iterable<Cell>  {
 
         try (InputStream xmlFile= new FileInputStream(EXTERNAL_ADDITIONAL_SCHEMAS_XML)){
             return countAdditionalSchemas(xmlFile);
-        } catch (IOException ignored){ }
+        } catch (IOException ignored){
+            //Not necessary
+        }
 
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         InputStream xmlFile= classLoader.getResourceAsStream(XML_ADDITIONAL_SCHEMAS);
@@ -389,9 +393,7 @@ public class SchemaCard implements Iterable<Cell>  {
      * @throws IllegalDieException iff the die can't be placed there
      */
     public void putDie (int index,Die die, IgnoredConstraint ignoreConstraint) throws IllegalDieException {
-        if(!ignoreConstraint.equals(IgnoredConstraint.FORCE)) {
-
-            if (!this.listPossiblePlacements(die, ignoreConstraint).contains(index))
+        if(!ignoreConstraint.equals(IgnoredConstraint.FORCE) && !this.listPossiblePlacements(die, ignoreConstraint).contains(index)){
                 throw new IllegalDieException(YOU_CAN_T_PLACE_THIS_DIE_HERE);
         }
         this.cell[index/NUM_COLS][index%NUM_COLS].setDie(die,ignoreConstraint);

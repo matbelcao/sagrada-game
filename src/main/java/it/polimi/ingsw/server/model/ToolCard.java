@@ -40,7 +40,7 @@ public class ToolCard extends Card {
     private static final String QUANTITYY = "quantity";
 
     private static final String WHEN = "when";
-    public static final String SOMETHING_WENT_WRONG = "Something went wrong....";
+    private static final String SOMETHING_WENT_WRONG = "Something went wrong....";
 
     private boolean used;
     private Place from;
@@ -112,7 +112,7 @@ public class ToolCard extends Card {
                 }
             }
         }catch (SAXException | ParserConfigurationException | IOException e1) {
-            e1.printStackTrace();
+            Logger.getGlobal().log(Level.INFO,e1.getMessage());
         }
     }
 
@@ -194,13 +194,17 @@ public class ToolCard extends Card {
             tmpDie=new Die(die.getShade(),die.getColor());
             tmpDie.increaseShade();
             modifiedDie.add(tmpDie);
-        } catch (IllegalShadeException ignored){ }
+        } catch (IllegalShadeException ignored){
+            //Not necessary
+        }
 
         try {
             tmpDie=new Die(die.getShade(),die.getColor());
             tmpDie.decreaseShade();
             modifiedDie.add(tmpDie);
-        } catch (IllegalShadeException ignored) { }
+        } catch (IllegalShadeException ignored) {
+            //Not necessary
+        }
 
         return SerializableServerUtil.toIndexedDieList(from,modifiedDie);
     }
