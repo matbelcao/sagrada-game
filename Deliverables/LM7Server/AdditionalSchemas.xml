@@ -80,7 +80,7 @@
             <data>RED</data>
         </constraint>
     </SchemaCard>
-    <SchemaCard id="1">
+    <SchemaCard id="3">
         <name>Personal - N</name>
         <token>4</token>
         <constraint>

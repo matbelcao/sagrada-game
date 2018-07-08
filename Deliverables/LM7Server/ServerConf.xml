@@ -3,7 +3,7 @@
 	<address>127.0.0.1</address>
 	<portRMI>1099</portRMI>
 	<portSocket>3000</portSocket>
-    <timeLobby>1</timeLobby>
+    <timeLobby>30</timeLobby>
     <timeGame>90</timeGame>
-	<additionalSchemas>true</additionalSchemas>
+	<additionalSchemas>false</additionalSchemas>
 </conf>
