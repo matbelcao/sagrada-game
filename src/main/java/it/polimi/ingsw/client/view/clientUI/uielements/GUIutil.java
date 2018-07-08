@@ -36,6 +36,9 @@ import static it.polimi.ingsw.client.view.clientUI.uielements.CustomGuiEvent.*;
 import static it.polimi.ingsw.client.view.clientUI.uielements.enums.UIMsg.*;
 import static javafx.geometry.Pos.*;
 
+/**
+ * implements the methods and stores the needed information for the gui rendering
+ */
 public class GUIutil {
     private final CmdWriter cmdWrite;
     private final UIMessages uimsg;

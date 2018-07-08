@@ -395,8 +395,9 @@ public class Game extends Thread implements Iterable  {
         for (User u:users){
             Player player=board.getPlayer(u);
             LightPlayer lightPlayer= SerializableServerUtil.toLightPlayer(player);
-            if(u.getStatus().equals(UserStatus.PLAYING) && !u.getGame().equals(this)) {
-                lightPlayer.setStatus(LightPlayerStatus.DISCONNECTED);
+            if((u.getStatus().equals(UserStatus.PLAYING) && !u.getGame().equals(this))
+                    || (board.getPlayer(u).hasQuitted())) {
+                lightPlayer.setStatus(LightPlayerStatus.QUITTED);
             }else{
                 lightPlayer.setStatus(LightPlayerStatus.toLightPlayerStatus(u.getStatus()));
             }
