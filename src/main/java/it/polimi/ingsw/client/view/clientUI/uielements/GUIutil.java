@@ -499,9 +499,9 @@ public class GUIutil {
     }
 
     /**
-     * Creates the buttons to end the turn and
-     * @param turnState //todo continue from here
-     * @return
+     * Creates a container for the buttons to end the turn and to revert a selection
+     * @param turnState the state of the ClientFSM
+     * @return the container with the buttons
      */
     private VBox buildMenuButtons(ClientFSMState turnState) {
         Button endTurn = new Button(END_TURN);
@@ -522,7 +522,12 @@ public class GUIutil {
         return buttonContainer;
     }
 
-
+    /**
+     * @param board a copy of the lightBoard
+     * @param cellDim the dimension of the cell in the game scene, used for scale when drawing the main game scene
+     * @param turnState the current state of the clientFSM
+     * @return a VBox containing the cards, the buttons to switch them and the information regarding who is playing and the current turn
+     */
     private VBox drawCards(LightBoard board, double cellDim, ClientFSMState turnState) {
         Button priv = new Button(uimsg.getMessage(UIMsg.PRIVATE_OBJ).replaceFirst(":",""));
         Button pub = new Button(uimsg.getMessage(UIMsg.PUBLIC_OBJ).replaceFirst(":",""));
@@ -591,6 +596,14 @@ public class GUIutil {
 
     }
 
+    /**
+     * Draws a single light card
+     * @param toolCard the light card to be drawn
+     * @param cardWidth the width of the card to be drawn
+     * @param cardHeight the height of the card to be drawn
+     * @param used the boolean that indicates weather the card has been used
+     * @return a group containing the drawn card and the favor token if the boolean used is set
+     */
     private Group drawCard(LightCard toolCard, double cardWidth, double cardHeight, boolean used) {
         Group tool = new Group();
         Rectangle imgRect = drawCard(toolCard,cardWidth,cardHeight);
@@ -610,6 +623,13 @@ public class GUIutil {
         return tool;
     }
 
+    /**
+     * Draws a single light card
+     * @param card the light card to be drawn
+     * @param imageWidth the width of the card to be drawn
+     * @param imageHeight the height of the card to be drawn
+     * @return a group containing the drawn card
+     */
     private Rectangle drawCard(LightCard card, double imageWidth, double imageHeight) {
         Image image = new Image(card.getImgSrc()+".png");
         Rectangle imgRect = new Rectangle(imageWidth, imageHeight);
@@ -618,7 +638,15 @@ public class GUIutil {
         return imgRect;
     }
 
-    public BorderPane buildSelectdPlayerPane(int showingPlayerId, double width, double height, LightBoard board){
+    /**
+     * builds the pane to be put in front of the main game pane containing the schema of one of the other players playing the game
+     * @param showingPlayerId the player whose schema is contained in the pane
+     * @param width the width of the scne containg the pane
+     * @param height the height of the scne containg the pane
+     * @param board a copy of the lightboard of the user
+     * @return builds the pane containing the schema of the other players playing the game
+     */
+    public BorderPane buildSelectedPlayerPane(int showingPlayerId, double width, double height, LightBoard board){
         BorderPane selectedPlayerPane = new BorderPane();
         HBox playersSelector = getPlayersStatusBar(board);
         Region spacer = new Region();
@@ -641,7 +669,11 @@ public class GUIutil {
         return selectedPlayerPane;
     }
 
-
+    /**
+     * Builds  a container containing the buttons to show other's players schemas
+     * @param board a copy of the lightboard
+     * @return a container containing the buttons that when are clicked launch the event to show other's players schemas
+     */
     private HBox getPlayersStatusBar(LightBoard board) {
         HBox playerSelector = new HBox();
         for(int playerId = 0; playerId<board.getNumPlayers();playerId++){
@@ -659,7 +691,14 @@ public class GUIutil {
         return playerSelector;
     }
 
-
+    /**
+     *
+     * @param playerId the player that gets shown after the button is pressed
+     * @param username the name of the user that gets shown after the button is pressed
+     * @param status the status in the game of the player associated to the button
+     * @param nowPlaying the player that is now playng
+     * @return  a button that when is clicked launch the event to show other's players schemas
+     */
     private Button getPlayerStatusButton(int playerId, String username, LightPlayerStatus status, int nowPlaying){
         Button player = new Button(username);
         if(playerId == nowPlaying ){
@@ -674,6 +713,13 @@ public class GUIutil {
         return player;
     }
 
+    /**
+     *
+     * @param width the width of the scne containg the pane
+     * @param height the height of the scne containg the pane
+     * @param board a copy of the lightboard of the user
+     * @return a pane containing a list of dice in the center that the user as to select
+     */
     public BorderPane bulidDieOptionPane(double width, double height, LightBoard board) {
         BorderPane selectDiePane = new BorderPane();
         HBox optionBox = new HBox();
@@ -698,6 +744,10 @@ public class GUIutil {
         return selectDiePane;
     }
 
+    /**
+     * @param roundTrackCells all the cells in the roundtrack
+     * @return an HBox containing the cells in the roundtrack
+     */
     private HBox buildRoundTrack(List<DieContainer> roundTrackCells) {
         HBox track = new HBox();
         track.setSpacing(ROUNDTRACK_SPACING);
@@ -706,6 +756,14 @@ public class GUIutil {
         return track;
     }
 
+    /**
+     * Creates a list of cells in the roundtrack, occupied by dice. If the roundtrack cell has more than one die inside, two dice are drawn in the cell and said cell gets a listener on mouse passed,
+     * that when activated fires the event to show all the dice in said cell
+     * @param roundTrack a list of all the dice in the track
+     * @param cellDim the dimension of the cell to be created
+     * @return a list of all the cells to be put on roundtrack
+     *
+     */
     private List<DieContainer> getRoundTrackCells(List<List<LightDie>> roundTrack, double cellDim) {
         ArrayList<DieContainer> roundTrackCells = new ArrayList<>();
         for (int i = 0; i < ROUNDTRACK_SIZE; i++) {
@@ -727,6 +785,12 @@ public class GUIutil {
         return roundTrackCells;
     }
 
+    /**
+     * Creates a list of cells containing all the cells of the schema, already populated with dice and constraints
+     * @param lightSchemaCard the light schema card whose cells are created
+     * @param cellDim the dimension of the cells
+     * @return a list of DieContainers corresponding to the cells in the schema
+     */
     private List<DieContainer> getSchemaCells(LightSchemaCard lightSchemaCard, double cellDim) {
         ArrayList<DieContainer> gridCells = new ArrayList<>();
         for (int i = 0; i < NUM_COLS * NUM_ROWS; i++) {
@@ -744,7 +808,13 @@ public class GUIutil {
         return gridCells;
     }
 
-
+    /**
+     *Groups a list of DieContainer in a schema and puts a black frame around it showing the number of favor tokens and the name of the player using that schema
+     * @param gridCells the cells of the schemas tha are grouped together
+     * @param favortokens the number of favor tokens remaing to the player
+     * @param userName the name of the user using the created schema
+     * @return a group containing the drawn schema
+     */
     private Group buildSchema(List<DieContainer> gridCells, int favortokens, String userName) {
         GridPane grid = schemaToGrid(gridCells);
         Label favorTokens = new Label(uimsg.getMessage(REMAINING_TOKENS)+" "+CLIUtils.replicate(CLIUtils.FAVOR,favortokens));
@@ -857,7 +927,7 @@ public class GUIutil {
     private void addSelectDieInSchemaAction(List<DieContainer> schemaCells, List<IndexedCellContent> latestDiceList) {
         for (IndexedCellContent activeCell : latestDiceList) {
             DieContainer cell = schemaCells.get(activeCell.getPosition());
-            cell.highlightBlue();
+            cell.highlightOrange();
             cell.setOnMouseClicked(e -> {synchronized (lockWrite) {cmdWrite.write(latestDiceList.indexOf(activeCell));}});
         }
     }

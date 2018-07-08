@@ -280,7 +280,7 @@ public class GUI extends Application implements ClientUI {
             p.getChildren().add(frontPane);
             //the pane listens for custom events to know when it has to which layer
             p.addEventFilter(MOUSE_ENTERED_MULTIPLE_DICE_CELL, e -> p.getChildren().setAll(frontPane, sceneCreator.showMultipleDiceRoundTrack(e.getEventObjectIndex(),width,height, board,turnState)));
-            p.addEventHandler(SELECTED_PLAYER, e -> p.getChildren().setAll(frontPane,sceneCreator.buildSelectdPlayerPane(e.getEventObjectIndex(),width, height, board)));
+            p.addEventHandler(SELECTED_PLAYER, e -> p.getChildren().setAll(frontPane,sceneCreator.buildSelectedPlayerPane(e.getEventObjectIndex(),width, height, board)));
             p.addEventHandler(MOUSE_EXITED_BACK_PANE, e->frontPane.toFront());
 
             if (client.getFsmState().equals(ClientFSMState.SELECT_DIE) && !latestOptionsList.isEmpty() && (latestOptionsList.get(0).equals(Actions.SET_SHADE) || latestOptionsList.get(0).equals(Actions.INCREASE_DECREASE))) {
