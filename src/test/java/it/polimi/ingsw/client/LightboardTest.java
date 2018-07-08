@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class LightboardTest {
     @Test
     void testSortRanking(){
@@ -27,5 +29,9 @@ public class LightboardTest {
         for(LightPlayer player: board.sortFinalPositions()){
             System.out.println(player.getUsername()+"  "+player.getFinalPosition());
         }
+
+        assertEquals(board.sortFinalPositions().get(0),players.get(1));
+        assertEquals(board.sortFinalPositions().get(1),players.get(2));
+        assertEquals(board.sortFinalPositions().get(2),players.get(0));
     }
 }

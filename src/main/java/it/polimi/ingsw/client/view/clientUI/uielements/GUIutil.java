@@ -612,7 +612,7 @@ public class GUIutil {
             GraphicsContext gc = favorToken.getGraphicsContext2D();
             gc.setFill(Color.TRANSPARENT);
             gc.fillRect(0,0,cardWidth,cardHeight);
-            gc.setFill(Color.BLUE);
+            gc.setFill(Color.BLACK);
             double radius = FAVOR_TO_TOOL_W*cardWidth;
             gc.fillOval(cardWidth-2*radius,radius,radius,radius);
             tool.getChildren().setAll(new StackPane(imgRect,favorToken));
