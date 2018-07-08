@@ -19,7 +19,7 @@ public class RMIServer implements ServerConn {
     private final Object lockPing =new Object();
     private Timer pingTimer;
 
-    private static final int PING_TIME=2000;
+    private static final int PING_TIME=3000;
     private static final String CONNECTION_TIMEOUT = "CONNECTION TIMEOUT!";
 
 

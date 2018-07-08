@@ -25,7 +25,7 @@ public class RMIClient implements ClientConn{
     private final Object lockPing =new Object();
     private Timer pingTimer;
 
-    private static final int PONG_TIME=2000;
+    private static final int PONG_TIME=3000;
     private static final String CONNECTION_TIMEOUT = "CONNECTION TIMEOUT!";
 
     /**

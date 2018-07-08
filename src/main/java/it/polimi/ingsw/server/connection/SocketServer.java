@@ -35,7 +35,7 @@ public class SocketServer extends Thread implements ServerConn  {
     private final Object lockPing;
     private boolean connectionOk;
     private final Object lockOutSocket;
-    private static final int PING_TIME=5000;
+    private static final int PING_TIME=3000;
 
     /**
      * This is the constructor of the class, it starts a thread linked to an open socket

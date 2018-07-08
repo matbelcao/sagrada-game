@@ -25,7 +25,7 @@ public class SocketClient implements ClientConn {
     private static final int COMMA_PARAMS_START=2;
     private static final int LIST_START=1;
     private static final int NUM_CARDS=3;
-    private static final int PONG_TIME=10000;
+    private static final int PONG_TIME=6000;
     private static final String INVALID_MESSAGE = "INVALID message";
     private static final String ERR_ERROR_WHILE_CLOSING_THE_SOCKET = "ERR: error while closing the socket";
 
